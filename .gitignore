@@ -1,0 +1,29 @@
+# Credentials & secrets
+.env
+private/
+
+# Node
+channels/node_modules/
+node_modules/
+
+# Claude Code local state — commit only shared config + memory index template
+.claude/*
+!.claude/settings.json
+!.claude/memory/
+.claude/memory/*
+!.claude/memory/MEMORY.md
+
+# MS Office skills are Anthropic-proprietary (see SETUP.md) — fetched at setup,
+# NEVER committed or redistributed. Each user installs from anthropics/skills.
+.claude/skills/
+
+# Local-only permission overrides (created during setup)
+.claude/settings.local.json
+
+# Launcher cache / logs
+.cache/
+.cache-*.log
+
+# OS / misc
+.DS_Store
+Thumbs.db

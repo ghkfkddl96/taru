@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "taru": {
+      "command": "node",
+      "args": ["channels/taru-discord.mjs"]
+    }
+  }
+}

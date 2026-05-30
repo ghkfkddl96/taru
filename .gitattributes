@@ -1,0 +1,21 @@
+# 기본: 텍스트는 LF로 정규화 (저장소 기준 LF)
+* text=auto eol=lf
+
+# 셸/노드 스크립트는 반드시 LF (CRLF면 mac/Linux bash 가 깨짐)
+*.sh   text eol=lf
+*.mjs  text eol=lf
+*.js   text eol=lf
+*.json text eol=lf
+*.lua  text eol=lf
+
+# Windows 전용 스크립트는 CRLF
+*.ps1  text eol=crlf
+*.bat  text eol=crlf
+
+# 바이너리 취급 (있을 경우)
+*.png  binary
+*.jpg  binary
+*.pdf  binary
+*.pptx binary
+*.docx binary
+*.xlsx binary
