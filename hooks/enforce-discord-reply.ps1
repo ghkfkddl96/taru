@@ -1,7 +1,11 @@
 # Stop hook — enforce Discord reply/dismiss (PowerShell variant of enforce-discord-reply.sh)
 $ErrorActionPreference = 'Stop'
-$inputRaw = [Console]::In.ReadToEnd()
-$data = $inputRaw | ConvertFrom-Json
+try { [Console]::OutputEncoding = [System.Text.Encoding]::UTF8 } catch {}
+try {
+  $reader = New-Object System.IO.StreamReader([Console]::OpenStandardInput(), [System.Text.Encoding]::UTF8)
+  $inputRaw = $reader.ReadToEnd(); $reader.Close()
+  $data = $inputRaw | ConvertFrom-Json
+} catch { exit 0 }
 
 if ($data.stop_hook_active) { exit 0 }
 $transcript = $data.transcript_path

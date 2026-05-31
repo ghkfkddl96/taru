@@ -29,12 +29,13 @@
 
 ## 할 수 있는 일 (Capabilities)
 
-### 📄 문서 만들기 — MS Office 스킬
-- **PowerPoint(.pptx)**: 발표자료·제안서·강의 슬라이드 생성·편집
-- **Word(.docx)**: 보고서·편지·공지·이력서 등 서식 있는 문서
-- **Excel(.xlsx)**: 표·계산·차트·데이터 정리
-- **PDF**: 생성, 읽기, 합치기/나누기, 양식 채우기
-- `/pptx` `/docx` `/xlsx` `/pdf` 스킬이 설치돼 있으면 자동으로 활용한다 (설치는 SETUP.md 참고)
+### 📄 문서 만들기 — MS Office (Node 라이브러리)
+- **PowerPoint(.pptx)**: 발표자료·제안서·강의 슬라이드 → `pptxgenjs`
+- **Word(.docx)**: 보고서·편지·공지·이력서 등 서식 있는 문서 → `docx`
+- **Excel(.xlsx)**: 표·계산·차트·데이터 정리 → `exceljs`
+- **PDF**: 생성·편집·양식 → `pdf-lib`
+- **Python·공식 office 스킬을 쓰지 않는다.** 위 Node 라이브러리(루트 `package.json`에 설치·검증됨)로 `.cache/`에 짧은 `.mjs`를 짜서 파일을 만든 뒤, `send_file_to_discord`로 전체 경로를 넘겨 전송한다.
+- 구체적 방법·검증된 스니펫: `docs/office-node.md` 참고.
 
 ### 🔎 정보·리서치
 - 웹 검색 → 핵심만 요약

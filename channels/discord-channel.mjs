@@ -6,11 +6,15 @@
  *   Discord msg → mcp.notification("notifications/claude/channel") → Claude Code
  *   Claude reply tool → channel.send() → Discord
  */
-import 'dotenv/config'
+import dotenv from 'dotenv'
+// override: true → .env 파일이 항상 우선. 런처가 옛날 환경변수를 물고 있어도
+// 재시작 시 .env 의 최신 값(예: DISCORD_HOME_CHANNEL)을 반영한다.
+dotenv.config({ override: true })
 import { Server } from '@modelcontextprotocol/sdk/server/index.js'
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { ListToolsRequestSchema, CallToolRequestSchema } from '@modelcontextprotocol/sdk/types.js'
 import { Client, GatewayIntentBits, Partials } from 'discord.js'
+import { makeFailover } from './failover.mjs'
 import fs from 'fs/promises'
 import path from 'path'
 import os from 'os'
@@ -30,6 +34,14 @@ import { z } from 'zod'
 export async function createChannel(config) {
   const { agentName, homeChannel, emoji, instructions, memoryEnvKey, memoryDefault } = config
 
+  // homeChannel은 쉼표(,)로 여러 채널을 받을 수 있다. 이 채널들은 멘션 없이도 듣는다.
+  const homeChannels = new Set(
+    String(homeChannel || '')
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean)
+  )
+
   const DISCORD_BOT_TOKEN = process.env.DISCORD_BOT_TOKEN
   if (!DISCORD_BOT_TOKEN) {
     process.stderr.write(`[${agentName.toUpperCase()}] ERROR: DISCORD_BOT_TOKEN required\n`)
@@ -38,6 +50,14 @@ export async function createChannel(config) {
 
   const LABEL = agentName.toUpperCase()
   const log = (...args) => process.stderr.write(`[${LABEL}] ${args.join(' ')}\n`)
+
+  // 멀티노드 failover (노트북=primary 우선, 미니컴=backup). 환경변수 없으면 동작 변화 없음.
+  const failover = makeFailover({
+    sharedDir: process.env.TARU_SHARED_DIR,
+    role: process.env.TARU_ROLE,
+    agentName,
+    log,
+  })
 
   const MEMORY_BASE = process.env[memoryEnvKey || 'PATRASCHE_MEMORY_DIR']
     ? (process.env[memoryEnvKey || 'PATRASCHE_MEMORY_DIR']).replace(/^~/, os.homedir())
@@ -110,7 +130,7 @@ export async function createChannel(config) {
     },
   )
 
-  let _lastChannelId = homeChannel || ''
+  let _lastChannelId = [...homeChannels][0] || ''
 
   const tools = [
     {
@@ -262,9 +282,12 @@ export async function createChannel(config) {
 
     const isDM = !message.guild
     const isMentioned = message.mentions.has(client.user)
-    const isHomeChannel = message.channel.id === homeChannel
+    const isHomeChannel = homeChannels.has(message.channel.id)
 
     if (!isDM && !isMentioned && !isHomeChannel) return
+
+    // failover 게이트: backup(미니컴)은 primary(노트북)가 살아있으면 응답하지 않는다.
+    if (!failover.shouldHandle()) { log('failover: skip (primary alive)'); return }
 
     let msgText = message.content.replace(/<@!?\d+>/g, '').trim().slice(0, 4000)
     const username = message.author.displayName || message.author.username
@@ -337,6 +360,7 @@ export async function createChannel(config) {
   log('MCP server started')
   await client.login(DISCORD_BOT_TOKEN)
   log(`Discord connected as ${client.user.tag}`)
+  failover.start()
 
   return { mcp, client }
 }
