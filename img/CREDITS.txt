@@ -1,0 +1,12 @@
+airport: "Rain Vortex Jewel Changi Airport.jpg" by kallerna (CC BY-SA 4.0) — Wikimedia Commons
+downtown: "Skylines of the Central Business District, Singapore at dusk.jpg" by Basile Morin (CC BY-SA 4.0) — Wikimedia Commons
+marina: "Supertree Grove, Gardens by the Bay, Singapore, at night - 20150530-01.jpg" by Smuconlaw. (CC BY-SA 4.0) — Wikimedia Commons
+garden: "Singapore Gardens by the Bay - Dome interior waterfall 20170306.jpg" by Jorge Cortell (CC BY 3.0) — Wikimedia Commons
+arab: "Sultan Mosque, Singapore.jpg" by Johan Jönsson (Julle) (CC BY-SA 4.0) — Wikimedia Commons
+merlion: "Singapore Merlion-at-Marina-Bay-01.jpg" by CEphoto, Uwe Aranas (CC BY-SA 3.0) — Wikimedia Commons
+
+[closeup]
+carrier: "SuitcaseCombinationLock.jpeg" by webandi from Pixabay (CC0)
+board: "Former flight departure board from Singapore Changi Airport.jpg" by Sgconlaw (CC BY-SA 4.0)
+locker: "Colorful coin locker (33381351421).jpg" by S.Brickman (CC BY-SA 2.0)
+locker2: "Coin-Locker Japan 1.jpg" by Mino mu (Public domain)
