@@ -43,3 +43,4 @@ songfa_ext: "Song Fa Bak Kut Teh, New Bridge Rd, Singapore (2023) 01.jpg" (CC BY
 
 [v11 북쑥 제공]
 arab(아랍스트리트 술탄모스크), downtown(중심지 거리): 북쑥 직접 제공(블로그 출처, 세로크롭·워터마크 제거). 개인 이벤트용.
+downtown(중심지 v2): 북쑥 제공 IMG_8611 파크로얄 녹색건물(webp→jpg 세로). 개인 이벤트용.

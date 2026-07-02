@@ -111,6 +111,10 @@
   #cuImgWrap{ position:relative; max-width:100%; max-height:56%; }
   #cuImg{ max-width:100%; max-height:100%; border-radius:16px; box-shadow:0 16px 46px rgba(0,0,0,.6);
     -webkit-user-drag:none; }
+  #cuPlaceholder{ display:none; flex-direction:column; align-items:center; justify-content:center;
+    width:270px; height:200px; border-radius:16px; background:rgba(255,255,255,.09);
+    border:2px dashed rgba(255,255,255,.42); color:#fff; font-size:46px; gap:12px; }
+  #cuPlaceholder span{ font-size:13.5px; color:rgba(255,255,255,.8); font-weight:600; }
   #cuLockBadge{ position:absolute; right:10px; bottom:10px; font-size:34px;
     filter:drop-shadow(0 3px 6px rgba(0,0,0,.6)); animation:floaty 3s ease-in-out infinite; }
   #cuCaption{ color:#fff; margin:16px 6px 4px; text-align:center; font-size:15px; line-height:1.55; white-space:pre-wrap; max-width:360px;}
@@ -183,7 +187,7 @@
   <!-- 클로즈업 뷰 -->
   <div id="closeup">
     <button id="cuClose" onclick="closeCloseup()">✕</button>
-    <div id="cuImgWrap"><img id="cuImg" alt=""><div id="cuLockBadge"></div></div>
+    <div id="cuImgWrap"><img id="cuImg" alt=""><div id="cuPlaceholder">📷<span>이미지 준비중 · 업데이트 예정</span></div><div id="cuLockBadge"></div></div>
     <div id="cuCaption"></div>
     <div id="cuActions"></div>
   </div>
@@ -486,15 +490,9 @@ function render(){
     if(h.showIf && !state.flags[h.showIf]) return;
     const el=document.createElement("div");
     el.style.left=h.x+"%"; el.style.top=h.y+"%";
-    if(h.closeup){
-      // 반짝이는 영역 (요소 크기만큼 넓게 / ?hint=off 면 반짝임만 숨김)
-      el.className="spot-dot"+(state.done[id]?" solved":"")+(HINTS?"":" nohint");
-      if(h.w) el.style.width=h.w+"%"; if(h.h) el.style.height=h.h+"%";
-    } else {
-      // 기존 이모지 버튼
-      el.className="hotspot tappable floaty";
-      el.style.animationDelay=(i*0.25)+"s"; el.textContent=h.emoji;
-    }
+    // 모든 요소를 '반짝이는 영역'으로 통일. DEBUG일 때만 빛남(일반은 투명 클릭영역=직접 찾기)
+    el.className="spot-dot"+(state.done[id]?" solved":"")+(DEBUG?"":" nohint");
+    if(h.w) el.style.width=h.w+"%"; if(h.h) el.style.height=h.h+"%";
     el.title=h.label||"";
     el.onclick=()=>tap(h,id);
     wrap.appendChild(el);
@@ -558,28 +556,35 @@ function showTransition(tr, done){
   }
 }
 
-/* ---- 탭 ---- */
+/* ---- 탭 ---- 모든 요소를 클로즈업(팝업)으로 통일 ---- */
 function tap(h,id){
-  if(h.closeup){ openCloseup(h,id); return; }
-  // 기존 이모지형
-  if(h.lock){ const L=h.lock; if(h.needFlag && !state.flags[h.needFlag]){ toast("먼저 다른 걸 해결해야 할 것 같아."); return; }
-    openLock(L, ()=>{ if(L.give)give(L.give); if(L.setFlag)state.flags[L.setFlag]=true; if(h.once)state.done[id]=true;
-      showModal("🎉","열렸다!",L.success||"자물쇠가 풀렸다!"); render(); }); return; }
-  if(h.give){ give(h.give); if(h.setFlag) state.flags[h.setFlag]=true; if(h.once) state.done[id]=true;
-    const f=h.found||{e:ITEMS[h.give]?.emoji||"🎁",t:"뭔가 주웠다!"}; showModal(f.e,"획득!",f.t); render(); return; }
-  if(h.clue){ showModal(h.clue.e,h.label||"단서",h.clue.t); return; }
+  const cu = h.closeup || toCloseup(h);
+  if(cu.action && cu.action.type==="numlock" && h.needFlag && !state.flags[h.needFlag]){
+    toast("먼저 다른 걸 해결해야 할 것 같아."); return; }
+  openCloseup(cu, h, id);
+}
+// 이모지형(clue/lock/give) 요소를 클로즈업 형태로 자동 변환. img 없으면 placeholder로 뜸.
+function toCloseup(h){
+  if(h.lock) return {img:h.img, badge:h.emoji||"🔒", caption:"🔒 "+(h.label||"자물쇠")+"\n번호를 맞춰보자.",
+    action:Object.assign({type:"numlock"}, h.lock)};
+  if(h.give) return {img:h.img, badge:h.emoji, caption:(h.found&&h.found.t)||"뭔가 있다!",
+    action:{type:"give", give:h.give, success:(h.found&&h.found.t)||"획득!"}};
+  return {img:h.img, badge:h.emoji, caption:(h.clue&&h.clue.t)||(h.label||""), action:{type:"clue"}};
 }
 
 /* ---- 클로즈업 뷰 ---- */
 let cuCtx=null;
-function openCloseup(h,id){
-  cuCtx={h,id};
-  const c=h.closeup, solved=!!state.done[id];
-  $("#cuImg").src=c.img;
-  $("#cuLockBadge").textContent = solved ? "✅" : (c.badge||"");
-  $("#cuCaption").textContent = c.caption||"";
+function openCloseup(cu, h, id){
+  cuCtx={cu,h,id};
+  const solved=!!state.done[id];
+  const hasImg = cu.img && cu.img!=="TODO";
+  const im=$("#cuImg"), ph=$("#cuPlaceholder");
+  if(hasImg){ im.src=cu.img; im.style.display=""; ph.style.display="none"; }
+  else { im.removeAttribute("src"); im.style.display="none"; ph.style.display="flex"; }  // 팝업 이미지 준비중
+  $("#cuLockBadge").textContent = solved ? "✅" : (cu.badge||"");
+  $("#cuCaption").textContent = cu.caption||"";
   const acts=$("#cuActions"); acts.innerHTML="";
-  const a=c.action||{type:"clue"};
+  const a=cu.action||{type:"clue"};
   if(solved){
     // 이미 해결됨
   } else if(a.type==="numlock"){
