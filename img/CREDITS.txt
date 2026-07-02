@@ -25,3 +25,9 @@ bakkutteh: "Song Fa Bak Kut Teh, New Bridge Rd, Singapore (2023) 01.jpg" by Chai
 [v6]
 trolley: "Kuiers op Schiphol verdwenen, door Schiphol beschikbaar gestelde bagagekarretjes, Bestanddeelnr 928-6165.jpg" by Rob Mieremet / Anefo (CC0)
 infodesk: "Tourist Service Center, Taoyuan Airport Terminal 2 20180512.jpg" by Solomon203 (CC BY-SA 4.0)
+
+[v7 사진]
+bakkutteh(호커센터 실내): Newton Food Centre food stalls (CC BY-SA 4.0) - Wikimedia
+bkt음식팝업: Song Fa Bak Kut Teh, New Bridge Rd 03~06 (CC BY-SA) - Wikimedia
+airport(세로크롭): Changi Airport Interior February 2023 (CC BY 2.0) - Wikimedia
+police(세로크롭): Old Hill Street Police Station in Singapore (CC BY-SA) - Wikimedia

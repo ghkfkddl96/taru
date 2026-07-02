@@ -207,22 +207,22 @@ const MAPS = {
     name:"창이공항 · 주얼", sub:"반짝이는 곳을 눌러 자세히 봐", photo:"img/airport.jpg",
     // 정답(answer)은 지금은 임시값. 실제 여행에서 발견한 값으로 나중에 교체.
     hotspots:[
-      { x:15,y:6, w:26,h:9, label:"출발 전광판", closeup:{
+      { x:50,y:11, w:74,h:12, label:"출발 안내판", closeup:{
         img:"img/closeup/board.jpg", badge:"🔎",
-        caption:"✈️ 출발 전광판.\n우리 비행기는 '수라바야(SURABAYA)'행!\n편명은 SQ930 — 뒤 3자리가 캐리어 번호일지도?",
+        caption:"✈️ 출발 안내 전광판.\n우리 비행기는 '수라바야(SURABAYA)'행!\n편명은 SQ930 — 뒤 3자리가 캐리어 번호일지도?",
         action:{type:"clue"} }},
-      { x:31,y:16, w:18,h:10, label:"안내데스크", closeup:{
+      { x:32,y:58, w:46,h:14, label:"체크인 카운터", closeup:{
         img:"img/closeup/infodesk.jpg", badge:"🗺️",
-        caption:"ℹ️ 공항 안내데스크.\n친절한 직원이 여행 지도를 건네줬다.",
+        caption:"ℹ️ 안내 카운터.\n친절한 직원이 여행 지도를 건네줬다.",
         action:{type:"give", give:["map"], success:"여행 지도를 얻었다! 🗺️"} }},
-      { x:48,y:52, w:56,h:24, label:"캐리어", closeup:{
+      { x:66,y:62, w:28,h:16, label:"캐리어", closeup:{
         img:"img/closeup/carrier.jpg", badge:"🔢",
-        caption:"🧳 수하물 벨트에서 찾은 우리 가방.\n3자리 번호 자물쇠가 걸려 있어.",
+        caption:"🧳 짐칸에서 찾은 우리 가방.\n3자리 번호 자물쇠가 걸려 있어.",
         action:{type:"numlock", len:3, answer:"930",
           hint:"전광판에서 본 우리 항공편(SQ930) 뒤 3자리",
           success:"딸깍! 가방이 열리고 사물함 열쇠가 나왔다. 🔑",
           give:["key"], setFlag:"gotKey"} }},
-      { x:84,y:44, w:28,h:18, label:"사물함", closeup:{
+      { x:88,y:60, w:22,h:16, label:"사물함", closeup:{
         img:"img/closeup/locker.jpg", badge:"🔑",
         caption:"🔐 열쇠로 잠긴 사물함.\n손잡이에 열쇠 구멍이 보여.",
         action:{type:"keylock", needItem:"key",
@@ -307,11 +307,20 @@ const MAPS = {
   },
 
   bakkutteh:{
-    name:"송파 바쿠테", sub:"1969년부터 이어온 육골차 맛집", photo:"img/bakkutteh.jpg",
+    name:"바쿠테 식당", sub:"현지 호커센터에서 맛보는 육골차 · 테이블을 눌러봐", photo:"img/bakkutteh.jpg",
     hotspots:[
-      {x:52,y:80,emoji:"🍲",label:"바쿠테 한 그릇",
-        clue:{e:"🍲",t:"돼지갈비를 후추 육수에 푹 끓인 바쿠테(肉骨茶).\n뜨끈하게 한 그릇, 여행 중 든든한 보양식!"}},
-      {x:40,y:52,emoji:"🏮",label:"송파 간판", clue:{e:"🏮",t:"SONG FA bak kut teh · SINCE 1969.\n싱가포르 바쿠테 원조격 맛집이야."}},
+      { x:16,y:72, w:30,h:15, label:"우리 테이블", closeup:{
+        img:"img/closeup/bkt_ribs.jpg", badge:"🍖",
+        caption:"🍖 송파 바쿠테 대표! 부드러운 돼지고기 간장조림.\n밥에 얹어 먹으면 최고야.", action:{type:"clue"} }},
+      { x:20,y:90, w:34,h:12, label:"앞 테이블", closeup:{
+        img:"img/closeup/bkt_shrimp.jpg", badge:"🍤",
+        caption:"🍤 새우롤 튀김.\n겉은 바삭, 속은 쫄깃한 별미!", action:{type:"clue"} }},
+      { x:44,y:70, w:22,h:14, label:"가운데 자리", closeup:{
+        img:"img/closeup/bkt_soup.jpg", badge:"🍲",
+        caption:"🍲 후추 육수에 끓인 갈비탕 '바쿠테(肉骨茶)'.\n뜨끈하게 속을 달래줘.", action:{type:"clue"} }},
+      { x:80,y:44, w:30,h:20, label:"음식 스톨", closeup:{
+        img:"img/closeup/bkt_side.jpg", badge:"🥢",
+        caption:"🥢 곁들임 반찬과 차(茶).\n현지인처럼 주문해서 즐겨봐.", action:{type:"clue"} }},
     ],
     exits:[{to:"police", label:"경찰서로", emoji:"🚔", dir:"left"}]
   },
