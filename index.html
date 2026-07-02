@@ -86,7 +86,11 @@
   .navBtn svg{ width:15px; height:15px; flex:0 0 auto; }
 
   /* 인벤토리 */
-  #invWrap{flex:0 0 auto; padding:8px 12px 14px;}
+  /* z-index 29 = 클로즈업 팝업(28)보다 위 → 팝업 열려도 가방이 밝게 보이고 선택 가능 */
+  #invWrap{flex:0 0 auto; padding:8px 12px 14px; position:relative; z-index:29;}
+  /* 팝업 열렸을 때 가방이 어두운 배경 위에 떠 보이도록 살짝 강조 */
+  #app.cuOpen #invWrap #inventory{ box-shadow:0 0 0 2px rgba(255,255,255,.25), 0 -6px 22px rgba(0,0,0,.45); }
+  #app.cuOpen #invLabel{ color:#fff; text-shadow:0 1px 3px rgba(0,0,0,.6); }
   #invLabel{font-size:11px; color:#b3a4bd; margin:0 4px 5px; font-weight:700;}
   #inventory{ display:flex; gap:8px; overflow-x:auto; padding:7px 8px 20px; min-height:70px;
     background:#fff; border-radius:16px; box-shadow:var(--shadow); }
@@ -690,8 +694,9 @@ function openCloseup(cu, h, id){
     acts.appendChild(b);
   }
   $("#closeup").style.display="flex";
+  $("#app").classList.add("cuOpen");   // 가방을 팝업 위로 강조
 }
-function closeCloseup(){ $("#closeup").style.display="none"; cuCtx=null; }
+function closeCloseup(){ $("#closeup").style.display="none"; $("#app").classList.remove("cuOpen"); cuCtx=null; }
 function solveCloseup(a){
   const {id}=cuCtx;
   if(a.give) give(a.give);
