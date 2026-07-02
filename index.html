@@ -41,17 +41,18 @@
   .bgphoto{ display:block; max-width:100%; max-height:100%; width:auto; height:auto;
     -webkit-user-drag:none; user-select:none; }
 
-  /* 반짝이는 포인트 (테두리 없이 '여기 뭔가 있다') */
-  .spot-dot{ position:absolute; transform:translate(-50%,-50%); width:42px; height:42px;
-    border-radius:50%; cursor:pointer; z-index:3; }
-  .spot-dot::before{ content:""; position:absolute; inset:0; border-radius:50%;
-    background:radial-gradient(circle at 50% 50%, rgba(255,255,255,.85), rgba(255,240,180,.35) 45%, rgba(255,255,255,0) 72%);
-    animation:twinkle 2.2s ease-in-out infinite; }
-  .spot-dot::after{ content:""; position:absolute; left:50%; top:50%; width:7px; height:7px; margin:-3.5px;
-    border-radius:50%; background:#fff; box-shadow:0 0 8px 2px rgba(255,255,255,.9); }
-  .spot-dot.solved::before,.spot-dot.solved::after{ animation:none; opacity:.25; }
-  .spot-dot.nohint::before,.spot-dot.nohint::after{ display:none; }  /* ?hint=off : 반짝임 끄고 직접 찾기 */
-  @keyframes twinkle{ 0%,100%{opacity:.35; transform:scale(.85)} 50%{opacity:1; transform:scale(1.12)} }
+  /* 반짝이는 '영역' (테두리 없이, 요소 크기만큼 넓게) */
+  .spot-dot{ position:absolute; transform:translate(-50%,-50%); width:17%; height:12%;
+    border-radius:18px; cursor:pointer; z-index:3; }
+  .spot-dot::before{ content:""; position:absolute; inset:0; border-radius:inherit;
+    background:radial-gradient(ellipse at center, rgba(255,255,255,.6), rgba(255,107,157,.32) 46%, rgba(255,107,157,0) 74%);
+    animation:breathe 2.4s ease-in-out infinite; }
+  .spot-dot::after{ content:""; position:absolute; inset:6%; border-radius:inherit;
+    box-shadow:0 0 0 2px rgba(255,255,255,.55); animation:ring 2.4s ease-in-out infinite; }
+  .spot-dot.solved::before,.spot-dot.solved::after{ animation:none; opacity:.15; }
+  .spot-dot.nohint::before,.spot-dot.nohint::after{ display:none; }  /* ?hint=off : 반짝임 끄고 직접 찾기 (클릭영역은 유지) */
+  @keyframes breathe{ 0%,100%{opacity:.45; transform:scale(.96)} 50%{opacity:1; transform:scale(1.04)} }
+  @keyframes ring{ 0%,100%{opacity:.2} 50%{opacity:.75} }
 
   /* 기존 동그란 이모지 버튼 (아직 사진 안 받은 방) */
   .hotspot{ position:absolute; transform:translate(-50%,-50%);
@@ -197,18 +198,18 @@ const MAPS = {
   airport:{
     name:"창이공항 · 주얼", sub:"반짝이는 곳을 눌러 자세히 봐", photo:"img/airport.jpg",
     hotspots:[
-      { x:52,y:30, label:"출발 전광판", closeup:{
+      { x:50,y:20, w:52,h:15, label:"출발 전광판", closeup:{
         img:"img/closeup/board.jpg", badge:"🔎",
         caption:"✈️ 출발 전광판.\n우리 비행기는 '수라바야(SURABAYA)'행!\n편명은 SQ930 — 뒤 3자리가 캐리어 번호일지도?",
         action:{type:"clue"} }},
-      { x:80,y:60, label:"캐리어", closeup:{
+      { x:34,y:52, w:44,h:20, label:"캐리어", closeup:{
         img:"img/closeup/carrier.jpg", badge:"🔢",
         caption:"🧳 여행가방의 3자리 번호 자물쇠.",
         action:{type:"numlock", len:3, answer:"930",
           hint:"전광판에서 본 우리 항공편(SQ930) 뒤 3자리",
           success:"딸깍! 가방이 열리고 사물함 열쇠가 나왔다. 🔑",
           give:["key"], setFlag:"gotKey"} }},
-      { x:22,y:62, label:"사물함", closeup:{
+      { x:70,y:74, w:44,h:20, label:"사물함", closeup:{
         img:"img/closeup/locker.jpg", badge:"🔑",
         caption:"🔐 열쇠로 잠긴 사물함.\n손잡이에 열쇠 구멍이 보여.",
         action:{type:"keylock", needItem:"key",
@@ -235,10 +236,45 @@ const MAPS = {
       {to:"garden", label:"실내 식물원", emoji:"🌿", dir:"right"},
       {to:"arab",   label:"아랍 스트리트", emoji:"🕌", dir:"right"},
       {to:"merlion",label:"머라이언 파크", emoji:"🦁", dir:"right"},
+      {to:"sentosa",label:"센토사", emoji:"🏖️", dir:"right"},
+      {to:"laupasat",label:"라우파삿", emoji:"🍢", dir:"right"},
       {to:"__ending", label:"우리의 호텔", emoji:"💝", dir:"right",
         requireFlags:["m_done","g_done","a_done","ml_done"],
         lockHint:"열쇠조각 4개를 다 모아야 열려! (네 명소를 모두 클리어)"},
     ]
+  },
+
+  sentosa:{
+    name:"센토사", sub:"해변과 케이블카의 섬", photo:"img/sentosa.jpg",
+    hotspots:[
+      {x:50,y:28,emoji:"🏝️",label:"팔라완 비치",
+        clue:{e:"🏝️",t:"아시아 최남단 표지판이 있는 다리.\n여기서 케이블카를 타면 유니버설로 갈 수 있어."}},
+      {x:30,y:62,emoji:"🚡",label:"케이블카",
+        clue:{e:"🚡",t:"섬을 잇는 케이블카.\n오른쪽 길로 가면 유니버설 스튜디오!"}},
+    ],
+    exits:[
+      {to:"downtown", label:"중심지로", emoji:"🏙️", dir:"left"},
+      {to:"universal", label:"유니버설", emoji:"🎢", dir:"right"},
+    ]
+  },
+
+  universal:{
+    name:"유니버설 스튜디오", sub:"지구본 앞 놀이공원", photo:"img/universal.jpg",
+    hotspots:[
+      {x:50,y:34,emoji:"🌐",label:"유니버설 지구본",
+        clue:{e:"🌐",t:"빙글빙글 도는 거대한 지구본!\n둘이 인증샷 찍기 딱 좋은 곳."}},
+    ],
+    exits:[{to:"sentosa", label:"센토사로", emoji:"🏖️", dir:"left"}]
+  },
+
+  laupasat:{
+    name:"라우파삿", sub:"옛 시장 호커센터", photo:"img/laupasat.jpg",
+    hotspots:[
+      {x:50,y:40,emoji:"🕰️",label:"시계탑",
+        clue:{e:"🕰️",t:"빅토리아풍 철제 시계탑이 상징인 옛 시장.\n저녁이면 사테(꼬치) 노점 거리가 열려."}},
+      {x:30,y:66,emoji:"🍢",label:"사테 거리", clue:{e:"🍢",t:"숯불 사테 냄새가 솔솔~ 여행 중 야식으로 최고!"}},
+    ],
+    exits:[{to:"downtown", label:"중심지로", emoji:"🏙️", dir:"left"}]
   },
 
   marina:{
@@ -349,8 +385,9 @@ function render(){
     const el=document.createElement("div");
     el.style.left=h.x+"%"; el.style.top=h.y+"%";
     if(h.closeup){
-      // 반짝이는 포인트 (?hint=off 면 반짝임 숨기고 투명 클릭영역만)
+      // 반짝이는 영역 (요소 크기만큼 넓게 / ?hint=off 면 반짝임만 숨김)
       el.className="spot-dot"+(state.done[id]?" solved":"")+(HINTS?"":" nohint");
+      if(h.w) el.style.width=h.w+"%"; if(h.h) el.style.height=h.h+"%";
     } else {
       // 기존 이모지 버튼
       el.className="hotspot tappable floaty";

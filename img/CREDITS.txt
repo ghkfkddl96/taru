@@ -10,3 +10,9 @@ carrier: "SuitcaseCombinationLock.jpeg" by webandi from Pixabay (CC0)
 board: "Former flight departure board from Singapore Changi Airport.jpg" by Sgconlaw (CC BY-SA 4.0)
 locker: "Colorful coin locker (33381351421).jpg" by S.Brickman (CC BY-SA 2.0)
 locker2: "Coin-Locker Japan 1.jpg" by Mino mu (Public domain)
+
+[vertical v5]
+airport(v): "Rain Vortex Night Jewel Changi Feb23 R16 06856.jpg" by This Photo was taken by Timothy A. Gonsalves. Feel free to use my photos, but please mention me as the author. I would much appreciate if you send me an email tagooty@yahoo.com or write on my talk page, for my information. Please contact me before commercial use. Please do not upload an edited image here without consulting me. I would like to make corrections only at my own source to ensure that the changes improve the image and are preserved.Otherwise you may upload an edited image with a new name. Please use one of the templates derivative or extract. (CC BY-SA 4.0)
+sentosa(v): "Footbridge to Southernmost Point of Continental Asia, Palawan, Sentosa, Singapore 01.jpg" by Fry72 (Karel Frydrýšek) (CC BY-SA 4.0)
+universal(v): "Universal Studios Singapore globe, 20240206 1324 6457.jpg" by Jakub Hałun (CC BY 4.0)
+laupasat(v): "Singapore Telok-Ayer-Market-01.jpg" by CEphoto, Uwe Aranas (CC BY-SA 3.0)
