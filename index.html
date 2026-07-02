@@ -66,17 +66,21 @@
   @keyframes floaty{0%,100%{translate:0 0}50%{translate:0 -6px}}
 
   /* 이동 네비게이션 */
+  /* 이동 = 싱가포르 여행 방향표지판 (나무판 + 화살표) */
   #navbar{ position:absolute; left:0; right:0; bottom:0; z-index:4;
-    display:flex; flex-wrap:wrap; gap:7px; justify-content:center; align-items:flex-end;
-    padding:14px 10px 12px; background:linear-gradient(0deg,rgba(40,20,45,.34),transparent); }
-  .navBtn{ display:flex; align-items:center; gap:5px; padding:9px 15px; border-radius:99px;
-    background:rgba(28,16,40,.40); -webkit-backdrop-filter:blur(9px); backdrop-filter:blur(9px);
-    font-size:13.5px; font-weight:800; color:#fff; text-shadow:0 1px 3px rgba(0,0,0,.5);
-    box-shadow:0 4px 14px rgba(0,0,0,.3); cursor:pointer; transition:.12s; border:1.5px solid rgba(255,255,255,.4); }
-  .navBtn:active{transform:scale(.94);}
-  .navBtn.go{border-color:rgba(255,158,196,.85);}
-  .navBtn.locked{opacity:.6; border-color:rgba(255,255,255,.22);}
-  .navBtn .ar{font-size:15px;}
+    display:grid; gap:5px 6px; justify-content:center;
+    padding:12px 12px 13px; background:linear-gradient(0deg,rgba(40,20,45,.40),transparent); }
+  .navBtn{ display:flex; align-items:center; justify-content:center; gap:2px; min-width:0;
+    padding:8px 13px 8px 8px; font-size:10px; font-weight:800; line-height:1.15; white-space:nowrap; overflow:hidden;
+    background:linear-gradient(180deg,#eccf9a,#d3a862); color:#4a3316; text-shadow:0 1px 0 rgba(255,255,255,.4);
+    box-shadow:0 3px 7px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.5), inset 0 -2px 4px rgba(140,95,40,.35);
+    border:none; cursor:pointer; transition:.12s;
+    clip-path:polygon(0 0, calc(100% - 11px) 0, 100% 50%, calc(100% - 11px) 100%, 0 100%); }
+  .navBtn.dl{ padding:8px 11px 8px 15px; clip-path:polygon(11px 0, 100% 0, 100% 100%, 11px 100%, 0 50%); }
+  .navBtn:active{ transform:scale(.95); }
+  .navBtn.locked{ background:linear-gradient(180deg,#c2b8a8,#9d9384); color:#f2ece2; }
+  .navBtn .nbl{ overflow:hidden; text-overflow:ellipsis; }
+  .navBtn .em{ font-size:11px; }
 
   /* 인벤토리 */
   #invWrap{flex:0 0 auto; padding:8px 12px 14px;}
@@ -168,7 +172,6 @@
   <div id="topbar">
     <div id="roomName">싱가포르 대탈출</div>
     <div id="roomSub"></div>
-    <div id="progress"><div id="progressBar"></div></div>
   </div>
   <div id="scene"></div>
   <div id="invWrap">
@@ -301,14 +304,14 @@ const MAPS = {
         clue:{e:"📋",t:"각 명소에서 퍼즐을 풀면 '열쇠조각🧩'을 준대.\n네 조각을 다 모으면… 마지막 장소가 열린다?"}},
     ],
     exits:[
-      {to:"marina", label:"마리나베이", emoji:"🏨", dir:"right"},
-      {to:"garden", label:"실내 식물원", emoji:"🌿", dir:"right"},
-      {to:"arab",   label:"아랍 스트리트", emoji:"🕌", dir:"right"},
-      {to:"merlion",label:"머라이언 파크", emoji:"🦁", dir:"right"},
+      {to:"marina", label:"마리나", emoji:"🏨", dir:"right"},
+      {to:"garden", label:"식물원", emoji:"🌿", dir:"right"},
+      {to:"arab",   label:"아랍", emoji:"🕌", dir:"right"},
+      {to:"merlion",label:"머라이언", emoji:"🦁", dir:"right"},
       {to:"sentosa",label:"센토사", emoji:"🏖️", dir:"right"},
       {to:"laupasat",label:"라우파삿", emoji:"🍢", dir:"right"},
-      {to:"police",label:"무지개 경찰서", emoji:"🌈", dir:"right"},
-      {to:"__ending", label:"우리의 호텔", emoji:"💝", dir:"right",
+      {to:"police",label:"경찰서", emoji:"🌈", dir:"right"},
+      {to:"__ending", label:"호텔", emoji:"💝", dir:"right",
         requireFlags:["m_done","g_done","a_done","ml_done"],
         lockHint:"열쇠조각 4개를 다 모아야 열려! (네 명소를 모두 클리어)"},
     ]
@@ -476,9 +479,6 @@ function render(){
   const r=MAPS[state.room]; if(!r) return;
   $("#roomName").textContent=r.name; $("#roomSub").textContent=r.sub;
 
-  const pct = state.flags.gotOut ? 10 + fragCount()/4*90 : 0;
-  $("#progressBar").style.width=pct+"%";
-
   scene.innerHTML="";
   const wrap=document.createElement("div"); wrap.id="photoWrap";
   const bg=document.createElement("img"); bg.className="bgphoto"; bg.alt=""; bg.src=r.photo||("img/"+state.room+".jpg");
@@ -500,12 +500,12 @@ function render(){
   scene.appendChild(wrap);
 
   const nav=document.createElement("div"); nav.id="navbar";
-  (r.exits||[]).forEach(ex=>{
+  const exs=r.exits||[];
+  nav.style.gridTemplateColumns=`repeat(${Math.min(exs.length,4)||1}, minmax(0,1fr))`;  // 최대 4열(→2행4열)
+  exs.forEach(ex=>{
     const ok = !ex.requireFlags || ex.requireFlags.every(f=>state.flags[f]);
-    const b=document.createElement("div"); b.className="navBtn "+(ok?"go":"locked");
-    const arL = ex.dir==="left" ? '<span class="ar">◀</span>' : '';
-    const arR = ex.dir!=="left" ? '<span class="ar">▶</span>' : '';
-    b.innerHTML = arL + (ok?ex.emoji:"🔒") + " " + ex.label + arR;
+    const b=document.createElement("div"); b.className="navBtn "+(ok?"go":"locked")+" "+(ex.dir==="left"?"dl":"dr");
+    b.innerHTML = '<span class="em">'+(ok?ex.emoji:"🔒")+'</span><span class="nbl">'+ex.label+'</span>';
     b.onclick=()=>{ ok ? goTo(ex.to) : toast(ex.lockHint||"아직 갈 수 없어."); };
     nav.appendChild(b);
   });
