@@ -83,7 +83,7 @@
   .navBtn:active{ transform:scale(.95); }
   .navBtn.locked .navInner{ background:linear-gradient(180deg,#8f9bad,#6b788a); }
   .navBtn .nbl{ overflow:hidden; text-overflow:ellipsis; }
-  .navBtn .em{ font-size:11px; }
+  .navBtn svg{ width:15px; height:15px; flex:0 0 auto; }
 
   /* 인벤토리 */
   #invWrap{flex:0 0 auto; padding:8px 12px 14px;}
@@ -244,6 +244,25 @@ const ITEMS = {
   flower:{emoji:"🌺", name:"꽃"},
 };
 
+/* 방향표지판용 흰색 벡터 아이콘 (싱가포르 도로표지 픽토그램 느낌) */
+const _svg = d => '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+d+'</svg>';
+const ICONS = {
+  building: _svg('<rect x="6" y="3" width="12" height="18" rx="1"/><path d="M9 8h.01M12 8h.01M15 8h.01M9 12h.01M12 12h.01M15 12h.01M10 21v-3h4v3"/>'),
+  leaf:     _svg('<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.5 19 2c1 2 2 4.2 2 8 0 5.5-4.8 10-10 10Z"/><path d="M2 21c0-3 1.9-5.4 5.1-6"/>'),
+  landmark: _svg('<path d="M3 21h18"/><path d="M5 21V10l7-5 7 5v11"/><path d="M9 21v-5h6v5"/>'),
+  umbrella: _svg('<path d="M12 12v7a2 2 0 0 0 4 0"/><path d="M2.5 12a9.5 9.5 0 0 1 19 0Z"/><path d="M12 2v2"/>'),
+  utensils: _svg('<path d="M4 3v6a2 2 0 0 0 4 0V3"/><path d="M6 9v12"/><path d="M18 3c-1.5 0-2.5 2-2.5 5s1 4 2.5 4"/><path d="M18 3v18"/>'),
+  shield:   _svg('<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>'),
+  bed:      _svg('<path d="M2 5v15"/><path d="M2 11h18a2 2 0 0 1 2 2v7"/><path d="M2 15h20"/><path d="M6 11V8h5v3"/>'),
+  droplet:  _svg('<path d="M12 22a7 7 0 0 0 7-7c0-3-4-9-7-13-3 4-7 10-7 13a7 7 0 0 0 7 7z"/>'),
+  luggage:  _svg('<rect x="5" y="7" width="14" height="14" rx="2"/><path d="M9 7V4h6v3M9 12v4M15 12v4"/>'),
+  star:     _svg('<path d="M12 3l2.6 5.6 6.1.6-4.6 4.1 1.4 6L12 16.9 6.5 19.3l1.4-6L3.3 9.2l6.1-.6z"/>'),
+  lock:     _svg('<rect x="5" y="11" width="14" height="10" rx="1.5"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>'),
+};
+const DEST_ICON = { jewel:"droplet", downtown:"building", marina:"building", garden:"leaf",
+  arab:"landmark", merlion:"landmark", sentosa:"umbrella", laupasat:"utensils", police:"shield",
+  ibis:"bed", bakkutteh:"utensils", universal:"star", airport:"luggage", __ending:"bed" };
+
 /* 핫스팟 종류
    A) 클로즈업형:  {x,y,label, closeup:{img, caption, badge, action}}
         action.type = clue | numlock | keylock | give
@@ -314,9 +333,7 @@ const MAPS = {
       {to:"sentosa",label:"센토사", emoji:"🏖️", dir:"right"},
       {to:"laupasat",label:"라우파삿", emoji:"🍢", dir:"right"},
       {to:"police",label:"경찰서", emoji:"🌈", dir:"right"},
-      {to:"__ending", label:"이비스", emoji:"🏩", dir:"right",
-        requireFlags:["m_done","g_done","a_done","ml_done"],
-        lockHint:"열쇠조각 4개를 다 모아야 열려! (네 명소를 모두 클리어)"},
+      {to:"ibis", label:"이비스", emoji:"🏩", dir:"right"},
     ]
   },
 
@@ -385,6 +402,20 @@ const MAPS = {
         caption:"📋 벽에 붙은 메뉴판.\n갈비탕·볶음·튀김… 뭘 먹을지 행복한 고민!", action:{type:"clue"} }},
     ],
     exits:[{to:"police", label:"경찰서로", emoji:"🚔", dir:"left"}]
+  },
+
+  ibis:{
+    name:"이비스 버짓 클락키", sub:"체크인하러 리셉션으로", photo:"img/ibis.jpg",
+    hotspots:[
+      { x:62,y:52, w:46,h:34, label:"리셉션", closeup:{
+        img:"TODO", badge:"🛎️",
+        caption:"🛎️ 리셉션 직원에게 체크인!\n'예약 확인 번호를 알려주세요'\n4자리 번호를 입력하자.",
+        action:{type:"numlock", len:4, answer:"0815",
+          hint:"예약 확인 번호 (실제 여행 때 받은 번호로 교체 예정)",
+          success:"체크인 완료! 방 열쇠를 받았다. 🔑\n이제 우리 방으로 올라가자.",
+          setFlag:"reception_done"} }},
+    ],
+    exits:[{to:"__ending", label:"방으로", emoji:"🛏️", dir:"right", showIf:"reception_done"}]
   },
 
   marina:{
@@ -465,7 +496,7 @@ window.addEventListener("load",()=>{
   // 배경/클로즈업/이동 사진 미리 로드
   Object.values(MAPS).forEach(m=>{ if(m.photo){const i=new Image(); i.src=m.photo;}
     (m.hotspots||[]).forEach(h=>{ if(h.closeup){const i=new Image(); i.src=h.closeup.img;} }); });
-  ["walk","mrt","songfa","bus"].forEach(k=>{const i=new Image(); i.src="img/transit/"+k+".jpg";});
+  ["walk","mrt","songfa","bus","citywalk"].forEach(k=>{const i=new Image(); i.src="img/transit/"+k+".jpg";});
   if(state.inv.length || Object.keys(state.flags).length || state.room!=="airport"){
     $("#intro").style.display="none"; render();
   }
@@ -503,12 +534,14 @@ function render(){
   scene.appendChild(wrap);
 
   const nav=document.createElement("div"); nav.id="navbar";
-  const exs=r.exits||[];
+  // showIf 조건 안 맞으면 방향버튼 자체가 안 뜸 (예: 이비스 리셉션 풀기 전엔 '방으로' 숨김)
+  const exs=(r.exits||[]).filter(ex=> !ex.showIf || state.flags[ex.showIf]);
   nav.style.gridTemplateColumns=`repeat(${Math.min(exs.length,4)||1}, minmax(0,1fr))`;  // 최대 4열(→2행4열)
   exs.forEach(ex=>{
     const ok = !ex.requireFlags || ex.requireFlags.every(f=>state.flags[f]);
     const b=document.createElement("div"); b.className="navBtn "+(ok?"go":"locked")+" "+(ex.dir==="left"?"dl":"dr");
-    b.innerHTML = '<div class="navInner"><span class="em">'+(ok?ex.emoji:"🔒")+'</span><span class="nbl">'+ex.label+'</span></div>';
+    const ic = ok ? (ICONS[DEST_ICON[ex.to]]||ICONS.building) : ICONS.lock;
+    b.innerHTML = '<div class="navInner">'+ic+'<span class="nbl">'+ex.label+'</span></div>';
     b.onclick=()=>{ ok ? goTo(ex.to) : toast(ex.lockHint||"아직 갈 수 없어."); };
     nav.appendChild(b);
   });
@@ -535,11 +568,12 @@ const TRANSITIONS = {
   "sentosa>downtown":{img:"img/transit/mrt.jpg",    icon:"🚈", text:"지하철 타고 이동 중"},
   "police>bakkutteh":{img:"img/transit/songfa.jpg", icon:"🚶", text:"걸어서 이동 중"},
   "bakkutteh>police":{img:"img/transit/songfa.jpg", icon:"🚶", text:"걸어서 이동 중"},
+  "downtown>ibis":   {img:"img/transit/citywalk.jpg", icon:"🚶", text:"걸어서 이동 중"},
   "default":         {img:"img/transit/bus.jpg",    icon:"🚌", text:"버스 타고 이동 중"},
 };
 const TRANSIT_MS = 7000;  // 7초 (일반: 스킵 없음 / 디버그: 탭 즉시)
 function goTo(to){
-  if(to==="__ending"){ openFinalLock(); return; }
+  if(to==="__ending"){ showEnding(); return; }  // 리셉션을 이미 통과했으므로 바로 방(엔딩)
   const tr = TRANSITIONS[state.room+">"+to] || TRANSITIONS.default;
   showTransition(tr, ()=>{ selected=null; state.room=to; render(); });
 }
