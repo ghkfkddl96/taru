@@ -261,7 +261,7 @@ const ICONS = {
 };
 const DEST_ICON = { jewel:"droplet", downtown:"building", marina:"building", supertree:"leaf", garden:"leaf",
   arab:"landmark", merlion:"landmark", sentosa:"umbrella", laupasat:"utensils", police:"shield",
-  ibis:"bed", bakkutteh:"utensils", universal:"star", airport:"luggage", __ending:"bed" };
+  ibis:"bed", room:"bed", bakkutteh:"utensils", universal:"star", airport:"luggage", __ending:"bed" };
 
 /* 핫스팟 종류
    A) 클로즈업형:  {x,y,label, closeup:{img, caption, badge, action}}
@@ -415,7 +415,23 @@ const MAPS = {
           success:"체크인 완료! 방 열쇠를 받았다. 🔑\n이제 우리 방으로 올라가자.",
           setFlag:"reception_done"} }},
     ],
-    exits:[{to:"__ending", label:"방으로", emoji:"🛏️", dir:"right", showIf:"reception_done"}]
+    exits:[
+      {to:"downtown", label:"중심지", emoji:"🏙️", dir:"left"},
+      {to:"room", label:"방으로", emoji:"🛏️", dir:"right", showIf:"reception_done"},
+    ]
+  },
+
+  room:{
+    name:"우리 방", sub:"이비스 버짓 클락키 · 체크인 완료 💗", photo:"img/room.jpg",
+    hotspots:[
+      { x:68,y:56, w:42,h:34, label:"침대", closeup:{
+        img:"TODO", badge:"🎁",
+        caption:"🎁 [ 선물 힌트 자리 ]\n예) '베개 밑을 확인해봐!'\n내용은 나중에 채우면 돼.", action:{type:"clue"} }},
+      { x:22,y:62, w:26,h:28, label:"책상", closeup:{
+        img:"TODO", badge:"💌",
+        caption:"💌 [ 편지 자리 ]\n둘만 아는 이야기로 채우면 완성 💗", action:{type:"clue"} }},
+    ],
+    exits:[{to:"ibis", label:"로비로", emoji:"🛎️", dir:"left"}]
   },
 
   marina:{
@@ -591,8 +607,10 @@ const TRANSITIONS = {
 };
 const TRANSIT_MS = 7000;  // 7초 (일반: 스킵 없음 / 디버그: 탭 즉시)
 function goTo(to){
-  if(to==="__ending"){ showEnding(); return; }  // 리셉션을 이미 통과했으므로 바로 방(엔딩)
-  const tr = TRANSITIONS[state.room+">"+to] || TRANSITIONS.default;
+  if(to==="__ending"){ showEnding(); return; }
+  const key=state.room+">"+to;
+  if(key==="ibis>room"||key==="room>ibis"){ selected=null; state.room=to; render(); return; }  // 같은 건물 내 이동은 즉시
+  const tr = TRANSITIONS[key] || TRANSITIONS.default;
   showTransition(tr, ()=>{ selected=null; state.room=to; render(); });
 }
 function showTransition(tr, done){
