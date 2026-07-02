@@ -48,3 +48,4 @@ downtown(중심지 v2): 북쑥 제공 IMG_8611 파크로얄 녹색건물(webp→
 [v15]
 reception: "Reception desk at Hotel Holiday Inn Helsinki City Centre.jpg" (CC BY-SA 4.0)
 citywalk: "The Singapore River with boats.jpg" (CC BY-SA 2.0)
+marina(v2 마리나베이샌즈 낮): "Marina Bay Sands Singapore by day" Wikimedia. supertree: 기존 marina 야경(슈퍼트리) 이동.

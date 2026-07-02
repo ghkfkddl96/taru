@@ -259,7 +259,7 @@ const ICONS = {
   star:     _svg('<path d="M12 3l2.6 5.6 6.1.6-4.6 4.1 1.4 6L12 16.9 6.5 19.3l1.4-6L3.3 9.2l6.1-.6z"/>'),
   lock:     _svg('<rect x="5" y="11" width="14" height="10" rx="1.5"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>'),
 };
-const DEST_ICON = { jewel:"droplet", downtown:"building", marina:"building", garden:"leaf",
+const DEST_ICON = { jewel:"droplet", downtown:"building", marina:"building", supertree:"leaf", garden:"leaf",
   arab:"landmark", merlion:"landmark", sentosa:"umbrella", laupasat:"utensils", police:"shield",
   ibis:"bed", bakkutteh:"utensils", universal:"star", airport:"luggage", __ending:"bed" };
 
@@ -419,9 +419,25 @@ const MAPS = {
   },
 
   marina:{
-    name:"마리나베이 샌즈", sub:"밤이면 슈퍼트리에 불이 들어와", photo:"img/marina.jpg",
+    name:"마리나베이 샌즈", sub:"배 모양 옥상 아래를 걸어봐", photo:"img/marina.jpg",
     hotspots:[
-      {x:50,y:20,emoji:"🏨",label:"스카이파크",
+      { x:50,y:15, w:54,h:13, label:"스카이파크", closeup:{
+        img:"TODO", badge:"🛥️",
+        caption:"🛥️ 배 모양 옥상 '스카이파크'!\n57층 위 인피니티풀에서 도시가 한눈에 보여.", action:{type:"clue"} }},
+      { x:34,y:54, w:34,h:28, label:"호텔 타워", closeup:{
+        img:"TODO", badge:"🏨",
+        caption:"🏨 55층 타워 3개가 배를 떠받치고 있어.\n밤이면 슈퍼트리에 불이 들어온대 — 걸어가 보자!", action:{type:"clue"} }},
+    ],
+    exits:[
+      {to:"downtown", label:"중심지", emoji:"🏙️", dir:"left"},
+      {to:"supertree", label:"슈퍼트리", emoji:"🌳", dir:"right"},
+    ]
+  },
+
+  supertree:{
+    name:"슈퍼트리 그로브", sub:"밤이면 불이 들어오는 인공나무 숲", photo:"img/supertree.jpg",
+    hotspots:[
+      {x:50,y:20,emoji:"🏨",label:"안내판",
         clue:{e:"🏨",t:"안내판: '슈퍼트리는 빨강 → 노랑 → 초록 순서로 빛난다'"}},
       {x:22,y:42,emoji:"🌳",label:"슈퍼트리 A", clue:{e:"🔴",t:"지금 빨갛게 빛나는 나무. (1번)"}},
       {x:50,y:48,emoji:"🌳",label:"슈퍼트리 B", clue:{e:"🟡",t:"지금 노랗게 빛나는 나무. (2번)"}},
@@ -431,7 +447,7 @@ const MAPS = {
         lock:{len:3, answer:"123", hint:"빛나는 순서(빨강·노랑·초록)의 나무 번호를 순서대로!",
           success:"세 나무가 반짝! 열쇠조각을 얻었다. ✨", give:["frag1"], setFlag:"m_done"}},
     ],
-    exits:[{to:"downtown", label:"중심지로", emoji:"🏙️", dir:"left"}]
+    exits:[{to:"marina", label:"마리나", emoji:"🏨", dir:"left"}]
   },
 
   garden:{
@@ -569,6 +585,8 @@ const TRANSITIONS = {
   "police>bakkutteh":{img:"img/transit/songfa.jpg", icon:"🚶", text:"걸어서 이동 중"},
   "bakkutteh>police":{img:"img/transit/songfa.jpg", icon:"🚶", text:"걸어서 이동 중"},
   "downtown>ibis":   {img:"img/transit/citywalk.jpg", icon:"🚶", text:"걸어서 이동 중"},
+  "marina>supertree":{img:"img/transit/citywalk.jpg", icon:"🚶", text:"걸어서 이동 중"},
+  "supertree>marina":{img:"img/transit/citywalk.jpg", icon:"🚶", text:"걸어서 이동 중"},
   "default":         {img:"img/transit/bus.jpg",    icon:"🚌", text:"버스 타고 이동 중"},
 };
 const TRANSIT_MS = 7000;  // 7초 (일반: 스킵 없음 / 디버그: 탭 즉시)
