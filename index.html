@@ -70,15 +70,18 @@
   #navbar{ position:absolute; left:0; right:0; bottom:0; z-index:4;
     display:grid; gap:5px 6px; justify-content:center;
     padding:12px 12px 13px; background:linear-gradient(0deg,rgba(40,20,45,.40),transparent); }
-  .navBtn{ display:flex; align-items:center; justify-content:center; gap:2px; min-width:0;
-    padding:8px 13px 8px 8px; font-size:10px; font-weight:800; line-height:1.15; white-space:nowrap; overflow:hidden;
-    background:linear-gradient(180deg,#eccf9a,#d3a862); color:#4a3316; text-shadow:0 1px 0 rgba(255,255,255,.4);
-    box-shadow:0 3px 7px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.5), inset 0 -2px 4px rgba(140,95,40,.35);
-    border:none; cursor:pointer; transition:.12s;
+  /* 싱가포르 도로 방향표지판: 파란 바탕 + 흰 테두리 + 흰 글자 (이중 레이어로 화살표 테두리) */
+  .navBtn{ cursor:pointer; transition:.12s; background:#fff; padding:2.5px;
+    filter:drop-shadow(0 3px 5px rgba(0,0,0,.42));
     clip-path:polygon(0 0, calc(100% - 11px) 0, 100% 50%, calc(100% - 11px) 100%, 0 100%); }
-  .navBtn.dl{ padding:8px 11px 8px 15px; clip-path:polygon(11px 0, 100% 0, 100% 100%, 11px 100%, 0 50%); }
+  .navBtn.dl{ clip-path:polygon(11px 0, 100% 0, 100% 100%, 11px 100%, 0 50%); }
+  .navBtn .navInner{ display:flex; align-items:center; justify-content:center; gap:2px; min-width:0;
+    padding:7px 13px 7px 8px; font-size:10px; font-weight:800; line-height:1.15; white-space:nowrap; overflow:hidden;
+    background:linear-gradient(180deg,#1a72c9,#12518f); color:#fff; text-shadow:0 1px 2px rgba(0,0,0,.35);
+    clip-path:polygon(0 0, calc(100% - 11px) 0, 100% 50%, calc(100% - 11px) 100%, 0 100%); }
+  .navBtn.dl .navInner{ padding:7px 8px 7px 13px; clip-path:polygon(11px 0, 100% 0, 100% 100%, 11px 100%, 0 50%); }
   .navBtn:active{ transform:scale(.95); }
-  .navBtn.locked{ background:linear-gradient(180deg,#c2b8a8,#9d9384); color:#f2ece2; }
+  .navBtn.locked .navInner{ background:linear-gradient(180deg,#8f9bad,#6b788a); }
   .navBtn .nbl{ overflow:hidden; text-overflow:ellipsis; }
   .navBtn .em{ font-size:11px; }
 
@@ -311,7 +314,7 @@ const MAPS = {
       {to:"sentosa",label:"센토사", emoji:"🏖️", dir:"right"},
       {to:"laupasat",label:"라우파삿", emoji:"🍢", dir:"right"},
       {to:"police",label:"경찰서", emoji:"🌈", dir:"right"},
-      {to:"__ending", label:"호텔", emoji:"💝", dir:"right",
+      {to:"__ending", label:"이비스", emoji:"🏩", dir:"right",
         requireFlags:["m_done","g_done","a_done","ml_done"],
         lockHint:"열쇠조각 4개를 다 모아야 열려! (네 명소를 모두 클리어)"},
     ]
@@ -505,7 +508,7 @@ function render(){
   exs.forEach(ex=>{
     const ok = !ex.requireFlags || ex.requireFlags.every(f=>state.flags[f]);
     const b=document.createElement("div"); b.className="navBtn "+(ok?"go":"locked")+" "+(ex.dir==="left"?"dl":"dr");
-    b.innerHTML = '<span class="em">'+(ok?ex.emoji:"🔒")+'</span><span class="nbl">'+ex.label+'</span>';
+    b.innerHTML = '<div class="navInner"><span class="em">'+(ok?ex.emoji:"🔒")+'</span><span class="nbl">'+ex.label+'</span></div>';
     b.onclick=()=>{ ok ? goTo(ex.to) : toast(ex.lockHint||"아직 갈 수 없어."); };
     nav.appendChild(b);
   });
@@ -616,7 +619,7 @@ function solveCloseup(a){
 /* ---- 자물쇠 UI (번호 입력) — 콜백 기반 ---- */
 let lockCtx=null;
 function openLock(lock, onSuccess){ lockCtx={lock, val:"", onSuccess}; drawLock(lock.emoji||"🔒", lock.title||"번호 자물쇠"); }
-function openFinalLock(){ openLock({len:FINAL.answer.length, answer:FINAL.answer, hint:FINAL.hint, emoji:"💝", title:"마지막 관문 · 우리의 호텔"}, ()=>showEnding()); }
+function openFinalLock(){ openLock({len:FINAL.answer.length, answer:FINAL.answer, hint:FINAL.hint, emoji:"🏩", title:"이비스 버짓 클락키"}, ()=>showEnding()); }
 function drawLock(emoji,title){
   const L=lockCtx.lock; const keys=[1,2,3,4,5,6,7,8,9,"←",0,"OK"];
   $("#modal").innerHTML=`
@@ -665,8 +668,8 @@ function showEnding(){
   closeModal(); closeCloseup();
   const ov=document.createElement("div"); ov.className="overlay";
   ov.innerHTML=`
-    <div class="bigemoji">💝</div>
-    <h1>도착!</h1>
+    <div class="bigemoji">🏩</div>
+    <h1>이비스 버짓 클락키 도착! 💗</h1>
     <p><b>[ 여기에 선물 힌트 ]</b><br>예) "침대 베개 밑을 확인해봐 🎁"</p>
     <p><b>[ 여기에 편지 ]</b><br><span style="font-size:13px;color:#9a8ba5">둘만 아는 이야기로 채우면 완성 💗</span></p>
     <button class="btn" style="max-width:220px" onclick="location.reload()">다시 보기</button>`;
