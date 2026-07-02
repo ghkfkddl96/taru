@@ -40,3 +40,6 @@ jewel: "Rain Vortex Night Jewel Changi Feb23 R16 06856.jpg" (CC BY-SA 4.0)
 bus: "SBS Transit 9 lower deck 10-08-2025(1).jpg" (CC BY-SA 4.0)
 mrt: "Commuters in a North-South Line MRT Train in Singapore - January 2023.jpg" (CC BY 4.0)
 songfa_ext: "Song Fa Bak Kut Teh, New Bridge Rd, Singapore (2023) 01.jpg" (CC BY 4.0)
+
+[v11 북쑥 제공]
+arab(아랍스트리트 술탄모스크), downtown(중심지 거리): 북쑥 직접 제공(블로그 출처, 세로크롭·워터마크 제거). 개인 이벤트용.

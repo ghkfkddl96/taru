@@ -69,11 +69,13 @@
   #navbar{ position:absolute; left:0; right:0; bottom:0; z-index:4;
     display:flex; flex-wrap:wrap; gap:7px; justify-content:center; align-items:flex-end;
     padding:14px 10px 12px; background:linear-gradient(0deg,rgba(40,20,45,.34),transparent); }
-  .navBtn{ display:flex; align-items:center; gap:5px; padding:9px 14px; border-radius:99px;
-    background:rgba(255,255,255,.94); font-size:13.5px; font-weight:800; color:var(--ink);
-    box-shadow:0 4px 12px rgba(60,30,50,.25); cursor:pointer; transition:.12s; border:2px solid transparent; }
+  .navBtn{ display:flex; align-items:center; gap:5px; padding:9px 15px; border-radius:99px;
+    background:rgba(28,16,40,.40); -webkit-backdrop-filter:blur(9px); backdrop-filter:blur(9px);
+    font-size:13.5px; font-weight:800; color:#fff; text-shadow:0 1px 3px rgba(0,0,0,.5);
+    box-shadow:0 4px 14px rgba(0,0,0,.3); cursor:pointer; transition:.12s; border:1.5px solid rgba(255,255,255,.4); }
   .navBtn:active{transform:scale(.94);}
-  .navBtn.go{border-color:var(--pop);} .navBtn.locked{opacity:.62; background:rgba(240,235,238,.9);}
+  .navBtn.go{border-color:rgba(255,158,196,.85);}
+  .navBtn.locked{opacity:.6; border-color:rgba(255,255,255,.22);}
   .navBtn .ar{font-size:15px;}
 
   /* 인벤토리 */
@@ -436,6 +438,7 @@ const FINAL = { answer:"0815", hint:"네 개의 조각에 적힌 숫자를 순�
 let state = load() || {room:"airport", inv:[], flags:{}, done:{}};
 let selected = null;
 const HINTS = new URLSearchParams(location.search).get("hint")!=="off";  // ?hint=off 면 반짝임 숨김
+const DEBUG = new URLSearchParams(location.search).get("debug")==="1";   // ?debug=1 : 이동 즉시스킵 + 자물쇠 0통과
 const $ = s=>document.querySelector(s);
 const scene=$("#scene"), inv=$("#inventory");
 
@@ -533,7 +536,7 @@ const TRANSITIONS = {
   "bakkutteh>police":{img:"img/transit/songfa.jpg", icon:"🚶", text:"걸어서 이동 중"},
   "default":         {img:"img/transit/bus.jpg",    icon:"🚌", text:"버스 타고 이동 중"},
 };
-const TRANSIT_MS = 10000;  // 10초 (스킵 없음)
+const TRANSIT_MS = 7000;  // 7초 (일반: 스킵 없음 / 디버그: 탭 즉시)
 function goTo(to){
   if(to==="__ending"){ openFinalLock(); return; }
   const tr = TRANSITIONS[state.room+">"+to] || TRANSITIONS.default;
@@ -547,7 +550,12 @@ function showTransition(tr, done){
   ov.style.display="flex";
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
     bar.style.transition="width "+TRANSIT_MS+"ms linear"; bar.style.width="100%"; }));
-  setTimeout(()=>{ ov.style.display="none"; done(); }, TRANSIT_MS);  // 스킵 없이 10초 후 이동
+  if(DEBUG){
+    ov.onclick=()=>{ ov.onclick=null; ov.style.display="none"; done(); };  // 디버그: 눌러서 즉시 스킵
+  } else {
+    ov.onclick=null;
+    setTimeout(()=>{ ov.style.display="none"; done(); }, TRANSIT_MS);      // 일반: 7초 자동, 스킵 없음
+  }
 }
 
 /* ---- 탭 ---- */
@@ -626,7 +634,7 @@ function lockKey(k){
 function submitLock(){
   if(!lockCtx) return; const L=lockCtx.lock, val=lockCtx.val;
   if(val.length<L.len) return;
-  if(val===L.answer || /^0+$/.test(val)){ /* ⚠️ 디버그: 0만 넣어도 통과 — 실제 이벤트 전 이 조건 제거 */ const cb=lockCtx.onSuccess; lockCtx=null; closeModal(); if(cb) cb(); }
+  if(val===L.answer || (DEBUG && /^0+$/.test(val))){ /* DEBUG(?debug=1)일 때만 0 통과 */ const cb=lockCtx.onSuccess; lockCtx=null; closeModal(); if(cb) cb(); }
   else{
     lockCtx.val=""; const el=$("#lockInput"); if(el){ el.value=""; el.style.borderColor="#ff5a5a";
       el.animate([{transform:"translateX(-6px)"},{transform:"translateX(6px)"},{transform:"translateX(0)"}],{duration:250});
