@@ -34,3 +34,9 @@ police(세로크롭): Old Hill Street Police Station in Singapore (CC BY-SA) - W
 
 [v8 북쑥 제공 사진]
 bakkutteh 실내 + bkt_main(대표메뉴): 북쑥 직접 제공(블로그 traveltohyeil.tistory.com 출처, 워터마크 크롭 제거). 개인 이벤트용.
+
+[v9 폭포/이동]
+jewel: "Rain Vortex Night Jewel Changi Feb23 R16 06856.jpg" (CC BY-SA 4.0)
+bus: "SBS Transit 9 lower deck 10-08-2025(1).jpg" (CC BY-SA 4.0)
+mrt: "Commuters in a North-South Line MRT Train in Singapore - January 2023.jpg" (CC BY 4.0)
+songfa_ext: "Song Fa Bak Kut Teh, New Bridge Rd, Singapore (2023) 01.jpg" (CC BY 4.0)

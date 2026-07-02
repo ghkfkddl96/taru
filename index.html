@@ -90,6 +90,18 @@
     font-size:8.5px; white-space:nowrap; color:#a294ac;}
   #invEmpty{color:#cbbcd4; font-size:13px; align-self:center; margin:auto; padding:12px;}
 
+  /* 이동 로딩 화면 (이동중...) */
+  #transit{ position:absolute; inset:0; z-index:45; display:none; flex-direction:column;
+    align-items:center; justify-content:flex-end; background-size:cover; background-position:center; cursor:pointer; }
+  #transitInner{ text-align:center; color:#fff; padding:30px 24px 60px; width:100%;
+    background:linear-gradient(0deg,rgba(10,6,18,.82),rgba(10,6,18,0)); }
+  #transitText{ font-size:21px; font-weight:800; margin-bottom:16px; text-shadow:0 2px 10px rgba(0,0,0,.8); letter-spacing:-.3px; }
+  #transitBarWrap{ width:210px; height:9px; border-radius:99px; background:rgba(255,255,255,.28); overflow:hidden; margin:0 auto; }
+  #transitBar{ height:100%; width:0%; background:linear-gradient(90deg,#ff6b9d,#ffd97d); border-radius:99px; }
+  #transitSkip{ font-size:12px; color:rgba(255,255,255,.72); margin-top:16px; }
+  .transitDots::after{ content:""; animation:dots 1.4s steps(4,end) infinite; }
+  @keyframes dots{ 0%{content:""} 25%{content:"."} 50%{content:".."} 75%{content:"..."} 100%{content:""} }
+
   /* 클로즈업 뷰 (요소 확대) */
   #closeup{ position:absolute; inset:0; z-index:28; background:rgba(12,6,20,.9);
     display:none; flex-direction:column; align-items:center; justify-content:center; padding:20px;
@@ -153,6 +165,15 @@
   <div id="invWrap">
     <div id="invLabel">🎒 가방</div>
     <div id="inventory"></div>
+  </div>
+
+  <!-- 이동 로딩 화면 -->
+  <div id="transit">
+    <div id="transitInner">
+      <div id="transitText"></div>
+      <div id="transitBarWrap"><div id="transitBar"></div></div>
+      <div id="transitSkip">화면을 누르면 건너뛰기</div>
+    </div>
   </div>
 
   <!-- 클로즈업 뷰 -->
@@ -231,9 +252,23 @@ const MAPS = {
           give:["card"], setFlag:"gotOut"} }},
     ],
     exits:[
+      {to:"jewel", label:"주얼 폭포", emoji:"💧", dir:"right"},
       {to:"downtown", label:"싱가포르 중심지", emoji:"🏙️", dir:"right",
         requireFlags:["gotOut"], lockHint:"사물함을 열어 짐을 챙겨야 나갈 수 있어!"},
     ]
+  },
+
+  jewel:{
+    name:"주얼 · 레인 보텍스", sub:"천장에서 쏟아지는 40m 실내폭포", photo:"img/jewel.jpg",
+    hotspots:[
+      { x:50,y:42, w:36,h:38, label:"레인 보텍스", closeup:{
+        img:"img/jewel.jpg", badge:"💧",
+        caption:"💧 창이의 명물, 세계 최대 실내폭포!\n\n📌 안내판 메모: '탑승 게이트는 항공편 번호를 따라가세요.'\n우리 항공편은 SQ930 — 캐리어 번호에 딱이네!", action:{type:"clue"} }},
+      { x:24,y:74, w:26,h:16, label:"기념품샵", closeup:{
+        img:"img/jewel.jpg", badge:"🎁",
+        caption:"🎁 아기자기한 창이 기념품 가게.\n둘이 커플 기념품 하나 골라볼까?", action:{type:"clue"} }},
+    ],
+    exits:[{to:"airport", label:"수하물 찾는 곳으로", emoji:"🧳", dir:"left"}]
   },
 
   downtown:{
@@ -399,9 +434,10 @@ function resetGame(){
 }
 function startGame(){ $("#intro").style.display="none"; render(); }
 window.addEventListener("load",()=>{
-  // 배경/클로즈업 사진 미리 로드
+  // 배경/클로즈업/이동 사진 미리 로드
   Object.values(MAPS).forEach(m=>{ if(m.photo){const i=new Image(); i.src=m.photo;}
     (m.hotspots||[]).forEach(h=>{ if(h.closeup){const i=new Image(); i.src=h.closeup.img;} }); });
+  ["walk","mrt","songfa","bus"].forEach(k=>{const i=new Image(); i.src="img/transit/"+k+".jpg";});
   if(state.inv.length || Object.keys(state.flags).length || state.room!=="airport"){
     $("#intro").style.display="none"; render();
   }
@@ -472,7 +508,35 @@ function renderInv(){
     inv.appendChild(el);
   });
 }
-function goTo(to){ if(to==="__ending"){ openFinalLock(); return; } selected=null; state.room=to; render(); }
+/* 이동 로딩 연출 — 경로별 수단/사진 (from>to). 없으면 기본 버스 */
+const TRANSITIONS = {
+  "airport>jewel":   {img:"img/transit/walk.jpg",   icon:"🚶", text:"공항 안을 걸어서 이동 중"},
+  "jewel>airport":   {img:"img/transit/walk.jpg",   icon:"🚶", text:"공항 안을 걸어서 이동 중"},
+  "downtown>sentosa":{img:"img/transit/mrt.jpg",    icon:"🚈", text:"지하철 타고 센토사로"},
+  "sentosa>downtown":{img:"img/transit/mrt.jpg",    icon:"🚈", text:"지하철 타고 중심지로"},
+  "police>bakkutteh":{img:"img/transit/songfa.jpg", icon:"🚶", text:"걸어서 송파 바쿠테로"},
+  "bakkutteh>police":{img:"img/transit/songfa.jpg", icon:"🚶", text:"걸어서 경찰서로"},
+  "default":         {img:"img/transit/bus.jpg",    icon:"🚌", text:"버스 타고 이동 중"},
+};
+const TRANSIT_MS = 10000;  // 10초
+function goTo(to){
+  if(to==="__ending"){ openFinalLock(); return; }
+  const tr = TRANSITIONS[state.room+">"+to] || TRANSITIONS.default;
+  showTransition(tr, ()=>{ selected=null; state.room=to; render(); });
+}
+function showTransition(tr, done){
+  const ov=$("#transit"), bar=$("#transitBar");
+  ov.style.backgroundImage=`linear-gradient(rgba(10,6,18,.30),rgba(10,6,18,.55)), url("${tr.img}")`;
+  $("#transitText").innerHTML = tr.icon+" "+tr.text+'<span class="transitDots"></span>';
+  bar.style.transition="none"; bar.style.width="0%";
+  ov.style.display="flex";
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    bar.style.transition="width "+TRANSIT_MS+"ms linear"; bar.style.width="100%"; }));
+  let fin=false;
+  const finish=()=>{ if(fin) return; fin=true; clearTimeout(t); ov.onclick=null; ov.style.display="none"; done(); };
+  const t=setTimeout(finish, TRANSIT_MS);
+  ov.onclick=finish;   // 탭하면 건너뛰기
+}
 
 /* ---- 탭 ---- */
 function tap(h,id){
