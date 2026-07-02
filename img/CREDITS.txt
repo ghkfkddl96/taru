@@ -16,3 +16,12 @@ airport(v): "Rain Vortex Night Jewel Changi Feb23 R16 06856.jpg" by This Photo w
 sentosa(v): "Footbridge to Southernmost Point of Continental Asia, Palawan, Sentosa, Singapore 01.jpg" by Fry72 (Karel Frydrýšek) (CC BY-SA 4.0)
 universal(v): "Universal Studios Singapore globe, 20240206 1324 6457.jpg" by Jakub Hałun (CC BY 4.0)
 laupasat(v): "Singapore Telok-Ayer-Market-01.jpg" by CEphoto, Uwe Aranas (CC BY-SA 3.0)
+
+[v6]
+airport: "Baggage carousel Jeddah International Airport.jpg" by Sa674 (CC BY-SA 4.0)
+police: "Old Hill Street Police Station 09-11-2023.jpg" by LN9267 (CC BY-SA 4.0)
+bakkutteh: "Song Fa Bak Kut Teh, New Bridge Rd, Singapore (2023) 01.jpg" by Chainwit. (CC BY 4.0)
+
+[v6]
+trolley: "Kuiers op Schiphol verdwenen, door Schiphol beschikbaar gestelde bagagekarretjes, Bestanddeelnr 928-6165.jpg" by Rob Mieremet / Anefo (CC0)
+infodesk: "Tourist Service Center, Taoyuan Airport Terminal 2 20180512.jpg" by Solomon203 (CC BY-SA 4.0)
