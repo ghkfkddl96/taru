@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
-<title>싱가포르 대탈출 🦁</title>
+<title>싱가포르 여행의 비밀 ✈️</title>
 <style>
   :root{
     --pink:#ff9ec4; --cream:#fff7f0; --ink:#4a3f55; --gold:#ffd97d; --pop:#ff6b9d;
@@ -174,7 +174,24 @@
   .skyline{ position:absolute; left:0; bottom:0; width:100%; height:92px; color:#c9a8dd; opacity:.5; pointer-events:none; }
   .skyline *{ fill:currentColor; }
   .skyline .wheel{ fill:none; stroke:currentColor; stroke-width:3; }
-  .resetLink{position:absolute; top:10px; right:12px; font-size:11px; color:#c3b4cd; background:none; border:none; z-index:6; cursor:pointer;}
+  .resetLink{position:absolute; top:10px; right:12px; font-size:11px; color:#fff; opacity:.75; background:none; border:none; z-index:6; cursor:pointer; text-shadow:0 1px 3px rgba(0,0,0,.5);}
+  /* 인트로 = 비행기 창밖 하늘/구름 (꽉 차게) */
+  #intro{ background:url("img/sky.jpg") center/cover no-repeat; }
+  #intro::before{ content:""; position:absolute; inset:0; background:linear-gradient(180deg,rgba(18,28,52,.18),rgba(18,28,52,.55)); z-index:0; }
+  #intro > *{ position:relative; z-index:1; }
+  #intro #introText{ color:#fff; text-shadow:0 2px 12px rgba(0,0,0,.6); }
+  #intro .deco{ opacity:.85; }
+  /* 스토리 3페이지 (같은 하늘 배경) */
+  #story{ background:url("img/sky.jpg") center/cover no-repeat; }
+  #story::before{ content:""; position:absolute; inset:0; background:rgba(12,22,45,.42); }
+  .storyCard{ position:relative; z-index:1; background:rgba(255,255,255,.95); border-radius:24px; padding:30px 24px 24px; max-width:340px; width:100%; box-shadow:0 20px 50px rgba(0,0,0,.35); animation:pop .3s; }
+  .storyCard .bigemoji{ font-size:56px; }
+  .storyCard h2{ font-size:20px; margin:8px 0 10px; color:var(--ink); }
+  .storyCard p{ font-size:15px; line-height:1.75; color:#5a4f68; white-space:pre-wrap; margin:0; }
+  .storyCard .btn{ max-width:220px; margin:18px auto 0; }
+  .storyDots{ display:flex; gap:7px; justify-content:center; margin-top:16px; }
+  .storyDots span{ width:8px; height:8px; border-radius:50%; background:#e0d3dc; transition:.2s; }
+  .storyDots span.on{ background:var(--pop); transform:scale(1.25); }
 </style>
 </head>
 <body>
@@ -182,7 +199,7 @@
   <button class="resetLink" onclick="resetGame()">처음부터</button>
   <button id="muteBtn" onclick="toggleMute()" title="배경음 켜기/끄기" style="position:absolute;top:8px;left:12px;font-size:18px;background:none;border:none;z-index:6;cursor:pointer;opacity:.72;">🔊</button>
   <div id="topbar">
-    <div id="roomName">싱가포르 대탈출</div>
+    <div id="roomName">싱가포르 여행의 비밀</div>
     <div id="roomSub"></div>
   </div>
   <div id="scene"></div>
@@ -217,7 +234,7 @@
     <span class="deco" style="bottom:18%;right:18%;animation-delay:1.6s">💫</span>
     <span class="deco" style="top:30%;left:24%;animation-delay:2s">🧳</span>
     <div class="bigemoji">🦁✈️</div>
-    <h1>싱가포르 대탈출</h1>
+    <h1>싱가포르 여행의 비밀</h1>
     <p id="introText">우리 둘의 싱가포르 여행,<br>반짝이는 곳을 눌러 자세히 살펴보고<br>숨은 수수께끼를 풀어봐!</p>
     <button class="btn" style="max-width:220px" onclick="startGame()">시작하기 💗</button>
     <svg class="skyline" viewBox="0 0 480 92" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
@@ -234,6 +251,9 @@
       <circle class="wheel" cx="412" cy="50" r="28"/><circle cx="412" cy="50" r="4"/><rect x="410" y="50" width="4" height="42"/>
     </svg>
   </div>
+
+  <!-- 스토리 3페이지 (시작하기 → 대본1·2·3 → 공항) -->
+  <div class="overlay" id="story" style="display:none"></div>
 </div>
 
 <script>
@@ -580,7 +600,27 @@ function resetGame(){
   state={room:"airport", inv:[], flags:{}, done:{}}; selected=null;
   closeCloseup(); closeModal(); $("#intro").style.display="flex";
 }
-function startGame(){ actx(); startAmbience(); initParallax(); SFX.open(); $("#intro").style.display="none"; render(); }
+function startGame(){ actx(); startAmbience(); initParallax(); SFX.open(); $("#intro").style.display="none"; showStory(0); }
+/* 스토리 3페이지 — 내용(text)은 placeholder. 나중에 둘만의 이야기로 교체. */
+const STORY=[
+  {emoji:"✈️", title:"대본 1", text:"[ 대본 1 자리 ]\n예) 창이공항에 막 도착한 우리.\n설레는 여행이 시작되려는데…"},
+  {emoji:"🧳", title:"대본 2", text:"[ 대본 2 자리 ]\n예) 그런데 가방 속에 낯선 쪽지가?\n'여행 곳곳에 비밀을 숨겨뒀어.'"},
+  {emoji:"🦁", title:"대본 3", text:"[ 대본 3 자리 ]\n예) 숨은 수수께끼를 하나씩 풀며\n싱가포르 여행의 비밀을 찾아 떠나자!"},
+];
+function showStory(i){
+  const ov=$("#story");
+  if(i>=STORY.length){ ov.style.display="none"; render(); return; }   // 스토리 끝 → 공항 시작
+  const s=STORY[i]; SFX.open();
+  const last=i>=STORY.length-1;
+  ov.innerHTML=`<div class="storyCard">
+    <div class="bigemoji">${s.emoji}</div>
+    <h2>${s.title}</h2>
+    <p>${s.text}</p>
+    <button class="btn" onclick="SFX.tap();showStory(${i+1})">${last?"여행 시작! 💗":"다음 ▶"}</button>
+    <div class="storyDots">${STORY.map((_,j)=>`<span class="${j===i?'on':''}"></span>`).join("")}</div>
+  </div>`;
+  ov.style.display="flex";
+}
 window.addEventListener("load",()=>{
   // 배경/클로즈업/이동 사진 미리 로드
   Object.values(MAPS).forEach(m=>{ if(m.photo){const i=new Image(); i.src=m.photo;}
