@@ -662,7 +662,7 @@ const TRANSITIONS = {
   "supertree>marina":{img:"img/transit/citywalk.jpg", icon:"🚶", text:"걸어서 이동 중"},
   "default":         {img:"img/transit/bus.jpg",    icon:"🚌", text:"버스 타고 이동 중", transit:true},
 };
-const TRANSIT_MS = 7000;  // 7초 (일반: 스킵 없음 / 디버그: 탭 즉시)
+const TRANSIT_MS = 5000;  // 5초 자동 진행 (디버그: 탭 즉시스킵 + 0.9초 자동)
 function goTo(to){
   if(to==="__ending"){ showEnding(); return; }
   const key=state.room+">"+to;
@@ -684,12 +684,9 @@ function showTransition(tr, done){
   ov.style.display="flex";
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
     bar.style.transition="width "+TRANSIT_MS+"ms linear"; bar.style.width="100%"; }));
-  if(DEBUG){
-    ov.onclick=()=>{ ov.onclick=null; ov.style.display="none"; done(); };  // 디버그: 눌러서 즉시 스킵
-  } else {
-    ov.onclick=null;
-    setTimeout(()=>{ ov.style.display="none"; done(); }, TRANSIT_MS);      // 일반: 7초 자동, 스킵 없음
-  }
+  let fin=false; const finish=()=>{ if(fin)return; fin=true; ov.onclick=null; ov.style.display="none"; done(); };
+  ov.onclick = DEBUG ? finish : null;             // 디버그: 탭하면 즉시 스킵
+  setTimeout(finish, DEBUG ? 900 : TRANSIT_MS);   // ★자동 진행 (일반 5초 / 디버그 0.9초). 디버그도 자동으로 넘어감(버그수정)
 }
 
 /* ---- 탭 ---- 모든 요소를 클로즈업(팝업)으로 통일 ---- */
