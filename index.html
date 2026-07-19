@@ -348,22 +348,22 @@ const MAPS = {
     name:"창이공항 · 주얼", sub:"반짝이는 곳을 눌러 자세히 봐", photo:"img/airport.jpg",
     // 정답(answer)은 지금은 임시값. 실제 여행에서 발견한 값으로 나중에 교체.
     hotspots:[
-      { x:50,y:11, w:74,h:12, label:"출발 안내판", closeup:{
+      { x:22,y:26, w:44,h:30, label:"비행정보 전광판", closeup:{
         img:"img/closeup/board.jpg", badge:"🔎",
         caption:"✈️ 출발 안내 전광판.\n우리 비행기는 '수라바야(SURABAYA)'행!\n편명은 SQ930 — 뒤 3자리가 캐리어 번호일지도?",
         action:{type:"clue"} }},
-      { x:32,y:58, w:46,h:14, label:"체크인 카운터", closeup:{
+      { x:75,y:45, w:32,h:15, label:"인포메이션 센터", closeup:{
         img:"img/closeup/infodesk.jpg", badge:"🗺️",
-        caption:"ℹ️ 안내 카운터.\n친절한 직원이 여행 지도를 건네줬다.",
+        caption:"ℹ️ 창이공항 인포메이션 센터.\n친절한 직원이 여행 지도를 건네줬다.",
         action:{type:"give", give:["map"], success:"여행 지도를 얻었다! 🗺️"} }},
-      { x:66,y:62, w:28,h:16, label:"캐리어", closeup:{
+      { x:72,y:80, w:52,h:26, label:"컨베이어벨트", closeup:{
         img:"img/closeup/carrier.jpg", badge:"🔢",
-        caption:"🧳 짐칸에서 찾은 우리 가방.\n3자리 번호 자물쇠가 걸려 있어.",
+        caption:"🧳 컨베이어벨트에서 찾은 우리 가방.\n3자리 번호 자물쇠가 걸려 있어.",
         action:{type:"numlock", len:3, answer:"930",
           hint:"전광판에서 본 우리 항공편(SQ930) 뒤 3자리",
           success:"딸깍! 가방이 열리고 사물함 열쇠가 나왔다. 🔑",
           give:["key1"], setFlag:"gotKey"} }},
-      { x:88,y:60, w:22,h:16, label:"사물함", closeup:{
+      { x:22,y:50, w:44,h:13, label:"사물함", closeup:{
         img:"img/closeup/locker.jpg", badge:"🔑",
         caption:"🔐 열쇠로 잠긴 사물함.\n손잡이에 열쇠 구멍이 보여.",
         action:{type:"keylock", needItem:"key1",
