@@ -346,7 +346,12 @@ const MAPS = {
         caption:"💧 창이의 명물, 세계 최대 실내폭포!\n\n📌 안내판 메모: '탑승 게이트는 항공편 번호를 따라가세요.'\n우리 항공편은 SQ930 — 캐리어 번호에 딱이네!", action:{type:"clue"} }},
       { x:24,y:74, w:26,h:16, label:"기념품샵", closeup:{
         img:"img/goodsshop.jpg", badge:"🎁",
-        caption:"🎁 아기자기한 창이 기념품 가게.\n둘이 커플 기념품 하나 골라볼까?", action:{type:"clue"} }},
+        caption:"🎁 아기자기한 창이 기념품 가게.\n둘이 커플 기념품 하나 골라볼까?", action:{type:"clue"},
+        subspots:[
+          {x:22,y:80,w:30,h:28,label:"인형 진열대", closeup:{
+            img:"img/dolls.jpg", badge:"🧸",
+            caption:"🧸 귀여운 인형들이 많이 있다! 🐰🐱🦁🐘🐻\n경찰복 입은 애들 너무 귀엽다 💙", action:{type:"clue"} }},
+        ] }},
     ],
     exits:[{to:"airport", label:"수하물 찾는 곳으로", emoji:"🧳", dir:"left"}]
   },
@@ -593,7 +598,7 @@ function resetGame(){
   if(!confirm("처음부터 다시 시작할까? (진행상황이 지워져)")) return;
   localStorage.removeItem("sg_escape");
   state={room:"airport", inv:[], flags:{}, done:{}}; selected=null;
-  closeCloseup(); closeModal(); $("#intro").style.display="flex";
+  closeCloseupAll(); closeModal(); $("#intro").style.display="flex";
 }
 function startGame(){ actx(); startAmbience(); initParallax(); SFX.open(); $("#intro").style.display="none"; showStory(0); }
 /* 스토리 3페이지 — 내용(text)은 placeholder. 나중에 둘만의 이야기로 교체. */
@@ -730,6 +735,7 @@ function tap(h,id){
   const cu = h.closeup || toCloseup(h);
   if(cu.action && cu.action.type==="numlock" && h.needFlag && !state.flags[h.needFlag]){
     toast("먼저 다른 걸 해결해야 할 것 같아."); return; }
+  cuStack.length=0;   // 맵에서 새로 여는 팝업은 스택 초기화(중첩 아님)
   openCloseup(cu, h, id);
 }
 // 이모지형(clue/lock/give) 요소를 클로즈업 형태로 자동 변환. img 없으면 placeholder로 뜸.
@@ -743,6 +749,7 @@ function toCloseup(h){
 
 /* ---- 클로즈업 뷰 ---- */
 let cuCtx=null, cuAnim=null;
+let cuStack=[];   // ★중첩 팝업 뒤로가기 스택 (팝업 속 요소 클릭→또 팝업, ✕ 누르면 부모 팝업으로 복귀)
 function openCloseup(cu, h, id){
   cuCtx={cu,h,id};
   const solved=!!state.done[id];
@@ -789,17 +796,37 @@ function openCloseup(cu, h, id){
     b.onclick=()=>solveCloseup(a);
     acts.appendChild(b);
   }
+  // ★팝업 속 서브 핫스팟(사진 위 클릭영역 → 중첩 팝업). 맵 요소와 동일한 반짝임영역 방식.
+  { const wrap=$("#cuImgWrap");
+    if(wrap){
+      wrap.querySelectorAll(".cu-subspot").forEach(e=>e.remove());   // 이전 것 제거
+      (cu.subspots||[]).forEach((s,si)=>{
+        const el=document.createElement("div");
+        el.className="spot-dot cu-subspot"+(DEBUG?"":" nohint");
+        el.style.left=s.x+"%"; el.style.top=s.y+"%";
+        if(s.w) el.style.width=s.w+"%"; if(s.h) el.style.height=s.h+"%";
+        el.title=s.label||"";
+        el.onclick=(ev)=>{ ev.stopPropagation(); SFX.tap(); vib(8); cuStack.push({cu,h,id}); openCloseup(s.closeup, s, id+"_s"+si); };
+        wrap.appendChild(el);
+      });
+    } }
   SFX.open();
   $("#closeup").style.display="flex";
   $("#app").classList.add("cuOpen");   // 가방을 팝업 위로 강조
 }
-function closeCloseup(){ clearInterval(cuAnim); cuAnim=null; $("#closeup").style.display="none"; $("#app").classList.remove("cuOpen"); cuCtx=null; }
+function closeCloseup(){
+  clearInterval(cuAnim); cuAnim=null;
+  if(cuStack.length){ const p=cuStack.pop(); openCloseup(p.cu, p.h, p.id); return; }   // ★중첩팝업: ✕ 누르면 부모 팝업으로 복귀
+  const w=$("#cuImgWrap"); if(w) w.querySelectorAll(".cu-subspot").forEach(e=>e.remove());
+  $("#closeup").style.display="none"; $("#app").classList.remove("cuOpen"); cuCtx=null;
+}
+function closeCloseupAll(){ cuStack.length=0; closeCloseup(); }   // 완전닫기(리셋/성공/엔딩용)
 function solveCloseup(a){
   const {id}=cuCtx;
   if(a.give){ give(a.give); SFX.item(); } else SFX.success();
   if(a.setFlag) state.flags[a.setFlag]=true;
   state.done[id]=true;
-  closeCloseup();
+  closeCloseupAll();
   showModal("🎉","성공!",a.success||"해결했다!");
   render();
 }
@@ -855,7 +882,7 @@ $("#modalBg").addEventListener("click",e=>{ if(e.target.id==="modalBg") closeMod
 
 /* ---- 엔딩(임시 placeholder) ---- */
 function showEnding(){
-  closeModal(); closeCloseup();
+  closeModal(); closeCloseupAll();
   const ov=document.createElement("div"); ov.className="overlay";
   ov.innerHTML=`
     <div class="bigemoji">🏩</div>
