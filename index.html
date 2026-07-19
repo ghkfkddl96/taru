@@ -100,7 +100,9 @@
   .invItem{ flex:0 0 auto; width:42px; height:42px; border-radius:11px;
     background:linear-gradient(160deg,#fff,#fdeef5);
     display:flex; align-items:center; justify-content:center; font-size:22px;
-    border:2px solid transparent; transition:.15s; position:relative; }
+    border:2px solid transparent; transition:.15s; position:relative; touch-action:manipulation; }
+  /* ★사파리 더블탭 확대 방지: 게임 인터랙션 요소 전반 */
+  #app, .spot-dot, .hotspot, .navBtn, .btn, .key, .invItem, #closeup, #phone{ touch-action:manipulation; }
   .invItem.sel{border-color:var(--pop); background:#fff0f6; transform:translateY(-3px) scale(1.05);}
   .invItem svg{ width:26px; height:26px; }
   .invItem .nm{position:absolute; bottom:-13px; left:50%; transform:translateX(-50%);
@@ -162,23 +164,28 @@
     font-size:13.5px; font-weight:600; opacity:0; transition:.3s; z-index:40; pointer-events:none; max-width:80%; text-align:center; }
   #toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
 
-  /* 스마트폰 잠금해제 팝업 */
+  /* 스마트폰 잠금해제 팝업 — ★입력칸·자판을 폰 화면 안에, 화면 크게 */
   #phone{ position:absolute; inset:0; z-index:34; background:rgba(10,6,18,.93); display:none;
-    flex-direction:column; align-items:center; justify-content:center; padding:16px 12px; gap:12px;
-    backdrop-filter:blur(3px); overflow-y:auto; }
+    flex-direction:column; align-items:center; justify-content:center; padding:10px; touch-action:manipulation; backdrop-filter:blur(3px); }
   #phoneClose{ position:absolute; top:14px; right:16px; width:38px; height:38px; border-radius:50%;
-    background:rgba(255,255,255,.15); color:#fff; border:none; font-size:20px; cursor:pointer; z-index:2; }
+    background:rgba(255,255,255,.15); color:#fff; border:none; font-size:20px; cursor:pointer; z-index:2; touch-action:manipulation; }
   #phoneImgWrap{ position:relative; flex:none; }
-  #phoneImg{ max-height:40vh; max-width:100%; border-radius:12px; display:block; -webkit-user-drag:none; }
-  #phoneScreen{ position:absolute; left:14%; top:18%; width:72%; text-align:center; color:#161616; }
-  #phoneLockMsg{ font-size:12.5px; font-weight:800; margin-bottom:9px; line-height:1.35; word-break:keep-all; }
-  #phoneInput{ font-family:'Courier New',monospace; font-size:18px; font-weight:800; letter-spacing:2px;
-    min-height:24px; color:#111; background:rgba(0,0,0,.07); border-radius:8px; padding:6px 3px; word-break:break-all; }
-  #phoneKeys{ display:grid; grid-template-columns:repeat(3,60px); gap:9px; justify-content:center; flex:none; }
-  .pkey{ width:60px; height:46px; border-radius:14px; border:none; font-size:19px; font-weight:800;
-    background:#fff; color:#333; box-shadow:0 3px 10px rgba(0,0,0,.32); cursor:pointer; transition:.1s; }
+  #phoneImg{ max-height:82vh; max-width:94vw; border-radius:14px; display:block; -webkit-user-drag:none; }
+  /* 폰 흰 화면 영역에 잠금UI 전체(문구+입력칸+자판)를 담음 */
+  #phoneScreen{ position:absolute; left:13%; top:10.5%; width:74%; height:79%;
+    display:flex; flex-direction:column; align-items:center; box-sizing:border-box; padding:6% 4% 5%; overflow:hidden; color:#161616; }
+  #phoneLockMsg{ font-size:min(2.4vh,15px); font-weight:800; text-align:center; word-break:keep-all; line-height:1.3; }
+  #phoneInput{ font-family:'Courier New',monospace; font-size:min(2.6vh,18px); font-weight:800; letter-spacing:2px;
+    color:#111; background:rgba(0,0,0,.07); border-radius:8px; padding:2.5% 3%; width:96%; text-align:center;
+    min-height:min(3vh,22px); margin-top:4%; word-break:break-all; box-sizing:border-box; }
+  #phoneKeys{ display:grid; grid-template-columns:repeat(3,1fr); gap:min(1.3vh,8px); width:100%; margin-top:auto; }
+  .pkey{ height:min(6.2vh,48px); border-radius:12px; border:none; font-size:min(2.7vh,19px); font-weight:800;
+    background:#fff; color:#333; box-shadow:0 2px 7px rgba(0,0,0,.28); cursor:pointer; transition:.1s; touch-action:manipulation; }
   .pkey:active{ transform:scale(.92); background:#ffeaf3; }
-  .pback{ grid-column:1 / span 3; width:100%; background:#f3e2ea; }
+  .pback{ grid-column:1 / span 3; background:#f3e2ea; }
+  /* ★아이템 팝업(폰) 열려도 가방 선택 가능: 인벤을 폰 위로 */
+  #app.phoneOpen #invWrap{ z-index:36; }
+  #app.phoneOpen #invWrap #inventory{ box-shadow:0 0 0 2px rgba(255,255,255,.3), 0 -6px 22px rgba(0,0,0,.5); }
 
   .overlay{ position:absolute; inset:0; z-index:50; display:flex; flex-direction:column;
     align-items:center; justify-content:center; text-align:center; padding:30px;
@@ -250,9 +257,9 @@
       <div id="phoneScreen">
         <div id="phoneLockMsg">🔒 스마트폰이 잠겨있어</div>
         <div id="phoneInput"></div>
+        <div id="phoneKeys"></div>
       </div>
     </div>
-    <div id="phoneKeys"></div>
   </div>
 
   <div id="modalBg"><div id="modal"></div></div>
@@ -882,18 +889,19 @@ function openPhone(){
   const ov=$("#phone"); phoneVal="";
   if(state.flags.phone_unlocked){
     $("#phoneImg").src="img/phone_home.jpg";
-    $("#phoneScreen").style.display="none"; $("#phoneKeys").style.display="none";
+    $("#phoneScreen").style.display="none";
   } else {
     $("#phoneImg").src="img/phone_lock.jpg";
-    $("#phoneScreen").style.display=""; $("#phoneKeys").style.display="";
+    $("#phoneScreen").style.display="flex";
     $("#phoneLockMsg").textContent="🔒 스마트폰이 잠겨있어";
     $("#phoneInput").textContent="";
     buildPhoneKeys();
   }
   SFX.open();
   ov.style.display="flex";
+  $("#app").classList.add("phoneOpen");   // ★가방 선택 가능(인벤 위로)
 }
-function closePhone(){ $("#phone").style.display="none"; }
+function closePhone(){ $("#phone").style.display="none"; $("#app").classList.remove("phoneOpen"); }
 function buildPhoneKeys(){
   const keys=$("#phoneKeys"); keys.innerHTML="";
   ["1","2","3","4","5","6","7","8","9","A","0","B"].forEach(k=>{
@@ -921,7 +929,7 @@ function phoneUnlock(){
   if(SFX.success)SFX.success();
   toast("🔓 비밀번호가 풀렸어!");   // ★한 번만(잠금해제는 1회)
   $("#phoneImg").src="img/phone_home.jpg";
-  $("#phoneScreen").style.display="none"; $("#phoneKeys").style.display="none";
+  $("#phoneScreen").style.display="none";
 }
 function solveCloseup(a){
   const {id}=cuCtx;
