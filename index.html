@@ -162,6 +162,24 @@
     font-size:13.5px; font-weight:600; opacity:0; transition:.3s; z-index:40; pointer-events:none; max-width:80%; text-align:center; }
   #toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
 
+  /* 스마트폰 잠금해제 팝업 */
+  #phone{ position:absolute; inset:0; z-index:34; background:rgba(10,6,18,.93); display:none;
+    flex-direction:column; align-items:center; justify-content:center; padding:16px 12px; gap:12px;
+    backdrop-filter:blur(3px); overflow-y:auto; }
+  #phoneClose{ position:absolute; top:14px; right:16px; width:38px; height:38px; border-radius:50%;
+    background:rgba(255,255,255,.15); color:#fff; border:none; font-size:20px; cursor:pointer; z-index:2; }
+  #phoneImgWrap{ position:relative; flex:none; }
+  #phoneImg{ max-height:40vh; max-width:100%; border-radius:12px; display:block; -webkit-user-drag:none; }
+  #phoneScreen{ position:absolute; left:14%; top:18%; width:72%; text-align:center; color:#161616; }
+  #phoneLockMsg{ font-size:12.5px; font-weight:800; margin-bottom:9px; line-height:1.35; word-break:keep-all; }
+  #phoneInput{ font-family:'Courier New',monospace; font-size:18px; font-weight:800; letter-spacing:2px;
+    min-height:24px; color:#111; background:rgba(0,0,0,.07); border-radius:8px; padding:6px 3px; word-break:break-all; }
+  #phoneKeys{ display:grid; grid-template-columns:repeat(3,60px); gap:9px; justify-content:center; flex:none; }
+  .pkey{ width:60px; height:46px; border-radius:14px; border:none; font-size:19px; font-weight:800;
+    background:#fff; color:#333; box-shadow:0 3px 10px rgba(0,0,0,.32); cursor:pointer; transition:.1s; }
+  .pkey:active{ transform:scale(.92); background:#ffeaf3; }
+  .pback{ grid-column:1 / span 3; width:100%; background:#f3e2ea; }
+
   .overlay{ position:absolute; inset:0; z-index:50; display:flex; flex-direction:column;
     align-items:center; justify-content:center; text-align:center; padding:30px;
     background:linear-gradient(160deg,#ffdff0,#dcecff); }
@@ -224,6 +242,19 @@
     <div id="cuActions"></div>
   </div>
 
+  <!-- 스마트폰 잠금해제 팝업 -->
+  <div id="phone">
+    <button id="phoneClose" onclick="closePhone()">✕</button>
+    <div id="phoneImgWrap">
+      <img id="phoneImg" alt="">
+      <div id="phoneScreen">
+        <div id="phoneLockMsg">🔒 스마트폰이 잠겨있어</div>
+        <div id="phoneInput"></div>
+      </div>
+    </div>
+    <div id="phoneKeys"></div>
+  </div>
+
   <div id="modalBg"><div id="modal"></div></div>
   <div id="toast"></div>
 
@@ -273,6 +304,8 @@ const ITEMS = {
   key4:{name:"열쇠", svg:_key('<path d="M7 2.6 L11.4 10.4 L2.6 10.4 Z"/>','#3fb8ae')},                                    // 삼각 청록
   map:{emoji:"🗺️", name:"지도"},
   card:{emoji:"🎟️", name:"교통카드"},
+  passport:{emoji:"🛂", name:"여권", inspect:"passport"},   // ★더블클릭→여권 팝업
+  phone:{emoji:"📱", name:"스마트폰", inspect:"phone"},       // ★더블클릭→스마트폰 잠금해제 팝업
   frag1:{emoji:"🧩", name:"조각1"}, frag2:{emoji:"🧩", name:"조각2"},
   frag3:{emoji:"🧩", name:"조각3"}, frag4:{emoji:"🧩", name:"조각4"},
   flower:{emoji:"🌺", name:"꽃"},
@@ -585,8 +618,9 @@ function initParallax(){ if(initParallax._on) return; initParallax._on=true;
   const apply=(x,y)=>{ const w=document.getElementById("photoWrap"); if(w) w.style.transform=`translate(${-x*7}px,${-y*7}px) scale(1.045)`; };
   window.addEventListener("mousemove",e=>apply(e.clientX/innerWidth-.5, e.clientY/innerHeight-.5),{passive:true});
   window.addEventListener("deviceorientation",e=>{ if(e.gamma==null)return; apply(Math.max(-1,Math.min(1,e.gamma/40)), Math.max(-1,Math.min(1,((e.beta||45)-45)/40))); },{passive:true}); }
-let state = load() || {room:"airport", inv:[], flags:{}, done:{}};
+let state = load() || {room:"airport", inv:["passport","phone"], flags:{}, done:{}};
 let selected = null;
+let _lastTap = {};   // ★아이템 더블탭 감지용(key별 마지막 탭 시각)
 const HINTS = new URLSearchParams(location.search).get("hint")!=="off";  // ?hint=off 면 반짝임 숨김
 const DEBUG = new URLSearchParams(location.search).get("debug")==="1";   // ?debug=1 : 이동 즉시스킵 + 자물쇠 0통과
 const $ = s=>document.querySelector(s);
@@ -597,7 +631,7 @@ function load(){ try{return JSON.parse(localStorage.getItem("sg_escape"));}catch
 function resetGame(){
   if(!confirm("처음부터 다시 시작할까? (진행상황이 지워져)")) return;
   localStorage.removeItem("sg_escape");
-  state={room:"airport", inv:[], flags:{}, done:{}}; selected=null;
+  state={room:"airport", inv:["passport","phone"], flags:{}, done:{}}; selected=null;
   closeCloseupAll(); closeModal(); $("#intro").style.display="flex";
 }
 function startGame(){ actx(); startAmbience(); initParallax(); SFX.open(); $("#intro").style.display="none"; showStory(0); }
@@ -683,9 +717,18 @@ function renderInv(){
   if(!state.inv.length){ inv.innerHTML='<div id="invEmpty">아직 주운 게 없어. 반짝이는 곳을 눌러봐!</div>'; return; }
   state.inv.forEach(key=>{
     const it=ITEMS[key]; if(!it) return;
-    const el=document.createElement("div"); el.className="invItem"+(selected===key?" sel":"");
+    const el=document.createElement("div"); el.className="invItem"+(selected===key?" sel":"")+(it.inspect?" inspectable":"");
     el.innerHTML=(it.svg||it.emoji)+'<span class="nm">'+it.name+'</span>';
-    el.onclick=()=>{ selected=(selected===key?null:key); renderInv(); if(selected) toast(it.name+" 선택됨"); };
+    if(it.inspect) el.title="더블탭하면 자세히 볼 수 있어";
+    // ★inspect 아이템: 더블탭(350ms내 2번) → 팝업. 단일탭 → 선택.
+    el.onclick=()=>{
+      if(it.inspect){
+        const now=performance.now();
+        if(_lastTap[key] && now-_lastTap[key]<350){ _lastTap[key]=0; openInspect(key); return; }
+        _lastTap[key]=now;
+      }
+      selected=(selected===key?null:key); renderInv(); if(selected) toast(it.name+" 선택됨");
+    };
     inv.appendChild(el);
   });
 }
@@ -821,6 +864,65 @@ function closeCloseup(){
   $("#closeup").style.display="none"; $("#app").classList.remove("cuOpen"); cuCtx=null;
 }
 function closeCloseupAll(){ cuStack.length=0; closeCloseup(); }   // 완전닫기(리셋/성공/엔딩용)
+
+/* ---- 아이템 자세히 보기(더블탭): 여권 팝업 / 스마트폰 잠금해제 ---- */
+function openInspect(key){
+  if(key==="passport"){
+    openCloseup({img:"img/passport.jpg", badge:"🛂",
+      caption:"🛂 대한민국 여권.\n해외에선 여권이 곧 신분증이자 생명이야. 잃어버리면 큰일나니까 꼭 잘 챙기자! ✈️",
+      action:{type:"clue"}}, {label:"여권"}, "item_passport");
+  } else if(key==="phone"){
+    openPhone();
+  }
+}
+/* ---- 스마트폰 잠금해제 팝업 ---- */
+let phoneVal="";
+const PHONE_ANS="924B4840";
+function openPhone(){
+  const ov=$("#phone"); phoneVal="";
+  if(state.flags.phone_unlocked){
+    $("#phoneImg").src="img/phone_home.jpg";
+    $("#phoneScreen").style.display="none"; $("#phoneKeys").style.display="none";
+  } else {
+    $("#phoneImg").src="img/phone_lock.jpg";
+    $("#phoneScreen").style.display=""; $("#phoneKeys").style.display="";
+    $("#phoneLockMsg").textContent="🔒 스마트폰이 잠겨있어";
+    $("#phoneInput").textContent="";
+    buildPhoneKeys();
+  }
+  SFX.open();
+  ov.style.display="flex";
+}
+function closePhone(){ $("#phone").style.display="none"; }
+function buildPhoneKeys(){
+  const keys=$("#phoneKeys"); keys.innerHTML="";
+  ["1","2","3","4","5","6","7","8","9","A","0","B"].forEach(k=>{
+    const b=document.createElement("button"); b.className="pkey"; b.textContent=k;
+    b.onclick=()=>phoneTap(k); keys.appendChild(b);
+  });
+  const bk=document.createElement("button"); bk.className="pkey pback"; bk.textContent="⌫";
+  bk.onclick=()=>{ phoneVal=phoneVal.slice(0,-1); $("#phoneInput").textContent=phoneVal; };
+  keys.appendChild(bk);
+}
+function phoneTap(k){
+  if(state.flags.phone_unlocked) return;
+  if(phoneVal.length>=PHONE_ANS.length) return;
+  phoneVal+=k; $("#phoneInput").textContent=phoneVal; if(SFX.tap)SFX.tap(); vib(6);
+  if(phoneVal.length===PHONE_ANS.length){
+    if(phoneVal===PHONE_ANS){ phoneUnlock(); }
+    else {
+      $("#phoneLockMsg").textContent="❌ 비밀번호가 틀렸어";
+      setTimeout(()=>{ phoneVal=""; $("#phoneInput").textContent=""; $("#phoneLockMsg").textContent="🔒 스마트폰이 잠겨있어"; }, 900);
+    }
+  }
+}
+function phoneUnlock(){
+  state.flags.phone_unlocked=true; save();
+  if(SFX.success)SFX.success();
+  toast("🔓 비밀번호가 풀렸어!");   // ★한 번만(잠금해제는 1회)
+  $("#phoneImg").src="img/phone_home.jpg";
+  $("#phoneScreen").style.display="none"; $("#phoneKeys").style.display="none";
+}
 function solveCloseup(a){
   const {id}=cuCtx;
   if(a.give){ give(a.give); SFX.item(); } else SFX.success();
