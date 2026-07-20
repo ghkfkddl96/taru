@@ -357,7 +357,6 @@ const MAPS = {
         img:"img/closeup/carrier.jpg", badge:"🔢",
         caption:"🧳 컨베이어벨트에서 찾은 우리 가방.\n3자리 번호 자물쇠가 걸려 있어.",
         action:{type:"numlock", len:3, answer:"601",
-          hint:"전광판에서 본 우리 항공편(SQ601) 뒤 3자리",
           success:"딸깍! 가방이 열리고 사물함 열쇠가 나왔다. 🔑",
           give:["key1"], setFlag:"gotKey"} }},
       { x:22,y:50, w:44,h:13, label:"사물함", closeup:{
@@ -487,7 +486,6 @@ const MAPS = {
         img:"TODO", badge:"🛎️",
         caption:"🛎️ 리셉션 직원에게 체크인!\n'예약 확인 번호를 알려주세요'\n4자리 번호를 입력하자.",
         action:{type:"numlock", len:4, answer:"0815",
-          hint:"예약 확인 번호 (실제 여행 때 받은 번호로 교체 예정)",
           success:"체크인 완료! 방 열쇠를 받았다. 🔑\n이제 우리 방으로 올라가자.",
           setFlag:"reception_done"} }},
     ],
@@ -540,11 +538,11 @@ const MAPS = {
   garden:{
     name:"실내 식물원 · 클라우드 포레스트", sub:"안개 낀 실내 숲속", photo:"img/garden.jpg",
     hotspots:[
-      {x:50,y:20,emoji:"⛲",label:"실내폭포", clue:{e:"⛲",t:"안내판: '피어난 꽃의 수를 세어보세요'"}},
+      {x:50,y:20,emoji:"⛲",label:"실내폭포", clue:{e:"⛲",t:"안내판: '피어난 꽃의 수를 세어보세요. 분홍이 먼저, 노랑이 그다음.'"}},
       {x:26,y:44,emoji:"🌸",label:"분홍 꽃밭", clue:{e:"🌸",t:"분홍 꽃은 4송이."}},
       {x:74,y:44,emoji:"🌼",label:"노란 꽃밭", clue:{e:"🌼",t:"노란 꽃은 2송이."}},
       {x:50,y:64,emoji:"🔒",label:"꽃의 자물쇠", once:true,
-        lock:{len:2, answer:"42", hint:"핀 꽃의 수 (분홍, 그다음 노랑)",
+        lock:{len:2, answer:"42",
           success:"덩굴이 열렸다. 열쇠조각 획득! 🌿", give:["frag2"], setFlag:"g_done"}},
     ],
     exits:[{to:"downtown", label:"중심지로", emoji:"🏙️", dir:"left"}]
@@ -558,7 +556,7 @@ const MAPS = {
       {x:50,y:52,emoji:"🟥",label:"빨간 카펫", clue:{e:"🟥",t:"빨간 카펫. (2번 자리)"}},
       {x:76,y:46,emoji:"🟨",label:"노란 카펫", clue:{e:"🟨",t:"노란 카펫. (3번 자리)"}},
       {x:50,y:66,emoji:"🔒",label:"골목 자물쇠", once:true,
-        lock:{len:3, answer:"123", hint:"파랑·빨강·노랑 카펫의 자리 번호를 순서대로!",
+        lock:{len:3, answer:"123",
           success:"골목 끝 문이 열렸다. 열쇠조각 획득! 🪔", give:["frag3"], setFlag:"a_done"}},
     ],
     exits:[{to:"downtown", label:"중심지로", emoji:"🏙️", dir:"left"}]
@@ -570,14 +568,14 @@ const MAPS = {
       {x:50,y:22,emoji:"🦁",label:"머라이언", clue:{e:"🦁",t:"받침대 각인: '내가 뿜는 물줄기의 수를 세어라'"}},
       {x:30,y:46,emoji:"💧",label:"물줄기", clue:{e:"💧",t:"물줄기를 세어보니… 5줄기."}},
       {x:50,y:64,emoji:"🔒",label:"분수 자물쇠", once:true,
-        lock:{len:1, answer:"5", hint:"머라이언이 뿜는 물줄기의 수",
+        lock:{len:1, answer:"5",
           success:"분수가 멈추더니 열쇠조각이 나타났다! 🦁", give:["frag4"], setFlag:"ml_done"}},
     ],
     exits:[{to:"downtown", label:"중심지로", emoji:"🏙️", dir:"left"}]
   },
 };
 
-const FINAL = { answer:"0815", hint:"네 개의 조각에 적힌 숫자를 순서대로!\n(조각1·조각2·조각3·조각4)" };
+const FINAL = { answer:"0815", hint:"네 개의 조각에 적힌 숫자를 순서대로!" };
 
 /* ---- 사운드 (Web Audio 합성, 파일 불필요) + 햅틱 ---- */
 let _actx=null;
