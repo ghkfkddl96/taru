@@ -26,7 +26,7 @@
   #topbar{ flex:0 0 auto; padding:12px 16px 8px; text-align:center;
     background:linear-gradient(180deg,#fff,rgba(255,255,255,0)); z-index:5; }
   #roomName{font-size:19px; font-weight:800; letter-spacing:-.3px;}
-  #roomSub{font-size:12px; color:#9a8ba5; margin-top:2px;}
+  #roomSub{display:none;}
   #progress{margin-top:7px; height:7px; border-radius:99px; background:#f0e4ec; overflow:hidden;}
   #progressBar{height:100%; width:0%; border-radius:99px;
     background:linear-gradient(90deg,var(--pop),var(--gold)); transition:width .4s;}
@@ -678,7 +678,7 @@ function fragCount(){ return ["m_done","g_done","a_done","ml_done"].filter(f=>st
 /* ---- 렌더 ---- */
 function render(){
   const r=MAPS[state.room]; if(!r) return;
-  $("#roomName").textContent=r.name; $("#roomSub").textContent=r.sub;
+  $("#roomName").textContent=r.name; $("#roomSub").textContent="";
 
   scene.innerHTML="";
   const wrap=document.createElement("div"); wrap.id="photoWrap";
