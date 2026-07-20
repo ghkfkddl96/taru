@@ -537,13 +537,9 @@ const MAPS = {
 
   garden:{
     name:"실내 식물원 · 클라우드 포레스트", sub:"안개 낀 실내 숲속", photo:"img/garden.jpg",
+    // 퍼즐 자리 비움 — 북쑥이 새 문제 직접 추가 예정 (기존: 꽃 수 세기, 답42, frag2/g_done)
     hotspots:[
-      {x:50,y:20,emoji:"⛲",label:"실내폭포", clue:{e:"⛲",t:"안내판: '피어난 꽃의 수를 세어보세요. 분홍이 먼저, 노랑이 그다음.'"}},
-      {x:26,y:44,emoji:"🌸",label:"분홍 꽃밭", clue:{e:"🌸",t:"분홍 꽃은 4송이."}},
-      {x:74,y:44,emoji:"🌼",label:"노란 꽃밭", clue:{e:"🌼",t:"노란 꽃은 2송이."}},
-      {x:50,y:64,emoji:"🔒",label:"꽃의 자물쇠", once:true,
-        lock:{len:2, answer:"42",
-          success:"덩굴이 열렸다. 열쇠조각 획득! 🌿", give:["frag2"], setFlag:"g_done"}},
+      {x:50,y:38,emoji:"⛲",label:"실내폭포", clue:{e:"⛲",t:"35m 실내폭포에서 안개가 피어오른다.\n구름 속을 걷는 기분!"}},
     ],
     exits:[{to:"downtown", label:"중심지로", emoji:"🏙️", dir:"left"}]
   },
