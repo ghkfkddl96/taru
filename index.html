@@ -333,10 +333,11 @@ const ICONS = {
   luggage:  _svg('<rect x="5" y="7" width="14" height="14" rx="2"/><path d="M9 7V4h6v3M9 12v4M15 12v4"/>'),
   star:     _svg('<path d="M12 3l2.6 5.6 6.1.6-4.6 4.1 1.4 6L12 16.9 6.5 19.3l1.4-6L3.3 9.2l6.1-.6z"/>'),
   lock:     _svg('<rect x="5" y="11" width="14" height="10" rx="1.5"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>'),
+  plane:    _svg('<path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/>'),
 };
 const DEST_ICON = { jewel:"droplet", downtown:"building", marina:"building", supertree:"leaf", garden:"leaf",
   arab:"landmark", merlion:"landmark", sentosa:"umbrella", laupasat:"utensils", police:"shield",
-  ibis:"bed", room:"bed", bakkutteh:"utensils", universal:"star", airport:"luggage", __ending:"bed" };
+  ibis:"bed", room:"bed", bakkutteh:"utensils", universal:"star", airport:"plane", __ending:"bed" };
 
 /* 핫스팟 종류
    A) 클로즈업형:  {x,y,label, closeup:{img, caption, badge, action}}
@@ -401,8 +402,8 @@ const MAPS = {
         clue:{e:"📋",t:"각 명소에서 퍼즐을 풀면 '열쇠조각🧩'을 준대.\n네 조각을 다 모으면… 마지막 장소가 열린다?"}},
     ],
     exits:[
+      {to:"airport", label:"공항", emoji:"✈️", dir:"left"},
       {to:"marina", label:"마리나", emoji:"🏨", dir:"right"},
-      {to:"garden", label:"식물원", emoji:"🌿", dir:"right"},
       {to:"arab",   label:"아랍", emoji:"🕌", dir:"right"},
       {to:"merlion",label:"머라이언", emoji:"🦁", dir:"right"},
       {to:"sentosa",label:"센토사", emoji:"🏖️", dir:"right"},
@@ -521,6 +522,7 @@ const MAPS = {
     exits:[
       {to:"downtown", label:"중심지", emoji:"🏙️", dir:"left"},
       {to:"supertree", label:"슈퍼트리", emoji:"🌳", dir:"right"},
+      {to:"garden", label:"식물원", emoji:"🌿", dir:"right"},
     ]
   },
 
@@ -541,7 +543,7 @@ const MAPS = {
     hotspots:[
       {x:50,y:38,emoji:"⛲",label:"실내폭포", clue:{e:"⛲",t:"35m 실내폭포에서 안개가 피어오른다.\n구름 속을 걷는 기분!"}},
     ],
-    exits:[{to:"downtown", label:"중심지로", emoji:"🏙️", dir:"left"}]
+    exits:[{to:"marina", label:"마리나", emoji:"🏨", dir:"left"}]
   },
 
   arab:{
@@ -741,6 +743,8 @@ const TRANSITIONS = {
   "downtown>ibis":   {img:"img/transit/citywalk.jpg", icon:"🚶", text:"걸어서 이동 중"},
   "marina>supertree":{img:"img/transit/citywalk.jpg", icon:"🚶", text:"걸어서 이동 중"},
   "supertree>marina":{img:"img/transit/citywalk.jpg", icon:"🚶", text:"걸어서 이동 중"},
+  "marina>garden":   {img:"img/transit/citywalk.jpg", icon:"🚶", text:"걸어서 이동 중"},
+  "garden>marina":   {img:"img/transit/citywalk.jpg", icon:"🚶", text:"걸어서 이동 중"},
   "default":         {img:"img/transit/bus.jpg",    icon:"🚌", text:"버스 타고 이동 중", transit:true},
 };
 const TRANSIT_MS = 5000;  // 5초 자동 진행 (디버그: 탭 즉시스킵 + 0.9초 자동)
