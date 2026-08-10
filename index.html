@@ -887,7 +887,7 @@ const CLOCK_NS="http://www.w3.org/2000/svg";
 const CLOCK_HANDS=[                      // len=보이는 길이, r0~r1=클릭영역 반지름 구간(겹치지 않게)
   {k:"h", len:16, w:2.7, col:"#c62828", r0:3,  r1:16},
   {k:"m", len:24, w:2.0, col:"#141414", r0:18, r1:25},
-  {k:"s", len:32, w:1.1, col:"#141414", r0:27, r1:33},
+  {k:"s", len:32, w:0.6, col:"#141414", r0:27, r1:33},
 ];
 let clockPos=null;
 function _cel(t,at){ const e=document.createElementNS(CLOCK_NS,t); for(const k in at) e.setAttribute(k,at[k]); return e; }
