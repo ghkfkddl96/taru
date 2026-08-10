@@ -884,39 +884,53 @@ function openCloseup(cu, h, id){
    클릭영역을 바늘마다 다른 반지름 구간에 두어, 바늘이 겹쳐도 원하는 걸 집을 수 있다.
    답은 hotspot의 action에 로마숫자 위치(1~12, 12는 0)로 적는다. */
 const CLOCK_NS="http://www.w3.org/2000/svg";
-const CLOCK_HANDS=[                      // len=보이는 길이, r0~r1=클릭영역 반지름 구간(겹치지 않게)
-  {k:"h", len:16, w:2.7, col:"#c62828", r0:3,  r1:16},
-  {k:"m", len:24, w:2.0, col:"#141414", r0:18, r1:25},
-  {k:"s", len:32, w:0.6, col:"#141414", r0:27, r1:33},
+// ★그리는 순서 = 뒤에서 앞으로. 초침이 맨 뒤, 시침이 맨 앞(겹치면 시침이 잡힌다).
+// hit=클릭영역 길이(중심부터), hw=클릭영역 굵기 — 손가락으로 집기 좋게 넉넉히.
+const CLOCK_HANDS=[
+  {k:"s", len:32, w:0.6, col:"#141414", hit:33, hw:13},
+  {k:"m", len:24, w:2.0, col:"#141414", hit:25, hw:15},
+  {k:"h", len:16, w:2.7, col:"#c62828", hit:17, hw:17},
 ];
-let clockPos=null;
+let clockPos=null, clockDeg=null;   // pos=0~11 칸, deg=누적 각도(11→12에서 거꾸로 안 돌게)
 function _cel(t,at){ const e=document.createElementNS(CLOCK_NS,t); for(const k in at) e.setAttribute(k,at[k]); return e; }
-function _turn(g,idx){ g.style.transform="rotate("+(idx*30)+"deg)"; }
+function _turn(g,deg){ g.style.transform="rotate("+deg+"deg)"; }
 function buildClock(a, id){
   const wrap=$("#cuImgWrap"); if(!wrap) return;
   const solved=!!state.done[id];
   clockPos = solved ? {h:a.hour%12, m:a.minute%12, s:a.second%12} : {h:0,m:0,s:0};
+  clockDeg = {h:clockPos.h*30, m:clockPos.m*30, s:clockPos.s*30};
   const svg=_cel("svg",{"class":"cu-clock",viewBox:"0 0 100 100"});
   CLOCK_HANDS.forEach(H=>{
     const g=_cel("g",{"class":"hand hand-"+H.k});
     g.appendChild(_cel("line",{x1:50,y1:50,x2:50,y2:50-H.len,stroke:H.col,
       "stroke-width":H.w,"stroke-linecap":"round","pointer-events":"none"}));
     // 투명 손잡이 — pointer-events:stroke 라야 안 보여도 눌린다(기본값 visiblePainted는 투명이면 무시됨)
-    g.appendChild(_cel("line",{x1:50,y1:50-H.r0,x2:50,y2:50-H.r1,
-      stroke:"#000","stroke-opacity":"0","stroke-width":11,
-      "stroke-linecap":"butt","pointer-events":"stroke"}));
-    _turn(g, clockPos[H.k]);
+    g.appendChild(_cel("line",{x1:50,y1:50,x2:50,y2:50-H.hit,
+      stroke:"#000","stroke-opacity":"0","stroke-width":H.hw,
+      "stroke-linecap":"round","pointer-events":"stroke"}));
+    _turn(g, clockDeg[H.k]);
     g.addEventListener("click",ev=>{ ev.stopPropagation(); tickHand(H.k,a,id); });
     svg.appendChild(g);
   });
-  svg.appendChild(_cel("circle",{cx:50,cy:50,r:1.9,fill:"#c62828"}));
+  // ★중앙 허브: 원본 사진의 가운데(주얼 폭포 로고가 있는 검은 원)만 동그랗게 오려서 바늘 위에 덮는다.
+  //   사진이 정확히 중심 50%,50%로 크롭돼 있어서 같은 이미지를 100×100으로 다시 깔면 딱 맞는다.
+  const defs=_cel("defs",{});
+  const cp=_cel("clipPath",{id:"clkHubClip"});
+  cp.appendChild(_cel("circle",{cx:50,cy:50,r:6.3}));
+  defs.appendChild(cp); svg.appendChild(defs);
+  const hub=_cel("image",{x:0,y:0,width:100,height:100,"clip-path":"url(#clkHubClip)",
+    preserveAspectRatio:"none","pointer-events":"none"});
+  hub.setAttribute("href", (cuCtx&&cuCtx.cu&&cuCtx.cu.img) || "img/closeup/clock.jpg");
+  hub.setAttributeNS("http://www.w3.org/1999/xlink","xlink:href", hub.getAttribute("href"));
+  svg.appendChild(hub);
   wrap.appendChild(svg);
 }
 function tickHand(k, a, id){
   if(state.done[id]) { toast("시계는 이미 맞춰뒀어."); return; }
   clockPos[k]=(clockPos[k]+1)%12;
+  clockDeg[k]+=30;                                   // ★누적 — 11칸→12칸에서 거꾸로 안 돈다
   const g=document.querySelector("#cuImgWrap .hand-"+k);
-  if(g) _turn(g, clockPos[k]);
+  if(g) _turn(g, clockDeg[k]);
   SFX.key(); vib(6);
   if(clockPos.h===a.hour%12 && clockPos.m===a.minute%12 && clockPos.s===a.second%12){
     state.done[id]=true;
