@@ -126,6 +126,13 @@
     display:none; flex-direction:column; align-items:center; justify-content:center; padding:20px;
     backdrop-filter:blur(3px); }
   #cuImgWrap{ position:relative; max-width:100%; max-height:56%; }
+  /* 벽시계 퍼즐 오버레이 — 바늘만 클릭 가능, 나머지는 사진 그대로 */
+  .cu-clock{ position:absolute; left:0; top:0; width:100%; height:100%; z-index:4; pointer-events:none; overflow:visible; }
+  .cu-clock .hand{ pointer-events:auto; cursor:pointer; transform-origin:50px 50px;
+    transition:transform .22s cubic-bezier(.34,1.32,.5,1); }
+  .cu-clock .hand:active{ filter:brightness(1.6); }
+  @media(hover:hover){ .cu-clock .hand:hover{ filter:drop-shadow(0 0 2px rgba(255,107,157,.9)); } }
+  @media(prefers-reduced-motion:reduce){ .cu-clock .hand{ transition:none; } }
   #cuImg{ max-width:100%; max-height:100%; border-radius:16px; box-shadow:0 16px 46px rgba(0,0,0,.6);
     -webkit-user-drag:none; }
   #cuPlaceholder{ display:none; flex-direction:column; align-items:center; justify-content:center;
@@ -317,6 +324,7 @@ const ITEMS = {
   frag1:{emoji:"🧩", name:"조각1"}, frag2:{emoji:"🧩", name:"조각2"},
   frag3:{emoji:"🧩", name:"조각3"}, frag4:{emoji:"🧩", name:"조각4"},
   flower:{emoji:"🌺", name:"꽃"},
+  battery:{emoji:"🔋", name:"건전지"},
 };
 
 /* 방향표지판용 흰색 벡터 아이콘 (싱가포르 도로표지 픽토그램 느낌) */
@@ -388,6 +396,15 @@ const MAPS = {
           {x:22,y:80,w:30,h:28,label:"인형 진열대", closeup:{
             img:"img/dolls.jpg", badge:"🧸",
             caption:"🧸 귀여운 인형들이 많이 있다! 🐰🐱🦁🐘🐻\n경찰복 입은 애들 너무 귀엽다 💙", action:{type:"clue"} }},
+          {x:63,y:13,w:17,h:19,label:"벽에 걸린 시계", closeup:{
+            img:"img/closeup/clock.jpg", badge:"🕰️",
+            caption:"🕰️ 로마숫자 벽시계.\n바늘이 헐겁게 달려 있어 — 눌러서 돌릴 수 있겠는데?",
+            action:{type:"clock", hour:5, minute:1, second:8,
+              /* 성공 시 열릴 팝업 */
+              prize:{ img:"img/closeup/battery.jpg", badge:"🔋",
+                caption:"딸깍 —\n무언가 떨어졌다.",
+                action:{type:"give", give:["battery"],
+                  success:"건전지를 챙겼다! 🔋", setFlag:"got_battery"} } } }},
         ] }},
     ],
     exits:[{to:"airport", label:"수하물 찾는 곳으로", emoji:"🧳", dir:"left"}]
@@ -841,6 +858,9 @@ function openCloseup(cu, h, id){
     b.onclick=()=>solveCloseup(a);
     acts.appendChild(b);
   }
+  // ★벽시계 퍼즐: 사진 위에 바늘을 얹는다 (버튼 없음 — 바늘을 직접 누른다)
+  { const w0=$("#cuImgWrap"); if(w0) w0.querySelectorAll(".cu-clock").forEach(e=>e.remove()); }
+  if(a.type==="clock") buildClock(a, id);
   // ★팝업 속 서브 핫스팟(사진 위 클릭영역 → 중첩 팝업). 맵 요소와 동일한 반짝임영역 방식.
   { const wrap=$("#cuImgWrap");
     if(wrap){
@@ -859,8 +879,57 @@ function openCloseup(cu, h, id){
   $("#closeup").style.display="flex";
   $("#app").classList.add("cuOpen");   // 가방을 팝업 위로 강조
 }
+/* ---- 벽시계 퍼즐 ----
+   바늘 하나를 누르면 1칸(30°)씩 돈다. 시침=1시간 / 분침=5분 / 초침=5초 → 셋 다 12칸.
+   클릭영역을 바늘마다 다른 반지름 구간에 두어, 바늘이 겹쳐도 원하는 걸 집을 수 있다.
+   답은 hotspot의 action에 로마숫자 위치(1~12, 12는 0)로 적는다. */
+const CLOCK_NS="http://www.w3.org/2000/svg";
+const CLOCK_HANDS=[                      // len=보이는 길이, r0~r1=클릭영역 반지름 구간(겹치지 않게)
+  {k:"h", len:16, w:2.7, col:"#c62828", r0:3,  r1:16},
+  {k:"m", len:24, w:2.0, col:"#141414", r0:18, r1:25},
+  {k:"s", len:32, w:1.1, col:"#141414", r0:27, r1:33},
+];
+let clockPos=null;
+function _cel(t,at){ const e=document.createElementNS(CLOCK_NS,t); for(const k in at) e.setAttribute(k,at[k]); return e; }
+function _turn(g,idx){ g.style.transform="rotate("+(idx*30)+"deg)"; }
+function buildClock(a, id){
+  const wrap=$("#cuImgWrap"); if(!wrap) return;
+  const solved=!!state.done[id];
+  clockPos = solved ? {h:a.hour%12, m:a.minute%12, s:a.second%12} : {h:0,m:0,s:0};
+  const svg=_cel("svg",{"class":"cu-clock",viewBox:"0 0 100 100"});
+  CLOCK_HANDS.forEach(H=>{
+    const g=_cel("g",{"class":"hand hand-"+H.k});
+    g.appendChild(_cel("line",{x1:50,y1:50,x2:50,y2:50-H.len,stroke:H.col,
+      "stroke-width":H.w,"stroke-linecap":"round","pointer-events":"none"}));
+    // 투명 손잡이 — pointer-events:stroke 라야 안 보여도 눌린다(기본값 visiblePainted는 투명이면 무시됨)
+    g.appendChild(_cel("line",{x1:50,y1:50-H.r0,x2:50,y2:50-H.r1,
+      stroke:"#000","stroke-opacity":"0","stroke-width":11,
+      "stroke-linecap":"butt","pointer-events":"stroke"}));
+    _turn(g, clockPos[H.k]);
+    g.addEventListener("click",ev=>{ ev.stopPropagation(); tickHand(H.k,a,id); });
+    svg.appendChild(g);
+  });
+  svg.appendChild(_cel("circle",{cx:50,cy:50,r:1.9,fill:"#c62828"}));
+  wrap.appendChild(svg);
+}
+function tickHand(k, a, id){
+  if(state.done[id]) { toast("시계는 이미 맞춰뒀어."); return; }
+  clockPos[k]=(clockPos[k]+1)%12;
+  const g=document.querySelector("#cuImgWrap .hand-"+k);
+  if(g) _turn(g, clockPos[k]);
+  SFX.key(); vib(6);
+  if(clockPos.h===a.hour%12 && clockPos.m===a.minute%12 && clockPos.s===a.second%12){
+    state.done[id]=true;
+    setTimeout(()=>{
+      SFX.lock(); vib([28,40,70]);                       // 딸깍
+      if(a.prize) openCloseup(a.prize, {label:"떨어진 것"}, id+"_prize");
+    }, 430);
+  }
+}
+
 function closeCloseup(){
   clearInterval(cuAnim); cuAnim=null;
+  { const w0=$("#cuImgWrap"); if(w0) w0.querySelectorAll(".cu-clock").forEach(e=>e.remove()); }
   if(cuStack.length){ const p=cuStack.pop(); openCloseup(p.cu, p.h, p.id); return; }   // ★중첩팝업: ✕ 누르면 부모 팝업으로 복귀
   const w=$("#cuImgWrap"); if(w) w.querySelectorAll(".cu-subspot").forEach(e=>e.remove());
   $("#closeup").style.display="none"; $("#app").classList.remove("cuOpen"); cuCtx=null;
