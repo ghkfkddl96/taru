@@ -325,6 +325,11 @@ const ITEMS = {
   frag3:{emoji:"🧩", name:"조각3"}, frag4:{emoji:"🧩", name:"조각4"},
   flower:{emoji:"🌺", name:"꽃"},
   battery:{emoji:"🔋", name:"건전지"},
+  // 손전등 — 건전지를 끼우기 전엔 렌즈가 어둡고, 끼우면 노랗게 빛난다(render에서 교체)
+  flashlight:{name:"손전등", inspect:"flashlight",
+    svg:'<svg viewBox="0 0 24 24"><rect x="2.6" y="9.2" width="3.4" height="5.6" rx="1" fill="#23272b"/><rect x="5.6" y="8.6" width="8.6" height="6.8" rx="1.1" fill="#2f353a"/><rect x="7.2" y="10.2" width="1.5" height="3.6" rx=".5" fill="#7d868d"/><rect x="13.8" y="7.4" width="3" height="9.2" rx="1" fill="#3b4249"/><path d="M16.6 6.6 L21.2 4.6 L21.2 19.4 L16.6 17.4 Z" fill="#464e56"/><ellipse cx="21" cy="12" rx="1.1" ry="6.6" fill="#2a2f34"/></svg>'},
+  flashlight_on:{name:"손전등", inspect:"flashlight",
+    svg:'<svg viewBox="0 0 24 24"><rect x="2.6" y="9.2" width="3.4" height="5.6" rx="1" fill="#23272b"/><rect x="5.6" y="8.6" width="8.6" height="6.8" rx="1.1" fill="#2f353a"/><rect x="7.2" y="10.2" width="1.5" height="3.6" rx=".5" fill="#ffd76a"/><rect x="13.8" y="7.4" width="3" height="9.2" rx="1" fill="#3b4249"/><path d="M16.6 6.6 L21.2 4.6 L21.2 19.4 L16.6 17.4 Z" fill="#464e56"/><ellipse cx="21" cy="12" rx="1.2" ry="6.8" fill="#ffe08a"/><ellipse cx="21" cy="12" rx="1.2" ry="6.8" fill="none" stroke="#fff3c4" stroke-width=".5"/></svg>'},
 };
 
 /* 방향표지판용 흰색 벡터 아이콘 (싱가포르 도로표지 픽토그램 느낌) */
@@ -484,7 +489,17 @@ const MAPS = {
             caption:"🔐 트렁크에 3자리 다이얼 자물쇠가 달려 있다.",
             action:{type:"numlock", len:3, answer:"149",
               success:"철컥 — 트렁크가 열렸다!",
-              setFlag:"p_trunk"} }},
+              setFlag:"p_trunk",
+              prize:{ img:"img/closeup/trunk_open.jpg", badge:"🔦", label:"열린 트렁크",
+                caption:"트렁크가 열렸다.\n바닥에 뭔가 하나 놓여 있다.",
+                action:{type:"clue"},
+                subspots:[
+                  {x:48,y:74,w:26,h:16,label:"손전등", closeup:{
+                    img:"img/closeup/flashlight_empty.jpg", badge:"🔦",
+                    caption:"🔦 손전등이다!",
+                    action:{type:"give", give:["flashlight"],
+                      success:"손전등 획득! 🔦\n건전지 칸이 비어 있는데…"} }},
+                ] } } }},
         ] }},
     ],
     exits:[
@@ -748,7 +763,8 @@ function renderInv(){
   inv.innerHTML="";
   if(!state.inv.length){ inv.innerHTML='<div id="invEmpty">아직 주운 게 없어. 반짝이는 곳을 눌러봐!</div>'; return; }
   state.inv.forEach(key=>{
-    const it=ITEMS[key]; if(!it) return;
+    let it=ITEMS[key]; if(!it) return;
+    if(key==="flashlight" && state.flags.fl_loaded) it=ITEMS.flashlight_on;   // 건전지 끼우면 렌즈가 밝아진다
     const el=document.createElement("div"); el.className="invItem"+(selected===key?" sel":"")+(it.inspect?" inspectable":"");
     el.innerHTML=(it.svg||it.emoji)+'<span class="nm">'+it.name+'</span>';
     if(it.inspect) el.title="더블탭하면 자세히 볼 수 있어";
@@ -886,7 +902,9 @@ function openCloseup(cu, h, id){
         el.style.left=s.x+"%"; el.style.top=s.y+"%";
         if(s.w) el.style.width=s.w+"%"; if(s.h) el.style.height=s.h+"%";
         el.title=s.label||"";
-        el.onclick=(ev)=>{ ev.stopPropagation(); SFX.tap(); vib(8); cuStack.push({cu,h,id}); openCloseup(s.closeup, s, id+"_s"+si); };
+        el.onclick=(ev)=>{ ev.stopPropagation();
+          if(s.insert){ doInsert(s.insert, id+"_s"+si); return; }   // ★그 자리에서 아이템 끼우기
+          SFX.tap(); vib(8); cuStack.push({cu,h,id}); openCloseup(s.closeup, s, id+"_s"+si); };
         wrap.appendChild(el);
       });
     } }
@@ -973,6 +991,22 @@ function openInspect(key){
       action:{type:"clue"}}, {label:"여권"}, "item_passport");
   } else if(key==="phone"){
     openPhone();
+  } else if(key==="flashlight"){
+    // 건전지를 이미 끼웠으면 볼 게 없다(북쑥 요청: 그 뒤엔 팝업 안 뜸)
+    if(state.flags.fl_loaded){ toast("건전지도 넣었고, 이제 켜기만 하면 돼 🔦"); return; }
+    openCloseup({img:"img/closeup/flashlight_empty.jpg", badge:"🔦",
+      caption:"🔦 손전등. 건전지 칸이 비어 있다.\n가방에서 건전지를 골라 넣어보자.",
+      action:{type:"clue"},
+      subspots:[
+        {x:46,y:51,w:34,h:16,label:"빈 건전지 칸",
+          insert:{ needItem:"battery", consume:true, setFlag:"fl_loaded", label:"손전등",
+            noItem:"건전지가 있어야 넣지…",
+            pick:"가방에서 🔋건전지를 골라서 넣어봐",
+            success:"딸깍! 건전지를 끼웠다. 이제 손전등을 쓸 수 있어 🔦",
+            next:{img:"img/closeup/flashlight_loaded.jpg", badge:"🔦",
+              caption:"🔦 건전지를 끼웠다!\n어두운 곳에서 쓸 수 있겠어.",
+              action:{type:"clue"}} }},
+      ]}, {label:"손전등"}, "item_flashlight");
   }
 }
 /* ---- 스마트폰 잠금해제 팝업 ---- */
@@ -1029,8 +1063,32 @@ function solveCloseup(a){
   if(a.give){ give(a.give); SFX.item(); } else SFX.success();
   if(a.setFlag) state.flags[a.setFlag]=true;
   state.done[id]=true;
+  // ★prize가 있으면 모달 대신 다음 팝업으로 이어간다(자물쇠 풀고 → 안을 들여다보는 흐름)
+  if(a.prize){
+    toast(a.success||"열렸다!");
+    openCloseup(a.prize, {label:a.prize.label||""}, id+"_prize");
+    render(); return;
+  }
   closeCloseupAll();
   showModal("🎉","성공!",a.success||"해결했다!");
+  render();
+}
+
+/* ---- 아이템 끼워넣기 (건전지 → 손전등) ----
+   subspot에 insert:{...}를 달면 팝업을 새로 열지 않고 그 자리에서 처리한다. */
+function doInsert(ins, id){
+  if(selected!==ins.needItem){
+    if(has(ins.needItem)) toast(ins.pick||("가방에서 "+((ITEMS[ins.needItem]||{}).name||"아이템")+"을(를) 골라서 넣어봐"));
+    else toast(ins.noItem||"뭔가 끼워야 할 것 같은데…");
+    SFX.fail(); return;
+  }
+  if(ins.consume){ state.inv=state.inv.filter(k=>k!==ins.needItem); selected=null; }
+  if(ins.setFlag) state.flags[ins.setFlag]=true;
+  if(ins.swapItem){ state.inv=state.inv.map(k=>k===ins.swapItem[0]?ins.swapItem[1]:k); }
+  state.done[id]=true;
+  SFX.item(); vib([22,32,60]);
+  if(ins.next) openCloseup(ins.next, {label:ins.label||""}, id+"_after");
+  toast(ins.success||"끼웠다!");
   render();
 }
 
