@@ -468,11 +468,24 @@ const MAPS = {
   police:{
     name:"올드힐스트리트 경찰서", sub:"창문이 무지개색인 옛 경찰서", photo:"img/police.jpg",
     hotspots:[
-      {x:34,y:36,emoji:"🌈",label:"무지개 창문",
+      {x:33,y:64,emoji:"🌈",label:"무지개 창문",
         clue:{e:"🌈",t:"창문 덧문이 층마다 무지개색!\n빨강·주황·노랑·초록·파랑·보라 순으로 칠해져 있어."}},
-      {x:64,y:44,emoji:"🟡",label:"노란 창문 구역", clue:{e:"🟡",t:"오른쪽 구역은 온통 노란 창문이 모여 있네."}},
-      {x:50,y:74,emoji:"🚔",label:"건물 입구",
+      {x:79,y:58,emoji:"🟢",label:"초록 창문 구역", clue:{e:"🟢",t:"오른쪽 끝 구역은 온통 초록 창문이 모여 있네."}},
+      {x:18,y:84,emoji:"🚔",label:"건물 입구",
         clue:{e:"🚔",t:"지금은 문화·예술 정보를 다루는 건물로 쓰여.\n바로 근처에 유명한 바쿠테(육골차) 집이 있대."}},
+      // 도로에 선 초록 2층버스 → 경찰차 클로즈업 → 트렁크 3자리 자물쇠
+      { x:57,y:86, w:30,h:12, label:"도로에 선 버스", closeup:{
+        img:"img/closeup/police_car.jpg", badge:"🚓",
+        caption:"🚓 경찰차가 정차해 있다.",
+        action:{type:"clue"},
+        subspots:[
+          {x:21,y:72,w:26,h:34,label:"트렁크", closeup:{
+            img:"img/closeup/police_trunk.jpg", badge:"🔢",
+            caption:"🔐 트렁크에 3자리 다이얼 자물쇠가 달려 있다.",
+            action:{type:"numlock", len:3, answer:"000",
+              success:"철컥 — 트렁크가 열렸다!",
+              setFlag:"p_trunk"} }},
+        ] }},
     ],
     exits:[
       {to:"downtown", label:"중심지로", emoji:"🏙️", dir:"left"},
