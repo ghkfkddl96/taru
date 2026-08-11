@@ -131,9 +131,8 @@
     backdrop-filter:blur(3px); }
   #cuImgWrap{ position:relative; max-width:100%; max-height:56%; }
   /* 손거울 — 벽에 비스듬히 대고 좌우로 끌어 맞춘다 */
-  .cu-mirror{ position:absolute; z-index:6; cursor:grab; touch-action:none;
-    filter:drop-shadow(-6px 10px 14px rgba(0,0,0,.5)); transition:filter .2s; }
-  .cu-mirror.grabbing{ cursor:grabbing; filter:drop-shadow(-8px 14px 18px rgba(0,0,0,.6)); }
+  .cu-mirror{ position:absolute; z-index:6; cursor:grab; touch-action:none; }
+  .cu-mirror.grabbing{ cursor:grabbing; }
   .cu-mirror.locked{ cursor:default; }
   .mirGlass{ position:absolute; inset:0; overflow:hidden; border-radius:3px; background:#c9d4d8; }
   .mirGlass img{ position:absolute; max-width:none; }
