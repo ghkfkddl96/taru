@@ -143,7 +143,7 @@
   .mirSheen{ position:absolute; inset:0; pointer-events:none;
     background:linear-gradient(112deg, rgba(255,255,255,.30) 0%, rgba(255,255,255,.05) 26%,
       rgba(255,255,255,0) 46%, rgba(255,255,255,.13) 74%, rgba(255,255,255,.03) 100%); }
-  .mirFrame{ position:absolute; inset:-7px; border:7px solid #8d7f6b; border-radius:6px;
+  .mirFrame{ position:absolute; inset:-3px; border:3px solid #8d7f6b; border-radius:5px;
     box-shadow:inset 0 0 0 1px rgba(255,255,255,.25), 0 0 0 1px rgba(0,0,0,.35); pointer-events:none; }
   .cu-mirror.locked .mirFrame{ border-color:#a8925f; }
   .mirGrip{ position:absolute; left:50%; bottom:-30px; transform:translateX(-50%);
@@ -695,8 +695,7 @@ const MAPS = {
         caption:"🧱 담벼락에 뭔가 세로로 칠해져 있다.\n칠하다 만 것 같다.",
         action:{type:"mirror", needItem:"mirror", targetX:48.9, tol:2.6,
           scratch:"img/closeup/mirror_scratch.png",
-          noItem:"반쪽만 남은 자국이라 읽을 수가 없다.",
-          success:"글자가 맞물렸다 — 쥐 · 오 · 티 · 와이", setFlag:"arab_mirror"} }},
+          noItem:"반쪽만 남은 자국이라 읽을 수가 없다."} }},
     ],
     exits:[{to:"downtown", label:"중심지로", emoji:"🏙️", dir:"left"}]
   },
@@ -1093,11 +1092,12 @@ const pickSet = a => PICK_SETS[a.set] || PICK_SETS.food;
    거울은 벽에 정면으로 댄다 — 기울여 봤더니 글자가 어긋나 보여서 북쑥이 정면을 택했다.
    쓰는 법: action:{type:"mirror", needItem:"mirror", targetX:48.9, tol:2.6, scratch:"...", ...} */
 let mirState=null;
-function clearMirror(){ document.querySelectorAll("#cuImgWrap .cu-mirror").forEach(e=>e.remove()); mirState=null; }
+function clearMirror(){ if(mirState&&mirState.ro) mirState.ro.disconnect();
+  document.querySelectorAll("#cuImgWrap .cu-mirror").forEach(e=>e.remove()); mirState=null; }
 function buildMirror(a, id){
   clearMirror();
+  if(a.needItem && !has(a.needItem)) return;      // 거울을 가지고 있을 때만 벽에 대볼 수 있다
   const wrap=$("#cuImgWrap"), img=$("#cuImg"); if(!wrap||!img) return;
-  const solved=!!state.done[id];
 
   const el=document.createElement("div"); el.className="cu-mirror";
   el.innerHTML =
@@ -1112,7 +1112,7 @@ function buildMirror(a, id){
   refl.src = img.getAttribute("src");
 
   // 거울 왼쪽 모서리 위치를 사진 폭의 %로 들고 다닌다
-  mirState = { x: solved ? a.targetX : (a.startX!=null?a.startX:28), a, id, done:solved };
+  mirState = { x: (a.startX!=null?a.startX:28), a, id };
 
   function layout(){
     const iw=img.clientWidth, ih=img.clientHeight;
@@ -1129,21 +1129,23 @@ function buildMirror(a, id){
              scr.style.left=(-anchor)+"px"; scr.style.top=(-my)+"px"; }
   }
   mirState.layout=layout;
-  layout(); if(!img.complete) img.addEventListener("load", layout, {once:true});
-
-  if(solved){ el.classList.add("locked"); return; }
+  layout();
+  requestAnimationFrame(layout);                                   // 첫 레이아웃 직후 한 번 더
+  if(!img.complete || !img.naturalWidth) img.addEventListener("load", layout, {once:true});
+  if(window.ResizeObserver){                                       // 사진 크기가 잡히는 순간 따라간다
+    const ro=new ResizeObserver(()=>layout()); ro.observe(img); mirState.ro=ro;
+  }
 
   // ---- 손가락으로 좌우로 끌기 ----
   let dragging=false, grabDX=0;
   const pxToPct = px => px / Math.max(1, img.clientWidth) * 100;
   el.addEventListener("pointerdown", ev=>{
-    if(mirState.done) return;
     ev.preventDefault(); ev.stopPropagation();
     dragging=true; try{ el.setPointerCapture(ev.pointerId); }catch(e){} el.classList.add("grabbing");
     grabDX = ev.clientX - el.getBoundingClientRect().left;
   });
   el.addEventListener("pointermove", ev=>{
-    if(!dragging||mirState.done) return;
+    if(!dragging) return;
     ev.preventDefault();
     const wrapL = img.getBoundingClientRect().left;
     let nx = pxToPct(ev.clientX - grabDX - wrapL);
@@ -1159,15 +1161,12 @@ function buildMirror(a, id){
   el.addEventListener("pointerup", drop);
   el.addEventListener("pointercancel", drop);
 
+  // 정답 알림은 일부러 없다 — 맞춰놓고 글자를 읽어서 스스로 알아채는 퍼즐이라
+  // "성공!" 을 띄우면 답을 확인시켜 주는 꼴이 된다. 자석처럼 붙여만 준다.
   function check(){
-    if(mirState.done) return;
-    if(!has(a.needItem)){ toast(a.noItem||"뭔가 비춰볼 게 있어야 할 것 같다."); return; }
     if(Math.abs(mirState.x - a.targetX) <= (a.tol||2.5)){
-      mirState.x = a.targetX; layout();                  // 딱 맞는 자리에 붙여준다
-      mirState.done = true; state.done[id]=true;
-      el.classList.add("locked");
-      SFX.item(); vib([20,40,80]);
-      setTimeout(()=>solveCloseup(a), 420);
+      mirState.x = a.targetX; layout();
+      SFX.key(); vib(10);
     }
   }
 }
