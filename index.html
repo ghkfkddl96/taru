@@ -126,20 +126,13 @@
     display:none; flex-direction:column; align-items:center; justify-content:center; padding:20px;
     backdrop-filter:blur(3px); }
   #cuImgWrap{ position:relative; max-width:100%; max-height:56%; }
-  /* 메뉴 아이콘 고르기 (1행 N칸) */
-  .pickRow{ display:flex; gap:8px; justify-content:center; margin-top:4px; }
-  .pickCell{ width:58px; height:58px; border-radius:12px; background:#fdfaf6;
-    border:2px solid #d8c9b6; box-shadow:0 3px 10px rgba(0,0,0,.28);
+  /* 메뉴 아이콘 고르기 (1행 N칸) — 사진 바로 아래, 설명글 위 */
+  .pickRow{ display:flex; gap:10px; justify-content:center; margin:12px 0 2px; flex:0 0 auto; }
+  .pickCell{ width:66px; height:66px; border-radius:13px; background:#fdfaf6;
+    border:2px solid #cbb9a2; box-shadow:0 3px 12px rgba(0,0,0,.32);
     display:flex; align-items:center; justify-content:center; cursor:pointer; }
-  .pickCell svg{ width:40px; height:40px; }
+  .pickCell svg{ width:52px; height:52px; }
   .pickCell:active{ transform:scale(.93); }
-  /* 사진 위에 얹는 경우 (상자 버튼 자리 등) */
-  .pickCell.onPhoto{ position:absolute; transform:translate(-50%,-50%); width:15%; aspect-ratio:1; height:auto;
-    z-index:5; background:rgba(253,250,246,.94); border-color:#b9a68e; }
-  .pickCell.onPhoto svg{ width:76%; height:76%; }
-  .pickCell.onPhoto:active{ transform:translate(-50%,-50%) scale(.93); }
-  .pickCell.onPhoto.pop{ animation:pickPopP .22s ease-out; }
-  @keyframes pickPopP{ 0%{transform:translate(-50%,-50%) scale(.86)} 60%{transform:translate(-50%,-50%) scale(1.06)} 100%{transform:translate(-50%,-50%) scale(1)} }
   .pickCell.pop{ animation:pickPop .22s ease-out; }
   @keyframes pickPop{ 0%{transform:scale(.86)} 60%{transform:scale(1.06)} 100%{transform:scale(1)} }
   @media(prefers-reduced-motion:reduce){ .pickCell.pop{animation:none} }
@@ -457,7 +450,7 @@ const MAPS = {
   vivocity:{
     name:"비보시티", sub:"센토사로 가는 관문 쇼핑몰", photo:"img/vivocity.jpg",
     hotspots:[
-      { x:35,y:44, w:30,h:11, label:"송파 바쿠테", closeup:{
+      { x:35,y:50, w:30,h:11, label:"송파 바쿠테", closeup:{
         img:"img/closeup/vivo_songfa.jpg", badge:"🍲",
         caption:"🍲 몰 안에도 송파 바쿠테가 있다.\n점심때라 자리가 거의 찼다.",
         action:{type:"clue"},
@@ -466,13 +459,9 @@ const MAPS = {
             img:"img/closeup/vivo_box.jpg", badge:"📦",
             caption:"📦 테이블 위에 놓인 나무 상자.\n앞면에 네모난 버튼 네 개가 달려 있다.",
             action:{type:"picker", answer:["rice","veggie","skewer","can"],
-              size:13,
-              slots:[{x:35.4,y:58.8},{x:53.1,y:57.8},{x:70.5,y:55.8},{x:86.8,y:53.4}],
               success:"덜컥 — 상자 뚜껑이 열렸다.",
               setFlag:"vivo_box"} }},
         ] }},
-      { x:70,y:73, w:26,h:12, label:"몰 안내판",
-        clue:{e:"🗺️",t:"비보시티 층별 안내도.\n센토사로 넘어가는 길은 3층이라고 적혀 있다."}},
     ],
     exits:[
       {to:"downtown", label:"중심지로", emoji:"🏙️", dir:"left"},
@@ -937,7 +926,8 @@ function openCloseup(cu, h, id){
   // ★벽시계 퍼즐: 사진 위에 바늘을 얹는다 (버튼 없음 — 바늘을 직접 누른다)
   { const w0=$("#cuImgWrap"); if(w0) w0.querySelectorAll(".cu-clock").forEach(e=>e.remove()); }
   if(a.type==="clock") buildClock(a, id);
-  // ★메뉴 아이콘 고르기: 팝업 아래에 빈칸 N개
+  // ★메뉴 아이콘 고르기: 사진 아래에 빈칸 N개 (다른 팝업으로 넘어가면 반드시 지운다)
+  clearPicker();
   if(a.type==="picker" && !solved) buildPicker(a, id);
   // ★팝업 속 서브 핫스팟(사진 위 클릭영역 → 중첩 팝업). 맵 요소와 동일한 반짝임영역 방식.
   { const wrap=$("#cuImgWrap");
@@ -963,40 +953,48 @@ function openCloseup(cu, h, id){
    빈칸을 누를 때마다 아이콘이 하나씩 바뀐다. N칸이 전부 정답이면 통과.
    아이콘 순서는 송파바쿠테 메뉴간판(3×3)과 같게 맞춰둠 — 간판을 보고 대조할 수 있도록.
    쓰는 법: action:{type:"picker", answer:["rice","veggie","skewer","can"], success:"...", setFlag:"..."}   */
-const _ln='fill="none" stroke="#141414" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"';
+/* 48×48 좌표계. 선은 굵게, 실루엣이 한눈에 읽히도록 채우기도 섞는다.
+   ★간판 그림을 베끼지 않고, 그 음식 하면 떠오르는 대표 형태로 그린다(북쑥 지시). */
+const _ln='fill="none" stroke="#141414" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"';
+const _fl='fill="#141414"';
 const PICK_ICONS=[
-  {k:"shrimp", name:"새우튀김", svg:`<svg viewBox="0 0 24 24"><path ${_ln} d="M4.5 14.5h15l-1.4 4.4a1.6 1.6 0 0 1-1.5 1.1H7.4a1.6 1.6 0 0 1-1.5-1.1z"/><path ${_ln} d="M4.5 14.5c3-1.2 11.5-1.2 15 0"/><path ${_ln} d="M8.6 13.8c-.6-2.8.3-5 2.3-6.2"/><path ${_ln} d="M12.2 13.8c-.6-3.2.4-5.6 2.6-6.9"/><path ${_ln} d="M15.8 13.8c-.4-2.4.4-4.2 2-5.2"/><path ${_ln} d="M10.9 7.6l-1.5-1.3M14.8 6.9l-1.5-1.3"/></svg>`},
-  {k:"skewer", name:"꼬치",     svg:`<svg viewBox="0 0 24 24"><path ${_ln} d="M2 8h20M2 12h20M2 16h20"/><rect ${_ln} x="6" y="6.4" width="3.4" height="3.2" rx="1"/><rect ${_ln} x="11" y="6.4" width="3.4" height="3.2" rx="1"/><rect ${_ln} x="6" y="10.4" width="3.4" height="3.2" rx="1"/><rect ${_ln} x="11" y="10.4" width="3.4" height="3.2" rx="1"/><rect ${_ln} x="6" y="14.4" width="3.4" height="3.2" rx="1"/><rect ${_ln} x="11" y="14.4" width="3.4" height="3.2" rx="1"/></svg>`},
-  {k:"egg",    name:"계란조림", svg:`<svg viewBox="0 0 24 24"><ellipse ${_ln} cx="12" cy="15" rx="9" ry="4.4"/><ellipse ${_ln} cx="8.6" cy="12.6" rx="3.1" ry="2.6"/><ellipse ${_ln} cx="15.4" cy="12.6" rx="3.1" ry="2.6"/><ellipse ${_ln} cx="12" cy="15.4" rx="3.1" ry="2.6"/><circle ${_ln} cx="12" cy="15.4" r="1.1"/></svg>`},
-  {k:"veggie", name:"공심채",   svg:`<svg viewBox="0 0 24 24"><ellipse ${_ln} cx="12" cy="16.4" rx="8.6" ry="3.6"/><path ${_ln} d="M4.6 15.2c2.6-2.6 5.4-4.2 8.4-4.8"/><path ${_ln} d="M6.4 16.6c3-3.4 6.6-5.4 10.4-5.8"/><path ${_ln} d="M8.4 17.4c3.2-2.6 6.6-4 10.4-4.2"/><path ${_ln} d="M13 10.4c1 .2 1.6.8 1.8 1.6M17 10.8c.9.3 1.4 1 1.5 1.8"/></svg>`},
-  {k:"soup",   name:"갈비탕",   svg:`<svg viewBox="0 0 24 24"><path ${_ln} d="M3.4 11.2h12.4l-1 6.6a2.2 2.2 0 0 1-2.2 1.9H6.6a2.2 2.2 0 0 1-2.2-1.9z"/><path ${_ln} d="M3.4 11.2c3-1 9.4-1 12.4 0"/><path ${_ln} d="M8.6 10.8l3.8-4.2"/><path ${_ln} d="M11.6 7.4c.7-.9 1.7-1 2.3-.4s.4 1.6-.5 2.2"/><path ${_ln} d="M18.6 10.6c.9 2.2.5 4.6-1.2 6.4"/></svg>`},
-  {k:"rice",   name:"볶음밥",   svg:`<svg viewBox="0 0 24 24"><ellipse ${_ln} cx="12" cy="14.6" rx="9.2" ry="5"/><ellipse ${_ln} cx="12" cy="13.6" rx="7" ry="3.6"/><circle fill="#141414" cx="9.4" cy="13" r=".8"/><circle fill="#141414" cx="12.4" cy="12.4" r=".8"/><circle fill="#141414" cx="14.8" cy="13.8" r=".8"/><circle fill="#141414" cx="10.8" cy="14.8" r=".8"/></svg>`},
-  {k:"noodle", name:"국수",     svg:`<svg viewBox="0 0 24 24"><path ${_ln} d="M3.5 11.5h13l-1 6.2a2 2 0 0 1-2 1.6H6.5a2 2 0 0 1-2-1.6z"/><path ${_ln} d="M6.4 13.4c1.4 2 5.8 2 7.2 0"/><path ${_ln} d="M14 12.6L21 6.4M15.6 13.4L22 8"/><path ${_ln} d="M8.4 9.4c.6-1 .2-1.8-.2-2.6M11 9c.6-1.2.2-2.1-.3-3"/></svg>`},
-  {k:"can",    name:"캔음료",   svg:`<svg viewBox="0 0 24 24"><rect ${_ln} x="4" y="5.5" width="6.4" height="13" rx="1.4"/><path ${_ln} d="M4 8.4h6.4M4 15.6h6.4"/><path ${_ln} d="M13.6 9h6.4l-.9 9.4h-4.6z"/><path ${_ln} d="M13.9 12.4h5.8"/></svg>`},
-  {k:"teapot", name:"주전자",   svg:`<svg viewBox="0 0 24 24"><path ${_ln} d="M5.5 11h11v4.6a3 3 0 0 1-3 3H8.5a3 3 0 0 1-3-3z"/><path ${_ln} d="M5.5 12.4c-1.8.4-3 1.2-3 2.2"/><path ${_ln} d="M2.5 14.6c0 .9.9 1.6 2.2 2"/><path ${_ln} d="M8 11c0-2 1.8-3.4 4-3.4S16 9 16 11"/><circle ${_ln} cx="12" cy="6.4" r="1.1"/></svg>`},
+  // 새우 한 마리 — 구부러진 몸통 + 마디 + 꼬리 + 더듬이
+  // 꼬리 달린 새우튀김 — 통통한 튀김옷 몸통 + 갈라진 꼬리
+  {k:"shrimp", name:"새우튀김", svg:`<svg viewBox="0 0 48 48"><path ${_ln} d="M17 14c0-4 3-7 7-7s7 3 7 7l2.5 18c0 3.5-4 5.5-9.5 5.5S14.5 35.5 14.5 32z"/><path ${_ln} d="M20 37.5L15 45M24 38v7M28 37.5L33 45"/><path ${_ln} d="M16.5 21c4 2 11 2 15 0M17.5 28c4 2 9 2 13 0"/></svg>`},
+  // 꼬치 — 사선 막대 + 고기 세 덩이(채움)
+  {k:"skewer", name:"꼬치",     svg:`<svg viewBox="0 0 48 48"><path ${_ln} d="M9 39L39 9"/><rect ${_fl} x="12" y="20.5" width="11" height="9" rx="3" transform="rotate(-45 17.5 25)"/><rect ${_fl} x="19" y="13.5" width="11" height="9" rx="3" transform="rotate(-45 24.5 18)"/><rect ${_fl} x="26" y="6.5" width="11" height="9" rx="3" transform="rotate(-45 31.5 11)"/></svg>`},
+  // 삶은 계란 반쪽 — 흰자 + 노른자
+  {k:"egg",    name:"계란조림", svg:`<svg viewBox="0 0 48 48"><ellipse ${_ln} cx="24" cy="26" rx="14" ry="16"/><ellipse ${_fl} cx="24" cy="27" rx="6.5" ry="7"/><path ${_ln} d="M15 16c2-3 4-5 7-6"/></svg>`},
+  // 잎채소 다발 — 줄기 + 넓은 잎 두 장
+  {k:"veggie", name:"공심채",   svg:`<svg viewBox="0 0 48 48"><path ${_ln} d="M24 42V16"/><path ${_ln} d="M24 26c-9 0-14-5-14-12 8 0 14 4 14 12z"/><path ${_ln} d="M24 20c0-8 6-13 14-13 0 8-5 13-14 13z"/><path ${_ln} d="M24 34c-6 0-9-3-9-7 5 0 9 2 9 7z"/></svg>`},
+  // 국물 그릇 + 갈비뼈가 삐죽 + 김
+  {k:"soup",   name:"갈비탕",   svg:`<svg viewBox="0 0 48 48"><path ${_ln} d="M7 24h30l-2.6 12A5 5 0 0 1 29.5 40h-15a5 5 0 0 1-4.9-4z"/><path ${_ln} d="M7 24c8-3 22-3 30 0"/><path ${_ln} d="M19 23l7-10"/><path ${_ln} d="M25 15c1.4-2 3.6-2.2 4.8-.8 1.2 1.4.7 3.4-1.2 4.6"/><path ${_ln} d="M15 12c1.4-2 1-3.6 0-5M23 9c1.4-2 1-3.6 0-5"/></svg>`},
+  // 접시 위 봉긋한 밥 + 밥알
+  {k:"rice",   name:"볶음밥",   svg:`<svg viewBox="0 0 48 48"><path ${_ln} d="M10 30c0-8 6-13 14-13s14 5 14 13"/><ellipse ${_ln} cx="24" cy="32" rx="19" ry="5.5"/><circle ${_fl} cx="19" cy="25" r="1.9"/><circle ${_fl} cx="27" cy="23" r="1.9"/><circle ${_fl} cx="31" cy="28" r="1.9"/><circle ${_fl} cx="22" cy="29.5" r="1.9"/></svg>`},
+  // 그릇 + 젓가락으로 집어올린 면발
+  {k:"noodle", name:"국수",     svg:`<svg viewBox="0 0 48 48"><path ${_ln} d="M7 26h28l-2.4 11A5 5 0 0 1 27.7 41H14.3a5 5 0 0 1-4.9-4z"/><path ${_ln} d="M7 26c8-3 20-3 28 0"/><path ${_ln} d="M13 30c3 4 13 4 16 0"/><path ${_ln} d="M31 24L43 10M35 27L46 15"/><path ${_ln} d="M31 24c-2-5 0-9 3-12"/></svg>`},
+  // 음료 캔 — 위에 따개 탭
+  {k:"can",    name:"캔음료",   svg:`<svg viewBox="0 0 48 48"><path ${_ln} d="M16 13h16v26a3 3 0 0 1-3 3H19a3 3 0 0 1-3-3z"/><ellipse ${_ln} cx="24" cy="13" rx="8" ry="3.4"/><ellipse ${_fl} cx="24" cy="12.6" rx="3" ry="1.4"/><path ${_ln} d="M16 21h16M16 34h16"/></svg>`},
+  // 주전자 — 뚜껑꼭지 + 주둥이 + 손잡이
+  {k:"teapot", name:"주전자",   svg:`<svg viewBox="0 0 48 48"><path ${_ln} d="M12 22h22v10a8 8 0 0 1-8 8h-6a8 8 0 0 1-8-8z"/><path ${_ln} d="M12 25c-4 1-7 3-7 6s3 5 7 6"/><path ${_ln} d="M15 22c0-5 4-8 8-8s8 3 8 8"/><path ${_ln} d="M34 26c4 1 7 3 7 6"/><circle ${_fl} cx="23" cy="12" r="2.6"/></svg>`},
 ];
-const PICK_BLANK=`<svg viewBox="0 0 24 24"><path ${_ln} stroke-dasharray="2.6 2.4" d="M4 4h16v16H4z"/></svg>`;
+const PICK_BLANK=`<svg viewBox="0 0 48 48"><path ${_ln} stroke-dasharray="5 4.5" d="M9 9h30v30H9z"/></svg>`;
 let pickSel=null;   // 각 칸의 아이콘 인덱스 (-1 = 빈칸)
+function clearPicker(){ document.querySelectorAll("#closeup .pickRow").forEach(e=>e.remove()); }
 function buildPicker(a, id){
+  clearPicker();
+  const wrap=$("#cuImgWrap"); if(!wrap) return;
   const n=(a.answer||[]).length||4;
   const solved=!!state.done[id];
   pickSel = solved ? a.answer.map(k=>PICK_ICONS.findIndex(i=>i.k===k)) : new Array(n).fill(-1);
-  // slots가 있으면 사진 위에 얹고(상자 버튼 위 등), 없으면 팝업 아래에 한 줄로
-  const onPhoto = !!(a.slots && a.slots.length===n);
-  const host = onPhoto ? $("#cuImgWrap") : $("#cuActions");
-  if(!host) return;
-  host.querySelectorAll(".pickCell,.pickRow").forEach(e=>e.remove());
-  const row = onPhoto ? host : document.createElement("div");
-  if(!onPhoto) row.className="pickRow";
+  const row=document.createElement("div"); row.className="pickRow";
   for(let i=0;i<n;i++){
-    const c=document.createElement("div"); c.className="pickCell"+(onPhoto?" onPhoto":""); c.dataset.i=i;
-    if(onPhoto){ c.style.left=a.slots[i].x+"%"; c.style.top=a.slots[i].y+"%";
-      if(a.size){ c.style.width=a.size+"%"; c.style.height="auto"; c.style.aspectRatio="1"; } }
+    const c=document.createElement("div"); c.className="pickCell"; c.dataset.i=i;
     c.innerHTML = pickSel[i]<0 ? PICK_BLANK : PICK_ICONS[pickSel[i]].svg;
     c.onclick=(ev)=>{ ev.stopPropagation(); cyclePick(i, a, id); };
     row.appendChild(c);
   }
-  if(!onPhoto) host.appendChild(row);
+  wrap.insertAdjacentElement("afterend", row);   // 사진 바로 아래 · 설명글 위 (사진을 안 가린다)
 }
 function cyclePick(i, a, id){
   if(state.done[id]) return;
@@ -1073,6 +1071,7 @@ function tickHand(k, a, id){
 function closeCloseup(){
   clearInterval(cuAnim); cuAnim=null;
   { const w0=$("#cuImgWrap"); if(w0) w0.querySelectorAll(".cu-clock").forEach(e=>e.remove()); }
+  clearPicker();
   if(cuStack.length){ const p=cuStack.pop(); openCloseup(p.cu, p.h, p.id); return; }   // ★중첩팝업: ✕ 누르면 부모 팝업으로 복귀
   const w=$("#cuImgWrap"); if(w) w.querySelectorAll(".cu-subspot").forEach(e=>e.remove());
   $("#closeup").style.display="none"; $("#app").classList.remove("cuOpen"); cuCtx=null;
