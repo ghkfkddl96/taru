@@ -135,6 +135,8 @@
   .pickCell{ width:66px; height:66px; border-radius:13px; background:#fdfaf6;
     border:2px solid #cbb9a2; box-shadow:0 3px 12px rgba(0,0,0,.32);
     display:flex; align-items:center; justify-content:center; cursor:pointer; }
+  .pickLetter{ font-size:34px; font-weight:800; color:#2c2418; letter-spacing:1px;
+    font-family:ui-monospace,"SF Mono",Menlo,monospace; line-height:1; }
   .pickCell svg, .pickCell img{ width:54px; height:54px; object-fit:contain; display:block; -webkit-user-drag:none; }
   .pickCell:active{ transform:scale(.93); }
   .pickCell.pop{ animation:pickPop .22s ease-out; }
@@ -340,6 +342,7 @@ const ITEMS = {
   frag3:{emoji:"🧩", name:"조각3"}, frag4:{emoji:"🧩", name:"조각4"},
   flower:{emoji:"🌺", name:"꽃"},
   battery:{emoji:"🔋", name:"건전지"},
+  mirror:{emoji:"🪞", name:"거울"},
   // 손전등 — 건전지를 끼우기 전엔 렌즈가 어둡고, 끼우면 노랗게 빛난다(render에서 교체)
   flashlight:{name:"손전등", inspect:"flashlight",
     svg:'<svg viewBox="0 0 24 24"><rect x="2.6" y="9.2" width="3.4" height="5.6" rx="1" fill="#23272b"/><rect x="5.6" y="8.6" width="8.6" height="6.8" rx="1.1" fill="#2f353a"/><rect x="7.2" y="10.2" width="1.5" height="3.6" rx=".5" fill="#7d868d"/><rect x="13.8" y="7.4" width="3" height="9.2" rx="1" fill="#3b4249"/><path d="M16.6 6.6 L21.2 4.6 L21.2 19.4 L16.6 17.4 Z" fill="#464e56"/><ellipse cx="21" cy="12" rx="1.1" ry="6.6" fill="#2a2f34"/></svg>'},
@@ -365,7 +368,7 @@ const ICONS = {
 };
 const DEST_ICON = { jewel:"droplet", downtown:"building", marina:"building", supertree:"leaf", garden:"leaf",
   arab:"landmark", merlion:"landmark", sentosa:"umbrella", laupasat:"utensils", police:"shield",
-  ibis:"bed", room:"bed", bakkutteh:"utensils", universal:"star", airport:"plane", vivocity:"building", __ending:"bed" };
+  ibis:"bed", room:"bed", bakkutteh:"utensils", universal:"star", airport:"plane", vivocity:"building", fortcanning:"leaf", __ending:"bed" };
 
 /* 핫스팟 종류
    A) 클로즈업형:  {x,y,label, closeup:{img, caption, badge, action}}
@@ -543,6 +546,32 @@ const MAPS = {
     exits:[
       {to:"downtown", label:"중심지로", emoji:"🏙️", dir:"left"},
       {to:"bakkutteh", label:"송파 바쿠테", emoji:"🍲", dir:"right"},
+      {to:"fortcanning", label:"포트 캐닝", emoji:"🌳", dir:"right"},
+    ]
+  },
+
+  /* 포트 캐닝 — 경찰서 바로 옆 언덕공원. 나선계단 위 원형 창(트리터널)이 유명하다.
+     왼쪽 벽에 붙은 돌상자 안에 거울이 들어 있다. */
+  fortcanning:{
+    name:"포트 캐닝", sub:"나무 터널이 내려다보이는 나선계단", photo:"img/fortcanning.jpg",
+    hotspots:[
+      { x:14,y:60, w:26,h:14, label:"벽에 붙은 돌상자", closeup:{
+        img:"img/closeup/fc_box.jpg", badge:"🪨",
+        caption:"🪨 벽에 붙은 돌상자.\n네모난 돌 네 개가 나란히 박혀 있다.",
+        action:{type:"picker", set:"alpha", answer:["S","G","P","R"],
+          success:"드르륵 — 돌 뚜껑이 열렸다.", setFlag:"fc_box",
+          prize:{ img:"img/closeup/fc_box_open.jpg", badge:"🪞", label:"열린 돌상자",
+            caption:"뚜껑이 열렸다.\n안쪽에 무언가 세워져 있다.",
+            action:{type:"clue"},
+            subspots:[
+              {x:50,y:48,w:26,h:16,label:"거울", closeup:{
+                img:"img/closeup/fc_box_open.jpg", badge:"🪞",
+                caption:"🪞 작은 거울이다.",
+                action:{type:"give", give:["mirror"], success:"거울 획득! 🪞"} }},
+            ] } } }},
+    ],
+    exits:[
+      {to:"police", label:"경찰서로", emoji:"🚔", dir:"left"},
     ]
   },
 
@@ -860,6 +889,8 @@ const TRANSITIONS = {
   "vivocity>sentosa": {img:"img/transit/mrt.jpg",   icon:"🚈", text:"지하철 타고 이동 중", transit:true},
   "sentosa>vivocity": {img:"img/transit/mrt.jpg",   icon:"🚈", text:"지하철 타고 이동 중", transit:true},
   "police>bakkutteh":{img:"img/transit/songfa.jpg", icon:"🚶", text:"걸어서 이동 중"},
+  "police>fortcanning":{img:"img/transit/walk.jpg", icon:"🚶", text:"걸어서 이동 중"},
+  "fortcanning>police":{img:"img/transit/walk.jpg", icon:"🚶", text:"걸어서 이동 중"},
   "bakkutteh>police":{img:"img/transit/songfa.jpg", icon:"🚶", text:"걸어서 이동 중"},
   "downtown>ibis":   {img:"img/transit/citywalk.jpg", icon:"🚶", text:"걸어서 이동 중"},
   "marina>supertree":{img:"img/transit/citywalk.jpg", icon:"🚶", text:"걸어서 이동 중"},
@@ -1007,20 +1038,34 @@ const PICK_ICONS=[
   {k:"teapot", name:"주전자",   img:"img/icon/teapot.png"},
 ];
 PICK_ICONS.forEach(o=>{ const im=new Image(); im.src=o.img; });   // 토글할 때 깜빡이지 않게 미리 받아둔다
-const pickHTML = i => `<img src="${PICK_ICONS[i].img}" alt="${PICK_ICONS[i].name}" draggable="false">`;
 const PICK_BLANK=`<svg viewBox="0 0 48 48"><path fill="none" stroke="#141414" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="5 4.5" d="M9 9h30v30H9z"/></svg>`;
-let pickSel=null;   // 각 칸의 아이콘 인덱스 (-1 = 빈칸)
+
+/* ★보기 묶음 — action.set 으로 고른다 (없으면 음식 아이콘)
+   food : 빈칸에서 시작해 한 번 누를 때마다 아이콘이 바뀐다
+   alpha: A로 시작해 알파벳 12자를 순서대로 돈다 (정답에 쓰는 A·S·G·P·R 포함) */
+const ALPHA_KEYS = "ADEGKLMNPRST".split("");
+const PICK_SETS = {
+  food : { keys: PICK_ICONS.map(o=>o.k), start:-1,
+           html: i => i<0 ? PICK_BLANK
+                          : `<img src="${PICK_ICONS[i].img}" alt="${PICK_ICONS[i].name}" draggable="false">` },
+  alpha: { keys: ALPHA_KEYS, start:0,
+           html: i => `<span class="pickLetter">${ALPHA_KEYS[i]}</span>` },
+};
+const pickSet = a => PICK_SETS[a.set] || PICK_SETS.food;
+
+let pickSel=null;   // 각 칸이 고른 보기의 번호 (food는 -1이 빈칸)
 function clearPicker(){ document.querySelectorAll("#closeup .pickRow").forEach(e=>e.remove()); }
 function buildPicker(a, id){
   clearPicker();
   const wrap=$("#cuImgWrap"); if(!wrap) return;
+  const S=pickSet(a);
   const n=(a.answer||[]).length||4;
   const solved=!!state.done[id];
-  pickSel = solved ? a.answer.map(k=>PICK_ICONS.findIndex(i=>i.k===k)) : new Array(n).fill(-1);
+  pickSel = solved ? a.answer.map(k=>S.keys.indexOf(k)) : new Array(n).fill(S.start);
   const row=document.createElement("div"); row.className="pickRow";
   for(let i=0;i<n;i++){
     const c=document.createElement("div"); c.className="pickCell"; c.dataset.i=i;
-    c.innerHTML = pickSel[i]<0 ? PICK_BLANK : pickHTML(pickSel[i]);
+    c.innerHTML = S.html(pickSel[i]);
     c.onclick=(ev)=>{ ev.stopPropagation(); cyclePick(i, a, id); };
     row.appendChild(c);
   }
@@ -1028,11 +1073,12 @@ function buildPicker(a, id){
 }
 function cyclePick(i, a, id){
   if(state.done[id]) return;
-  pickSel[i] = (pickSel[i]+1) % PICK_ICONS.length;      // -1 → 0 → … → 8 → 0
+  const S=pickSet(a);
+  pickSel[i] = (pickSel[i]+1) % S.keys.length;          // 끝까지 가면 처음으로 돌아온다
   const c=document.querySelector('.pickCell[data-i="'+i+'"]');
-  if(c){ c.innerHTML=pickHTML(pickSel[i]); c.classList.remove("pop"); void c.offsetWidth; c.classList.add("pop"); }
+  if(c){ c.innerHTML=S.html(pickSel[i]); c.classList.remove("pop"); void c.offsetWidth; c.classList.add("pop"); }
   SFX.key(); vib(6);
-  const ok = (a.answer||[]).every((k,j)=> pickSel[j]>=0 && PICK_ICONS[pickSel[j]].k===k);
+  const ok = (a.answer||[]).every((k,j)=> pickSel[j]>=0 && S.keys[pickSel[j]]===k);
   if(ok){ state.done[id]=true; setTimeout(()=>solveCloseup(a), 380); }
 }
 
