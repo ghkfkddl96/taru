@@ -469,7 +469,7 @@ const MAPS = {
       {to:"merlion",label:"머라이언", emoji:"🦁", dir:"right"},
       {to:"vivocity",label:"비보시티", emoji:"🛍️", dir:"right"},
       {to:"laupasat",label:"라우파삿", emoji:"🍢", dir:"right"},
-      {to:"police",label:"경찰서", emoji:"🌈", dir:"right"},
+      {to:"police",label:"올드힐", emoji:"🌈", dir:"right"},
       {to:"ibis", label:"이비스", emoji:"🏩", dir:"right"},
     ]
   },
@@ -679,17 +679,17 @@ const MAPS = {
   },
 
   arab:{
-    name:"아랍 스트리트 · 캄퐁글람", sub:"황금 돔과 알록달록한 골목", photo:"img/arab.jpg",
+    name:"아랍 스트리트", sub:"황금 돔과 알록달록한 골목", photo:"img/arab.jpg",
     hotspots:[
-      {x:50,y:20,emoji:"🕌",label:"술탄 모스크", clue:{e:"🕌",t:"타일: '카펫을 파랑-빨강-노랑 순으로 밟으면 길이 열린다'"}},
-      {x:24,y:46,emoji:"🟦",label:"파란 카펫", clue:{e:"🟦",t:"파란 카펫. (1번 자리)"}},
-      {x:50,y:52,emoji:"🟥",label:"빨간 카펫", clue:{e:"🟥",t:"빨간 카펫. (2번 자리)"}},
-      {x:76,y:46,emoji:"🟨",label:"노란 카펫", clue:{e:"🟨",t:"노란 카펫. (3번 자리)"}},
-      {x:50,y:66,emoji:"🔒",label:"골목 자물쇠", once:true,
+      {x:55,y:29,emoji:"🕌",label:"술탄 모스크", clue:{e:"🕌",t:"타일: '천을 파랑-빨강-노랑 순으로 걷으면 길이 열린다'"}},
+      {x:37,y:43,emoji:"🟦",label:"파란 천", clue:{e:"🟦",t:"파란 천. (1번 자리)"}},
+      {x:26,y:60,emoji:"🟥",label:"빨간 천", clue:{e:"🟥",t:"빨간 천. (2번 자리)"}},
+      {x:88,y:60,emoji:"🟨",label:"노란 천", clue:{e:"🟨",t:"노란 천. (3번 자리)"}},
+      {x:62,y:72,emoji:"🔒",label:"골목 자물쇠", once:true,
         lock:{len:3, answer:"123",
           success:"골목 끝 문이 열렸다. 열쇠조각 획득! 🪔", give:["frag3"], setFlag:"a_done"}},
       // 거울을 대야 읽히는 벽 — 반쪽만 칠해진 글씨
-      { x:22,y:74, w:26,h:14, label:"페인트 벗겨진 벽", closeup:{
+      { x:10,y:26, w:19,h:27, label:"페인트 벗겨진 벽", closeup:{
         img:"img/closeup/arab_wall.jpg", badge:"🔎",
         caption:"🧱 담벼락에 뭔가 세로로 칠해져 있다.\n칠하다 만 것 같다.",
         action:{type:"mirror", needItem:"mirror", targetX:48.9, tol:2.6,
