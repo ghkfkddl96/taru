@@ -130,6 +130,28 @@
     display:none; flex-direction:column; align-items:center; justify-content:center; padding:20px;
     backdrop-filter:blur(3px); }
   #cuImgWrap{ position:relative; max-width:100%; max-height:56%; }
+  /* 손거울 — 벽에 비스듬히 대고 좌우로 끌어 맞춘다 */
+  .cu-mirror{ position:absolute; z-index:6; cursor:grab; touch-action:none;
+    transform:rotate(-7deg); transform-origin:50% 50%;
+    filter:drop-shadow(-6px 10px 14px rgba(0,0,0,.5)); transition:filter .2s; }
+  .cu-mirror.grabbing{ cursor:grabbing; filter:drop-shadow(-8px 14px 18px rgba(0,0,0,.6)); }
+  .cu-mirror.locked{ cursor:default; }
+  .mirGlass{ position:absolute; inset:0; overflow:hidden; border-radius:3px; background:#c9d4d8; }
+  .mirGlass img{ position:absolute; max-width:none; }
+  .mirRefl{ transform:scaleX(-1) scaleY(1.02); transform-origin:center;
+    filter:brightness(.94) contrast(.96) saturate(.9); }   /* 유리 너머라 살짝 죽은 색 */
+  .mirScr{ pointer-events:none; opacity:.92; }
+  .mirSheen{ position:absolute; inset:0; pointer-events:none;
+    background:linear-gradient(112deg, rgba(255,255,255,.30) 0%, rgba(255,255,255,.05) 26%,
+      rgba(255,255,255,0) 46%, rgba(255,255,255,.13) 74%, rgba(255,255,255,.03) 100%); }
+  .mirFrame{ position:absolute; inset:-7px; border:7px solid #8d7f6b; border-radius:6px;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.25), 0 0 0 1px rgba(0,0,0,.35); pointer-events:none; }
+  .cu-mirror.locked .mirFrame{ border-color:#a8925f; }
+  .mirGrip{ position:absolute; left:50%; bottom:-30px; transform:translateX(-50%);
+    color:#fff; font-size:15px; font-weight:800; letter-spacing:2px; opacity:.72;
+    text-shadow:0 2px 6px rgba(0,0,0,.8); pointer-events:none; }
+  .cu-mirror.locked .mirGrip{ display:none; }
+
   /* 메뉴 아이콘 고르기 (1행 N칸) — 사진 바로 아래, 설명글 위 */
   .pickRow{ display:flex; gap:10px; justify-content:center; margin:12px 0 2px; flex:0 0 auto; }
   .pickCell{ width:66px; height:66px; border-radius:13px; background:#fdfaf6;
@@ -342,7 +364,8 @@ const ITEMS = {
   frag3:{emoji:"🧩", name:"조각3"}, frag4:{emoji:"🧩", name:"조각4"},
   flower:{emoji:"🌺", name:"꽃"},
   battery:{emoji:"🔋", name:"건전지"},
-  mirror:{emoji:"🪞", name:"거울"},
+  mirror:{name:"거울",
+    svg:'<svg viewBox="0 0 24 24"><rect x="5.4" y="2.4" width="13.2" height="17.4" rx="6.6" fill="#7d6a52"/><rect x="6.9" y="3.9" width="10.2" height="14.4" rx="5.1" fill="#dfe9ee"/><path d="M8.2 14.6 14.9 5.6c1.1 1 1.6 2.3 1.5 3.6L10.6 17c-1-.3-1.8-1.1-2.4-2.4z" fill="#fff" opacity=".75"/><rect x="10.6" y="19.2" width="2.8" height="2.6" rx="1" fill="#7d6a52"/></svg>'},
   // 손전등 — 건전지를 끼우기 전엔 렌즈가 어둡고, 끼우면 노랗게 빛난다(render에서 교체)
   flashlight:{name:"손전등", inspect:"flashlight",
     svg:'<svg viewBox="0 0 24 24"><rect x="2.6" y="9.2" width="3.4" height="5.6" rx="1" fill="#23272b"/><rect x="5.6" y="8.6" width="8.6" height="6.8" rx="1.1" fill="#2f353a"/><rect x="7.2" y="10.2" width="1.5" height="3.6" rx=".5" fill="#7d868d"/><rect x="13.8" y="7.4" width="3" height="9.2" rx="1" fill="#3b4249"/><path d="M16.6 6.6 L21.2 4.6 L21.2 19.4 L16.6 17.4 Z" fill="#464e56"/><ellipse cx="21" cy="12" rx="1.1" ry="6.6" fill="#2a2f34"/></svg>'},
@@ -667,6 +690,14 @@ const MAPS = {
       {x:50,y:66,emoji:"🔒",label:"골목 자물쇠", once:true,
         lock:{len:3, answer:"123",
           success:"골목 끝 문이 열렸다. 열쇠조각 획득! 🪔", give:["frag3"], setFlag:"a_done"}},
+      // 거울을 대야 읽히는 벽 — 반쪽만 칠해진 글씨
+      { x:22,y:74, w:26,h:14, label:"페인트 벗겨진 벽", closeup:{
+        img:"img/closeup/arab_wall.jpg", badge:"🔎",
+        caption:"🧱 담벼락에 뭔가 세로로 칠해져 있다.\n칠하다 만 것 같다.",
+        action:{type:"mirror", needItem:"mirror", targetX:48.9, tol:2.6,
+          scratch:"img/closeup/mirror_scratch.png",
+          noItem:"반쪽만 남은 자국이라 읽을 수가 없다.",
+          success:"글자가 맞물렸다 — 쥐 · 오 · 티 · 와이", setFlag:"arab_mirror"} }},
     ],
     exits:[{to:"downtown", label:"중심지로", emoji:"🏙️", dir:"left"}]
   },
@@ -808,7 +839,7 @@ function fitScenePhoto(){
    가로로 넓은 사진이라 높이 제한(56%)에 안 걸려서 왜곡이 안 생긴 것으로 보인다. */
 /* 화면이 바뀌면(회전·주소창 접힘·창 크기) 다시 맞춘다 */
 { let t=null;
-  const refit=()=>{ clearTimeout(t); t=setTimeout(fitScenePhoto, 60); };
+  const refit=()=>{ clearTimeout(t); t=setTimeout(()=>{ fitScenePhoto(); if(mirState&&mirState.layout) mirState.layout(); }, 60); };
   addEventListener("resize", refit);
   addEventListener("orientationchange", refit);
   if(window.visualViewport) visualViewport.addEventListener("resize", refit);   // iOS 주소창 접힘
@@ -999,6 +1030,9 @@ function openCloseup(cu, h, id){
   // ★메뉴 아이콘 고르기: 사진 아래에 빈칸 N개 (다른 팝업으로 넘어가면 반드시 지운다)
   clearPicker();
   if(a.type==="picker" && !solved) buildPicker(a, id);
+  // ★거울 대기: 사진 위에 끌 수 있는 손거울
+  clearMirror();
+  if(a.type==="mirror") buildMirror(a, id);
   // ★팝업 속 서브 핫스팟(사진 위 클릭영역 → 중첩 팝업). 맵 요소와 동일한 반짝임영역 방식.
   { const wrap=$("#cuImgWrap");
     if(wrap){
@@ -1052,6 +1086,92 @@ const PICK_SETS = {
            html: i => `<span class="pickLetter">${ALPHA_KEYS[i]}</span>` },
 };
 const pickSet = a => PICK_SETS[a.set] || PICK_SETS.food;
+
+/* ---- 거울 대기 퍼즐 ----
+   벽에는 글자가 세로 중심선 왼쪽만 칠해져 있다. 손거울을 그 선에 맞춰 세우면
+   반쪽이 거울에 비쳐 글자가 완성되고, 거울에 난 긁힌 자국이 반사만으로는 안 생기는
+   획(ㅣ·ㅏ·ㅣ)을 채워준다. 거울은 정면이 아니라 살짝 눕혀 대는 것처럼 기울여 뒀다.
+   쓰는 법: action:{type:"mirror", needItem:"mirror", targetX:48.9, tol:2.6, scratch:"...", ...} */
+const MIRROR_TILT = -7;      // deg — 벽에 비스듬히 대고 있는 느낌
+let mirState=null;
+function clearMirror(){ document.querySelectorAll("#cuImgWrap .cu-mirror").forEach(e=>e.remove()); mirState=null; }
+function buildMirror(a, id){
+  clearMirror();
+  const wrap=$("#cuImgWrap"), img=$("#cuImg"); if(!wrap||!img) return;
+  const solved=!!state.done[id];
+
+  const el=document.createElement("div"); el.className="cu-mirror";
+  el.innerHTML =
+    '<div class="mirGlass">'+
+      '<img class="mirRefl" alt="" draggable="false">'+
+      (a.scratch ? '<img class="mirScr" alt="" draggable="false" src="'+a.scratch+'">' : '')+
+      '<div class="mirSheen"></div>'+
+    '</div><div class="mirFrame"></div><div class="mirGrip">↔</div>';
+  wrap.appendChild(el);
+
+  const refl=el.querySelector(".mirRefl"), scr=el.querySelector(".mirScr");
+  refl.src = img.getAttribute("src");
+
+  // 거울 왼쪽 모서리 위치를 사진 폭의 %로 들고 다닌다
+  mirState = { x: solved ? a.targetX : (a.startX!=null?a.startX:28), a, id, done:solved };
+
+  function layout(){
+    const iw=img.clientWidth, ih=img.clientHeight;
+    if(!iw||!ih) return;
+    const mw=Math.round(iw*(a.width||24)/100), mh=Math.round(ih*0.94);
+    const mx=Math.round(iw*mirState.x/100), my=Math.round((ih-mh)/2);
+    el.style.width=mw+"px"; el.style.height=mh+"px";
+    el.style.left=mx+"px"; el.style.top=my+"px";
+    // 거울 안쪽: 벽을 좌우 뒤집어 깔면, 거울 왼쪽 모서리를 축으로 반사한 그림이 된다
+    refl.style.width=iw+"px"; refl.style.height=ih+"px";
+    refl.style.left=(mx-iw)+"px"; refl.style.top=(-my)+"px";
+    if(scr){ const anchor=Math.round(iw*a.targetX/100);   // 딱 맞는 자리에서 획이 제자리에 오도록
+             scr.style.width=iw+"px"; scr.style.height=ih+"px";
+             scr.style.left=(-anchor)+"px"; scr.style.top=(-my)+"px"; }
+  }
+  mirState.layout=layout;
+  layout(); if(!img.complete) img.addEventListener("load", layout, {once:true});
+
+  if(solved){ el.classList.add("locked"); return; }
+
+  // ---- 손가락으로 좌우로 끌기 ----
+  let dragging=false, grabDX=0;
+  const pxToPct = px => px / Math.max(1, img.clientWidth) * 100;
+  el.addEventListener("pointerdown", ev=>{
+    if(mirState.done) return;
+    ev.preventDefault(); ev.stopPropagation();
+    dragging=true; try{ el.setPointerCapture(ev.pointerId); }catch(e){} el.classList.add("grabbing");
+    grabDX = ev.clientX - el.getBoundingClientRect().left;
+  });
+  el.addEventListener("pointermove", ev=>{
+    if(!dragging||mirState.done) return;
+    ev.preventDefault();
+    const wrapL = img.getBoundingClientRect().left;
+    let nx = pxToPct(ev.clientX - grabDX - wrapL);
+    mirState.x = Math.max(a.width||24, Math.min(56, nx));
+    layout();
+  });
+  const drop=ev=>{
+    if(!dragging) return;
+    dragging=false; el.classList.remove("grabbing");
+    try{ el.releasePointerCapture(ev.pointerId); }catch(e){}
+    check();
+  };
+  el.addEventListener("pointerup", drop);
+  el.addEventListener("pointercancel", drop);
+
+  function check(){
+    if(mirState.done) return;
+    if(!has(a.needItem)){ toast(a.noItem||"뭔가 비춰볼 게 있어야 할 것 같다."); return; }
+    if(Math.abs(mirState.x - a.targetX) <= (a.tol||2.5)){
+      mirState.x = a.targetX; layout();                  // 딱 맞는 자리에 붙여준다
+      mirState.done = true; state.done[id]=true;
+      el.classList.add("locked");
+      SFX.item(); vib([20,40,80]);
+      setTimeout(()=>solveCloseup(a), 420);
+    }
+  }
+}
 
 let pickSel=null;   // 각 칸이 고른 보기의 번호 (food는 -1이 빈칸)
 function clearPicker(){ document.querySelectorAll("#closeup .pickRow").forEach(e=>e.remove()); }
@@ -1150,6 +1270,7 @@ function closeCloseup(){
   clearPicker();
   if(cuStack.length){ const p=cuStack.pop(); openCloseup(p.cu, p.h, p.id); return; }   // ★중첩팝업: ✕ 누르면 부모 팝업으로 복귀
   const w=$("#cuImgWrap"); if(w) w.querySelectorAll(".cu-subspot").forEach(e=>e.remove());
+  clearMirror();
   $("#closeup").style.display="none"; $("#app").classList.remove("cuOpen"); cuCtx=null;
 }
 function closeCloseupAll(){ cuStack.length=0; closeCloseup(); }   // 완전닫기(리셋/성공/엔딩용)
