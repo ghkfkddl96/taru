@@ -131,7 +131,7 @@
   .pickCell{ width:66px; height:66px; border-radius:13px; background:#fdfaf6;
     border:2px solid #cbb9a2; box-shadow:0 3px 12px rgba(0,0,0,.32);
     display:flex; align-items:center; justify-content:center; cursor:pointer; }
-  .pickCell svg{ width:52px; height:52px; }
+  .pickCell svg, .pickCell img{ width:54px; height:54px; object-fit:contain; display:block; -webkit-user-drag:none; }
   .pickCell:active{ transform:scale(.93); }
   .pickCell.pop{ animation:pickPop .22s ease-out; }
   @keyframes pickPop{ 0%{transform:scale(.86)} 60%{transform:scale(1.06)} 100%{transform:scale(1)} }
@@ -736,7 +736,8 @@ function showStory(i){
 window.addEventListener("load",()=>{
   // 배경/클로즈업/이동 사진 미리 로드
   Object.values(MAPS).forEach(m=>{ if(m.photo){const i=new Image(); i.src=m.photo;}
-    (m.hotspots||[]).forEach(h=>{ if(h.closeup){const i=new Image(); i.src=h.closeup.img;} }); });
+    (m.hotspots||[]).forEach(h=>{ const s=h.closeup&&h.closeup.img;   // 아직 사진 없는 팝업(TODO)은 건너뛴다
+      if(s&&s!=="TODO"){const i=new Image(); i.src=s;} }); });
   ["walk","mrt","songfa","bus","citywalk"].forEach(k=>{const i=new Image(); i.src="img/transit/"+k+".jpg";});
   if(state.inv.length || Object.keys(state.flags).length || state.room!=="airport"){
     $("#intro").style.display="none"; render();
@@ -953,32 +954,23 @@ function openCloseup(cu, h, id){
    빈칸을 누를 때마다 아이콘이 하나씩 바뀐다. N칸이 전부 정답이면 통과.
    아이콘 순서는 송파바쿠테 메뉴간판(3×3)과 같게 맞춰둠 — 간판을 보고 대조할 수 있도록.
    쓰는 법: action:{type:"picker", answer:["rice","veggie","skewer","can"], success:"...", setFlag:"..."}   */
-/* 48×48 좌표계. 선은 굵게, 실루엣이 한눈에 읽히도록 채우기도 섞는다.
-   ★간판 그림을 베끼지 않고, 그 음식 하면 떠오르는 대표 형태로 그린다(북쑥 지시). */
-const _ln='fill="none" stroke="#141414" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"';
-const _fl='fill="#141414"';
+/* ★아이콘 9종 = 북쑥이 준 라인아트 한 장(3×3)을 잘라 쓴다.
+   img/icon/*.png — 192px 정사각, 흰 배경은 투명 처리, 각 그림을 칸 정중앙에 정렬해 뒀다.
+   (내가 직접 그린 SVG 두 판은 알아보기 힘들다고 반려됨) */
 const PICK_ICONS=[
-  // 새우 한 마리 — 구부러진 몸통 + 마디 + 꼬리 + 더듬이
-  // 꼬리 달린 새우튀김 — 통통한 튀김옷 몸통 + 갈라진 꼬리
-  {k:"shrimp", name:"새우튀김", svg:`<svg viewBox="0 0 48 48"><path ${_ln} d="M17 14c0-4 3-7 7-7s7 3 7 7l2.5 18c0 3.5-4 5.5-9.5 5.5S14.5 35.5 14.5 32z"/><path ${_ln} d="M20 37.5L15 45M24 38v7M28 37.5L33 45"/><path ${_ln} d="M16.5 21c4 2 11 2 15 0M17.5 28c4 2 9 2 13 0"/></svg>`},
-  // 꼬치 — 사선 막대 + 고기 세 덩이(채움)
-  {k:"skewer", name:"꼬치",     svg:`<svg viewBox="0 0 48 48"><path ${_ln} d="M9 39L39 9"/><rect ${_fl} x="12" y="20.5" width="11" height="9" rx="3" transform="rotate(-45 17.5 25)"/><rect ${_fl} x="19" y="13.5" width="11" height="9" rx="3" transform="rotate(-45 24.5 18)"/><rect ${_fl} x="26" y="6.5" width="11" height="9" rx="3" transform="rotate(-45 31.5 11)"/></svg>`},
-  // 삶은 계란 반쪽 — 흰자 + 노른자
-  {k:"egg",    name:"계란조림", svg:`<svg viewBox="0 0 48 48"><ellipse ${_ln} cx="24" cy="26" rx="14" ry="16"/><ellipse ${_fl} cx="24" cy="27" rx="6.5" ry="7"/><path ${_ln} d="M15 16c2-3 4-5 7-6"/></svg>`},
-  // 잎채소 다발 — 줄기 + 넓은 잎 두 장
-  {k:"veggie", name:"공심채",   svg:`<svg viewBox="0 0 48 48"><path ${_ln} d="M24 42V16"/><path ${_ln} d="M24 26c-9 0-14-5-14-12 8 0 14 4 14 12z"/><path ${_ln} d="M24 20c0-8 6-13 14-13 0 8-5 13-14 13z"/><path ${_ln} d="M24 34c-6 0-9-3-9-7 5 0 9 2 9 7z"/></svg>`},
-  // 국물 그릇 + 갈비뼈가 삐죽 + 김
-  {k:"soup",   name:"갈비탕",   svg:`<svg viewBox="0 0 48 48"><path ${_ln} d="M7 24h30l-2.6 12A5 5 0 0 1 29.5 40h-15a5 5 0 0 1-4.9-4z"/><path ${_ln} d="M7 24c8-3 22-3 30 0"/><path ${_ln} d="M19 23l7-10"/><path ${_ln} d="M25 15c1.4-2 3.6-2.2 4.8-.8 1.2 1.4.7 3.4-1.2 4.6"/><path ${_ln} d="M15 12c1.4-2 1-3.6 0-5M23 9c1.4-2 1-3.6 0-5"/></svg>`},
-  // 접시 위 봉긋한 밥 + 밥알
-  {k:"rice",   name:"볶음밥",   svg:`<svg viewBox="0 0 48 48"><path ${_ln} d="M10 30c0-8 6-13 14-13s14 5 14 13"/><ellipse ${_ln} cx="24" cy="32" rx="19" ry="5.5"/><circle ${_fl} cx="19" cy="25" r="1.9"/><circle ${_fl} cx="27" cy="23" r="1.9"/><circle ${_fl} cx="31" cy="28" r="1.9"/><circle ${_fl} cx="22" cy="29.5" r="1.9"/></svg>`},
-  // 그릇 + 젓가락으로 집어올린 면발
-  {k:"noodle", name:"국수",     svg:`<svg viewBox="0 0 48 48"><path ${_ln} d="M7 26h28l-2.4 11A5 5 0 0 1 27.7 41H14.3a5 5 0 0 1-4.9-4z"/><path ${_ln} d="M7 26c8-3 20-3 28 0"/><path ${_ln} d="M13 30c3 4 13 4 16 0"/><path ${_ln} d="M31 24L43 10M35 27L46 15"/><path ${_ln} d="M31 24c-2-5 0-9 3-12"/></svg>`},
-  // 음료 캔 — 위에 따개 탭
-  {k:"can",    name:"캔음료",   svg:`<svg viewBox="0 0 48 48"><path ${_ln} d="M16 13h16v26a3 3 0 0 1-3 3H19a3 3 0 0 1-3-3z"/><ellipse ${_ln} cx="24" cy="13" rx="8" ry="3.4"/><ellipse ${_fl} cx="24" cy="12.6" rx="3" ry="1.4"/><path ${_ln} d="M16 21h16M16 34h16"/></svg>`},
-  // 주전자 — 뚜껑꼭지 + 주둥이 + 손잡이
-  {k:"teapot", name:"주전자",   svg:`<svg viewBox="0 0 48 48"><path ${_ln} d="M12 22h22v10a8 8 0 0 1-8 8h-6a8 8 0 0 1-8-8z"/><path ${_ln} d="M12 25c-4 1-7 3-7 6s3 5 7 6"/><path ${_ln} d="M15 22c0-5 4-8 8-8s8 3 8 8"/><path ${_ln} d="M34 26c4 1 7 3 7 6"/><circle ${_fl} cx="23" cy="12" r="2.6"/></svg>`},
+  {k:"shrimp", name:"새우튀김", img:"img/icon/shrimp.png"},
+  {k:"skewer", name:"꼬치",     img:"img/icon/skewer.png"},
+  {k:"egg",    name:"계란조림", img:"img/icon/egg.png"},
+  {k:"veggie", name:"공심채",   img:"img/icon/veggie.png"},
+  {k:"soup",   name:"갈비탕",   img:"img/icon/soup.png"},
+  {k:"rice",   name:"볶음밥",   img:"img/icon/rice.png"},
+  {k:"noodle", name:"국수",     img:"img/icon/noodle.png"},
+  {k:"can",    name:"캔음료",   img:"img/icon/can.png"},
+  {k:"teapot", name:"주전자",   img:"img/icon/teapot.png"},
 ];
-const PICK_BLANK=`<svg viewBox="0 0 48 48"><path ${_ln} stroke-dasharray="5 4.5" d="M9 9h30v30H9z"/></svg>`;
+PICK_ICONS.forEach(o=>{ const im=new Image(); im.src=o.img; });   // 토글할 때 깜빡이지 않게 미리 받아둔다
+const pickHTML = i => `<img src="${PICK_ICONS[i].img}" alt="${PICK_ICONS[i].name}" draggable="false">`;
+const PICK_BLANK=`<svg viewBox="0 0 48 48"><path fill="none" stroke="#141414" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="5 4.5" d="M9 9h30v30H9z"/></svg>`;
 let pickSel=null;   // 각 칸의 아이콘 인덱스 (-1 = 빈칸)
 function clearPicker(){ document.querySelectorAll("#closeup .pickRow").forEach(e=>e.remove()); }
 function buildPicker(a, id){
@@ -990,7 +982,7 @@ function buildPicker(a, id){
   const row=document.createElement("div"); row.className="pickRow";
   for(let i=0;i<n;i++){
     const c=document.createElement("div"); c.className="pickCell"; c.dataset.i=i;
-    c.innerHTML = pickSel[i]<0 ? PICK_BLANK : PICK_ICONS[pickSel[i]].svg;
+    c.innerHTML = pickSel[i]<0 ? PICK_BLANK : pickHTML(pickSel[i]);
     c.onclick=(ev)=>{ ev.stopPropagation(); cyclePick(i, a, id); };
     row.appendChild(c);
   }
@@ -1000,7 +992,7 @@ function cyclePick(i, a, id){
   if(state.done[id]) return;
   pickSel[i] = (pickSel[i]+1) % PICK_ICONS.length;      // -1 → 0 → … → 8 → 0
   const c=document.querySelector('.pickCell[data-i="'+i+'"]');
-  if(c){ c.innerHTML=PICK_ICONS[pickSel[i]].svg; c.classList.remove("pop"); void c.offsetWidth; c.classList.add("pop"); }
+  if(c){ c.innerHTML=pickHTML(pickSel[i]); c.classList.remove("pop"); void c.offsetWidth; c.classList.add("pop"); }
   SFX.key(); vib(6);
   const ok = (a.answer||[]).every((k,j)=> pickSel[j]>=0 && PICK_ICONS[pickSel[j]].k===k);
   if(ok){ state.done[id]=true; setTimeout(()=>solveCloseup(a), 380); }
