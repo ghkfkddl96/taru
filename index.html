@@ -132,7 +132,6 @@
   #cuImgWrap{ position:relative; max-width:100%; max-height:56%; }
   /* 손거울 — 벽에 비스듬히 대고 좌우로 끌어 맞춘다 */
   .cu-mirror{ position:absolute; z-index:6; cursor:grab; touch-action:none;
-    transform:rotate(-7deg); transform-origin:50% 50%;
     filter:drop-shadow(-6px 10px 14px rgba(0,0,0,.5)); transition:filter .2s; }
   .cu-mirror.grabbing{ cursor:grabbing; filter:drop-shadow(-8px 14px 18px rgba(0,0,0,.6)); }
   .cu-mirror.locked{ cursor:default; }
@@ -140,7 +139,7 @@
   .mirGlass img{ position:absolute; max-width:none; }
   .mirRefl{ transform:scaleX(-1) scaleY(1.02); transform-origin:center;
     filter:brightness(.94) contrast(.96) saturate(.9); }   /* 유리 너머라 살짝 죽은 색 */
-  .mirScr{ pointer-events:none; opacity:.92; }
+  .mirScr{ pointer-events:none; }
   .mirSheen{ position:absolute; inset:0; pointer-events:none;
     background:linear-gradient(112deg, rgba(255,255,255,.30) 0%, rgba(255,255,255,.05) 26%,
       rgba(255,255,255,0) 46%, rgba(255,255,255,.13) 74%, rgba(255,255,255,.03) 100%); }
@@ -1091,8 +1090,8 @@ const pickSet = a => PICK_SETS[a.set] || PICK_SETS.food;
    벽에는 글자가 세로 중심선 왼쪽만 칠해져 있다. 손거울을 그 선에 맞춰 세우면
    반쪽이 거울에 비쳐 글자가 완성되고, 거울에 난 긁힌 자국이 반사만으로는 안 생기는
    획(ㅣ·ㅏ·ㅣ)을 채워준다. 거울은 정면이 아니라 살짝 눕혀 대는 것처럼 기울여 뒀다.
+   거울은 벽에 정면으로 댄다 — 기울여 봤더니 글자가 어긋나 보여서 북쑥이 정면을 택했다.
    쓰는 법: action:{type:"mirror", needItem:"mirror", targetX:48.9, tol:2.6, scratch:"...", ...} */
-const MIRROR_TILT = -7;      // deg — 벽에 비스듬히 대고 있는 느낌
 let mirState=null;
 function clearMirror(){ document.querySelectorAll("#cuImgWrap .cu-mirror").forEach(e=>e.remove()); mirState=null; }
 function buildMirror(a, id){
