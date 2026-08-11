@@ -133,6 +133,13 @@
     display:flex; align-items:center; justify-content:center; cursor:pointer; }
   .pickCell svg{ width:40px; height:40px; }
   .pickCell:active{ transform:scale(.93); }
+  /* 사진 위에 얹는 경우 (상자 버튼 자리 등) */
+  .pickCell.onPhoto{ position:absolute; transform:translate(-50%,-50%); width:15%; aspect-ratio:1; height:auto;
+    z-index:5; background:rgba(253,250,246,.94); border-color:#b9a68e; }
+  .pickCell.onPhoto svg{ width:76%; height:76%; }
+  .pickCell.onPhoto:active{ transform:translate(-50%,-50%) scale(.93); }
+  .pickCell.onPhoto.pop{ animation:pickPopP .22s ease-out; }
+  @keyframes pickPopP{ 0%{transform:translate(-50%,-50%) scale(.86)} 60%{transform:translate(-50%,-50%) scale(1.06)} 100%{transform:translate(-50%,-50%) scale(1)} }
   .pickCell.pop{ animation:pickPop .22s ease-out; }
   @keyframes pickPop{ 0%{transform:scale(.86)} 60%{transform:scale(1.06)} 100%{transform:scale(1)} }
   @media(prefers-reduced-motion:reduce){ .pickCell.pop{animation:none} }
@@ -361,7 +368,7 @@ const ICONS = {
 };
 const DEST_ICON = { jewel:"droplet", downtown:"building", marina:"building", supertree:"leaf", garden:"leaf",
   arab:"landmark", merlion:"landmark", sentosa:"umbrella", laupasat:"utensils", police:"shield",
-  ibis:"bed", room:"bed", bakkutteh:"utensils", universal:"star", airport:"plane", __ending:"bed" };
+  ibis:"bed", room:"bed", bakkutteh:"utensils", universal:"star", airport:"plane", vivocity:"building", __ending:"bed" };
 
 /* 핫스팟 종류
    A) 클로즈업형:  {x,y,label, closeup:{img, caption, badge, action}}
@@ -439,10 +446,37 @@ const MAPS = {
       {to:"marina", label:"마리나", emoji:"🏨", dir:"right"},
       {to:"arab",   label:"아랍", emoji:"🕌", dir:"right"},
       {to:"merlion",label:"머라이언", emoji:"🦁", dir:"right"},
-      {to:"sentosa",label:"센토사", emoji:"🏖️", dir:"right"},
+      {to:"vivocity",label:"비보시티", emoji:"🛍️", dir:"right"},
       {to:"laupasat",label:"라우파삿", emoji:"🍢", dir:"right"},
       {to:"police",label:"경찰서", emoji:"🌈", dir:"right"},
       {to:"ibis", label:"이비스", emoji:"🏩", dir:"right"},
+    ]
+  },
+
+  // 비보시티 — 중심지와 센토사 사이의 관문. 여기서 버스↔지하철이 갈린다.
+  vivocity:{
+    name:"비보시티", sub:"센토사로 가는 관문 쇼핑몰", photo:"img/vivocity.jpg",
+    hotspots:[
+      { x:35,y:44, w:30,h:11, label:"송파 바쿠테", closeup:{
+        img:"img/closeup/vivo_songfa.jpg", badge:"🍲",
+        caption:"🍲 몰 안에도 송파 바쿠테가 있다.\n점심때라 자리가 거의 찼다.",
+        action:{type:"clue"},
+        subspots:[
+          {x:62,y:65,w:22,h:16,label:"나무 상자", closeup:{
+            img:"img/closeup/vivo_box.jpg", badge:"📦",
+            caption:"📦 테이블 위에 놓인 나무 상자.\n앞면에 네모난 버튼 네 개가 달려 있다.",
+            action:{type:"picker", answer:["rice","veggie","skewer","can"],
+              size:13,
+              slots:[{x:35.4,y:58.8},{x:53.1,y:57.8},{x:70.5,y:55.8},{x:86.8,y:53.4}],
+              success:"덜컥 — 상자 뚜껑이 열렸다.",
+              setFlag:"vivo_box"} }},
+        ] }},
+      { x:70,y:73, w:26,h:12, label:"몰 안내판",
+        clue:{e:"🗺️",t:"비보시티 층별 안내도.\n센토사로 넘어가는 길은 3층이라고 적혀 있다."}},
+    ],
+    exits:[
+      {to:"downtown", label:"중심지로", emoji:"🏙️", dir:"left"},
+      {to:"sentosa", label:"센토사", emoji:"🏖️", dir:"right"},
     ]
   },
 
@@ -457,7 +491,7 @@ const MAPS = {
         clue:{e:"🏖️",t:"비치 셱·OLA 비치클럽… 해변을 따라 가게가 쭉 늘어서 있다.\n기념품 가게도 보이네."}},
     ],
     exits:[
-      {to:"downtown", label:"중심지로", emoji:"🏙️", dir:"left"},
+      {to:"vivocity", label:"비보시티", emoji:"🛍️", dir:"left"},
       {to:"universal", label:"유니버설", emoji:"🎢", dir:"right"},
     ]
   },
@@ -792,8 +826,11 @@ function renderInv(){
 const TRANSITIONS = {
   "airport>jewel":   {img:"img/transit/walk.jpg",   icon:"🚶", text:"걸어서 이동 중"},
   "jewel>airport":   {img:"img/transit/walk.jpg",   icon:"🚶", text:"걸어서 이동 중"},
-  "downtown>sentosa":{img:"img/transit/mrt.jpg",    icon:"🚈", text:"지하철 타고 이동 중", transit:true},
-  "sentosa>downtown":{img:"img/transit/mrt.jpg",    icon:"🚈", text:"지하철 타고 이동 중", transit:true},
+  // 센토사는 비보시티를 거쳐서만 오간다 — 중심지↔비보시티는 버스, 비보시티↔센토사는 지하철
+  "downtown>vivocity":{img:"img/transit/bus.jpg",   icon:"🚌", text:"버스 타고 이동 중",   transit:true},
+  "vivocity>downtown":{img:"img/transit/bus.jpg",   icon:"🚌", text:"버스 타고 이동 중",   transit:true},
+  "vivocity>sentosa": {img:"img/transit/mrt.jpg",   icon:"🚈", text:"지하철 타고 이동 중", transit:true},
+  "sentosa>vivocity": {img:"img/transit/mrt.jpg",   icon:"🚈", text:"지하철 타고 이동 중", transit:true},
   "police>bakkutteh":{img:"img/transit/songfa.jpg", icon:"🚶", text:"걸어서 이동 중"},
   "bakkutteh>police":{img:"img/transit/songfa.jpg", icon:"🚶", text:"걸어서 이동 중"},
   "downtown>ibis":   {img:"img/transit/citywalk.jpg", icon:"🚶", text:"걸어서 이동 중"},
@@ -941,23 +978,30 @@ const PICK_ICONS=[
 const PICK_BLANK=`<svg viewBox="0 0 24 24"><path ${_ln} stroke-dasharray="2.6 2.4" d="M4 4h16v16H4z"/></svg>`;
 let pickSel=null;   // 각 칸의 아이콘 인덱스 (-1 = 빈칸)
 function buildPicker(a, id){
-  const box=$("#cuActions"); if(!box) return;
   const n=(a.answer||[]).length||4;
   const solved=!!state.done[id];
   pickSel = solved ? a.answer.map(k=>PICK_ICONS.findIndex(i=>i.k===k)) : new Array(n).fill(-1);
-  const row=document.createElement("div"); row.className="pickRow";
+  // slots가 있으면 사진 위에 얹고(상자 버튼 위 등), 없으면 팝업 아래에 한 줄로
+  const onPhoto = !!(a.slots && a.slots.length===n);
+  const host = onPhoto ? $("#cuImgWrap") : $("#cuActions");
+  if(!host) return;
+  host.querySelectorAll(".pickCell,.pickRow").forEach(e=>e.remove());
+  const row = onPhoto ? host : document.createElement("div");
+  if(!onPhoto) row.className="pickRow";
   for(let i=0;i<n;i++){
-    const c=document.createElement("div"); c.className="pickCell"; c.dataset.i=i;
+    const c=document.createElement("div"); c.className="pickCell"+(onPhoto?" onPhoto":""); c.dataset.i=i;
+    if(onPhoto){ c.style.left=a.slots[i].x+"%"; c.style.top=a.slots[i].y+"%";
+      if(a.size){ c.style.width=a.size+"%"; c.style.height="auto"; c.style.aspectRatio="1"; } }
     c.innerHTML = pickSel[i]<0 ? PICK_BLANK : PICK_ICONS[pickSel[i]].svg;
     c.onclick=(ev)=>{ ev.stopPropagation(); cyclePick(i, a, id); };
     row.appendChild(c);
   }
-  box.appendChild(row);
+  if(!onPhoto) host.appendChild(row);
 }
 function cyclePick(i, a, id){
   if(state.done[id]) return;
   pickSel[i] = (pickSel[i]+1) % PICK_ICONS.length;      // -1 → 0 → … → 8 → 0
-  const c=document.querySelector('#cuActions .pickCell[data-i="'+i+'"]');
+  const c=document.querySelector('.pickCell[data-i="'+i+'"]');
   if(c){ c.innerHTML=PICK_ICONS[pickSel[i]].svg; c.classList.remove("pop"); void c.offsetWidth; c.classList.add("pop"); }
   SFX.key(); vib(6);
   const ok = (a.answer||[]).every((k,j)=> pickSel[j]>=0 && PICK_ICONS[pickSel[j]].k===k);
