@@ -750,6 +750,43 @@ function give(keys){ (Array.isArray(keys)?keys:[keys]).forEach(k=>{ if(!state.in
 function has(k){ return state.inv.includes(k); }
 function fragCount(){ return ["m_done","g_done","a_done","ml_done"].filter(f=>state.flags[f]).length; }
 
+/* ---- ★사진 상자 크기 고정 ----
+   핫스팟 좌표는 전부 "사진의 몇 %"다. 그래서 사진을 감싼 상자가 사진이 실제로 그려지는
+   크기와 1px이라도 다르면 모든 좌표가 밀린다.
+   CSS의 max-width/max-height만 걸어두면 iOS 사파리가 flex 안에서 종횡비를 안 지켜서
+   사진이 가로로 늘어난다(북쑥 아이폰16프로에서 0.56 → 0.69로 왜곡, 2026-08-11 확인).
+   → 브라우저에 맡기지 않고 그려질 크기를 직접 계산해 픽셀로 못 박는다. */
+function fitWrap(wrap, img, availW, availH){
+  if(!wrap || !img || !img.naturalWidth || availW<=0 || availH<=0) return false;
+  const r = img.naturalWidth / img.naturalHeight;
+  let w = availW, h = availW / r;
+  if(h > availH){ h = availH; w = availH * r; }
+  wrap.style.width = w+"px"; wrap.style.height = h+"px";
+  img.style.width = "100%"; img.style.height = "100%";
+  img.style.objectFit = "contain";      // 계산이 정확하니 잘릴 일은 없다(보험)
+  return true;
+}
+/* 사진이 아직 안 읽혔으면 로드된 뒤에 다시 맞춘다 */
+function fitWhenReady(wrap, img, getAvail){
+  const go=()=>{ const a=getAvail(); fitWrap(wrap, img, a[0], a[1]); };
+  go();
+  if(!img.complete || !img.naturalWidth) img.addEventListener("load", go, {once:true});
+}
+function fitScenePhoto(){
+  const wrap=document.getElementById("photoWrap"); if(!wrap) return;
+  const img=wrap.querySelector(".bgphoto"); if(!img) return;
+  fitWhenReady(wrap, img, ()=>[scene.clientWidth, scene.clientHeight]);
+}
+/* 팝업 사진(#cuImgWrap)은 건드리지 않는다 — 시계 바늘·상자 버튼 위치가 이미 맞는다(북쑥 확인, 2026-08-11).
+   가로로 넓은 사진이라 높이 제한(56%)에 안 걸려서 왜곡이 안 생긴 것으로 보인다. */
+/* 화면이 바뀌면(회전·주소창 접힘·창 크기) 다시 맞춘다 */
+{ let t=null;
+  const refit=()=>{ clearTimeout(t); t=setTimeout(fitScenePhoto, 60); };
+  addEventListener("resize", refit);
+  addEventListener("orientationchange", refit);
+  if(window.visualViewport) visualViewport.addEventListener("resize", refit);   // iOS 주소창 접힘
+}
+
 /* ---- 렌더 ---- */
 function render(){
   const r=MAPS[state.room]; if(!r) return;
@@ -774,6 +811,7 @@ function render(){
     wrap.appendChild(el);
   });
   scene.appendChild(wrap);
+  fitScenePhoto();          // ★상자를 사진 실제 크기에 못 박는다 (좌표 % 기준을 맞추려고)
 
   const nav=document.createElement("div"); nav.id="navbar";
   // showIf 조건 안 맞으면 방향버튼 자체가 안 뜸 (예: 이비스 리셉션 풀기 전엔 '방으로' 숨김)
