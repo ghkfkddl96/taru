@@ -681,13 +681,7 @@ const MAPS = {
   arab:{
     name:"아랍 스트리트", sub:"황금 돔과 알록달록한 골목", photo:"img/arab.jpg",
     hotspots:[
-      {x:55,y:29,emoji:"🕌",label:"술탄 모스크", clue:{e:"🕌",t:"타일: '천을 파랑-빨강-노랑 순으로 걷으면 길이 열린다'"}},
-      {x:37,y:43,emoji:"🟦",label:"파란 천", clue:{e:"🟦",t:"파란 천. (1번 자리)"}},
-      {x:26,y:60,emoji:"🟥",label:"빨간 천", clue:{e:"🟥",t:"빨간 천. (2번 자리)"}},
-      {x:88,y:60,emoji:"🟨",label:"노란 천", clue:{e:"🟨",t:"노란 천. (3번 자리)"}},
-      {x:62,y:72,emoji:"🔒",label:"골목 자물쇠", once:true,
-        lock:{len:3, answer:"123",
-          success:"골목 끝 문이 열렸다. 열쇠조각 획득! 🪔", give:["frag3"], setFlag:"a_done"}},
+      {x:55,y:29,emoji:"🕌",label:"술탄 모스크", clue:{e:"🕌",t:"황금 돔이 햇빛을 그대로 받아낸다."}},
       // 거울을 대야 읽히는 벽 — 반쪽만 칠해진 글씨
       { x:10,y:26, w:19,h:27, label:"페인트 벗겨진 벽", closeup:{
         img:"img/closeup/arab_wall.jpg", badge:"🔎",
@@ -903,6 +897,9 @@ function renderInv(){
         _lastTap[key]=now;
       }
       selected=(selected===key?null:key); renderInv(); if(selected) toast(it.name+" 선택됨");
+      // 벽 팝업을 열어둔 채로 거울을 고를 수도 있으니 그 자리에서 반영한다
+      if(cuCtx && cuCtx.cu && cuCtx.cu.action && cuCtx.cu.action.type==="mirror")
+        buildMirror(cuCtx.cu.action, cuCtx.id);
     };
     inv.appendChild(el);
   });
@@ -1095,7 +1092,7 @@ function clearMirror(){ if(mirState&&mirState.ro) mirState.ro.disconnect();
   document.querySelectorAll("#cuImgWrap .cu-mirror").forEach(e=>e.remove()); mirState=null; }
 function buildMirror(a, id){
   clearMirror();
-  if(a.needItem && !has(a.needItem)) return;      // 거울을 가지고 있을 때만 벽에 대볼 수 있다
+  if(a.needItem && selected!==a.needItem) return;  // 가방에서 거울을 골라야 벽에 대볼 수 있다
   const wrap=$("#cuImgWrap"), img=$("#cuImg"); if(!wrap||!img) return;
 
   const el=document.createElement("div"); el.className="cu-mirror";
