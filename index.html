@@ -667,15 +667,9 @@ const MAPS = {
   },
 
   marina:{
+    // 배경 = 북쑥 실사진(2026-08-13 교체). 팝업 전부 삭제(북쑥 지시) — 구경만 하는 맵.
     name:"마리나베이 샌즈", sub:"배 모양 옥상 아래를 걸어봐", photo:"img/marina.jpg",
-    hotspots:[
-      { x:50,y:15, w:54,h:13, label:"스카이파크", closeup:{
-        img:"TODO", badge:"🛥️",
-        caption:"🛥️ 배 모양 옥상 '스카이파크'!\n57층 위 인피니티풀에서 도시가 한눈에 보여.", action:{type:"clue"} }},
-      { x:34,y:54, w:34,h:28, label:"호텔 타워", closeup:{
-        img:"TODO", badge:"🏨",
-        caption:"🏨 55층 타워 3개가 배를 떠받치고 있어.\n밤이면 슈퍼트리에 불이 들어온대 — 걸어가 보자!", action:{type:"clue"} }},
-    ],
+    hotspots:[],
     exits:[
       {to:"downtown", label:"중심지", emoji:"🏙️", dir:"left"},
       {to:"supertree", label:"슈퍼트리", emoji:"🌳", dir:"right"},
@@ -761,6 +755,11 @@ const MAPS = {
   merlion:{
     // 배경 = 북쑥 실사진(2026-08-12 교체, 세로 768×1365). 핫스팟도 새 사진에 맞춰 재배치.
     name:"머라이언 파크", sub:"물을 뿜는 사자상 앞", photo:"img/merlion.jpg",
+    // ★열쇠(ml_key) 꽂으면 물줄기가 [강 약 중 강 중 약] 순서로 반복(북쑥 지정, 2026-08-13).
+    //   중 = 기존 merlion.jpg 그대로. 마지막 약을 길게 잡아 한 바퀴 끝을 알 수 있게.
+    bgAnim:{ ifFlag:"ml_key", ms:1400, endHoldMs:3400,
+      frames:["img/merlion_strong.jpg","img/merlion_weak.jpg","img/merlion.jpg",
+              "img/merlion_strong.jpg","img/merlion.jpg","img/merlion_weak.jpg"] },
     hotspots:[
       // 물줄기 세기 단서 삭제(북쑥 2026-08-12). 사자상 각인 문구도 물줄기 언급 제거.
       {x:16,y:52,emoji:"🦁",label:"머라이언", clue:{e:"🦁",t:"물을 뿜는 머라이언 사자상.\n등쪽에 금이 가 있는 게 보인다."}},
@@ -879,6 +878,7 @@ function showStory(i){
 window.addEventListener("load",()=>{
   // 배경/클로즈업/이동 사진 미리 로드
   Object.values(MAPS).forEach(m=>{ if(m.photo){const i=new Image(); i.src=m.photo;}
+    if(m.bgAnim) m.bgAnim.frames.forEach(f=>{const i=new Image(); i.src=f;});   // 물줄기 강약 프레임 미리받기
     (m.hotspots||[]).forEach(h=>{ const s=h.closeup&&h.closeup.img;   // 아직 사진 없는 팝업(TODO)은 건너뛴다
       if(s&&s!=="TODO"){const i=new Image(); i.src=s;} }); });
   ["walk","mrt","songfa","bus","citywalk"].forEach(k=>{const i=new Image(); i.src="img/transit/"+k+".jpg";});
@@ -925,8 +925,10 @@ function fitScenePhoto(){
 }
 
 /* ---- 렌더 ---- */
+let bgAnimT=null;   // ★맵 배경 애니(머라이언 물줄기 강약) 타이머 — 리렌더/방 이동 시 반드시 정리
 function render(){
   const r=MAPS[state.room]; if(!r) return;
+  clearTimeout(bgAnimT); bgAnimT=null;
   $("#roomName").textContent=r.name; $("#roomSub").textContent="";
 
   scene.innerHTML="";
@@ -952,6 +954,19 @@ function render(){
   wrap.appendChild(inner);
   scene.appendChild(wrap);
   fitScenePhoto();          // ★사진·핫스팟 상자를 픽셀로 못 박는다 (좌표 % 기준을 맞추려고)
+
+  // ★맵 배경 애니 — 조건 플래그가 서 있으면 frames를 순서대로 반복 (마지막 프레임은 길게)
+  { const ba=r.bgAnim;
+    if(ba && (!ba.ifFlag || state.flags[ba.ifFlag])){
+      let bi=0;
+      const step=()=>{
+        bg.src=ba.frames[bi];
+        const last = bi===ba.frames.length-1;
+        bi=(bi+1)%ba.frames.length;
+        bgAnimT=setTimeout(step, last?(ba.endHoldMs||ba.ms||1500):(ba.ms||1500));
+      };
+      step();
+    } }
 
   const nav=document.createElement("div"); nav.id="navbar";
   // showIf 조건 안 맞으면 방향버튼 자체가 안 뜸 (예: 이비스 리셉션 풀기 전엔 '방으로' 숨김)
