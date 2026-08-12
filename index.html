@@ -762,8 +762,30 @@ const MAPS = {
     // 배경 = 북쑥 실사진(2026-08-12 교체, 세로 768×1365). 핫스팟도 새 사진에 맞춰 재배치.
     name:"머라이언 파크", sub:"물을 뿜는 사자상 앞", photo:"img/merlion.jpg",
     hotspots:[
-      {x:16,y:52,emoji:"🦁",label:"머라이언", clue:{e:"🦁",t:"받침대 각인: '내가 뿜는 물줄기의 수를 세어라'"}},
-      {x:48,y:57,emoji:"💧",label:"물줄기", clue:{e:"💧",t:"물줄기를 세어보니… 5줄기."}},
+      // 물줄기 세기 단서 삭제(북쑥 2026-08-12). 사자상 각인 문구도 물줄기 언급 제거.
+      {x:16,y:52,emoji:"🦁",label:"머라이언", clue:{e:"🦁",t:"물을 뿜는 머라이언 사자상.\n등쪽에 금이 가 있는 게 보인다."}},
+      // 등쪽 열쇠 홈 — 터널에서 얻은 앤틱 열쇠(key5)를 꽂는 곳. 꽂으면 ml_key.
+      // ★이후 기믹(북쑥 예고): 머라이언 물줄기가 강·약으로 나가는 연출 — 순서는 [강 약 중 강 중 약].
+      //   강/약 이미지는 북쑥이 보내줄 예정. 오면 ml_key 상태의 맵 배경 애니로 붙인다.
+      { x:11,y:67, w:16,h:16, label:"머라이언 등쪽", hideIf:"ml_key", closeup:{
+        img:"img/closeup/merlion_back.jpg", badge:"🗝️",
+        caption:"🗝️ 등에 열쇠 모양 홈이 파여 있다.\n어딘가 낯익은 모양이다…",
+        action:{type:"clue"},
+        subspots:[
+          { x:51,y:54, w:38,h:58, label:"열쇠 홈",
+            insert:{ needItem:"key5", consume:true, setFlag:"ml_key", label:"머라이언 등쪽",
+              noItem:"홈에 꼭 맞는 뭔가가 필요해 보인다.",
+              pick:"가방에서 🗝️열쇠를 골라서 꽂아봐.",
+              success:"철컥! 열쇠가 꼭 맞게 들어갔다.",
+              next:{ img:"img/closeup/merlion_back_key.jpg", badge:"🗝️",
+                caption:"🗝️ 열쇠가 등에 꽂혔다.\n어디선가 물소리가 달라진 것 같다…!",
+                action:{type:"clue"} } } },
+        ] }},
+      // 열쇠 꽂은 뒤엔 꽂힌 모습으로
+      { x:11,y:67, w:16,h:16, label:"머라이언 등쪽", showIf:"ml_key", closeup:{
+        img:"img/closeup/merlion_back_key.jpg", badge:"🗝️",
+        caption:"🗝️ 열쇠가 등에 꽂혀 있다.",
+        action:{type:"clue"} }},
       {x:63,y:76,emoji:"🔒",label:"분수 자물쇠", once:true,
         lock:{len:1, answer:"5",
           success:"분수가 멈추더니 열쇠조각이 나타났다! 🦁", give:["frag4"], setFlag:"ml_done"}},
@@ -917,6 +939,7 @@ function render(){
     const id=state.room+"_"+i;
     if(h.once && state.done[id]) return;
     if(h.showIf && !state.flags[h.showIf]) return;
+    if(h.hideIf && state.flags[h.hideIf]) return;   // ★플래그가 서면 사라지는 요소 (예: 열쇠 꽂기 전 홈)
     const el=document.createElement("div");
     el.style.left=h.x+"%"; el.style.top=h.y+"%";
     // 모든 요소를 '반짝이는 영역'으로 통일. DEBUG일 때만 빛남(일반은 투명 클릭영역=직접 찾기)
