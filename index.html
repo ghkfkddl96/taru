@@ -149,6 +149,13 @@
     color:#fff; font-size:15px; font-weight:800; letter-spacing:2px; opacity:.72;
     text-shadow:0 2px 6px rgba(0,0,0,.8); pointer-events:none; }
   .cu-mirror.locked .mirGrip{ display:none; }
+  /* 거울 아이템 더블탭 팝업 — 유리는 하얗고, 긁힌 자국(모음)만 보인다 */
+  .mirGlass.white{ background:#f5f6f6; }
+  /* 쌍안경 뷰 — 안은 사진, 검은 원 테두리, 바깥은 어둡게.
+     원 중심을 살짝 내리고 크게 — 돔의 각인(사진아이콘+숫자)이 밝은 원 안에 들어오게 */
+  .cu-binoc{ position:absolute; inset:0; pointer-events:none; z-index:5;
+    background:radial-gradient(circle farthest-side at 50% 52%,
+      rgba(0,0,0,0) 70%, rgba(0,0,0,.42) 79%, rgba(3,2,6,.97) 88%, #030206 100%); }
 
   /* 메뉴 아이콘 고르기 (1행 N칸) — 사진 바로 아래, 설명글 위 */
   .pickRow{ display:flex; gap:10px; justify-content:center; margin:12px 0 2px; flex:0 0 auto; }
@@ -362,8 +369,11 @@ const ITEMS = {
   frag3:{emoji:"🧩", name:"조각3"}, frag4:{emoji:"🧩", name:"조각4"},
   flower:{emoji:"🌺", name:"꽃"},
   battery:{emoji:"🔋", name:"건전지"},
-  mirror:{name:"거울",
+  mirror:{name:"거울", inspect:"mirror",   // ★더블탭→거울 살펴보기(하얀 유리+긁힌 자국)
     svg:'<svg viewBox="0 0 24 24"><rect x="5.4" y="2.4" width="13.2" height="17.4" rx="6.6" fill="#7d6a52"/><rect x="6.9" y="3.9" width="10.2" height="14.4" rx="5.1" fill="#dfe9ee"/><path d="M8.2 14.6 14.9 5.6c1.1 1 1.6 2.3 1.5 3.6L10.6 17c-1-.3-1.8-1.1-2.4-2.4z" fill="#fff" opacity=".75"/><rect x="10.6" y="19.2" width="2.8" height="2.6" rx="1" fill="#7d6a52"/></svg>'},
+  // 쌍안경 — 비보시티 송파바쿠테 나무상자에서 나온다. 골라 들고 멀리 있는 걸 본다.
+  binoc:{name:"쌍안경",
+    svg:'<svg viewBox="0 0 24 24"><rect x="10.7" y="7.6" width="2.6" height="6.2" rx="1" fill="#3b4249"/><rect x="2.9" y="5.2" width="7.2" height="6" rx="2.4" fill="#2f353a"/><rect x="13.9" y="5.2" width="7.2" height="6" rx="2.4" fill="#2f353a"/><rect x="2.3" y="9.8" width="8.4" height="9.6" rx="3.4" fill="#23272b"/><rect x="13.3" y="9.8" width="8.4" height="9.6" rx="3.4" fill="#23272b"/><circle cx="6.5" cy="15.2" r="2.7" fill="#11151a"/><circle cx="17.5" cy="15.2" r="2.7" fill="#11151a"/><circle cx="5.6" cy="14.3" r="0.9" fill="#4a545e"/><circle cx="16.6" cy="14.3" r="0.9" fill="#4a545e"/></svg>'},
   // 손전등 — 건전지를 끼우기 전엔 렌즈가 어둡고, 끼우면 노랗게 빛난다(render에서 교체)
   flashlight:{name:"손전등", inspect:"flashlight",
     svg:'<svg viewBox="0 0 24 24"><rect x="2.6" y="9.2" width="3.4" height="5.6" rx="1" fill="#23272b"/><rect x="5.6" y="8.6" width="8.6" height="6.8" rx="1.1" fill="#2f353a"/><rect x="7.2" y="10.2" width="1.5" height="3.6" rx=".5" fill="#7d868d"/><rect x="13.8" y="7.4" width="3" height="9.2" rx="1" fill="#3b4249"/><path d="M16.6 6.6 L21.2 4.6 L21.2 19.4 L16.6 17.4 Z" fill="#464e56"/><ellipse cx="21" cy="12" rx="1.1" ry="6.6" fill="#2a2f34"/></svg>'},
@@ -488,7 +498,16 @@ const MAPS = {
             caption:"📦 테이블 위에 놓인 나무 상자.\n앞면에 네모난 버튼 네 개가 달려 있다.",
             action:{type:"picker", answer:["rice","veggie","skewer","can"],
               success:"덜컥 — 상자 뚜껑이 열렸다.",
-              setFlag:"vivo_box"} }},
+              setFlag:"vivo_box",
+              prize:{ img:"img/closeup/vivo_box_open.jpg", badge:"🔭", label:"열린 나무 상자",
+                caption:"뚜껑이 열렸다.\n안에 뭔가 들어 있다.",
+                action:{type:"clue"},
+                subspots:[
+                  {x:54.5,y:49,w:32,h:28,label:"쌍안경", closeup:{
+                    img:"img/closeup/vivo_box_open.jpg", badge:"🔭",
+                    caption:"🔭 가죽 끈이 달린 낡은 쌍안경이다.",
+                    action:{type:"give", give:["binoc"], success:"쌍안경 획득! 🔭"} }},
+                ] } } }},
         ] }},
     ],
     exits:[
@@ -681,7 +700,14 @@ const MAPS = {
   arab:{
     name:"아랍 스트리트", sub:"황금 돔과 알록달록한 골목", photo:"img/arab.jpg",
     hotspots:[
-      {x:55,y:29,emoji:"🕌",label:"술탄 모스크", clue:{e:"🕌",t:"황금 돔이 햇빛을 그대로 받아낸다."}},
+      // 술탄 모스크 돔 — 쌍안경을 골라 들고 봐야 확대된다 (구경용 팝업은 삭제, 2026-08-12 북쑥 지시)
+      { x:55,y:29, w:30,h:22, label:"술탄 모스크 돔",
+        needSel:{item:"binoc",
+          no:"돔이 너무 멀어서 잘 안 보인다.",
+          pick:"가방에서 🔭쌍안경을 골라서 봐야지."},
+        closeup:{ img:"img/closeup/arab_dome.jpg", badge:"🔭", binoc:true,
+          caption:"🔭 쌍안경으로 황금 돔을 한가득 당겨 봤다.\n돔에 뭔가 새겨져 있다…!",
+          action:{type:"clue"} }},
       // 거울을 대야 읽히는 벽 — 반쪽만 칠해진 글씨
       { x:10,y:26, w:19,h:27, label:"페인트 벗겨진 벽", closeup:{
         img:"img/closeup/arab_wall.jpg", badge:"🔎",
@@ -954,6 +980,12 @@ function showTransition(tr, done){
 /* ---- 탭 ---- 모든 요소를 클로즈업(팝업)으로 통일 ---- */
 function tap(h,id){
   SFX.tap(); vib(8);
+  // ★needSel: 특정 아이템을 '골라 든' 상태여야 열리는 요소 (예: 모스크 돔=쌍안경)
+  if(h.needSel && selected!==h.needSel.item){
+    if(has(h.needSel.item)) toast(h.needSel.pick||"가방에서 골라서 써봐.");
+    else toast(h.needSel.no||"이대로는 안 되겠는데.");
+    return;
+  }
   const cu = h.closeup || toCloseup(h);
   if(cu.action && cu.action.type==="numlock" && h.needFlag && !state.flags[h.needFlag]){
     toast("먼저 다른 걸 해결해야 할 것 같아."); return; }
@@ -973,6 +1005,9 @@ function toCloseup(h){
 let cuCtx=null, cuAnim=null;
 let cuStack=[];   // ★중첩 팝업 뒤로가기 스택 (팝업 속 요소 클릭→또 팝업, ✕ 누르면 부모 팝업으로 복귀)
 function openCloseup(cu, h, id){
+  // ★이미 푼 상자(prize형)를 다시 열면 열린 모습으로 바로 간다 — 안 챙긴 아이템을 다시 집을 수 있게
+  if(cu.action && cu.action.prize && state.done[id])
+    return openCloseup(cu.action.prize, {label:cu.action.prize.label||""}, id+"_prize");
   cuCtx={cu,h,id};
   const solved=!!state.done[id];
   const hasImg = cu.img && cu.img!=="TODO";
@@ -1027,6 +1062,11 @@ function openCloseup(cu, h, id){
   // ★거울 대기: 사진 위에 끌 수 있는 손거울
   clearMirror();
   if(a.type==="mirror") buildMirror(a, id);
+  else if(a.type==="mirrorview") buildMirrorView(a);   // 거울 아이템 더블탭 팝업(고정·하얀 유리)
+  // ★쌍안경 뷰: 검은 원 테두리 오버레이 (바깥 어둡고 안은 사진)
+  { const w0=$("#cuImgWrap");
+    if(w0){ w0.querySelectorAll(".cu-binoc").forEach(e=>e.remove());
+      if(cu.binoc){ const v=document.createElement("div"); v.className="cu-binoc"; w0.appendChild(v); } } }
   // ★팝업 속 서브 핫스팟(사진 위 클릭영역 → 중첩 팝업). 맵 요소와 동일한 반짝임영역 방식.
   { const wrap=$("#cuImgWrap");
     if(wrap){
@@ -1167,6 +1207,43 @@ function buildMirror(a, id){
   }
 }
 
+/* ---- 거울 아이템 더블탭 팝업 ----
+   벽이 아니어도 거울을 들여다볼 수 있다. 유리는 하얗고(비치는 건 없다),
+   긁힌 자국(ㅣ·ㅏ·ㅣ)만 벽에서 보던 그대로 남아 있다. 끌기 없음·고정.
+   scratch 좌표계는 벽 퍼즐과 동일: 유리에 보이는 창 = [targetX, targetX+width]% */
+function buildMirrorView(a){
+  clearMirror();
+  const wrap=$("#cuImgWrap"), img=$("#cuImg"); if(!wrap||!img) return;
+  const el=document.createElement("div"); el.className="cu-mirror locked";
+  el.innerHTML =
+    '<div class="mirGlass white">'+
+      (a.scratch ? '<img class="mirScr" alt="" draggable="false" src="'+a.scratch+'">' : '')+
+      '<div class="mirSheen"></div>'+
+    '</div><div class="mirFrame"></div>';
+  wrap.appendChild(el);
+  const scr=el.querySelector(".mirScr");
+  const W=a.width||24;
+  mirState={ x:50-W/2, a, id:"item_mirror" };   // 가운데 고정
+  function layout(){
+    const iw=img.clientWidth, ih=img.clientHeight;
+    if(!iw||!ih) return;
+    const mw=Math.round(iw*W/100), mh=Math.round(ih*0.94);
+    const mx=Math.round(iw*mirState.x/100), my=Math.round((ih-mh)/2);
+    el.style.width=mw+"px"; el.style.height=mh+"px";
+    el.style.left=mx+"px"; el.style.top=my+"px";
+    if(scr){ const anchor=Math.round(iw*a.targetX/100);
+             scr.style.width=iw+"px"; scr.style.height=ih+"px";
+             scr.style.left=(-anchor)+"px"; scr.style.top=(-my)+"px"; }
+  }
+  mirState.layout=layout;
+  layout();
+  requestAnimationFrame(layout);
+  if(!img.complete || !img.naturalWidth) img.addEventListener("load", layout, {once:true});
+  if(window.ResizeObserver){
+    const ro=new ResizeObserver(()=>layout()); ro.observe(img); mirState.ro=ro;
+  }
+}
+
 let pickSel=null;   // 각 칸이 고른 보기의 번호 (food는 -1이 빈칸)
 function clearPicker(){ document.querySelectorAll("#closeup .pickRow").forEach(e=>e.remove()); }
 function buildPicker(a, id){
@@ -1270,8 +1347,21 @@ function closeCloseup(){
 function closeCloseupAll(){ cuStack.length=0; closeCloseup(); }   // 완전닫기(리셋/성공/엔딩용)
 
 /* ---- 아이템 자세히 보기(더블탭): 여권 팝업 / 스마트폰 잠금해제 ---- */
+/* 거울 팝업 배경 — 어두운 바탕(비트맵 없이 SVG). 벽 사진과 같은 비율(1052:1448)이라
+   긁힌 자국 좌표계가 벽 퍼즐과 똑같이 맞는다. */
+const MIRROR_BG = 'data:image/svg+xml;utf8,'+encodeURIComponent(
+  '<svg xmlns="http://www.w3.org/2000/svg" width="526" height="724">'+
+  '<rect width="526" height="724" fill="#221a2c"/>'+
+  '<ellipse cx="263" cy="352" rx="330" ry="430" fill="#2c2237"/>'+
+  '<ellipse cx="263" cy="340" rx="215" ry="330" fill="#332941"/></svg>');
 function openInspect(key){
-  if(key==="passport"){
+  if(key==="mirror"){
+    openCloseup({img:MIRROR_BG, badge:"🪞",
+      caption:"🪞 손거울.\n유리가 약간 지저분하다.",
+      action:{type:"mirrorview", targetX:48.9, width:24,
+        scratch:"img/closeup/mirror_scratch.png"}},
+      {label:"거울"}, "item_mirror");
+  } else if(key==="passport"){
     openCloseup({img:"img/passport.jpg", badge:"🛂",
       caption:"🛂 대한민국 여권.\n해외에선 여권이 곧 신분증이자 생명이야. 잃어버리면 큰일나니까 꼭 잘 챙기자! ✈️",
       action:{type:"clue"}}, {label:"여권"}, "item_passport");
