@@ -548,11 +548,17 @@ const MAPS = {
   },
 
   laupasat:{
+    // 배경 = 북쑥 실사진(2026-08-13 교체, 세로). 화로 앞 꼬치 굽는 사람 → 꼬치 확대 팝업.
     name:"라우파삿", sub:"옛 시장 호커센터", photo:"img/laupasat.jpg",
     hotspots:[
-      {x:50,y:40,emoji:"🕰️",label:"시계탑",
+      {x:62,y:20,emoji:"🕰️",label:"시계탑",
         clue:{e:"🕰️",t:"빅토리아풍 철제 시계탑이 상징인 옛 시장.\n저녁이면 사테(꼬치) 노점 거리가 열려."}},
-      {x:30,y:66,emoji:"🍢",label:"사테 거리", clue:{e:"🍢",t:"숯불 사테 냄새가 솔솔~ 여행 중 야식으로 최고!"}},
+      {x:47,y:82,emoji:"🍢",label:"사테 거리", clue:{e:"🍢",t:"숯불 사테 냄새가 솔솔~ 여행 중 야식으로 최고!"}},
+      // 왼쪽 화로에서 꼬치 굽는 사람 → 그릴 위 꼬치 5종 확대 (북쑥 제공 이미지)
+      { x:8,y:63, w:16,h:24, label:"꼬치 굽는 사람", closeup:{
+        img:"img/closeup/laupasat_grill.jpg", badge:"🍢",
+        caption:"🍢 화로 앞 아저씨가 꼬치를 굽고 있다.\n숯불 위에서 노릇노릇 익어간다…",
+        action:{type:"clue"} }},
     ],
     exits:[{to:"downtown", label:"중심지로", emoji:"🏙️", dir:"left"}]
   },
