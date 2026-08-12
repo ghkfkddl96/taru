@@ -698,6 +698,12 @@ const MAPS = {
     name:"실내 식물원 · 클라우드 포레스트", sub:"안개 낀 실내 숲속", photo:"img/garden.jpg",
     hotspots:[
       {x:50,y:38,emoji:"⛲",label:"실내폭포", clue:{e:"⛲",t:"35m 실내폭포에서 안개가 피어오른다.\n구름 속을 걷는 기분!"}},
+      // 좌측 중앙 — 꽃 일곱 송이 벽(좌→우: 빨·주·보·초·빨·노·하늘). 지금은 구경용 팝업.
+      // ★나중에 빨주노초하늘보라 버튼 6개를 이 순서대로 누르는 퍼즐 예정(답=빨주보초빨노하늘, 북쑥 2026-08-12).
+      { x:16,y:48, w:28,h:24, label:"꽃 전시 벽", closeup:{
+        img:"img/closeup/garden_flowers.jpg", badge:"🌺",
+        caption:"🌺 'Orchid Haven' — 형형색색 꽃 일곱 송이가\n벽에 줄지어 빛나고 있다.",
+        action:{type:"clue"} }},
       // 우측하단 덩굴 터널 — 처음엔 캄캄. 켜진 손전등(건전지 필수)을 골라 들고
       // 검은 터널을 누르면 손전등 빛에 마루(석상)와 열쇠가 드러난다. 열쇠 클릭=즉시 획득.
       { x:80,y:78, w:34,h:26, label:"덩굴 터널", closeup:{
@@ -753,11 +759,12 @@ const MAPS = {
   },
 
   merlion:{
+    // 배경 = 북쑥 실사진(2026-08-12 교체, 세로 768×1365). 핫스팟도 새 사진에 맞춰 재배치.
     name:"머라이언 파크", sub:"물을 뿜는 사자상 앞", photo:"img/merlion.jpg",
     hotspots:[
-      {x:50,y:22,emoji:"🦁",label:"머라이언", clue:{e:"🦁",t:"받침대 각인: '내가 뿜는 물줄기의 수를 세어라'"}},
-      {x:30,y:46,emoji:"💧",label:"물줄기", clue:{e:"💧",t:"물줄기를 세어보니… 5줄기."}},
-      {x:50,y:64,emoji:"🔒",label:"분수 자물쇠", once:true,
+      {x:16,y:52,emoji:"🦁",label:"머라이언", clue:{e:"🦁",t:"받침대 각인: '내가 뿜는 물줄기의 수를 세어라'"}},
+      {x:48,y:57,emoji:"💧",label:"물줄기", clue:{e:"💧",t:"물줄기를 세어보니… 5줄기."}},
+      {x:63,y:76,emoji:"🔒",label:"분수 자물쇠", once:true,
         lock:{len:1, answer:"5",
           success:"분수가 멈추더니 열쇠조각이 나타났다! 🦁", give:["frag4"], setFlag:"ml_done"}},
     ],
