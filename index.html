@@ -371,6 +371,12 @@ const ITEMS = {
   battery:{emoji:"🔋", name:"건전지"},
   mirror:{name:"거울", inspect:"mirror",   // ★더블탭→거울 살펴보기(하얀 유리+긁힌 자국)
     svg:'<svg viewBox="0 0 24 24"><rect x="5.4" y="2.4" width="13.2" height="17.4" rx="6.6" fill="#7d6a52"/><rect x="6.9" y="3.9" width="10.2" height="14.4" rx="5.1" fill="#dfe9ee"/><path d="M8.2 14.6 14.9 5.6c1.1 1 1.6 2.3 1.5 3.6L10.6 17c-1-.3-1.8-1.1-2.4-2.4z" fill="#fff" opacity=".75"/><rect x="10.6" y="19.2" width="2.8" height="2.6" rx="1" fill="#7d6a52"/></svg>'},
+  // 아이스 아메리카노 — 아랍 카페 숫자퍼즐 보상. 나중에 어떤 인물에게 주는 아이템.
+  americano:{name:"아메리카노",
+    svg:'<svg viewBox="0 0 24 24"><path d="M13.5 1.5 L15 6" stroke="#23272b" stroke-width="1.6" stroke-linecap="round" fill="none"/><rect x="5.9" y="5.7" width="12.2" height="1.9" rx="0.95" fill="#cfd6da"/><path d="M6.8 7.6 h10.4 l-1.14 12.8 a1.7 1.7 0 0 1 -1.7 1.5 h-4.72 a1.7 1.7 0 0 1 -1.7 -1.5 Z" fill="#dbeaf2"/><path d="M7.35 9.1 h9.3 l-0.98 11.2 a1.25 1.25 0 0 1 -1.25 1.1 h-4.84 a1.25 1.25 0 0 1 -1.25 -1.1 Z" fill="#4c2e1a"/><rect x="8.6" y="9.6" width="2.5" height="2.5" rx="0.7" fill="#fff" opacity="0.5" transform="rotate(12 9.85 10.85)"/><rect x="12.6" y="10.1" width="2.4" height="2.4" rx="0.7" fill="#fff" opacity="0.42" transform="rotate(-9 13.8 11.3)"/><path d="M7.15 12.6 h9.7 l-0.42 4.8 h-8.86 Z" fill="#c9a26b"/><path d="M9.6 14.6 h4.8" stroke="#fff" stroke-width="1" stroke-linecap="round" opacity="0.85"/></svg>'},
+  // 마루의 열쇠 — 클라우드 포레스트 어두운 터널(손전등)에서. 왕관+하트 장식 앤틱 청동 열쇠.
+  key5:{name:"열쇠",
+    svg:'<svg viewBox="0 0 24 24" fill="none" stroke="#9a7b3f" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9.3 3.1 L9.9 1.6 L11 2.8 L12 1.3 L13 2.8 L14.1 1.6 L14.7 3.1"/><circle cx="9.6" cy="6.3" r="2.5"/><circle cx="14.4" cy="6.3" r="2.5"/><path d="M12 6.1 q-1.4-1.3-2.1 0 q-.4.9 2.1 2.3 q2.5-1.4 2.1-2.3 q-.7-1.3-2.1 0"/><path d="M10.9 9.9 h2.2"/><path d="M12 9.9 V21.3"/><path d="M12 14.8 h3 v1.6 h-1.5 v1.4 h1.5 v1.5 h-3"/></svg>'},
   // 쌍안경 — 비보시티 송파바쿠테 나무상자에서 나온다. 골라 들고 멀리 있는 걸 본다.
   binoc:{name:"쌍안경",
     svg:'<svg viewBox="0 0 24 24"><rect x="10.7" y="7.6" width="2.6" height="6.2" rx="1" fill="#3b4249"/><rect x="2.9" y="5.2" width="7.2" height="6" rx="2.4" fill="#2f353a"/><rect x="13.9" y="5.2" width="7.2" height="6" rx="2.4" fill="#2f353a"/><rect x="2.3" y="9.8" width="8.4" height="9.6" rx="3.4" fill="#23272b"/><rect x="13.3" y="9.8" width="8.4" height="9.6" rx="3.4" fill="#23272b"/><circle cx="6.5" cy="15.2" r="2.7" fill="#11151a"/><circle cx="17.5" cy="15.2" r="2.7" fill="#11151a"/><circle cx="5.6" cy="14.3" r="0.9" fill="#4a545e"/><circle cx="16.6" cy="14.3" r="0.9" fill="#4a545e"/></svg>'},
@@ -690,9 +696,28 @@ const MAPS = {
 
   garden:{
     name:"실내 식물원 · 클라우드 포레스트", sub:"안개 낀 실내 숲속", photo:"img/garden.jpg",
-    // 퍼즐 자리 비움 — 북쑥이 새 문제 직접 추가 예정 (기존: 꽃 수 세기, 답42, frag2/g_done)
     hotspots:[
       {x:50,y:38,emoji:"⛲",label:"실내폭포", clue:{e:"⛲",t:"35m 실내폭포에서 안개가 피어오른다.\n구름 속을 걷는 기분!"}},
+      // 우측하단 덩굴 터널 — 처음엔 캄캄. 켜진 손전등(건전지 필수)을 골라 들고
+      // 검은 터널을 누르면 손전등 빛에 마루(석상)와 열쇠가 드러난다. 열쇠 클릭=즉시 획득.
+      { x:80,y:78, w:34,h:26, label:"덩굴 터널", closeup:{
+        img:"img/closeup/garden_tunnel_dark.jpg", badge:"🕳️",
+        caption:"🕳️ 덩굴로 뒤덮인 터널.\n어두워서 들어갈 수 없다.",
+        action:{type:"clue"},
+        subspots:[
+          { x:50,y:46, w:88,h:78, label:"검은 터널",
+            needSel:{item:"flashlight", flag:"fl_loaded",
+              no:"어두워서 아무것도 안 보인다.",
+              pick:"가방에서 🔦손전등을 골라서 비춰봐.",
+              noFlag:"손전등이 켜지지 않는다. 건전지가 없다…"},
+            closeup:{ img:"img/closeup/garden_tunnel_lit.jpg", badge:"🔦",
+              caption:"🔦 마루가… 왜 여기에?!\n무언가를 들고 있다!",
+              action:{type:"clue"},
+              subspots:[
+                { x:68.5,y:54, w:24,h:14, label:"열쇠",
+                  give:{item:"key5", success:"열쇠 획득! 🗝️"} },
+              ] } },
+        ] }},
     ],
     exits:[{to:"marina", label:"마리나", emoji:"🏨", dir:"left"}]
   },
@@ -721,7 +746,8 @@ const MAPS = {
         img:"img/closeup/arab_cafe.jpg", badge:"☕",
         caption:"☕ 사람들 틈에 작은 카페가 있다.\n음료 네 잔 앞에 숫자판이 하나씩 놓여 있다.",
         action:{type:"picker", set:"digit", answer:["7","7","6","8"],
-          success:"딸깍! 뭔가 맞아떨어졌다.", setFlag:"arab_cafe"} }},
+          success:"딸깍! 아이스 아메리카노 한 잔이 나왔다! 🥤",
+          give:["americano"], setFlag:"arab_cafe"} }},
     ],
     exits:[{to:"downtown", label:"중심지로", emoji:"🏙️", dir:"left"}]
   },
@@ -985,14 +1011,20 @@ function showTransition(tr, done){
 }
 
 /* ---- 탭 ---- 모든 요소를 클로즈업(팝업)으로 통일 ---- */
+/* ★needSel: 특정 아이템을 '골라 든' 상태여야 통과 (예: 돔=쌍안경, 터널=켜진 손전등)
+   {item, flag?, no(미보유), pick(보유+미선택), noFlag(선택했지만 flag 미충족)} — 막히면 토스트+true */
+function needSelBlocked(ns){
+  if(!ns) return false;
+  if(selected!==ns.item){
+    toast(has(ns.item) ? (ns.pick||"가방에서 골라서 써봐.") : (ns.no||"이대로는 안 되겠는데."));
+    return true;
+  }
+  if(ns.flag && !state.flags[ns.flag]){ toast(ns.noFlag||"아직 쓸 수 없다."); return true; }
+  return false;
+}
 function tap(h,id){
   SFX.tap(); vib(8);
-  // ★needSel: 특정 아이템을 '골라 든' 상태여야 열리는 요소 (예: 모스크 돔=쌍안경)
-  if(h.needSel && selected!==h.needSel.item){
-    if(has(h.needSel.item)) toast(h.needSel.pick||"가방에서 골라서 써봐.");
-    else toast(h.needSel.no||"이대로는 안 되겠는데.");
-    return;
-  }
+  if(needSelBlocked(h.needSel)) return;
   const cu = h.closeup || toCloseup(h);
   if(cu.action && cu.action.type==="numlock" && h.needFlag && !state.flags[h.needFlag]){
     toast("먼저 다른 걸 해결해야 할 것 같아."); return; }
@@ -1086,6 +1118,11 @@ function openCloseup(cu, h, id){
         if(s.w) el.style.width=s.w+"%"; if(s.h) el.style.height=s.h+"%";
         el.title=s.label||"";
         el.onclick=(ev)=>{ ev.stopPropagation();
+          if(needSelBlocked(s.needSel)) return;                     // ★아이템 골라 들어야 열림
+          if(s.give){ const sid=id+"_s"+si;                         // ★클릭 즉시 획득 (팝업 없이)
+            if(state.done[sid]){ toast("이미 챙겼어."); return; }
+            state.done[sid]=true; give([s.give.item]); SFX.item(); vib([22,32,60]);
+            toast(s.give.success||"획득!"); renderInv(); save(); return; }
           if(s.insert){ doInsert(s.insert, id+"_s"+si); return; }   // ★그 자리에서 아이템 끼우기
           SFX.tap(); vib(8); cuStack.push({cu,h,id}); openCloseup(s.closeup, s, id+"_s"+si); };
         wrap.appendChild(el);
