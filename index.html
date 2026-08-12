@@ -715,6 +715,13 @@ const MAPS = {
         action:{type:"mirror", needItem:"mirror", targetX:48.9, tol:2.6,
           scratch:"img/closeup/mirror_scratch.png",
           noItem:"반쪽만 남은 자국이라 읽을 수가 없다."} }},
+      // 사람 많은 거리 → 길가 카페. 음료 4잔 앞 숫자판 4칸(0000, 누르면 +1). 정답 7768.
+      // 힌트는 게임 밖(실제 갤러리 사진, 돔 각인 250501·22:15와 연결) — 게임 안엔 힌트 없음.
+      { x:47,y:72, w:42,h:24, label:"북적이는 거리", closeup:{
+        img:"img/closeup/arab_cafe.jpg", badge:"☕",
+        caption:"☕ 사람들 틈에 작은 카페가 있다.\n음료 네 잔 앞에 숫자판이 하나씩 놓여 있다.",
+        action:{type:"picker", set:"digit", answer:["7","7","6","8"],
+          success:"딸깍! 뭔가 맞아떨어졌다.", setFlag:"arab_cafe"} }},
     ],
     exits:[{to:"downtown", label:"중심지로", emoji:"🏙️", dir:"left"}]
   },
@@ -1057,8 +1064,9 @@ function openCloseup(cu, h, id){
   { const w0=$("#cuImgWrap"); if(w0) w0.querySelectorAll(".cu-clock").forEach(e=>e.remove()); }
   if(a.type==="clock") buildClock(a, id);
   // ★메뉴 아이콘 고르기: 사진 아래에 빈칸 N개 (다른 팝업으로 넘어가면 반드시 지운다)
+  // 풀린 뒤에도 정답이 잠긴 채 보이게 buildPicker는 항상 호출 (내부에서 solved면 조작 잠금)
   clearPicker();
-  if(a.type==="picker" && !solved) buildPicker(a, id);
+  if(a.type==="picker") buildPicker(a, id);
   // ★거울 대기: 사진 위에 끌 수 있는 손거울
   clearMirror();
   if(a.type==="mirror") buildMirror(a, id);
@@ -1110,14 +1118,18 @@ const PICK_BLANK=`<svg viewBox="0 0 48 48"><path fill="none" stroke="#141414" st
 
 /* ★보기 묶음 — action.set 으로 고른다 (없으면 음식 아이콘)
    food : 빈칸에서 시작해 한 번 누를 때마다 아이콘이 바뀐다
-   alpha: A로 시작해 알파벳 12자를 순서대로 돈다 (정답에 쓰는 A·S·G·P·R 포함) */
+   alpha: A로 시작해 알파벳 12자를 순서대로 돈다 (정답에 쓰는 A·S·G·P·R 포함)
+   digit: 0000에서 시작해 누를 때마다 1씩 증가(9 다음 0) — 아랍 카페 4자리 */
 const ALPHA_KEYS = "ADEGKLMNPRST".split("");
+const DIGIT_KEYS = "0123456789".split("");
 const PICK_SETS = {
   food : { keys: PICK_ICONS.map(o=>o.k), start:-1,
            html: i => i<0 ? PICK_BLANK
                           : `<img src="${PICK_ICONS[i].img}" alt="${PICK_ICONS[i].name}" draggable="false">` },
   alpha: { keys: ALPHA_KEYS, start:0,
            html: i => `<span class="pickLetter">${ALPHA_KEYS[i]}</span>` },
+  digit: { keys: DIGIT_KEYS, start:0,
+           html: i => `<span class="pickLetter">${DIGIT_KEYS[i]}</span>` },
 };
 const pickSet = a => PICK_SETS[a.set] || PICK_SETS.food;
 
