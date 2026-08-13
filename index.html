@@ -800,7 +800,16 @@ const MAPS = {
   marina:{
     // 배경 = 북쑥 실사진(2026-08-13 교체). 팝업 전부 삭제(북쑥 지시) — 구경만 하는 맵.
     name:"마리나베이 샌즈", sub:"배 모양 옥상 아래를 걸어봐", photo:"img/marina.jpg",
-    hotspots:[],
+    hotspots:[
+      // 스카이파크(배 옥상) — 쌍안경 골라 들고 봐야 확대뷰 (돔과 동일 패턴). 힌트 용도는 북쑥 미정.
+      { x:50,y:35, w:56,h:11, label:"스카이파크",
+        needSel:{item:"binoc",
+          no:"옥상 쪽에 뭔가 보이는 것 같은데… 너무 멀다.",
+          pick:"가방에서 🔭쌍안경을 골라서 봐야지."},
+        closeup:{ img:"img/closeup/marina_sky.jpg", badge:"🔭", binoc:true,
+          caption:"🔭 배 모양 옥상을 한가득 당겨 봤다.",
+          action:{type:"clue"} }},
+    ],
     exits:[
       {to:"downtown", label:"중심지", emoji:"🏙️", dir:"left"},
       {to:"supertree", label:"슈퍼트리", emoji:"🌳", dir:"right"},
