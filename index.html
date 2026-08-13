@@ -377,8 +377,8 @@
     <span class="deco" style="top:30%;left:24%;animation-delay:2s">🧳</span>
     <div class="bigemoji">🦁✈️</div>
     <h1>싱가포르 여행 대소동</h1>
-    <p id="introText">드디어 다가온 싱가포르 여행!<br>오랜만에 둘만의 여행이라 기대된다!<br>그런데 무언가 일이 생길 것 같은 기분이 든다...</p>
-    <button class="btn" style="max-width:220px" onclick="startGame()">시작하기 💗</button>
+    <p id="introText">드디어 기다리던 싱가포르 여행 날.<br>오랜만의 둘만의 여행이라 마음이 들뜬다.<br>그런데 왠지, 무슨 일이 일어날 것만 같은 예감이 든다…</p>
+    <button class="btn" style="max-width:220px" onclick="startGame()">시작하기</button>
     <svg class="skyline" viewBox="0 0 480 92" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
       <rect x="14" y="52" width="20" height="40"/><rect x="40" y="40" width="16" height="52"/><rect x="62" y="58" width="22" height="34"/>
       <!-- 마리나베이 샌즈 -->
@@ -997,19 +997,19 @@ function startGame(){ actx(); startAmbience(); initParallax(); SFX.open(); $("#i
 /* 스토리 — 대본 7개 (북쑥 대본, 2026-08-13). 1→2 사이 검은 페이드 깜빡임.
    버뮤다 삼각지대 설정: 플레이어의 생각대로 세상이 방탈출처럼 바뀜. */
 const STORY=[
-  {emoji:"✈️", text:"드디어 다가온 싱가포르 여행! 즐거운 마음으로 비행기에 탑승했다. 무언가 두고온건 없겠지?"},
-  {emoji:"😴", text:"한숨 자고 일어나니 무언가 이상한 기분이 들었다. 아까 보았던 비행기 풍경이랑 조금 다른 것 같은데..."},
-  {emoji:"📢", text:"비행기에서 안내 방송이 나오기 시작했다."},
-  {emoji:"📢", text:"“아아, 방금 버뮤다 삼각지대를 무사히 통과했습니다. 간혹 버뮤다 삼각지대의 영향으로, 일부 탑승자의 생각에 따라 세상이 바뀌는 경우가 있습니다.”"},
-  {emoji:"📢", text:"”하지만 이는 해당 탑승자 외에는 인지하지 못하기 때문에 큰 문제는 되지 않습니다. 사실 실제하는 현상인지도 모르겠습니다만.....“"},
-  {emoji:"💭", text:".... 혹시 나의 생각이 이 세상에 영향을 끼친 것일까? 다른 사람들은 바뀐 모습을 인식하지 못하는 듯 하다."},
-  {emoji:"💪", text:"세상이 어떻게 바뀌었든 큰 문제는 없다니 다행이지만, 이로 인해 여행을 포기할 수는 없다!"},
+  {emoji:"✈️", text:"설레는 마음으로 비행기에 올랐다. 창밖으로 활주로가 멀어진다. …빠뜨리고 온 건 없겠지?"},
+  {emoji:"😴", text:"깜빡 잠들었다 눈을 떴다. …뭔가 이상하다. 잠들기 전에 봤던 기내 풍경이랑 어딘가 미묘하게 다른 것 같은데."},
+  {emoji:"📢", text:"그때, 기내에 안내 방송이 흘러나왔다."},
+  {emoji:"📢", text:"“아─ 안내 말씀드립니다. 우리 비행기는 방금 버뮤다 삼각지대를 무사히 통과했습니다. 간혹 삼각지대의 영향으로, 일부 승객의 '생각'이 세상에 반영되는 현상이 보고되고 있습니다.”"},
+  {emoji:"📢", text:"“다만 이 변화는 당사자 외에는 아무도 알아차리지 못하므로, 큰 문제는 없습니다. …사실 승무원들도 실제로 있는 현상인지는 잘 모릅니다만.”"},
+  {emoji:"💭", text:"…설마, 내 생각이 세상을 바꿔버린 걸까? 주위를 둘러봐도 다들 아무렇지 않은 얼굴이다. 눈치챈 건 나뿐인 것 같다."},
+  {emoji:"💪", text:"뭐, 큰 문제는 없다고 했으니까. 세상이 어떻게 바뀌었든 — 기다려온 여행을 포기할 수는 없지!"},
 ];
 /* 공항→시내 첫 진입 시 일회성 스토리. [1]은 북쑥 사진 오면 img 필드 추가 예정. */
 const DTSTORY=[
-  {emoji:"🏙️", text:"공항에서 무사히 시내로 넘어왔다. 최근 방탈출 게임을 많이 해서 그런지, 세상이 방탈출 게임과 섞여버린 것 같다..."},
-  {emoji:"😱", text:"“헉 분명 여권을 챙겼었는데... 무슨 일인지 보이지 않아요!”"},
-  {emoji:"🛂", text:"세상이 바뀐 영향일까? 화랑이의 여권이 어디론가 사라진 모양이다..! 체크인을 하려면 여권이 필요할텐데! 어서 찾아보자!"},
+  {emoji:"🏙️", text:"공항을 빠져나와 무사히 시내에 도착했다. …그리고 확실해졌다. 요즘 방탈출을 너무 많이 한 탓일까, 세상이 온통 방탈출 게임처럼 변해버렸다."},
+  {emoji:"😱", text:"“어…? 분명히 여권을 챙겨 왔는데— 아무리 찾아도 안 보여요…!”"},
+  {emoji:"🛂", text:"이것도 세상이 바뀐 탓일까, 화랑이의 여권이 감쪽같이 사라져버렸다. 호텔 체크인엔 두 사람의 여권이 꼭 필요한데… 이 도시 어딘가에 있을 거야. 찾으러 가자!"},
 ];
 let curStory=STORY;
 function showStory(i){
@@ -1019,7 +1019,7 @@ function showStory(i){
   const last=i>=curStory.length-1;
   const media = s.img ? ('<img class="storyImg" src="'+s.img+'" alt="">')
                       : ('<div class="bigemoji">'+(s.emoji||"")+'</div>');
-  const btnLabel = last ? (curStory===STORY ? "여행 시작! 💗" : "알겠어!") : "다음 ▶";
+  const btnLabel = last ? (curStory===STORY ? "여행 시작!" : "알겠어!") : "다음 ▶";
   ov.innerHTML='<div class="storyCard">'+media+
     (s.title ? '<h2>'+s.title+'</h2>' : '')+
     '<p>'+s.text+'</p>'+
