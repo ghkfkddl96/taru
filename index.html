@@ -247,6 +247,30 @@
   #app.phoneOpen #invWrap{ z-index:36; }
   #app.phoneOpen #invWrap #inventory{ box-shadow:0 0 0 2px rgba(255,255,255,.3), 0 -6px 22px rgba(0,0,0,.5); }
 
+  /* 태블릿 잠금해제(보닛) — 폰 팝업과 같은 구조, 6칸 알파벳 + ABC 자판 */
+  #tab{ position:absolute; inset:0; z-index:34; background:rgba(10,6,18,.93); display:none;
+    flex-direction:column; align-items:center; justify-content:center; padding:10px; touch-action:manipulation; backdrop-filter:blur(3px); }
+  #tabClose{ position:absolute; top:14px; right:16px; width:38px; height:38px; border-radius:50%;
+    background:rgba(255,255,255,.15); color:#fff; border:none; font-size:20px; cursor:pointer; z-index:2; touch-action:manipulation; }
+  #tabImgWrap{ position:relative; flex:none; }
+  #tabImg{ max-height:82vh; max-width:94vw; border-radius:14px; display:block; -webkit-user-drag:none; }
+  #tabScreen{ position:absolute; left:14%; top:11.5%; width:72%; height:79%;
+    display:flex; flex-direction:column; align-items:center; box-sizing:border-box; padding:7% 4% 5%; overflow:hidden; color:#fff; }
+  #tabLockMsg{ font-size:min(2.4vh,15px); font-weight:800; text-align:center; word-break:keep-all; line-height:1.3;
+    text-shadow:0 1px 6px rgba(0,0,0,.45); }
+  #tabCells{ display:flex; gap:min(.9vh,6px); margin-top:26%; }
+  .tcell{ width:min(5vh,37px); height:min(6vh,45px); border-radius:9px; background:rgba(255,255,255,.92);
+    color:#1c2333; font-size:min(3.2vh,22px); font-weight:800; display:flex; align-items:center; justify-content:center;
+    font-family:'Courier New',monospace; box-shadow:0 2px 8px rgba(0,0,0,.3); }
+  .tcell.blink{ box-shadow:0 0 0 2px #ffd97d, 0 2px 8px rgba(0,0,0,.3); }
+  #tabKeys{ width:100%; margin-top:auto; display:flex; flex-direction:column; gap:min(1vh,7px); }
+  .tkrow{ display:flex; gap:min(.7vh,5px); justify-content:center; }
+  .tkey{ flex:1 1 0; min-width:0; height:min(5.6vh,44px); border-radius:8px; border:none; padding:0;
+    font-size:min(2.2vh,15px); font-weight:800; background:#fff; color:#333;
+    box-shadow:0 2px 7px rgba(0,0,0,.28); cursor:pointer; transition:.1s; touch-action:manipulation; }
+  .tkey:active{ transform:scale(.92); background:#ffeaf3; }
+  .tkey.tback{ flex:1.5 1 0; background:#f3e2ea; }
+
   .overlay{ position:absolute; inset:0; z-index:50; display:flex; flex-direction:column;
     align-items:center; justify-content:center; text-align:center; padding:30px;
     background:linear-gradient(160deg,#ffdff0,#dcecff); }
@@ -318,6 +342,19 @@
         <div id="phoneLockMsg">🔒 스마트폰이 잠겨있어</div>
         <div id="phoneInput"></div>
         <div id="phoneKeys"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 태블릿 잠금해제 팝업 (경찰차 보닛) -->
+  <div id="tab">
+    <button id="tabClose" onclick="closeTab()">✕</button>
+    <div id="tabImgWrap">
+      <img id="tabImg" alt="">
+      <div id="tabScreen">
+        <div id="tabLockMsg">🔒 태블릿이 잠겨있어</div>
+        <div id="tabCells"></div>
+        <div id="tabKeys"></div>
       </div>
     </div>
   </div>
@@ -616,6 +653,15 @@ const MAPS = {
         caption:"🚓 경찰차가 정차해 있다.",
         action:{type:"clue"},
         subspots:[
+          // ★보닛(차 앞쪽) → 무전기·태블릿·검정대시·빨간 두 줄이 놓인 문제 씬 (2026-08-13)
+          {x:88,y:64,w:20,h:30,label:"보닛", closeup:{
+            img:"img/closeup/police_bonnet.jpg", badge:"🚓",
+            caption:"🚓 보닛 위에 무전기와 태블릿이 놓여 있다.\n보닛엔 검은 선 하나와 빨간 줄 두 개.",
+            action:{type:"clue"},
+            subspots:[
+              // 태블릿 → 6칸 알파벳 잠금해제(CORTIS) → 지도 앱
+              {x:27,y:74,w:44,h:26,label:"태블릿", tablet:true},
+            ] }},
           {x:21,y:72,w:26,h:34,label:"트렁크", closeup:{
             img:"img/closeup/police_trunk.jpg", badge:"🔢",
             caption:"🔐 트렁크에 3자리 다이얼 자물쇠가 달려 있다.",
@@ -1244,6 +1290,7 @@ function openCloseup(cu, h, id){
         el.title=s.label||"";
         el.onclick=(ev)=>{ ev.stopPropagation();
           if(needSelBlocked(s.needSel)) return;                     // ★아이템 골라 들어야 열림
+          if(s.tablet){ SFX.tap(); vib(8); openTablet(); return; }  // ★보닛 태블릿 → 잠금해제 팝업
           if(s.give){ const sid=id+"_s"+si;                         // ★클릭 즉시 획득 (팝업 없이)
             if(state.done[sid]){ toast("이미 챙겼어."); return; }
             state.done[sid]=true; give([s.give.item]); SFX.item(); vib([22,32,60]);
@@ -1658,6 +1705,68 @@ function openPhone(){
   $("#app").classList.add("phoneOpen");   // ★가방 선택 가능(인벤 위로)
 }
 function closePhone(){ $("#phone").style.display="none"; $("#app").classList.remove("phoneOpen"); }
+
+/* ---- 태블릿 잠금해제 (경찰차 보닛) ----
+   6칸 알파벳 주관식, 정답 CORTIS(대소문자 무관 — 자판은 대문자만이라 자동 충족).
+   무전기 노래(레드레드=CORTIS)가 힌트. 풀면 지도 앱(3×3 격자+빨간점 5개) 화면. */
+let tabVal="";
+const TAB_ANS="CORTIS";
+function openTablet(){
+  if(state.flags.tablet_open){ openTabletMap(); return; }   // 이미 풀렸으면 바로 지도
+  tabVal="";
+  $("#tabImg").src="img/closeup/tablet_lock.jpg";
+  $("#tabLockMsg").textContent="🔒 태블릿이 잠겨있어";
+  renderTabCells(); buildTabKeys();
+  SFX.open();
+  $("#tab").style.display="flex";
+}
+function closeTab(){ $("#tab").style.display="none"; }
+function openTabletMap(){
+  closeTab();
+  openCloseup({img:"img/closeup/tablet_map.jpg", badge:"🗺️",
+    caption:"🗺️ 지도 앱이 열려 있다.", action:{type:"clue"}}, {label:"태블릿"}, "tablet_map");
+}
+function renderTabCells(){
+  const c=$("#tabCells"); c.innerHTML="";
+  for(let i=0;i<TAB_ANS.length;i++){
+    const d=document.createElement("div");
+    d.className="tcell"+(i===tabVal.length?" blink":"");
+    d.textContent=tabVal[i]||"";
+    c.appendChild(d);
+  }
+}
+function buildTabKeys(){
+  const wrap=$("#tabKeys"); wrap.innerHTML="";
+  ["QWERTYUIOP","ASDFGHJKL","ZXCVBNM⌫"].forEach(rowStr=>{
+    const row=document.createElement("div"); row.className="tkrow";
+    rowStr.split("").forEach(k=>{
+      const b=document.createElement("button");
+      b.className="tkey"+(k==="⌫"?" tback":""); b.textContent=k;
+      b.onclick=()=>tabTap(k);
+      row.appendChild(b);
+    });
+    wrap.appendChild(row);
+  });
+}
+function tabTap(k){
+  if(state.flags.tablet_open) return;
+  if(k==="⌫"){ tabVal=tabVal.slice(0,-1); renderTabCells(); if(SFX.tap)SFX.tap(); return; }
+  if(tabVal.length>=TAB_ANS.length) return;
+  tabVal+=k; renderTabCells(); if(SFX.tap)SFX.tap(); vib(6);
+  if(tabVal.length===TAB_ANS.length){
+    if(tabVal.toUpperCase()===TAB_ANS){
+      state.flags.tablet_open=true; save();
+      if(SFX.success)SFX.success(); vib([30,40,80]);
+      toast("🔓 잠금이 풀렸다!");
+      setTimeout(()=>openTabletMap(), 500);
+    } else {
+      $("#tabLockMsg").textContent="❌ 아닌 것 같다…";
+      if(SFX.fail)SFX.fail(); vib([40,30,40]);
+      setTimeout(()=>{ tabVal=""; renderTabCells();
+        $("#tabLockMsg").textContent="🔒 태블릿이 잠겨있어"; }, 900);
+    }
+  }
+}
 function buildPhoneKeys(){
   const keys=$("#phoneKeys"); keys.innerHTML="";
   ["1","2","3","4","5","6","7","8","9","A","0","B"].forEach(k=>{
