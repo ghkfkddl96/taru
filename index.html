@@ -247,29 +247,32 @@
   #app.phoneOpen #invWrap{ z-index:36; }
   #app.phoneOpen #invWrap #inventory{ box-shadow:0 0 0 2px rgba(255,255,255,.3), 0 -6px 22px rgba(0,0,0,.5); }
 
-  /* 태블릿 잠금해제(보닛) — 폰 팝업과 같은 구조, 6칸 알파벳 + ABC 자판 */
+  /* 태블릿 잠금해제(보닛) — 밑줄 6개는 사진 속 입력 필 구역(밝은 띠)에 딱 맞춤, 멘트는 사진 아래 */
   #tab{ position:absolute; inset:0; z-index:34; background:rgba(10,6,18,.93); display:none;
     flex-direction:column; align-items:center; justify-content:center; padding:10px; touch-action:manipulation; backdrop-filter:blur(3px); }
   #tabClose{ position:absolute; top:14px; right:16px; width:38px; height:38px; border-radius:50%;
     background:rgba(255,255,255,.15); color:#fff; border:none; font-size:20px; cursor:pointer; z-index:2; touch-action:manipulation; }
   #tabImgWrap{ position:relative; flex:none; }
-  #tabImg{ max-height:82vh; max-width:94vw; border-radius:14px; display:block; -webkit-user-drag:none; }
-  #tabScreen{ position:absolute; left:14%; top:11.5%; width:72%; height:79%;
-    display:flex; flex-direction:column; align-items:center; box-sizing:border-box; padding:7% 4% 5%; overflow:hidden; color:#fff; }
-  #tabLockMsg{ font-size:min(2.4vh,15px); font-weight:800; text-align:center; word-break:keep-all; line-height:1.3;
-    text-shadow:0 1px 6px rgba(0,0,0,.45); }
-  #tabCells{ display:flex; gap:min(.9vh,6px); margin-top:26%; }
-  .tcell{ width:min(5vh,37px); height:min(6vh,45px); border-radius:9px; background:rgba(255,255,255,.92);
-    color:#1c2333; font-size:min(3.2vh,22px); font-weight:800; display:flex; align-items:center; justify-content:center;
-    font-family:'Courier New',monospace; box-shadow:0 2px 8px rgba(0,0,0,.3); }
-  .tcell.blink{ box-shadow:0 0 0 2px #ffd97d, 0 2px 8px rgba(0,0,0,.3); }
-  #tabKeys{ width:100%; margin-top:auto; display:flex; flex-direction:column; gap:min(1vh,7px); }
-  .tkrow{ display:flex; gap:min(.7vh,5px); justify-content:center; }
-  .tkey{ flex:1 1 0; min-width:0; height:min(5.6vh,44px); border-radius:8px; border:none; padding:0;
-    font-size:min(2.2vh,15px); font-weight:800; background:#fff; color:#333;
-    box-shadow:0 2px 7px rgba(0,0,0,.28); cursor:pointer; transition:.1s; touch-action:manipulation; }
+  #tabImg{ max-height:76vh; max-width:94vw; border-radius:14px; display:block; -webkit-user-drag:none; }
+  /* 입력 밑줄 6개 — 사진의 입력 필(가로 띠) 위치: x 24.4~76.4%, y 44.9~50.7% */
+  #tabCells{ position:absolute; left:25.5%; top:45.1%; width:49.5%; height:5.4%;
+    display:flex; gap:4.5%; align-items:stretch; }
+  .tcell{ flex:1 1 0; min-width:0; border-bottom:2px solid rgba(255,255,255,.9);
+    color:#fff; font-size:min(3vh,22px); font-weight:800; font-family:'Courier New',monospace;
+    display:flex; align-items:flex-end; justify-content:center; padding-bottom:1px;
+    text-shadow:0 1px 5px rgba(0,0,0,.5); }
+  .tcell.blink{ border-bottom-color:#ffd97d; border-bottom-width:3px; }
+  /* 자판 — 화면 안쪽 하단 (화면 아래 경계 약 84% 위로) */
+  #tabKeys{ position:absolute; left:16.5%; width:68%; top:56%;
+    display:flex; flex-direction:column; gap:min(.9vh,6px); }
+  .tkrow{ display:flex; gap:min(.6vh,5px); justify-content:center; }
+  .tkey{ flex:1 1 0; min-width:0; height:min(4.8vh,38px); border-radius:8px; border:none; padding:0;
+    font-size:min(2vh,14px); font-weight:800; background:rgba(255,255,255,.95); color:#333;
+    box-shadow:0 2px 6px rgba(0,0,0,.35); cursor:pointer; transition:.1s; touch-action:manipulation; }
   .tkey:active{ transform:scale(.92); background:#ffeaf3; }
   .tkey.tback{ flex:1.5 1 0; background:#f3e2ea; }
+  #tabMsg{ margin-top:12px; color:#fff; font-size:15px; font-weight:800; text-align:center;
+    text-shadow:0 2px 8px rgba(0,0,0,.7); }
 
   .overlay{ position:absolute; inset:0; z-index:50; display:flex; flex-direction:column;
     align-items:center; justify-content:center; text-align:center; padding:30px;
@@ -346,17 +349,15 @@
     </div>
   </div>
 
-  <!-- 태블릿 잠금해제 팝업 (경찰차 보닛) -->
+  <!-- 태블릿 잠금해제 팝업 (경찰차 보닛) — 밑줄 6개는 사진의 입력 필 위, 자판은 화면 안, 멘트는 사진 아래 -->
   <div id="tab">
     <button id="tabClose" onclick="closeTab()">✕</button>
     <div id="tabImgWrap">
       <img id="tabImg" alt="">
-      <div id="tabScreen">
-        <div id="tabLockMsg">🔒 태블릿이 잠겨있어</div>
-        <div id="tabCells"></div>
-        <div id="tabKeys"></div>
-      </div>
+      <div id="tabCells"></div>
+      <div id="tabKeys"></div>
     </div>
+    <div id="tabMsg">🔒 태블릿이 잠겨있어</div>
   </div>
 
   <div id="modalBg"><div id="modal"></div></div>
@@ -1715,7 +1716,7 @@ function openTablet(){
   if(state.flags.tablet_open){ openTabletMap(); return; }   // 이미 풀렸으면 바로 지도
   tabVal="";
   $("#tabImg").src="img/closeup/tablet_lock.jpg";
-  $("#tabLockMsg").textContent="🔒 태블릿이 잠겨있어";
+  $("#tabMsg").textContent="🔒 태블릿이 잠겨있어";
   renderTabCells(); buildTabKeys();
   SFX.open();
   $("#tab").style.display="flex";
@@ -1760,10 +1761,10 @@ function tabTap(k){
       toast("🔓 잠금이 풀렸다!");
       setTimeout(()=>openTabletMap(), 500);
     } else {
-      $("#tabLockMsg").textContent="❌ 아닌 것 같다…";
+      $("#tabMsg").textContent="❌ 아닌 것 같다…";
       if(SFX.fail)SFX.fail(); vib([40,30,40]);
       setTimeout(()=>{ tabVal=""; renderTabCells();
-        $("#tabLockMsg").textContent="🔒 태블릿이 잠겨있어"; }, 900);
+        $("#tabMsg").textContent="🔒 태블릿이 잠겨있어"; }, 900);
     }
   }
 }
