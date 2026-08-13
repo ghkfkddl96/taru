@@ -151,6 +151,15 @@
   .cu-mirror.locked .mirGrip{ display:none; }
   /* 거울 아이템 더블탭 팝업 — 유리는 하얗고, 긁힌 자국(모음)만 보인다 */
   .mirGlass.white{ background:#f5f6f6; }
+  /* 철문 순서 퍼즐 램프 — 평소엔 안 보이고, 누를 때마다 초록/틀리면 빨강/완성 파랑 */
+  .cu-lamp{ position:absolute; transform:translate(-50%,-50%); border-radius:50%; z-index:5;
+    pointer-events:none; opacity:0; transition:opacity .18s ease, box-shadow .18s ease; }
+  .cu-lamp.green{ opacity:1; background:radial-gradient(circle, #7dff9a 0%, #2ecc5f 55%, rgba(46,204,95,0) 78%);
+    box-shadow:0 0 16px 5px rgba(60,230,110,.7); }
+  .cu-lamp.red{ opacity:1; background:radial-gradient(circle, #ff8a8a 0%, #e33333 55%, rgba(238,51,51,0) 78%);
+    box-shadow:0 0 16px 5px rgba(255,70,70,.75); }
+  .cu-lamp.blue{ opacity:1; background:radial-gradient(circle, #8ad2ff 0%, #2e86ff 55%, rgba(46,134,255,0) 78%);
+    box-shadow:0 0 18px 6px rgba(80,150,255,.75); }
   /* 쌍안경 뷰 — 안은 사진, 검은 원 테두리, 바깥은 어둡게.
      원 중심을 살짝 내리고 크게 — 돔의 각인(사진아이콘+숫자)이 밝은 원 안에 들어오게 */
   .cu-binoc{ position:absolute; inset:0; pointer-events:none; z-index:5;
@@ -571,6 +580,28 @@ const MAPS = {
       {x:79,y:58,emoji:"🟢",label:"초록 창문 구역", clue:{e:"🟢",t:"오른쪽 끝 구역은 온통 초록 창문이 모여 있네."}},
       {x:18,y:84,emoji:"🚔",label:"건물 입구",
         clue:{e:"🚔",t:"지금은 문화·예술 정보를 다루는 건물로 쓰여.\n바로 근처에 유명한 바쿠테(육골차) 집이 있대."}},
+      // ★초록 철문 (건물 우측 1층) — 동물 6개를 '크기 순서'(크레센도)대로 누르는 문제.
+      //   힌트 = 공항 토이샵 인형 6종(전부 경찰모자) + 문에 그려진 크레센도·경찰모.
+      //   정답(작은→큰, 타루 제안·북쑥 확정 대기): 참새→토끼→고양이→사자→곰→코끼리
+      //   맞을 때마다 초록 램프, 틀리면 빨강 번쩍+리셋, 완성 시 파랑+달칵(police_door).
+      //   문 열리면 나오는 것(보상)은 북쑥 미정 — police_door 플래그에 붙이면 됨.
+      { x:92,y:87, w:11,h:10, label:"초록 철문", closeup:{
+        img:"img/closeup/police_door.jpg", badge:"🚪",
+        caption:"🚪 건물 옆 초록 철문.\n동물 문양 여섯 개와 불 꺼진 홈 여섯 개가 있다.",
+        action:{type:"seq",
+          answer:["sparrow","rabbit","cat","lion","bear","elephant"],
+          zones:[
+            {k:"lion",     x:24.8,y:45.2, w:20,h:15, label:"사자"},
+            {k:"bear",     x:49.7,y:44.9, w:20,h:15, label:"곰"},
+            {k:"cat",      x:73.6,y:44.5, w:20,h:15, label:"고양이"},
+            {k:"sparrow",  x:26.2,y:64.9, w:20,h:15, label:"참새"},
+            {k:"rabbit",   x:50.1,y:64.5, w:20,h:15, label:"토끼"},
+            {k:"elephant", x:75.0,y:64.5, w:20,h:15, label:"코끼리"},
+          ],
+          lamps:[{x:18.1,y:87.6},{x:29.9,y:87.6},{x:41.6,y:87.6},
+                 {x:53.4,y:87.6},{x:65.0,y:87.6},{x:76.8,y:87.6}],
+          lampW:8.6, lampH:6.4,
+          success:"달칵! 문이 열렸다…!", setFlag:"police_door"} }},
       // 도로에 선 초록 2층버스 → 경찰차 클로즈업 → 트렁크 3자리 자물쇠
       { x:57,y:86, w:30,h:12, label:"도로에 선 버스", closeup:{
         img:"img/closeup/police_car.jpg", badge:"🚓",
@@ -1154,6 +1185,9 @@ function openCloseup(cu, h, id){
   clearMirror();
   if(a.type==="mirror") buildMirror(a, id);
   else if(a.type==="mirrorview") buildMirrorView(a);   // 거울 아이템 더블탭 팝업(고정·하얀 유리)
+  // ★순서 누르기(철문): 동물 클릭영역 + 램프
+  clearSeq();
+  if(a.type==="seq") buildSeq(a, id);
   // ★쌍안경 뷰: 검은 원 테두리 오버레이 (바깥 어둡고 안은 사진)
   { const w0=$("#cuImgWrap");
     if(w0){ w0.querySelectorAll(".cu-binoc").forEach(e=>e.remove());
@@ -1341,6 +1375,60 @@ function buildMirrorView(a){
   if(!img.complete || !img.naturalWidth) img.addEventListener("load", layout, {once:true});
   if(window.ResizeObserver){
     const ro=new ResizeObserver(()=>layout()); ro.observe(img); mirState.ro=ro;
+  }
+}
+
+/* ---- 순서 누르기 퍼즐 (경찰서 철문) ----
+   동물을 정답 순서대로 누른다. 맞을 때마다 램프가 왼쪽부터 초록으로 켜지고,
+   틀리면 전부 빨갛게 번쩍인 뒤 꺼지며 처음부터. 다 맞으면 파랗게 빛나며 달칵.
+   쓰는 법: action:{type:"seq", answer:["sparrow",...], zones:[{k,x,y,w,h,label}],
+            lamps:[{x,y}], lampW, lampH, success, setFlag} */
+let seqState=null;
+function clearSeq(){ document.querySelectorAll("#cuImgWrap .cu-seqzone, #cuImgWrap .cu-lamp").forEach(e=>e.remove()); seqState=null; }
+function buildSeq(a, id){
+  clearSeq();
+  const wrap=$("#cuImgWrap"); if(!wrap) return;
+  const solved=!!state.done[id];
+  seqState={ i:0, lock:false };
+  a.lamps.forEach(L=>{
+    const el=document.createElement("div"); el.className="cu-lamp";
+    el.style.left=L.x+"%"; el.style.top=L.y+"%";
+    el.style.width=(a.lampW||9)+"%"; el.style.height=(a.lampH||6.6)+"%";
+    wrap.appendChild(el);
+  });
+  if(solved){ wrap.querySelectorAll(".cu-lamp").forEach(e=>e.classList.add("blue")); return; }
+  a.zones.forEach(z=>{
+    const el=document.createElement("div"); el.className="spot-dot cu-seqzone"+(DEBUG?"":" nohint");
+    el.style.left=z.x+"%"; el.style.top=z.y+"%";
+    el.style.width=z.w+"%"; el.style.height=z.h+"%";
+    el.title=z.label||"";
+    el.onclick=(ev)=>{ ev.stopPropagation(); seqTap(z.k, a, id); };
+    wrap.appendChild(el);
+  });
+}
+function seqTap(k, a, id){
+  if(!seqState || seqState.lock || state.done[id]) return;
+  const lamps=[...document.querySelectorAll("#cuImgWrap .cu-lamp")];
+  if(k===a.answer[seqState.i]){
+    lamps[seqState.i] && lamps[seqState.i].classList.add("green");
+    SFX.key(); vib(10);
+    seqState.i++;
+    if(seqState.i>=a.answer.length){
+      seqState.lock=true;
+      setTimeout(()=>{
+        lamps.forEach(l=>{ l.classList.remove("green"); l.classList.add("blue"); });
+        SFX.success(); vib([30,40,80]);
+        state.done[id]=true; if(a.setFlag) state.flags[a.setFlag]=true; save();
+        toast(a.success||"달칵! 문이 열렸다.");
+        document.querySelectorAll("#cuImgWrap .cu-seqzone").forEach(e=>e.remove());
+        $("#cuLockBadge").textContent="✅";
+      }, 380);
+    }
+  } else {
+    seqState.lock=true;
+    if(SFX.fail) SFX.fail(); vib([40,30,40]);
+    lamps.forEach(l=>{ l.classList.remove("green"); l.classList.add("red"); });
+    setTimeout(()=>{ lamps.forEach(l=>l.classList.remove("red")); seqState.i=0; seqState.lock=false; }, 750);
   }
 }
 
