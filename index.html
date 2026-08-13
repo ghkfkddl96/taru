@@ -385,6 +385,9 @@ const ITEMS = {
   // 마루의 열쇠 — 클라우드 포레스트 어두운 터널(손전등)에서. 왕관+하트 장식 앤틱 청동 열쇠.
   key5:{name:"열쇠",
     svg:'<svg viewBox="0 0 24 24" fill="none" stroke="#9a7b3f" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9.3 3.1 L9.9 1.6 L11 2.8 L12 1.3 L13 2.8 L14.1 1.6 L14.7 3.1"/><circle cx="9.6" cy="6.3" r="2.5"/><circle cx="14.4" cy="6.3" r="2.5"/><path d="M12 6.1 q-1.4-1.3-2.1 0 q-.4.9 2.1 2.3 q2.5-1.4 2.1-2.3 q-.7-1.3-2.1 0"/><path d="M10.9 9.9 h2.2"/><path d="M12 9.9 V21.3"/><path d="M12 14.8 h3 v1.6 h-1.5 v1.4 h1.5 v1.5 h-3"/></svg>'},
+  // 무전기 — 경찰서 안 콘솔(RGB 7타) 뚜껑에서. 용도는 추후(교신 이벤트 등).
+  radio:{name:"무전기",
+    svg:'<svg viewBox="0 0 24 24"><rect x="10.9" y="1.4" width="1.7" height="5.2" rx="0.85" fill="#23272b"/><circle cx="15" cy="5" r="1.15" fill="#3b4249"/><circle cx="17.6" cy="5" r="1.15" fill="#3b4249"/><rect x="8" y="5.9" width="10.6" height="16.4" rx="2" fill="#2f353a"/><rect x="9.5" y="7.9" width="7.6" height="5.8" rx="1" fill="#1b1f23"/><path d="M10.3 9.3h6 M10.3 10.8h6 M10.3 12.3h6" stroke="#39424a" stroke-width="0.8"/><rect x="7.2" y="9.4" width="1.3" height="3.6" rx="0.65" fill="#23272b"/><rect x="9.5" y="15.5" width="7.6" height="4.8" rx="0.9" fill="#262b30"/></svg>'},
   // 쌍안경 — 비보시티 송파바쿠테 나무상자에서 나온다. 골라 들고 멀리 있는 걸 본다.
   binoc:{name:"쌍안경",
     svg:'<svg viewBox="0 0 24 24"><rect x="10.7" y="7.6" width="2.6" height="6.2" rx="1" fill="#3b4249"/><rect x="2.9" y="5.2" width="7.2" height="6" rx="2.4" fill="#2f353a"/><rect x="13.9" y="5.2" width="7.2" height="6" rx="2.4" fill="#2f353a"/><rect x="2.3" y="9.8" width="8.4" height="9.6" rx="3.4" fill="#23272b"/><rect x="13.3" y="9.8" width="8.4" height="9.6" rx="3.4" fill="#23272b"/><circle cx="6.5" cy="15.2" r="2.7" fill="#11151a"/><circle cx="17.5" cy="15.2" r="2.7" fill="#11151a"/><circle cx="5.6" cy="14.3" r="0.9" fill="#4a545e"/><circle cx="16.6" cy="14.3" r="0.9" fill="#4a545e"/></svg>'},
@@ -413,6 +416,7 @@ const ICONS = {
 };
 const DEST_ICON = { jewel:"droplet", downtown:"building", marina:"building", supertree:"leaf", garden:"leaf",
   arab:"landmark", merlion:"landmark", sentosa:"umbrella", laupasat:"utensils", police:"shield",
+  policein:"shield",
   ibis:"bed", room:"bed", bakkutteh:"utensils", universal:"star", airport:"plane", vivocity:"building", fortcanning:"leaf", __ending:"bed" };
 
 /* 핫스팟 종류
@@ -587,7 +591,7 @@ const MAPS = {
       //   dolls.jpg 픽셀 실측(키): 참새158 < 고양이194 < 코끼리228 < 곰276 < 토끼300 < 사자334
       //   맞을 때마다 초록 램프, 틀리면 빨강 번쩍+리셋, 완성 시 파랑+달칵(police_door).
       //   문 열리면 나오는 것(보상)은 북쑥 미정 — police_door 플래그에 붙이면 됨.
-      { x:92,y:87, w:11,h:10, label:"초록 철문", closeup:{
+      { x:92,y:87, w:11,h:10, label:"초록 철문", hideIf:"police_door", closeup:{
         img:"img/closeup/police_door.jpg", badge:"🚪",
         caption:"🚪 건물 옆 초록 철문.\n동물 문양 여섯 개와 불 꺼진 홈 여섯 개가 있다.",
         action:{type:"seq",
@@ -604,6 +608,8 @@ const MAPS = {
                  {x:53.4,y:87.6},{x:65.0,y:87.6},{x:76.8,y:87.6}],
           lampW:8.6, lampH:6.4,
           success:"달칵! 문이 열렸다…!", setFlag:"police_door"} }},
+      // 문이 열린 뒤: 같은 자리 클릭 → 즉시 경찰서 안으로 (팝업·이동연출 없음, 북쑥 지시)
+      { x:92,y:87, w:11,h:10, label:"열린 철문", showIf:"police_door", goTo:"policein" },
       // 도로에 선 초록 2층버스 → 경찰차 클로즈업 → 트렁크 3자리 자물쇠
       { x:57,y:86, w:30,h:12, label:"도로에 선 버스", closeup:{
         img:"img/closeup/police_car.jpg", badge:"🚓",
@@ -633,6 +639,37 @@ const MAPS = {
       {to:"bakkutteh", label:"송파 바쿠테", emoji:"🍲", dir:"right"},
       {to:"fortcanning", label:"포트 캐닝", emoji:"🌳", dir:"right"},
     ]
+  },
+
+  /* 올드힐 경찰서 안 — 철문(동물 퍼즐) 풀고 들어오는 실내. 밝고 아기자기한 파스텔 콜로니얼.
+     우측 벽 통신 콘솔: RGB 버튼 3개를 슈퍼트리 점등 순서(빨파초파초빨초, 7타)로 누르면
+     아래 뚜껑이 열리며 무전기. 진입/퇴장은 이동연출 없이 즉시. */
+  policein:{
+    name:"올드힐 경찰서 안", sub:"", photo:"img/policein.jpg",
+    hotspots:[
+      { x:72.5,y:44, w:21,h:23, label:"통신 콘솔", closeup:{
+        img:"img/closeup/police_console.jpg", badge:"🎛️",
+        caption:"🎛️ 벽에 붙은 낡은 통신 콘솔.\n색색 버튼 위에 낯익은 나무 세 그루가 새겨져 있다.",
+        action:{type:"seq",
+          answer:["r","b","g","b","g","r","g"],   // 슈퍼트리 점등 순서 그대로 (북쑥 확정: 7타)
+          zones:[
+            {k:"r", x:29.3,y:48.8, w:17,h:12, label:"빨간 버튼"},
+            {k:"g", x:50.3,y:49.2, w:17,h:12, label:"초록 버튼"},
+            {k:"b", x:71.2,y:48.8, w:17,h:12, label:"파란 버튼"},
+          ],
+          lamps:[{x:25.1,y:63.3},{x:33.7,y:63.3},{x:42.3,y:63.3},{x:50.8,y:63.3},
+                 {x:59.4,y:63.3},{x:68.0,y:63.3},{x:76.5,y:63.3}],
+          lampW:5.6, lampH:4.2,
+          success:"덜컥! 콘솔 아래 뚜껑이 열렸다.", setFlag:"police_console",
+          prize:{ img:"img/closeup/police_console_open.jpg", badge:"📻", label:"열린 콘솔",
+            caption:"뚜껑이 열렸다.\n안에 무언가 들어 있다.",
+            action:{type:"clue"},
+            subspots:[
+              { x:46,y:79, w:24,h:20, label:"무전기",
+                give:{item:"radio", success:"무전기 획득! 📻"} },
+            ] } } }},
+    ],
+    exits:[{to:"police", label:"밖으로", emoji:"🚪", dir:"left"}]
   },
 
   /* 포트 캐닝 — 경찰서 바로 옆 언덕공원. 나선계단 위 원형 창(트리터널)이 유명하다.
@@ -1065,11 +1102,12 @@ const TRANSITIONS = {
   "garden>marina":   {img:"img/transit/citywalk.jpg", icon:"🚶", text:"걸어서 이동 중"},
   "default":         {img:"img/transit/bus.jpg",    icon:"🚌", text:"버스 타고 이동 중", transit:true},
 };
-const TRANSIT_MS = 5000;  // 5초 자동 진행 (디버그: 탭 즉시스킵 + 0.9초 자동)
+const TRANSIT_MS = 3000;  // 3초 자동 진행 (북쑥 2026-08-13: 5초 너무 길다) (디버그: 탭 즉시스킵 + 0.9초 자동)
 function goTo(to){
   if(to==="__ending"){ showEnding(); return; }
   const key=state.room+">"+to;
-  if(key==="ibis>room"||key==="room>ibis"){ state.room=to; render(); return; }  // 같은 건물 내 이동은 즉시 (★선택아이템 유지)
+  if(key==="ibis>room"||key==="room>ibis"||key==="police>policein"||key==="policein>police"){
+    state.room=to; render(); return; }  // 같은 건물 내 이동은 즉시 (★선택아이템 유지)
   const tr = TRANSITIONS[key] || TRANSITIONS.default;
   if(tr.transit && selected!=="card"){  // 버스·지하철은 교통카드를 골라야 탑승
     if(selected) toast((ITEMS[selected]?.name||"그거")+"로는 대중교통을 탈 수 없어🥲");
@@ -1107,6 +1145,8 @@ function needSelBlocked(ns){
 function tap(h,id){
   SFX.tap(); vib(8);
   if(needSelBlocked(h.needSel)) return;
+  // ★goTo: 팝업 없이 즉시 맵 이동 (예: 열린 철문 → 경찰서 안. 이동연출 없음)
+  if(h.goTo){ state.room=h.goTo; render(); return; }
   const cu = h.closeup || toCloseup(h);
   if(cu.action && cu.action.type==="numlock" && h.needFlag && !state.flags[h.needFlag]){
     toast("먼저 다른 걸 해결해야 할 것 같아."); return; }
@@ -1422,6 +1462,9 @@ function seqTap(k, a, id){
         toast(a.success||"달칵! 문이 열렸다.");
         document.querySelectorAll("#cuImgWrap .cu-seqzone").forEach(e=>e.remove());
         $("#cuLockBadge").textContent="✅";
+        render();   // 뒤의 맵 갱신 (hideIf/showIf 요소 반영 — 팝업은 별도 오버레이라 안전)
+        // ★prize: 완성 연출 뒤 열린 모습 팝업으로 (예: 콘솔 뚜껑 열림 → 무전기)
+        if(a.prize) setTimeout(()=>openCloseup(a.prize, {label:a.prize.label||""}, id+"_prize"), 900);
       }, 380);
     }
   } else {
