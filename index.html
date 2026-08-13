@@ -374,8 +374,7 @@ const ITEMS = {
   passport:{name:"여권", inspect:"passport",   // ★파란 여권 아이콘(덮힌 얇은 책) + 더블클릭 팝업
     svg:'<svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="1.8" fill="#264a90"/><rect x="5" y="3" width="2.4" height="18" rx="1.8" fill="#1b3568"/><rect x="7.1" y="3" width="0.5" height="18" fill="#3a5da3"/><circle cx="13.2" cy="9" r="2.4" fill="none" stroke="#eccb6d" stroke-width="1"/><circle cx="13.2" cy="9" r="0.8" fill="#eccb6d"/><rect x="9.8" y="13.4" width="6.6" height="1.2" rx="0.6" fill="#eccb6d"/><rect x="10.4" y="15.9" width="5.4" height="0.9" rx="0.45" fill="#b4c4e8"/></svg>'},
   phone:{emoji:"📱", name:"스마트폰", inspect:"phone"},       // ★더블클릭→스마트폰 잠금해제 팝업
-  frag1:{emoji:"🧩", name:"조각1"}, frag2:{emoji:"🧩", name:"조각2"},
-  frag3:{emoji:"🧩", name:"조각3"}, frag4:{emoji:"🧩", name:"조각4"},
+  // 조각(frag) 시스템 삭제 — 북쑥 2026-08-13. (혹시 옛 저장에 frag가 남아도 ITEMS에 없으면 renderInv가 건너뜀)
   flower:{emoji:"🌺", name:"꽃"},
   battery:{emoji:"🔋", name:"건전지"},
   mirror:{name:"거울", inspect:"mirror",   // ★더블탭→거울 살펴보기(하얀 유리+긁힌 자국)
@@ -455,7 +454,8 @@ const MAPS = {
   jewel:{
     name:"주얼 · 레인 보텍스", sub:"천장에서 쏟아지는 40m 실내폭포", photo:"img/jewel.jpg",
     hotspots:[
-      { x:52,y:48, w:26,h:42, label:"레인 보텍스", closeup:{
+      // 팝업 사진이 폭포 천장(깔때기) 쪽이라 누르는 위치도 위로 (북쑥 2026-08-13). 벽시계 518의 힌트가 이 사진에 있음.
+      { x:52,y:30, w:30,h:28, label:"레인 보텍스", closeup:{
         img:"img/closeup/waterfall.jpg", badge:"💧",
         caption:"💧 최대 규모의 실내 폭포가 시원하게 떨어지고 있다.", action:{type:"clue"} }},
       { x:20,y:73, w:26,h:14, label:"기념품샵", closeup:{
@@ -582,14 +582,15 @@ const MAPS = {
         clue:{e:"🚔",t:"지금은 문화·예술 정보를 다루는 건물로 쓰여.\n바로 근처에 유명한 바쿠테(육골차) 집이 있대."}},
       // ★초록 철문 (건물 우측 1층) — 동물 6개를 '크기 순서'(크레센도)대로 누르는 문제.
       //   힌트 = 공항 토이샵 인형 6종(전부 경찰모자) + 문에 그려진 크레센도·경찰모.
-      //   정답(작은→큰, 타루 제안·북쑥 확정 대기): 참새→토끼→고양이→사자→곰→코끼리
+      //   ★정답 = "인형 크기" 순서(북쑥 확정 2026-08-13, 실제 동물 크기 아님!).
+      //   dolls.jpg 픽셀 실측(키): 참새158 < 고양이194 < 코끼리228 < 곰276 < 사자334 < 토끼340(귀 포함 최고)
       //   맞을 때마다 초록 램프, 틀리면 빨강 번쩍+리셋, 완성 시 파랑+달칵(police_door).
       //   문 열리면 나오는 것(보상)은 북쑥 미정 — police_door 플래그에 붙이면 됨.
       { x:92,y:87, w:11,h:10, label:"초록 철문", closeup:{
         img:"img/closeup/police_door.jpg", badge:"🚪",
         caption:"🚪 건물 옆 초록 철문.\n동물 문양 여섯 개와 불 꺼진 홈 여섯 개가 있다.",
         action:{type:"seq",
-          answer:["sparrow","rabbit","cat","lion","bear","elephant"],
+          answer:["sparrow","cat","elephant","bear","lion","rabbit"],
           zones:[
             {k:"lion",     x:24.8,y:45.2, w:20,h:15, label:"사자"},
             {k:"bear",     x:49.7,y:44.9, w:20,h:15, label:"곰"},
@@ -822,15 +823,13 @@ const MAPS = {
         img:"img/closeup/merlion_back_key.jpg", badge:"🗝️",
         caption:"🗝️ 열쇠가 등에 꽂혀 있다.",
         action:{type:"clue"} }},
-      {x:63,y:76,emoji:"🔒",label:"분수 자물쇠", once:true,
-        lock:{len:1, answer:"5",
-          success:"분수가 멈추더니 열쇠조각이 나타났다! 🦁", give:["frag4"], setFlag:"ml_done"}},
+      // 분수 자물쇠(임시 5, frag4) 삭제 — 북쑥 2026-08-13
     ],
     exits:[{to:"downtown", label:"중심지로", emoji:"🏙️", dir:"left"}]
   },
 };
 
-const FINAL = { answer:"0815", hint:"네 개의 조각에 적힌 숫자를 순서대로!" };
+const FINAL = { answer:"0815", hint:"" };   // 조각 시스템 삭제(2026-08-13). 리셉션은 북쑥이 개편 예정.
 
 /* ---- 사운드 (Web Audio 합성, 파일 불필요) + 햅틱 ---- */
 let _actx=null;
@@ -928,7 +927,7 @@ function toast(msg){ const t=$("#toast"); t.textContent=msg; t.classList.add("sh
   clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove("show"),2000); }
 function give(keys){ (Array.isArray(keys)?keys:[keys]).forEach(k=>{ if(!state.inv.includes(k)) state.inv.push(k); }); }
 function has(k){ return state.inv.includes(k); }
-function fragCount(){ return ["m_done","g_done","a_done","ml_done"].filter(f=>state.flags[f]).length; }
+// fragCount() 삭제 — 조각 시스템 제거(2026-08-13)
 
 /* ---- ★사진 배치 ----
    핫스팟 좌표는 전부 "사진의 몇 %"다. 그래서 사진과 핫스팟이 같은 상자(#photoInner) 안에 있어야
