@@ -441,6 +441,9 @@ const ITEMS = {
   // 유니버설 입장 티켓 — 머라이언 물가 나무 상자(물줄기 6타)에서. ★사용처(유니버설 입장 게이트?)는 북쑥 지시 대기.
   ticket:{name:"입장 티켓",
     svg:'<svg viewBox="0 0 24 24"><g transform="rotate(-8 12 12)"><rect x="2.6" y="7.4" width="18.8" height="9.2" rx="1.4" fill="#e0b83f"/><rect x="3.8" y="8.6" width="16.4" height="6.8" rx="0.8" fill="none" stroke="#8a6a1a" stroke-width="0.55"/><circle cx="12" cy="12" r="2.6" fill="#c99e2c"/><circle cx="12" cy="12" r="2.6" fill="none" stroke="#8a6a1a" stroke-width="0.5"/><path d="M10.6 11.1 q0.8-0.9 1.6-0.4 q0.9 0.4 1.7-0.1 M10.3 12.4 h3.4 M10.9 13.5 q1.1 0.6 2.2 0" stroke="#8a6a1a" stroke-width="0.45" fill="none"/><path d="M5 9.6 v5.6 M19 9.6 v5.6" stroke="#8a6a1a" stroke-width="0.4" stroke-dasharray="0.7 0.9"/></g></svg>'},
+  // 입장 티켓 2번째 — ★입수처 북쑥 제작 예정. 유니버설 내부는 두 장(인원 2명) 있어야 입장.
+  ticket2:{name:"입장 티켓",
+    svg:'<svg viewBox="0 0 24 24"><g transform="rotate(8 12 12)"><rect x="2.6" y="7.4" width="18.8" height="9.2" rx="1.4" fill="#e0b83f"/><rect x="3.8" y="8.6" width="16.4" height="6.8" rx="0.8" fill="none" stroke="#8a6a1a" stroke-width="0.55"/><circle cx="12" cy="12" r="2.6" fill="#c99e2c"/><circle cx="12" cy="12" r="2.6" fill="none" stroke="#8a6a1a" stroke-width="0.5"/><path d="M10.6 11.1 q0.8-0.9 1.6-0.4 q0.9 0.4 1.7-0.1 M10.3 12.4 h3.4 M10.9 13.5 q1.1 0.6 2.2 0" stroke="#8a6a1a" stroke-width="0.45" fill="none"/><path d="M5 9.6 v5.6 M19 9.6 v5.6" stroke="#8a6a1a" stroke-width="0.4" stroke-dasharray="0.7 0.9"/></g></svg>'},
   // 쌍안경 — 비보시티 송파바쿠테 나무상자에서 나온다. 골라 들고 멀리 있는 걸 본다.
   binoc:{name:"쌍안경",
     svg:'<svg viewBox="0 0 24 24"><rect x="10.7" y="7.6" width="2.6" height="6.2" rx="1" fill="#3b4249"/><rect x="2.9" y="5.2" width="7.2" height="6" rx="2.4" fill="#2f353a"/><rect x="13.9" y="5.2" width="7.2" height="6" rx="2.4" fill="#2f353a"/><rect x="2.3" y="9.8" width="8.4" height="9.6" rx="3.4" fill="#23272b"/><rect x="13.3" y="9.8" width="8.4" height="9.6" rx="3.4" fill="#23272b"/><circle cx="6.5" cy="15.2" r="2.7" fill="#11151a"/><circle cx="17.5" cy="15.2" r="2.7" fill="#11151a"/><circle cx="5.6" cy="14.3" r="0.9" fill="#4a545e"/><circle cx="16.6" cy="14.3" r="0.9" fill="#4a545e"/></svg>'},
@@ -470,7 +473,7 @@ const ICONS = {
 const DEST_ICON = { jewel:"droplet", downtown:"building", marina:"building", supertree:"leaf", garden:"leaf",
   arab:"landmark", merlion:"landmark", sentosa:"umbrella", laupasat:"utensils", police:"shield",
   policein:"shield",
-  ibis:"bed", room:"bed", bakkutteh:"utensils", universal:"star", airport:"plane", vivocity:"building", fortcanning:"leaf", __ending:"bed" };
+  ibis:"bed", room:"bed", bakkutteh:"utensils", universal:"star", universalin:"star", airport:"plane", vivocity:"building", fortcanning:"leaf", __ending:"bed" };
 
 /* 핫스팟 종류
    A) 클로즈업형:  {x,y,label, closeup:{img, caption, badge, action}}
@@ -601,11 +604,34 @@ const MAPS = {
     ]
   },
 
+  /* 유니버설 입구 — 지구본 광장(북쑥 실사진 2026-08-14 교체, 구사진=universal_old_backup).
+     여기까진 자유 입장. 안(universalin)은 입장 게이트에서 티켓 2장 필요(인원 2명). */
   universal:{
-    name:"유니버설 스튜디오", sub:"지구본 앞 놀이공원", photo:"img/universal.jpg",
+    name:"유니버설 스튜디오", sub:"지구본 앞 입구 광장", photo:"img/universal.jpg",
     hotspots:[
+      // ★입장 게이트(왼쪽 아치) — 티켓 2장 있어야 내부 입장. ticket=머라이언 상자, ticket2=입수처 북쑥 제작 예정.
+      { x:9,y:46, w:17,h:16, label:"입장 게이트",
+        gate:{ items:["ticket","ticket2"], to:"universalin",
+          msgs:["입구 직원이 웃으며 막아선다.\"티켓이 있어야 입장하실 수 있어요!\"",
+                "티켓이 한 장뿐이다…\n인원이 둘이라 두 장이 필요해..!"] } },
     ],
     exits:[{to:"sentosa", label:"센토사로", emoji:"🏖️", dir:"left"}]
+  },
+
+  /* 유니버설 안 — 동화 성 앞 분수 광장(북쑥 실사진 2026-08-14).
+     분수대 인형 = 크리스탈 수집가. 크리스탈을 주면 '원하는 물건 찾아주기' 마법(북쑥 기획):
+     여권을 직접 말하지 않고 특징(네모난 물건/초록색 물건…)을 보기로 골라도 계속 엉뚱한 걸
+     찾아오고, 마지막 크리스탈을 모아야 화랑이의 여권을 제대로 찾아준다.
+     ★오답 물건 사진·크리스탈 개수는 북쑥 대기 — 지금은 캐릭터 소개 팝업만. */
+  universalin:{
+    name:"유니버설 안", sub:"동화 성 앞 분수 광장", photo:"img/universalin.jpg",
+    hotspots:[
+      { x:50,y:72, w:30,h:26, label:"분수대의 인형", closeup:{
+        img:"img/closeup/universal_chara.jpg", badge:"🧸",
+        caption:"🧸 분수대에 앉은 신비한 인형이 말을 건다.\n\"난 반짝이는 크리스탈을 모으고 있어.\n크리스탈을 가져다주면 네가 찾는 물건을\n마법으로 찾아줄 수 있는데…!\"",
+        action:{type:"clue"} }},
+    ],
+    exits:[{to:"universal", label:"입구로", emoji:"🎡", dir:"left"}]
   },
 
   laupasat:{
@@ -1237,6 +1263,9 @@ const TRANSITIONS = {
   "supertree>marina":{img:"img/transit/citywalk.jpg", icon:"🚶", text:"걸어서 이동 중"},
   "marina>garden":   {img:"img/transit/citywalk.jpg", icon:"🚶", text:"걸어서 이동 중"},
   "garden>marina":   {img:"img/transit/citywalk.jpg", icon:"🚶", text:"걸어서 이동 중"},
+  // 유니버설 입구↔안 — 게이트 통과 도보 (교통카드 불필요)
+  "universal>universalin":{img:"img/transit/walk.jpg", icon:"🚶", text:"걸어서 이동 중"},
+  "universalin>universal":{img:"img/transit/walk.jpg", icon:"🚶", text:"걸어서 이동 중"},
   "default":         {img:"img/transit/bus.jpg",    icon:"🚌", text:"버스 타고 이동 중", transit:true},
 };
 const TRANSIT_MS = 3000;  // 3초 자동 진행 (북쑥 2026-08-13: 5초 너무 길다) (디버그: 탭 즉시스킵 + 0.9초 자동)
@@ -1285,6 +1314,13 @@ function needSelBlocked(ns){
 function tap(h,id){
   SFX.tap(); vib(8);
   if(needSelBlocked(h.needSel)) return;
+  // ★gate: 아이템을 전부 가져야 통과하는 문 (예: 유니버설 입장 게이트 = 티켓 2장).
+  //   msgs[n] = n개 갖고 있을 때 멘트. 전부 있으면 goTo와 같은 맵 이동(이동연출 포함).
+  if(h.gate){
+    const g=h.gate, held=(g.items||[]).filter(it=>has(it)).length;
+    if(held>=(g.items||[]).length){ goTo(g.to); return; }
+    toast((g.msgs&&g.msgs[held])||"아직 들어갈 수 없다."); return;
+  }
   // ★goTo: 팝업 없이 즉시 맵 이동 (예: 열린 철문 → 경찰서 안. 이동연출 없음)
   if(h.goTo){ state.room=h.goTo; render(); return; }
   const cu = h.closeup || toCloseup(h);
