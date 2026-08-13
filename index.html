@@ -441,6 +441,9 @@ const ITEMS = {
   // 유니버설 입장 티켓 — 머라이언 물가 나무 상자(물줄기 6타)에서. ★사용처(유니버설 입장 게이트?)는 북쑥 지시 대기.
   ticket:{name:"입장 티켓",
     svg:'<svg viewBox="0 0 24 24"><g transform="rotate(-8 12 12)"><rect x="2.6" y="7.4" width="18.8" height="9.2" rx="1.4" fill="#e0b83f"/><rect x="3.8" y="8.6" width="16.4" height="6.8" rx="0.8" fill="none" stroke="#8a6a1a" stroke-width="0.55"/><circle cx="12" cy="12" r="2.6" fill="#c99e2c"/><circle cx="12" cy="12" r="2.6" fill="none" stroke="#8a6a1a" stroke-width="0.5"/><path d="M10.6 11.1 q0.8-0.9 1.6-0.4 q0.9 0.4 1.7-0.1 M10.3 12.4 h3.4 M10.9 13.5 q1.1 0.6 2.2 0" stroke="#8a6a1a" stroke-width="0.45" fill="none"/><path d="M5 9.6 v5.6 M19 9.6 v5.6" stroke="#8a6a1a" stroke-width="0.4" stroke-dasharray="0.7 0.9"/></g></svg>'},
+  // 크리스탈 2번째 — 가든 벽장(꽃벽 색순서 7타)에서. 인형 마법용 수집. 디자인은 crystal과 동일(북쑥 지시).
+  crystal2:{name:"크리스탈",
+    svg:'<svg viewBox="0 0 24 24"><g transform="rotate(-24 12 12)"><path d="M12 1.6 L15 6 L15 18 L12 22.4 L9 18 L9 6 Z" fill="#dff0f6"/><path d="M12 1.6 L15 6 L12 8 Z" fill="#f6fcfe"/><path d="M12 1.6 L9 6 L12 8 Z" fill="#c6e3ee"/><path d="M9 6 L12 8 L12 22.4 L9 18 Z" fill="#cfe8f1"/><path d="M15 6 L12 8 L12 22.4 L15 18 Z" fill="#eef8fc"/><path d="M12 8 L12 22.4" stroke="#b9dcE8" stroke-width="0.5"/></g></svg>'},
   // 입장 티켓 2번째 — ★입수처 북쑥 제작 예정. 유니버설 내부는 두 장(인원 2명) 있어야 입장.
   ticket2:{name:"입장 티켓",
     svg:'<svg viewBox="0 0 24 24"><g transform="rotate(8 12 12)"><rect x="2.6" y="7.4" width="18.8" height="9.2" rx="1.4" fill="#e0b83f"/><rect x="3.8" y="8.6" width="16.4" height="6.8" rx="0.8" fill="none" stroke="#8a6a1a" stroke-width="0.55"/><circle cx="12" cy="12" r="2.6" fill="#c99e2c"/><circle cx="12" cy="12" r="2.6" fill="none" stroke="#8a6a1a" stroke-width="0.5"/><path d="M10.6 11.1 q0.8-0.9 1.6-0.4 q0.9 0.4 1.7-0.1 M10.3 12.4 h3.4 M10.9 13.5 q1.1 0.6 2.2 0" stroke="#8a6a1a" stroke-width="0.45" fill="none"/><path d="M5 9.6 v5.6 M19 9.6 v5.6" stroke="#8a6a1a" stroke-width="0.4" stroke-dasharray="0.7 0.9"/></g></svg>'},
@@ -915,6 +918,32 @@ const MAPS = {
         img:"img/closeup/garden_tunnel_dark.jpg", badge:"✅",
         caption:"더 이상 여기에 볼일은 없어 보인다.",
         action:{type:"clue"} }},
+      // ★우측상단 벽장(빌트인) — 색버튼 6개를 꽃벽 순서(빨주보초빨노하늘 7타)로 누르면 크리스탈② (북쑥 2026-08-14)
+      //   버튼이 빽빽 → lampColors: 인디케이터에 누른 색이 그대로 뜬다. 램프 7개는 원근 따라 개별 실측(격자).
+      { x:82,y:24, w:26,h:20, label:"벽에 붙은 나무 벽장", closeup:{
+        img:"img/closeup/garden_cab.jpg", badge:"🚪",
+        caption:"🚪 이끼 낀 벽에 박힌 작은 나무 벽장.\n색색 버튼 여섯 개 위로 화살표가 새겨져 있다.",
+        action:{type:"seq", lampColors:true,
+          answer:["r","o","p","g","r","y","s"],   // 꽃벽 일곱 송이 순서 그대로 = 빨 주 보 초 빨 노 하늘
+          zones:[
+            {k:"r", x:30.0,y:47.5, w:6.2,h:11, label:"빨간 버튼", color:"#e23b3b"},
+            {k:"o", x:37.0,y:47.4, w:6.2,h:11, label:"주황 버튼", color:"#f6942c"},
+            {k:"y", x:44.0,y:47.3, w:6.2,h:11, label:"노란 버튼", color:"#f2cc2a"},
+            {k:"g", x:50.8,y:47.2, w:6.0,h:11, label:"초록 버튼", color:"#58c85a"},
+            {k:"s", x:56.7,y:47.2, w:5.6,h:11, label:"하늘 버튼", color:"#54bdf0"},
+            {k:"p", x:62.2,y:47.2, w:5.6,h:11, label:"보라 버튼", color:"#8a4fd0"},
+          ],
+          lamps:[{x:31.5,y:58.7},{x:36.8,y:58.4},{x:41.6,y:58.2},{x:46.2,y:58.0},
+                 {x:50.6,y:57.8},{x:55.4,y:57.6},{x:60.0,y:57.3}],
+          lampW:4.6, lampH:3.5,
+          success:"달칵! 벽장 문이 열렸다.", setFlag:"garden_cab",
+          prize:{ img:"img/closeup/garden_cab_open.jpg", badge:"💎", label:"열린 벽장",
+            caption:"문이 열렸다.\n이끼 위에 크리스탈이 반짝인다…!",
+            action:{type:"clue"},
+            subspots:[
+              { x:32,y:53, w:26,h:30, label:"크리스탈",
+                give:{item:"crystal2", success:"크리스탈 획득! 💎"} },
+            ] } } }},
     ],
     exits:[{to:"marina", label:"마리나", emoji:"🏨", dir:"left"}]
   },
@@ -1657,6 +1686,11 @@ function buildMirrorView(a){
             lamps:[{x,y}], lampW, lampH, success, setFlag} */
 let seqState=null;
 function clearSeq(){ document.querySelectorAll("#cuImgWrap .cu-seqzone, #cuImgWrap .cu-lamp").forEach(e=>e.remove()); seqState=null; }
+// lampColors용: 램프에 임의 색 점등 / 지우기 (인라인 스타일이 클래스보다 우선이라 반드시 지워야 red·blue가 보인다)
+function paintLamp(el,c){ el.style.opacity="1";
+  el.style.background="radial-gradient(circle, #ffffff 0%, "+c+" 50%, rgba(0,0,0,0) 78%)";
+  el.style.boxShadow="0 0 14px 4px "+c; }
+function clearLampPaint(el){ el.style.opacity=""; el.style.background=""; el.style.boxShadow=""; }
 function buildSeq(a, id){
   clearSeq();
   const wrap=$("#cuImgWrap"); if(!wrap) return;
@@ -1681,17 +1715,22 @@ function buildSeq(a, id){
 function seqTap(k, a, id){
   // ★판정은 끝에서: 누를 때마다 램프만 초록으로 차오르고(맞든 틀리든),
   //   전부 입력한 뒤에 정답이면 파랑, 틀리면 그때 빨강+리셋 (북쑥 2026-08-13)
+  // ★lampColors:true면 초록 대신 '누른 버튼의 색'이 램프에 뜬다 (가든 벽장 — 버튼이 빽빽해 피드백용, 북쑥 2026-08-14)
   if(!seqState || seqState.lock || state.done[id]) return;
   const lamps=[...document.querySelectorAll("#cuImgWrap .cu-lamp")];
   seqState.seq.push(k);
-  lamps[seqState.seq.length-1] && lamps[seqState.seq.length-1].classList.add("green");
+  const li=lamps[seqState.seq.length-1];
+  if(li){
+    if(a.lampColors){ const z=(a.zones||[]).find(z=>z.k===k); paintLamp(li,(z&&z.color)||"#2ecc5f"); }
+    else li.classList.add("green");
+  }
   SFX.key(); vib(10);
   if(seqState.seq.length>=a.answer.length){
     seqState.lock=true;
     const okAll = a.answer.every((v,i)=>seqState.seq[i]===v);
     setTimeout(()=>{
       if(okAll){
-        lamps.forEach(l=>{ l.classList.remove("green"); l.classList.add("blue"); });
+        lamps.forEach(l=>{ clearLampPaint(l); l.classList.remove("green"); l.classList.add("blue"); });
         SFX.success(); vib([30,40,80]);
         state.done[id]=true; if(a.setFlag) state.flags[a.setFlag]=true; save();
         toast(a.success||"달칵! 문이 열렸다.");
@@ -1702,7 +1741,7 @@ function seqTap(k, a, id){
         if(a.prize) setTimeout(()=>openCloseup(a.prize, {label:a.prize.label||""}, id+"_prize"), 900);
       } else {
         if(SFX.fail) SFX.fail(); vib([40,30,40]);
-        lamps.forEach(l=>{ l.classList.remove("green"); l.classList.add("red"); });
+        lamps.forEach(l=>{ clearLampPaint(l); l.classList.remove("green"); l.classList.add("red"); });
         setTimeout(()=>{ lamps.forEach(l=>l.classList.remove("red"));
           seqState.seq=[]; seqState.lock=false; }, 750);
       }
