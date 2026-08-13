@@ -642,12 +642,20 @@ const MAPS = {
             {k:"rabbit",   x:50.1,y:64.5, w:20,h:15, label:"토끼"},
             {k:"elephant", x:75.0,y:64.5, w:20,h:15, label:"코끼리"},
           ],
-          lamps:[{x:18.1,y:87.6},{x:29.9,y:87.6},{x:41.6,y:87.6},
-                 {x:53.4,y:87.6},{x:65.0,y:87.6},{x:76.8,y:87.6}],
-          lampW:8.6, lampH:6.4,
-          success:"달칵! 문이 열렸다…!", setFlag:"police_door"} }},
-      // 문이 열린 뒤: 같은 자리 클릭 → 즉시 경찰서 안으로 (팝업·이동연출 없음, 북쑥 지시)
-      { x:92,y:87, w:11,h:10, label:"열린 철문", showIf:"police_door", goTo:"policein" },
+          lamps:[{x:18.9,y:88.1},{x:31.3,y:88.1},{x:43.7,y:88.1},
+                 {x:56.2,y:88.1},{x:68.6,y:88.1},{x:81.5,y:88.1}],
+          lampW:8.7, lampH:6.6,
+          success:"달칵! 문이 열렸다…!", setFlag:"police_door",
+          prize:{ img:"img/closeup/police_door_open.jpg", badge:"🚪", label:"열린 철문",
+            caption:"🚪 문이 열렸다…!",
+            action:{type:"clue"},
+            subspots:[ {x:50,y:50,w:96,h:92,label:"안으로", goTo:"policein"} ] } } }},
+      // 문이 열린 뒤: 같은 자리 클릭 → 열린 문 사진 팝업 → 사진 누르면 경찰서 안으로 (북쑥 지시)
+      { x:92,y:87, w:11,h:10, label:"열린 철문", showIf:"police_door", closeup:{
+        img:"img/closeup/police_door_open.jpg", badge:"🚪",
+        caption:"🚪 문이 열려 있다.",
+        action:{type:"clue"},
+        subspots:[ {x:50,y:50,w:96,h:92,label:"안으로", goTo:"policein"} ] }},
       // 도로에 선 초록 2층버스 → 경찰차 클로즈업 → 트렁크 3자리 자물쇠
       { x:57,y:86, w:30,h:12, label:"도로에 선 버스", closeup:{
         img:"img/closeup/police_car.jpg", badge:"🚓",
@@ -704,9 +712,9 @@ const MAPS = {
             {k:"g", x:50.3,y:49.2, w:17,h:12, label:"초록 버튼"},
             {k:"b", x:71.2,y:48.8, w:17,h:12, label:"파란 버튼"},
           ],
-          lamps:[{x:25.1,y:63.3},{x:33.7,y:63.3},{x:42.3,y:63.3},{x:50.8,y:63.3},
-                 {x:59.4,y:63.3},{x:68.0,y:63.3},{x:76.5,y:63.3}],
-          lampW:5.6, lampH:4.2,
+          lamps:[{x:24.9,y:62.9},{x:33.3,y:62.9},{x:41.9,y:62.9},{x:50.2,y:62.9},
+                 {x:58.5,y:62.9},{x:67.0,y:62.9},{x:75.7,y:62.9}],
+          lampW:5.3, lampH:4.0,
           success:"덜컥! 콘솔 아래 뚜껑이 열렸다.", setFlag:"police_console",
           prize:{ img:"img/closeup/police_console_open.jpg", badge:"📻", label:"열린 콘솔",
             caption:"뚜껑이 열렸다.\n안에 무언가 들어 있다.",
@@ -857,7 +865,7 @@ const MAPS = {
           caption:"🔭 쌍안경으로 황금 돔을 한가득 당겨 봤다.\n돔에 뭔가 새겨져 있다…!",
           action:{type:"clue"} }},
       // 거울을 대야 읽히는 벽 — 반쪽만 칠해진 글씨
-      { x:10,y:26, w:19,h:27, label:"페인트 벗겨진 벽", closeup:{
+      { x:10,y:58, w:19,h:22, label:"페인트 벗겨진 벽", closeup:{
         img:"img/closeup/arab_wall.jpg", badge:"🔎",
         caption:"🧱 담벼락에 뭔가 세로로 칠해져 있다.\n칠하다 만 것 같다.",
         action:{type:"mirror", needItem:"mirror", targetX:48.9, tol:2.6,
@@ -885,13 +893,13 @@ const MAPS = {
               "img/merlion_strong.jpg","img/merlion.jpg","img/merlion_weak.jpg"] },
     hotspots:[
       // 물줄기 세기 단서 삭제(북쑥 2026-08-12). 사자상 각인 문구도 물줄기 언급 제거.
-      {x:16,y:52,emoji:"🦁",label:"머라이언", clue:{e:"🦁",t:"물을 뿜는 머라이언 사자상.\n등쪽에 금이 가 있는 게 보인다."}},
+      // 사자상 구경 핫스팟 삭제(북쑥 2026-08-13)
       // 등쪽 열쇠 홈 — 터널에서 얻은 앤틱 열쇠(key5)를 꽂는 곳. 꽂으면 ml_key.
       // ★이후 기믹(북쑥 예고): 머라이언 물줄기가 강·약으로 나가는 연출 — 순서는 [강 약 중 강 중 약].
       //   강/약 이미지는 북쑥이 보내줄 예정. 오면 ml_key 상태의 맵 배경 애니로 붙인다.
       { x:11,y:67, w:16,h:16, label:"머라이언 등쪽", hideIf:"ml_key", closeup:{
         img:"img/closeup/merlion_back.jpg", badge:"🗝️",
-        caption:"🗝️ 등에 열쇠 모양 홈이 파여 있다.\n어딘가 낯익은 모양이다…",
+        caption:"🗝️ 등에 열쇠 모양 홈이 파여 있다.",
         action:{type:"clue"},
         subspots:[
           { x:51,y:54, w:38,h:58, label:"열쇠 홈",
@@ -1291,6 +1299,7 @@ function openCloseup(cu, h, id){
         el.title=s.label||"";
         el.onclick=(ev)=>{ ev.stopPropagation();
           if(needSelBlocked(s.needSel)) return;                     // ★아이템 골라 들어야 열림
+          if(s.goTo){ SFX.tap(); vib(8); closeCloseupAll(); state.room=s.goTo; render(); return; }  // ★사진 눌러 맵 이동
           if(s.tablet){ SFX.tap(); vib(8); openTablet(); return; }  // ★보닛 태블릿 → 잠금해제 팝업
           if(s.give){ const sid=id+"_s"+si;                         // ★클릭 즉시 획득 (팝업 없이)
             if(state.done[sid]){ toast("이미 챙겼어."); return; }
@@ -1477,7 +1486,7 @@ function buildSeq(a, id){
   clearSeq();
   const wrap=$("#cuImgWrap"); if(!wrap) return;
   const solved=!!state.done[id];
-  seqState={ i:0, lock:false };
+  seqState={ seq:[], lock:false };
   a.lamps.forEach(L=>{
     const el=document.createElement("div"); el.className="cu-lamp";
     el.style.left=L.x+"%"; el.style.top=L.y+"%";
@@ -1495,15 +1504,18 @@ function buildSeq(a, id){
   });
 }
 function seqTap(k, a, id){
+  // ★판정은 끝에서: 누를 때마다 램프만 초록으로 차오르고(맞든 틀리든),
+  //   전부 입력한 뒤에 정답이면 파랑, 틀리면 그때 빨강+리셋 (북쑥 2026-08-13)
   if(!seqState || seqState.lock || state.done[id]) return;
   const lamps=[...document.querySelectorAll("#cuImgWrap .cu-lamp")];
-  if(k===a.answer[seqState.i]){
-    lamps[seqState.i] && lamps[seqState.i].classList.add("green");
-    SFX.key(); vib(10);
-    seqState.i++;
-    if(seqState.i>=a.answer.length){
-      seqState.lock=true;
-      setTimeout(()=>{
+  seqState.seq.push(k);
+  lamps[seqState.seq.length-1] && lamps[seqState.seq.length-1].classList.add("green");
+  SFX.key(); vib(10);
+  if(seqState.seq.length>=a.answer.length){
+    seqState.lock=true;
+    const okAll = a.answer.every((v,i)=>seqState.seq[i]===v);
+    setTimeout(()=>{
+      if(okAll){
         lamps.forEach(l=>{ l.classList.remove("green"); l.classList.add("blue"); });
         SFX.success(); vib([30,40,80]);
         state.done[id]=true; if(a.setFlag) state.flags[a.setFlag]=true; save();
@@ -1511,15 +1523,15 @@ function seqTap(k, a, id){
         document.querySelectorAll("#cuImgWrap .cu-seqzone").forEach(e=>e.remove());
         $("#cuLockBadge").textContent="✅";
         render();   // 뒤의 맵 갱신 (hideIf/showIf 요소 반영 — 팝업은 별도 오버레이라 안전)
-        // ★prize: 완성 연출 뒤 열린 모습 팝업으로 (예: 콘솔 뚜껑 열림 → 무전기)
+        // ★prize: 완성 연출 뒤 열린 모습 팝업으로 (문 열림 / 콘솔 뚜껑 → 무전기)
         if(a.prize) setTimeout(()=>openCloseup(a.prize, {label:a.prize.label||""}, id+"_prize"), 900);
-      }, 380);
-    }
-  } else {
-    seqState.lock=true;
-    if(SFX.fail) SFX.fail(); vib([40,30,40]);
-    lamps.forEach(l=>{ l.classList.remove("green"); l.classList.add("red"); });
-    setTimeout(()=>{ lamps.forEach(l=>l.classList.remove("red")); seqState.i=0; seqState.lock=false; }, 750);
+      } else {
+        if(SFX.fail) SFX.fail(); vib([40,30,40]);
+        lamps.forEach(l=>{ l.classList.remove("green"); l.classList.add("red"); });
+        setTimeout(()=>{ lamps.forEach(l=>l.classList.remove("red"));
+          seqState.seq=[]; seqState.lock=false; }, 750);
+      }
+    }, 380);
   }
 }
 
