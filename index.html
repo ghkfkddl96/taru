@@ -851,7 +851,7 @@ const MAPS = {
       // 술탄 모스크 돔 — 쌍안경을 골라 들고 봐야 확대된다 (구경용 팝업은 삭제, 2026-08-12 북쑥 지시)
       { x:55,y:29, w:30,h:22, label:"술탄 모스크 돔",
         needSel:{item:"binoc",
-          no:"돔이 너무 멀어서 잘 안 보인다.",
+          no:"돔에 무언가 적혀있는 것 같은데….",
           pick:"가방에서 🔭쌍안경을 골라서 봐야지."},
         closeup:{ img:"img/closeup/arab_dome.jpg", badge:"🔭", binoc:true,
           caption:"🔭 쌍안경으로 황금 돔을 한가득 당겨 봤다.\n돔에 뭔가 새겨져 있다…!",
@@ -865,7 +865,7 @@ const MAPS = {
           noItem:"반쪽만 남은 자국이라 읽을 수가 없다."} }},
       // 사람 많은 거리 → 길가 카페. 음료 4잔 앞 숫자판 4칸(0000, 누르면 +1). 정답 7768.
       // 힌트는 게임 밖(실제 갤러리 사진, 돔 각인 250501·22:15와 연결) — 게임 안엔 힌트 없음.
-      { x:47,y:72, w:42,h:24, label:"북적이는 거리", closeup:{
+      { x:32,y:72, w:30,h:24, label:"북적이는 거리", closeup:{
         img:"img/closeup/arab_cafe.jpg", badge:"☕",
         caption:"☕ 사람들 틈에 작은 카페가 있다.\n음료 네 잔 앞에 숫자판이 하나씩 놓여 있다.",
         action:{type:"picker", set:"digit", answer:["7","7","6","8"],
