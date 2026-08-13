@@ -597,6 +597,28 @@ const MAPS = {
         action:{type:"picker", set:"digit", answer:["7","7","6","8"],
           success:"딸깍! 아이스 아메리카노 한 잔이 나왔다! 🥤",
           give:["americano"], setFlag:"arab_cafe"} }},
+      // ★더위 먹은 고양이(북쑥 오리지널 캐릭터 2026-08-14) — 아메리카노를 건네면 답례로 유니버설 티켓(ticket2).
+      //   insert swapItem = 아메리카노↔티켓 맞교환 한 번에 처리(티켓을 못 챙기고 닫는 사고 방지).
+      { x:20,y:84, w:22,h:16, label:"더위 먹은 고양이", hideIf:"cat_coffee", closeup:{
+        img:"img/closeup/cat_hot.jpg", badge:"🥵",
+        caption:"🥵 밀짚모자를 쓴 고양이가 모래밭에 퍼져 있다.\n\"더워… 너무 덥다냥… 시원한 게 간절하다냥…\"",
+        action:{type:"clue"},
+        subspots:[
+          { x:50,y:58, w:74,h:64, label:"고양이",
+            insert:{ needItem:"americano", swapItem:["americano","ticket2"], setFlag:"cat_coffee",
+              label:"더위 먹은 고양이",
+              noItem:"시원한 마실 것을 주면 기운을 차릴 것 같다…",
+              pick:"가방에서 🥤아메리카노를 골라서 건네보자.",
+              success:"\"고맙다냥!!\" 답례로 🎫입장 티켓을 받았다!",
+              next:{ img:"img/closeup/cat_cool.jpg", badge:"😺",
+                caption:"😺 \"살 것 같다냥~!!\"\n고양이가 기분 좋게 아메리카노를 들이켰다.\n답례로 품에서 🎫입장 티켓을 꺼내 줬다!",
+                action:{type:"clue"} } } },
+        ] }},
+      // 커피를 준 뒤엔 시원해진 모습
+      { x:20,y:84, w:22,h:16, label:"시원해진 고양이", showIf:"cat_coffee", closeup:{
+        img:"img/closeup/cat_cool.jpg", badge:"😺",
+        caption:"😺 고양이가 시원하게 아메리카노를 마시고 있다.\n\"고맙다냥~ 유니버설에서 재밌게 놀다 오라냥!\"",
+        action:{type:"clue"} }},
     ],
     exits:[
       {to:"vivocity", label:"비보시티", emoji:"🛍️", dir:"left"},
@@ -1988,7 +2010,8 @@ function doInsert(ins, id){
   }
   if(ins.consume){ state.inv=state.inv.filter(k=>k!==ins.needItem); selected=null; }
   if(ins.setFlag) state.flags[ins.setFlag]=true;
-  if(ins.swapItem){ state.inv=state.inv.map(k=>k===ins.swapItem[0]?ins.swapItem[1]:k); }
+  if(ins.swapItem){ state.inv=state.inv.map(k=>k===ins.swapItem[0]?ins.swapItem[1]:k);
+    if(selected===ins.swapItem[0]) selected=null; }   // 맞바꾼 아이템이 선택 중이었으면 선택 해제
   state.done[id]=true;
   SFX.item(); vib([22,32,60]);
   if(ins.next) openCloseup(ins.next, {label:ins.label||""}, id+"_after");
