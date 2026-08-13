@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
-<title>싱가포르 여행의 비밀 ✈️</title>
+<title>싱가포르 여행 대소동 ✈️</title>
 <style>
   :root{
     --pink:#ff9ec4; --cream:#fff7f0; --ink:#4a3f55; --gold:#ffd97d; --pop:#ff6b9d;
@@ -301,6 +301,11 @@
   .storyCard h2{ font-size:20px; margin:8px 0 10px; color:var(--ink); }
   .storyCard p{ font-size:15px; line-height:1.75; color:#5a4f68; white-space:pre-wrap; margin:0; }
   .storyCard .btn{ max-width:220px; margin:18px auto 0; }
+  .storyImg{ max-width:72%; max-height:30vh; border-radius:14px; box-shadow:0 8px 24px rgba(0,0,0,.3);
+    display:block; margin:0 auto 4px; }
+  /* 검은 페이드 깜빡임 (대본 1→2) */
+  #blackFade{ position:absolute; inset:0; background:#000; opacity:0; pointer-events:none;
+    transition:opacity .45s ease; z-index:60; }
   .storyDots{ display:flex; gap:7px; justify-content:center; margin-top:16px; }
   .storyDots span{ width:8px; height:8px; border-radius:50%; background:#e0d3dc; transition:.2s; }
   .storyDots span.on{ background:var(--pop); transform:scale(1.25); }
@@ -311,7 +316,7 @@
   <button class="resetLink" onclick="resetGame()">처음부터</button>
   <button id="muteBtn" onclick="toggleMute()" title="배경음 켜기/끄기" style="position:absolute;top:8px;left:12px;font-size:18px;background:none;border:none;z-index:6;cursor:pointer;opacity:.72;">🔊</button>
   <div id="topbar">
-    <div id="roomName">싱가포르 여행의 비밀</div>
+    <div id="roomName">싱가포르 여행 대소동</div>
     <div id="roomSub"></div>
   </div>
   <div id="scene"></div>
@@ -360,6 +365,7 @@
     <div id="tabMsg">🔒 태블릿이 잠겨있어</div>
   </div>
 
+  <div id="blackFade"></div>
   <div id="modalBg"><div id="modal"></div></div>
   <div id="toast"></div>
 
@@ -370,8 +376,8 @@
     <span class="deco" style="bottom:18%;right:18%;animation-delay:1.6s">💫</span>
     <span class="deco" style="top:30%;left:24%;animation-delay:2s">🧳</span>
     <div class="bigemoji">🦁✈️</div>
-    <h1>싱가포르 여행의 비밀</h1>
-    <p id="introText">우리 둘의 싱가포르 여행,<br>반짝이는 곳을 눌러 자세히 살펴보고<br>숨은 수수께끼를 풀어봐!</p>
+    <h1>싱가포르 여행 대소동</h1>
+    <p id="introText">드디어 다가온 싱가포르 여행!<br>오랜만에 둘만의 여행이라 기대된다!<br>그런데 무언가 일이 생길 것 같은 기분이 든다...</p>
     <button class="btn" style="max-width:220px" onclick="startGame()">시작하기 💗</button>
     <svg class="skyline" viewBox="0 0 480 92" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
       <rect x="14" y="52" width="20" height="40"/><rect x="40" y="40" width="16" height="52"/><rect x="62" y="58" width="22" height="34"/>
@@ -409,8 +415,11 @@ const ITEMS = {
   key4:{name:"열쇠", svg:_key('<path d="M7 2.6 L11.4 10.4 L2.6 10.4 Z"/>','#3fb8ae')},                                    // 삼각 청록
   map:{emoji:"🗺️", name:"지도"},
   card:{emoji:"🎟️", name:"교통카드"},
-  passport:{name:"여권", inspect:"passport",   // ★파란 여권 아이콘(덮힌 얇은 책) + 더블클릭 팝업
+  passport:{name:"내 여권", inspect:"passport",   // ★파란 여권 아이콘(덮힌 얇은 책) + 더블클릭 팝업
     svg:'<svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="1.8" fill="#264a90"/><rect x="5" y="3" width="2.4" height="18" rx="1.8" fill="#1b3568"/><rect x="7.1" y="3" width="0.5" height="18" fill="#3a5da3"/><circle cx="13.2" cy="9" r="2.4" fill="none" stroke="#eccb6d" stroke-width="1"/><circle cx="13.2" cy="9" r="0.8" fill="#eccb6d"/><rect x="9.8" y="13.4" width="6.6" height="1.2" rx="0.6" fill="#eccb6d"/><rect x="10.4" y="15.9" width="5.4" height="0.9" rx="0.45" fill="#b4c4e8"/></svg>'},
+  // 화랑이의 여권 — 초록 표지. 이비스 체크인용(어디서 얻을지는 북쑥 지시 대기).
+  passport2:{name:"화랑이의 여권",
+    svg:'<svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="1.8" fill="#1f7a44"/><rect x="5" y="3" width="2.4" height="18" rx="1.8" fill="#155c32"/><rect x="7.1" y="3" width="0.5" height="18" fill="#2f9c5c"/><circle cx="13.2" cy="9" r="2.4" fill="none" stroke="#eccb6d" stroke-width="1"/><circle cx="13.2" cy="9" r="0.8" fill="#eccb6d"/><rect x="9.8" y="13.4" width="6.6" height="1.2" rx="0.6" fill="#eccb6d"/><rect x="10.4" y="15.9" width="5.4" height="0.9" rx="0.45" fill="#bfe3cd"/></svg>'},
   phone:{emoji:"📱", name:"스마트폰", inspect:"phone"},       // ★더블클릭→스마트폰 잠금해제 팝업
   // 조각(frag) 시스템 삭제 — 북쑥 2026-08-13. (혹시 옛 저장에 frag가 남아도 ITEMS에 없으면 renderInv가 건너뜀)
   flower:{emoji:"🌺", name:"꽃"},
@@ -773,8 +782,9 @@ const MAPS = {
     hotspots:[
       { x:62,y:52, w:46,h:34, label:"리셉션", closeup:{
         img:"TODO", badge:"🛎️",
-        caption:"🛎️ 리셉션 직원에게 체크인!\n'예약 확인 번호를 알려주세요'\n4자리 번호를 입력하자.",
-        action:{type:"numlock", len:4, answer:"0815",
+        caption:"🛎️ 리셉션 직원에게 체크인!\n\"체크인을 하시려면 두 분의 여권이 모두 필요합니다.\"",
+        action:{type:"checkin",
+          no:"\"체크인을 하시려면 두 분의 여권이 모두 필요합니다.\"",
           success:"체크인 완료! 방 열쇠를 받았다. 🔑\n이제 우리 방으로 올라가자.",
           setFlag:"reception_done"} }},
     ],
@@ -984,25 +994,51 @@ function resetGame(){
   closeCloseupAll(); closeModal(); $("#intro").style.display="flex";
 }
 function startGame(){ actx(); startAmbience(); initParallax(); SFX.open(); $("#intro").style.display="none"; showStory(0); }
-/* 스토리 3페이지 — 내용(text)은 placeholder. 나중에 둘만의 이야기로 교체. */
+/* 스토리 — 대본 7개 (북쑥 대본, 2026-08-13). 1→2 사이 검은 페이드 깜빡임.
+   버뮤다 삼각지대 설정: 플레이어의 생각대로 세상이 방탈출처럼 바뀜. */
 const STORY=[
-  {emoji:"✈️", title:"대본 1", text:"[ 대본 1 자리 ]\n예) 창이공항에 막 도착한 우리.\n설레는 여행이 시작되려는데…"},
-  {emoji:"🧳", title:"대본 2", text:"[ 대본 2 자리 ]\n예) 그런데 가방 속에 낯선 쪽지가?\n'여행 곳곳에 비밀을 숨겨뒀어.'"},
-  {emoji:"🦁", title:"대본 3", text:"[ 대본 3 자리 ]\n예) 숨은 수수께끼를 하나씩 풀며\n싱가포르 여행의 비밀을 찾아 떠나자!"},
+  {emoji:"✈️", text:"드디어 다가온 싱가포르 여행! 즐거운 마음으로 비행기에 탑승했다. 무언가 두고온건 없겠지?"},
+  {emoji:"😴", text:"한숨 자고 일어나니 무언가 이상한 기분이 들었다. 아까 보았던 비행기 풍경이랑 조금 다른 것 같은데..."},
+  {emoji:"📢", text:"비행기에서 안내 방송이 나오기 시작했다."},
+  {emoji:"📢", text:"“아아, 방금 버뮤다 삼각지대를 무사히 통과했습니다. 간혹 버뮤다 삼각지대의 영향으로, 일부 탑승자의 생각에 따라 세상이 바뀌는 경우가 있습니다.”"},
+  {emoji:"📢", text:"”하지만 이는 해당 탑승자 외에는 인지하지 못하기 때문에 큰 문제는 되지 않습니다. 사실 실제하는 현상인지도 모르겠습니다만.....“"},
+  {emoji:"💭", text:".... 혹시 나의 생각이 이 세상에 영향을 끼친 것일까? 다른 사람들은 바뀐 모습을 인식하지 못하는 듯 하다."},
+  {emoji:"💪", text:"세상이 어떻게 바뀌었든 큰 문제는 없다니 다행이지만, 이로 인해 여행을 포기할 수는 없다!"},
 ];
+/* 공항→시내 첫 진입 시 일회성 스토리. [1]은 북쑥 사진 오면 img 필드 추가 예정. */
+const DTSTORY=[
+  {emoji:"🏙️", text:"공항에서 무사히 시내로 넘어왔다. 최근 방탈출 게임을 많이 해서 그런지, 세상이 방탈출 게임과 섞여버린 것 같다..."},
+  {emoji:"😱", text:"“헉 분명 여권을 챙겼었는데... 무슨 일인지 보이지 않아요!”"},
+  {emoji:"🛂", text:"세상이 바뀐 영향일까? 화랑이의 여권이 어디론가 사라진 모양이다..! 체크인을 하려면 여권이 필요할텐데! 어서 찾아보자!"},
+];
+let curStory=STORY;
 function showStory(i){
   const ov=$("#story");
-  if(i>=STORY.length){ ov.style.display="none"; render(); return; }   // 스토리 끝 → 공항 시작
-  const s=STORY[i]; SFX.open();
-  const last=i>=STORY.length-1;
-  ov.innerHTML=`<div class="storyCard">
-    <div class="bigemoji">${s.emoji}</div>
-    <h2>${s.title}</h2>
-    <p>${s.text}</p>
-    <button class="btn" onclick="SFX.tap();showStory(${i+1})">${last?"여행 시작! 💗":"다음 ▶"}</button>
-    <div class="storyDots">${STORY.map((_,j)=>`<span class="${j===i?'on':''}"></span>`).join("")}</div>
-  </div>`;
+  if(i>=curStory.length){ ov.style.display="none"; curStory=STORY; render(); return; }
+  const s=curStory[i]; SFX.open();
+  const last=i>=curStory.length-1;
+  const media = s.img ? ('<img class="storyImg" src="'+s.img+'" alt="">')
+                      : ('<div class="bigemoji">'+(s.emoji||"")+'</div>');
+  const btnLabel = last ? (curStory===STORY ? "여행 시작! 💗" : "알겠어!") : "다음 ▶";
+  ov.innerHTML='<div class="storyCard">'+media+
+    (s.title ? '<h2>'+s.title+'</h2>' : '')+
+    '<p>'+s.text+'</p>'+
+    '<button class="btn" onclick="SFX.tap();storyNext('+i+')">'+btnLabel+'</button>'+
+    '<div class="storyDots">'+curStory.map(function(_,j){ return '<span class="'+(j===i?'on':'')+'"></span>'; }).join("")+
+    '</div></div>';
   ov.style.display="flex";
+}
+function storyNext(i){
+  if(curStory===STORY && i===0){ fadeBlink(function(){ showStory(1); }); return; }   // 대본1→2 검은 깜빡임
+  showStory(i+1);
+}
+function showDtStory(){ curStory=DTSTORY; showStory(0); }
+/* 검은 페이드 깜빡임 — 어두워졌다가 밝아지며 중간에 내용 전환 */
+function fadeBlink(mid){
+  const f=$("#blackFade");
+  f.style.pointerEvents="auto"; f.style.opacity="1";
+  setTimeout(function(){ if(mid) mid(); f.style.opacity="0";
+    setTimeout(function(){ f.style.pointerEvents="none"; }, 500); }, 500);
 }
 window.addEventListener("load",()=>{
   // 배경/클로즈업/이동 사진 미리 로드
@@ -1169,7 +1205,10 @@ function goTo(to){
     else toast("교통카드를 선택해서 타야 해🥲");
     return;
   }
-  showTransition(tr, ()=>{ state.room=to; render(); });   // ★선택아이템 유지(맵 넘어가도)
+  showTransition(tr, ()=>{ state.room=to; render();
+    // ★공항→시내 첫 진입: 일회성 스토리 (여권 실종 안내)
+    if(key==="airport>downtown" && !state.flags.dt_story){ state.flags.dt_story=true; save(); showDtStory(); }
+  });   // ★선택아이템 유지(맵 넘어가도)
 }
 function showTransition(tr, done){
   SFX.move();
@@ -1264,6 +1303,14 @@ function openCloseup(cu, h, id){
       else toast(a.noKey||"열쇠가 필요해.");
     };
     acts.appendChild(b);
+  } else if(a.type==="checkin"){
+    // 이비스 체크인 — 두 여권(내 여권+화랑이의 여권)을 모두 가져야 통과
+    const cb=document.createElement("button"); cb.className="btn compact"; cb.textContent="🛎️ 체크인하기";
+    cb.onclick=()=>{
+      if(has("passport") && has("passport2")) solveCloseup(a);
+      else toast(a.no||"두 분의 여권이 모두 필요합니다.");
+    };
+    acts.appendChild(cb);
   } else if(a.type==="give"){
     const b=document.createElement("button"); b.className="btn compact"; b.textContent="가져가기";
     b.onclick=()=>solveCloseup(a);
