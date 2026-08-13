@@ -1589,8 +1589,9 @@ const MIRROR_BG = 'data:image/svg+xml;utf8,'+encodeURIComponent(
 /* ---- 무전기 팝업 + 노래 ----
    더블탭 → 무전기 누끼 사진 + "노래가 흘러나온다" + 실제 재생(도입부 5초, 페이드아웃은 파일에 구움).
    끝나면 "더 이상 아무 소리도 들리지 않는다". 팝업 다시 열면 처음부터 다시.
-   음원: audio/redred5.mp3 (북쑥 제공 원곡을 5초로 잘라 넣음. 파일 없으면 잡음 멘트로 폴백). */
-const RADIO_SONG="audio/redred5.mp3";
+   음원: audio/redred5.wav — 북쑥이 폰 화면녹화로 보내준 도입부를 5.5초 컷+페이드아웃(WAV PCM16, iOS 재생 OK).
+   (여행 이벤트 끝나면 이 파일만 지우면 됨 — 코드는 자동으로 잡음 멘트 폴백) */
+const RADIO_SONG="audio/redred5.wav";
 let radioAudio=null;
 function stopRadio(){ if(radioAudio){ try{ radioAudio.pause(); }catch(e){} } }
 function openRadio(){
