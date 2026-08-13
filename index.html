@@ -490,7 +490,7 @@ const MAPS = {
       { x:22,y:50, w:44,h:13, label:"사물함", closeup:{
         img:"img/closeup/locker.jpg", badge:"🔑",
         caption:"🔐 열쇠로 잠긴 사물함.\n손잡이에 열쇠 구멍이 보여.",
-        action:{type:"keylock", needItem:"key1",
+        action:{type:"keylock", needItem:"key1", consume:true,
           noKey:"열쇠 구멍이 있어. 열쇠를 먼저 찾아야 할 것 같아.",
           success:"열쇠로 사물함을 열었다!\n교통카드가 들어 있었다. 이제 도심으로!",
           give:["card"], setFlag:"gotOut"} }},
@@ -591,6 +591,13 @@ const MAPS = {
         clue:{e:"🚡",t:"섬을 잇는 케이블카가 머리 위로 지나간다.\n오른쪽 길로 가면 유니버설 스튜디오!"}},
       {x:68,y:64,emoji:"🏖️",label:"비치 클럽 거리",
         clue:{e:"🏖️",t:"비치 셱·OLA 비치클럽… 해변을 따라 가게가 쭉 늘어서 있다.\n기념품 가게도 보이네."}},
+      // 해변 카페 숫자퍼즐 (아랍에서 이전). 정답 7768(실제 갤러리 힌트) → 아메리카노.
+      { x:47,y:66, w:18,h:14, label:"해변 카페", closeup:{
+        img:"img/closeup/arab_cafe.jpg", badge:"☕",
+        caption:"🏖️ 해변 상점가 한켠의 작은 카페.\n음료 네 잔 앞에 숫자판이 하나씩 놓여 있다.",
+        action:{type:"picker", set:"digit", answer:["7","7","6","8"],
+          success:"딸깍! 아이스 아메리카노 한 잔이 나왔다! 🥤",
+          give:["americano"], setFlag:"arab_cafe"} }},
     ],
     exits:[
       {to:"vivocity", label:"비보시티", emoji:"🛍️", dir:"left"},
@@ -881,14 +888,7 @@ const MAPS = {
         action:{type:"mirror", needItem:"mirror", targetX:48.9, tol:2.6,
           scratch:"img/closeup/mirror_scratch.png",
           noItem:"반쪽만 남은 자국이라 읽을 수가 없다."} }},
-      // 사람 많은 거리 → 길가 카페. 음료 4잔 앞 숫자판 4칸(0000, 누르면 +1). 정답 7768.
-      // 힌트는 게임 밖(실제 갤러리 사진, 돔 각인 250501·22:15와 연결) — 게임 안엔 힌트 없음.
-      { x:32,y:72, w:30,h:24, label:"북적이는 거리", closeup:{
-        img:"img/closeup/arab_cafe.jpg", badge:"☕",
-        caption:"☕ 사람들 틈에 작은 카페가 있다.\n음료 네 잔 앞에 숫자판이 하나씩 놓여 있다.",
-        action:{type:"picker", set:"digit", answer:["7","7","6","8"],
-          success:"딸깍! 아이스 아메리카노 한 잔이 나왔다! 🥤",
-          give:["americano"], setFlag:"arab_cafe"} }},
+      // (카페 숫자퍼즐은 센토사로 이전 — 북쑥 2026-08-13)
     ],
     exits:[{to:"downtown", label:"중심지로", emoji:"🏙️", dir:"left"}]
   },
@@ -1297,7 +1297,10 @@ function openCloseup(cu, h, id){
   } else if(a.type==="keylock"){
     const b=document.createElement("button"); b.className="btn compact"; b.textContent="🔑 열쇠로 열기";
     b.onclick=()=>{
-      if(selected===a.needItem) solveCloseup(a);                                   // 맞는 열쇠를 골랐다
+      if(selected===a.needItem){                                                  // 맞는 열쇠를 골랐다
+        if(a.consume){ state.inv=state.inv.filter(k=>k!==a.needItem); selected=null; renderInv(); }  // ★쓴 열쇠는 사라짐
+        solveCloseup(a);
+      }
       else if(selected && selected.indexOf("key")===0) toast("이 열쇠로는 안 열리는데? 🔑");  // 다른 열쇠 선택
       else if(has(a.needItem)) toast("맞는 열쇠를 선택해서 열어봐 🔑");                 // 갖고 있는데 선택 안 함
       else toast(a.noKey||"열쇠가 필요해.");
