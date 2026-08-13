@@ -385,8 +385,8 @@ const ITEMS = {
   // 마루의 열쇠 — 클라우드 포레스트 어두운 터널(손전등)에서. 왕관+하트 장식 앤틱 청동 열쇠.
   key5:{name:"열쇠",
     svg:'<svg viewBox="0 0 24 24" fill="none" stroke="#9a7b3f" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9.3 3.1 L9.9 1.6 L11 2.8 L12 1.3 L13 2.8 L14.1 1.6 L14.7 3.1"/><circle cx="9.6" cy="6.3" r="2.5"/><circle cx="14.4" cy="6.3" r="2.5"/><path d="M12 6.1 q-1.4-1.3-2.1 0 q-.4.9 2.1 2.3 q2.5-1.4 2.1-2.3 q-.7-1.3-2.1 0"/><path d="M10.9 9.9 h2.2"/><path d="M12 9.9 V21.3"/><path d="M12 14.8 h3 v1.6 h-1.5 v1.4 h1.5 v1.5 h-3"/></svg>'},
-  // 무전기 — 경찰서 안 콘솔(RGB 7타) 뚜껑에서. 용도는 추후(교신 이벤트 등).
-  radio:{name:"무전기",
+  // 무전기 — 경찰서 안 콘솔(RGB 7타) 뚜껑에서. ★더블탭→누끼 팝업+노래 도입부 5초(레드레드).
+  radio:{name:"무전기", inspect:"radio",
     svg:'<svg viewBox="0 0 24 24"><rect x="10.9" y="1.4" width="1.7" height="5.2" rx="0.85" fill="#23272b"/><circle cx="15" cy="5" r="1.15" fill="#3b4249"/><circle cx="17.6" cy="5" r="1.15" fill="#3b4249"/><rect x="8" y="5.9" width="10.6" height="16.4" rx="2" fill="#2f353a"/><rect x="9.5" y="7.9" width="7.6" height="5.8" rx="1" fill="#1b1f23"/><path d="M10.3 9.3h6 M10.3 10.8h6 M10.3 12.3h6" stroke="#39424a" stroke-width="0.8"/><rect x="7.2" y="9.4" width="1.3" height="3.6" rx="0.65" fill="#23272b"/><rect x="9.5" y="15.5" width="7.6" height="4.8" rx="0.9" fill="#262b30"/></svg>'},
   // 쌍안경 — 비보시티 송파바쿠테 나무상자에서 나온다. 골라 들고 멀리 있는 걸 본다.
   binoc:{name:"쌍안경",
@@ -1568,6 +1568,7 @@ function tickHand(k, a, id){
 
 function closeCloseup(){
   clearInterval(cuAnim); cuAnim=null;
+  if(typeof stopRadio==="function") stopRadio();   // 무전기 팝업 닫으면 노래도 끔
   { const w0=$("#cuImgWrap"); if(w0) w0.querySelectorAll(".cu-clock").forEach(e=>e.remove()); }
   clearPicker();
   if(cuStack.length){ const p=cuStack.pop(); openCloseup(p.cu, p.h, p.id); return; }   // ★중첩팝업: ✕ 누르면 부모 팝업으로 복귀
@@ -1585,8 +1586,28 @@ const MIRROR_BG = 'data:image/svg+xml;utf8,'+encodeURIComponent(
   '<rect width="526" height="724" fill="#221a2c"/>'+
   '<ellipse cx="263" cy="352" rx="330" ry="430" fill="#2c2237"/>'+
   '<ellipse cx="263" cy="340" rx="215" ry="330" fill="#332941"/></svg>');
+/* ---- 무전기 팝업 + 노래 ----
+   더블탭 → 무전기 누끼 사진 + "노래가 흘러나온다" + 실제 재생(도입부 5초, 페이드아웃은 파일에 구움).
+   끝나면 "더 이상 아무 소리도 들리지 않는다". 팝업 다시 열면 처음부터 다시.
+   음원: audio/redred5.mp3 (북쑥 제공 원곡을 5초로 잘라 넣음. 파일 없으면 잡음 멘트로 폴백). */
+const RADIO_SONG="audio/redred5.mp3";
+let radioAudio=null;
+function stopRadio(){ if(radioAudio){ try{ radioAudio.pause(); }catch(e){} } }
+function openRadio(){
+  openCloseup({img:"img/closeup/radio_view.jpg", badge:"📻",
+    caption:"📻 낡은 무전기.\n지지직… 아무 소리도 잡히지 않는다.",
+    action:{type:"clue"}}, {label:"무전기"}, "item_radio");
+  if(!radioAudio){ radioAudio=new Audio(RADIO_SONG); radioAudio.preload="auto"; }
+  try{ radioAudio.currentTime=0; }catch(e){}
+  radioAudio.onended=()=>{ if(cuCtx && cuCtx.id==="item_radio")
+    $("#cuCaption").textContent="📻 …더 이상 아무 소리도 들리지 않는다."; };
+  radioAudio.play().then(()=>{
+    if(cuCtx && cuCtx.id==="item_radio")
+      $("#cuCaption").textContent="📻 지지직… 노래가 흘러나온다 🎵";
+  }).catch(()=>{});   // 파일 없음/자동재생 차단 → 기본(잡음) 멘트 유지
+}
 function openInspect(key){
-  if(key==="mirror"){
+  if(key==="radio"){ openRadio(); } else if(key==="mirror"){
     openCloseup({img:MIRROR_BG, badge:"🪞",
       caption:"🪞 손거울.\n유리가 약간 지저분하다.",
       action:{type:"mirrorview", targetX:48.9, width:24,
