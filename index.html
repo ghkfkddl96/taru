@@ -435,6 +435,9 @@ const ITEMS = {
   // 무전기 — 경찰서 안 콘솔(RGB 7타) 뚜껑에서. ★더블탭→누끼 팝업+노래 도입부 5초(레드레드).
   radio:{name:"무전기", inspect:"radio",
     svg:'<svg viewBox="0 0 24 24"><rect x="10.9" y="1.4" width="1.7" height="5.2" rx="0.85" fill="#23272b"/><circle cx="15" cy="5" r="1.15" fill="#3b4249"/><circle cx="17.6" cy="5" r="1.15" fill="#3b4249"/><rect x="8" y="5.9" width="10.6" height="16.4" rx="2" fill="#2f353a"/><rect x="9.5" y="7.9" width="7.6" height="5.8" rx="1" fill="#1b1f23"/><path d="M10.3 9.3h6 M10.3 10.8h6 M10.3 12.3h6" stroke="#39424a" stroke-width="0.8"/><rect x="7.2" y="9.4" width="1.3" height="3.6" rx="0.65" fill="#23272b"/><rect x="9.5" y="15.5" width="7.6" height="4.8" rx="0.9" fill="#262b30"/></svg>'},
+  // 크리스탈 — 아랍 가판대 상자(GOTY)에서. ★나중에 어딘가에 '장착'하는 문제 예정.
+  crystal:{name:"크리스탈",
+    svg:'<svg viewBox="0 0 24 24"><g transform="rotate(38 12 12)"><path d="M12 1.6 L15 6 L15 18 L12 22.4 L9 18 L9 6 Z" fill="#dff0f6"/><path d="M12 1.6 L15 6 L12 8 Z" fill="#f6fcfe"/><path d="M12 1.6 L9 6 L12 8 Z" fill="#c6e3ee"/><path d="M9 6 L12 8 L12 22.4 L9 18 Z" fill="#cfe8f1"/><path d="M15 6 L12 8 L12 22.4 L15 18 Z" fill="#eef8fc"/><path d="M12 8 L12 22.4" stroke="#b9dcE8" stroke-width="0.5"/></g></svg>'},
   // 쌍안경 — 비보시티 송파바쿠테 나무상자에서 나온다. 골라 들고 멀리 있는 걸 본다.
   binoc:{name:"쌍안경",
     svg:'<svg viewBox="0 0 24 24"><rect x="10.7" y="7.6" width="2.6" height="6.2" rx="1" fill="#3b4249"/><rect x="2.9" y="5.2" width="7.2" height="6" rx="2.4" fill="#2f353a"/><rect x="13.9" y="5.2" width="7.2" height="6" rx="2.4" fill="#2f353a"/><rect x="2.3" y="9.8" width="8.4" height="9.6" rx="3.4" fill="#23272b"/><rect x="13.3" y="9.8" width="8.4" height="9.6" rx="3.4" fill="#23272b"/><circle cx="6.5" cy="15.2" r="2.7" fill="#11151a"/><circle cx="17.5" cy="15.2" r="2.7" fill="#11151a"/><circle cx="5.6" cy="14.3" r="0.9" fill="#4a545e"/><circle cx="16.6" cy="14.3" r="0.9" fill="#4a545e"/></svg>'},
@@ -867,6 +870,26 @@ const MAPS = {
         action:{type:"mirror", needItem:"mirror", targetX:48.9, tol:2.6,
           scratch:"img/closeup/mirror_scratch.png",
           noItem:"반쪽만 남은 자국이라 읽을 수가 없다."} }},
+      // 우측 골동품 가판대 → 황동버튼 상자(GOTY 퍼즐, 거울 벽 힌트) → 크리스탈
+      // ★크리스탈은 나중에 "어딘가에 장착"하는 문제로 이어질 예정 (북쑥 2026-08-13)
+      { x:86,y:64, w:22,h:26, label:"골동품 가판대", closeup:{
+        img:"img/closeup/arab_stand.jpg", badge:"💍",
+        caption:"💍 골동품 가판대 앞에 낡은 상자가 놓여 있다.",
+        action:{type:"clue"},
+        subspots:[
+          { x:61,y:81, w:50,h:22, label:"낡은 상자", closeup:{
+            img:"img/closeup/arab_box.jpg", badge:"📦",
+            caption:"📦 황동 버튼 네 개가 박힌 낡은 상자다.",
+            action:{type:"picker", set:"goty", answer:["G","O","T","Y"],
+              success:"덜컥 — 상자가 열렸다.", setFlag:"arab_box",
+              prize:{ img:"img/closeup/arab_box_open.jpg", badge:"💎", label:"열린 상자",
+                caption:"상자가 열렸다.\n안에서 맑은 빛이 새어 나온다.",
+                action:{type:"clue"},
+                subspots:[
+                  { x:52,y:65, w:28,h:16, label:"크리스탈",
+                    give:{item:"crystal", success:"크리스탈 획득! 💎"} },
+                ] } } }},
+        ] }},
       // (카페 숫자퍼즐은 센토사로 이전 — 북쑥 2026-08-13)
     ],
     exits:[{to:"downtown", label:"중심지로", emoji:"🏙️", dir:"left"}]
@@ -1369,6 +1392,7 @@ const PICK_BLANK=`<svg viewBox="0 0 48 48"><path fill="none" stroke="#141414" st
    alpha: A로 시작해 알파벳 12자를 순서대로 돈다 (정답에 쓰는 A·S·G·P·R 포함)
    digit: 0000에서 시작해 누를 때마다 1씩 증가(9 다음 0) — 아랍 카페 4자리 */
 const ALPHA_KEYS = "ADEGKLMNPRST".split("");
+const GOTY_KEYS = "BGEOATSY".split("");   // 8글자 순환 — 정답 GOTY(거울 벽 퍼즐의 답)
 const DIGIT_KEYS = "0123456789".split("");
 const PICK_SETS = {
   food : { keys: PICK_ICONS.map(o=>o.k), start:-1,
@@ -1378,6 +1402,8 @@ const PICK_SETS = {
            html: i => `<span class="pickLetter">${ALPHA_KEYS[i]}</span>` },
   digit: { keys: DIGIT_KEYS, start:0,
            html: i => `<span class="pickLetter">${DIGIT_KEYS[i]}</span>` },
+  goty : { keys: GOTY_KEYS, start:0,
+           html: i => `<span class="pickLetter">${GOTY_KEYS[i]}</span>` },
 };
 const pickSet = a => PICK_SETS[a.set] || PICK_SETS.food;
 
