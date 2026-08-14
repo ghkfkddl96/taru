@@ -2421,15 +2421,22 @@ function maruPick(f){
       [{t:"다른 특징 고르기", fn:maruChoice}])}]);
 }
 function maruSuccess(){
-  maruOpen("img/closeup/maru_passport.jpg",
-    "✨ 뿅! 마지막 크리스탈이 눈부시게 빛나더니 —\n마루가 초록색 여권을 찾아왔다!",
-    [{t:"이거야…! 화랑이의 여권!!", fn:()=>{
-      if(!state.inv.includes("passport2")) state.inv.push("passport2");
-      state.flags.maru_done=true; save(); renderInv();
-      if(SFX.success)SFX.success(); vib([30,40,80]);
-      toast("화랑이의 여권 획득! 🛂✨");
-      maruThanks();
-    }}]);
+  // ★극적 연출 4비트 (북쑥 2026-08-15): 크리스탈 이변 → 여권 등장 → 화랑이 외침 → 마루 환호
+  maruOpen(MARU_IMG,
+    "✨ 마지막 크리스탈이 지금까지와는 다르게\n눈부시게 빛나기 시작한다…!",
+    [{t:"다음 ▶", fn:()=>maruOpen("img/closeup/maru_passport.jpg",
+      "뿅! — 마루가 초록색 물건을 들고 나타났다.\n🧸 \"어라…? 이번엔 뭔가 느낌이 달라!\"",
+      [{t:"다음 ▶", fn:()=>maruOpen("img/closeup/maru_passport.jpg",
+        "그때 — 옆에 있던 화랑이가 소리쳤다.\n😳 \"어!! 잠깐만요…\n그거, 제 여권이 맞는 것 같아요!!\"",
+        [{t:"다음 ▶", fn:()=>maruOpen("img/closeup/maru_passport.jpg",
+          "🧸 \"정말?! 드디어 찾았다!!\n자 — 이번엔 절대 잃어버리면 안 돼~!\"",
+          [{t:"🛂 여권 받기", fn:()=>{
+            if(!state.inv.includes("passport2")) state.inv.push("passport2");
+            state.flags.maru_done=true; save(); renderInv();
+            if(SFX.success)SFX.success(); vib([30,40,80]);
+            toast("화랑이의 여권 획득! 🛂✨");
+            maruThanks();
+          }}])}])}])}]);
 }
 function maruThanks(){
   maruOpen(MARU_IMG, "🧸 \"크리스탈 정말 고마워!\n덕분에 힘이 반짝반짝 넘쳐~\n여행 재밌게 해! 잘 가!\"", []);
