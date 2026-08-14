@@ -715,7 +715,7 @@ const MAPS = {
       // ★기념품 상점(북쑥 사진 2026-08-15) — 크리스탈⑥ = 동전 1개로 구매(자판기 동전의 사용처).
       { x:84,y:58, w:18,h:13, label:"기념품 상점", hideIf:"uv_shop_done", closeup:{
         img:"img/closeup/uv_shop.jpg", badge:"💎",
-        caption:"🛍️ 길가의 작은 기념품 좌판.\n벨벳 방석 위에 크리스탈이 놓여 있다.\n가격표엔… 동전 1개?",
+        caption:"🛍️ 길가의 작은 기념품 좌판.\n벨벳 방석 위에 크리스탈이 놓여 있다.\n가격표를 보니… 특별한 동전이 필요해 보인다!",
         action:{type:"clue"},
         subspots:[
           { x:35,y:52, w:46,h:20, label:"크리스탈",
@@ -735,17 +735,14 @@ const MAPS = {
   },
 
   /* 유니버설 안 — 동화 성 앞 분수 광장(북쑥 실사진 2026-08-14).
-     분수대 인형 = 크리스탈 수집가. 크리스탈을 주면 '원하는 물건 찾아주기' 마법(북쑥 기획):
-     여권을 직접 말하지 않고 특징(네모난 물건/초록색 물건…)을 보기로 골라도 계속 엉뚱한 걸
-     찾아오고, 마지막 크리스탈을 모아야 화랑이의 여권을 제대로 찾아준다.
-     ★오답 물건 사진·크리스탈 개수는 북쑥 대기 — 지금은 캐릭터 소개 팝업만. */
+     분수대 인형 = ★마루★ (북쑥 확정 2026-08-15). 크리스탈 1개당 '특징으로 물건 찾기' 마법 1회.
+     8특징 전부 오답(큐브/수박/부채/사전/트로피/액자/손거울/캐리어) —
+     6번째(마지막) 크리스탈을 쓸 때만 무엇을 고르든 화랑이의 여권(passport2)이 나온다.
+     구현 = maruTalk() 상태머신. 오답·여권 사진은 img/closeup/maru_*.jpg (북쑥 사진 오면 같은 이름으로 교체). */
   universalin:{
     name:"유니버설 안", sub:"동화 성 앞 분수 광장", photo:"img/universalin.jpg",
     hotspots:[
-      { x:50,y:72, w:30,h:26, label:"분수대의 인형", closeup:{
-        img:"img/closeup/universal_chara.jpg", badge:"🧸",
-        caption:"🧸 분수대에 앉은 신비한 인형이 말을 건다.\n\"난 반짝이는 크리스탈을 모으고 있어.\n크리스탈을 가져다주면 네가 찾는 물건을\n마법으로 찾아줄 수 있는데…!\"",
-        action:{type:"clue"} }},
+      { x:50,y:72, w:30,h:26, label:"분수대의 인형", maru:true },
     ],
     exits:[{to:"universal", label:"입구로", emoji:"🎡", dir:"left"}]
   },
@@ -1600,6 +1597,8 @@ function tap(h,id){
   }
   // ★goTo: 팝업 없이 즉시 맵 이동 (예: 열린 철문 → 경찰서 안. 이동연출 없음)
   if(h.goTo){ state.room=h.goTo; render(); return; }
+  // ★마루(유니버설 인형): 크리스탈 마법 대화 상태머신
+  if(h.maru){ maruTalk(); return; }
   const cu = h.closeup || toCloseup(h);
   if(cu.action && cu.action.type==="numlock" && h.needFlag && !state.flags[h.needFlag]){
     toast("먼저 다른 걸 해결해야 할 것 같아."); return; }
@@ -1636,6 +1635,7 @@ function openCloseup(cu, h, id){
   }
   if(cu.seenFlag && !state.flags[cu.seenFlag]){ state.flags[cu.seenFlag]=true; save(); }   // ★'봤음' 플래그 (석판 등)
   cuCtx={cu,h,id};
+  { const w9=$("#cuImgWrap"); if(w9) w9.style.maxHeight=""; }   // 마루 선택지 등에서 줄인 이미지 높이 원복
   const solved=!!state.done[id];
   const hasImg = cu.img && cu.img!=="TODO";
   const im=$("#cuImg"), ph=$("#cuPlaceholder");
@@ -2348,6 +2348,91 @@ function openInspect(key){
               action:{type:"clue"}} }},
       ]}, {label:"손전등"}, "item_flashlight");
   }
+}
+/* ---- 마루(유니버설 분수대 인형) 크리스탈 마법 (북쑥 기획 2026-08-15) ----
+   크리스탈 1개 = '특징으로 물건 찾기' 마법 1회. 8특징 전부 사실상 오답 —
+   6번째(마지막) 크리스탈을 쓰는 순간엔 무엇을 골라도 화랑이의 여권(passport2)이 나온다.
+   한 번 쓴 특징은 회색 비활성(6회 시도/8보기). 사진 = img/closeup/maru_*.jpg
+   (지금은 자리표시용 — 북쑥 사진 오면 같은 파일명으로 덮어쓰면 끝). */
+const MARU_IMG="img/closeup/universal_chara.jpg";
+const MARU_FEATURES=[   // wj = 오답 물건 이름(조사 포함)
+  {k:"cube",    label:"네모난 물건",        img:"maru_cube",    wj:"큐브를"},
+  {k:"melon",   label:"초록색 물건",        img:"maru_melon",   wj:"수박을"},
+  {k:"fan",     label:"펼쳐지는 물건",      img:"maru_fan",     wj:"부채를"},
+  {k:"stamp",   label:"도장이 찍혀 있는 물건", img:"maru_stamp",  wj:"편지봉투를"},
+  {k:"trophy",  label:"금색 무늬 물건",     img:"maru_trophy",  wj:"트로피를"},
+  {k:"frame",   label:"사진이 붙은 물건",   img:"maru_frame",   wj:"액자를"},
+  {k:"mirror",  label:"손바닥 크기 물건",   img:"maru_mirror",  wj:"손거울을"},
+  {k:"carrier", label:"여행 필수품",        img:"maru_carrier", wj:"캐리어를"},
+];
+const CRYSTAL_KEYS=["crystal","crystal2","crystal3","crystal4","crystal5","crystal6"];
+const MARU_NEED=6;   // 여권이 나오는 크리스탈 번째 수(=게임 내 크리스탈 총 개수)
+function maruState(){ if(!state.maru) state.maru={used:[],given:0}; return state.maru; }
+function maruCrystals(){ return state.inv.filter(k=>CRYSTAL_KEYS.includes(k)).length; }
+function maruOpen(img, caption, btns){   // openCloseup 후 버튼 주입 (done 마킹 안 하는 id 사용)
+  openCloseup({img:img, badge:"🧸", caption:caption, action:{type:"clue"}}, {label:"마루"}, "maru_talk_live");
+  const acts=$("#cuActions");
+  (btns||[]).forEach(b=>{ const el=document.createElement("button");
+    el.className="btn compact"; el.textContent=b.t; el.onclick=b.fn; acts.appendChild(el); });
+}
+function maruTalk(){
+  if(state.flags.maru_done){ maruThanks(); return; }
+  if(!state.flags.maru_intro){
+    maruOpen(MARU_IMG, "🧸 분수대에 앉아 있던 인형이\n폴짝 일어나더니 말을 건다.\n\"안녕! 나는 마루야.\"",
+      [{t:"다음 ▶", fn:()=>maruOpen(MARU_IMG,
+        "🧸 \"나에겐 특별한 능력이 있어!\n특징을 말해주면 그 물건을\n마법으로 찾아줄 수 있지.\"",
+        [{t:"다음 ▶", fn:()=>maruOpen(MARU_IMG,
+          "🧸 \"근데 그 능력을 쓰려면…\n특별한 힘을 가진 크리스탈이 필요해! 💎\"",
+          [{t:"다음 ▶", fn:()=>{ state.flags.maru_intro=true; save(); maruChoice(); }}])}])}]);
+    return;
+  }
+  maruChoice();
+}
+function maruChoice(){
+  const st=maruState();
+  maruOpen(MARU_IMG,
+    "🧸 \"그래서 — 원하는 물건은\n어떤 특징을 가졌어?\"\n(가진 크리스탈 💎 "+maruCrystals()+"개)", []);
+  $("#cuImgWrap").style.maxHeight="30%";   // 보기 8개가 가방 위로 다 보이게 이미지 축소
+  const acts=$("#cuActions");
+  const grid=document.createElement("div");
+  grid.style.cssText="display:grid;grid-template-columns:1fr 1fr;gap:7px;width:100%;max-width:330px;margin:0 auto;";
+  MARU_FEATURES.filter(f=>!st.used.includes(f.k)).forEach(f=>{   // 쓴 특징은 목록에서 아예 제거(북쑥)
+    const b=document.createElement("button");
+    b.className="btn compact"; b.style.margin="0"; b.style.fontSize="12.5px"; b.style.padding="9px 6px";
+    b.textContent=f.label;
+    b.onclick=()=>maruPick(f);
+    grid.appendChild(b);
+  });
+  acts.appendChild(grid);
+}
+function maruPick(f){
+  const st=maruState();
+  if(maruCrystals()<=0){ toast("🧸 \"특별한 힘을 가진 크리스탈이 필요해…!\""); return; }
+  const key=CRYSTAL_KEYS.find(k=>state.inv.includes(k));   // 크리스탈 1개 소모
+  state.inv=state.inv.filter(k=>k!==key); if(selected===key) selected=null;
+  st.given++; if(st.used.indexOf(f.k)<0) st.used.push(f.k);
+  save(); renderInv();
+  if(SFX.item)SFX.item(); vib([15,25,45]);
+  if(st.given>=MARU_NEED) maruSuccess();
+  else maruOpen("img/closeup/"+f.img+".jpg",
+    "✨ 뿅! 마루가 "+f.wj+" 찾아왔다!\n🧸 \"자, 원하는 물건이 맞아?\"",
+    [{t:"…", fn:()=>maruOpen("img/closeup/"+f.img+".jpg",
+      "🧸 \"이게 아니야…? 미안하지만\n새로운 크리스탈로 다른 특징을 골라줘!\"",
+      [{t:"다른 특징 고르기", fn:maruChoice}])}]);
+}
+function maruSuccess(){
+  maruOpen("img/closeup/maru_passport.jpg",
+    "✨ 뿅! 마지막 크리스탈이 눈부시게 빛나더니 —\n마루가 초록색 여권을 찾아왔다!",
+    [{t:"이거야…! 화랑이의 여권!!", fn:()=>{
+      if(!state.inv.includes("passport2")) state.inv.push("passport2");
+      state.flags.maru_done=true; save(); renderInv();
+      if(SFX.success)SFX.success(); vib([30,40,80]);
+      toast("화랑이의 여권 획득! 🛂✨");
+      maruThanks();
+    }}]);
+}
+function maruThanks(){
+  maruOpen(MARU_IMG, "🧸 \"크리스탈 정말 고마워!\n덕분에 힘이 반짝반짝 넘쳐~\n여행 재밌게 해! 잘 가!\"", []);
 }
 /* ---- 스마트폰 잠금해제 팝업 ---- */
 let phoneVal="";
