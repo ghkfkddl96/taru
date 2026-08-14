@@ -153,6 +153,10 @@
   .mirGlass.white{ background:#f5f6f6; }
   /* 철문 순서 퍼즐 램프 — 평소엔 안 보이고, 누를 때마다 초록/틀리면 빨강/완성 파랑 */
   .cu-togimg{ position:absolute; transform:translate(-50%,-50%); z-index:4; pointer-events:none; }
+  .cu-crcell{ position:absolute; transform:translate(-50%,-50%); z-index:4; cursor:pointer;
+    border-radius:8%; border:1px solid rgba(0,0,0,.35);
+    box-shadow:inset 0 2px 6px rgba(255,255,255,.35), inset 0 -2px 6px rgba(0,0,0,.3); opacity:.92; }
+  .cu-crcell:active{ transform:translate(-50%,-50%) scale(.94); }
   .cu-lamp{ position:absolute; transform:translate(-50%,-50%); border-radius:50%; z-index:5;
     pointer-events:none; opacity:0; transition:opacity .18s ease, box-shadow .18s ease; }
   .cu-lamp.green{ opacity:1; background:radial-gradient(circle, #7dff9a 0%, #2ecc5f 55%, rgba(46,204,95,0) 78%);
@@ -174,6 +178,8 @@
     display:flex; align-items:center; justify-content:center; cursor:pointer; }
   .pickLetter{ font-size:34px; font-weight:800; color:#2c2418; letter-spacing:1px;
     font-family:ui-monospace,"SF Mono",Menlo,monospace; line-height:1; }
+  .pickColor{ width:46px; height:46px; border-radius:9px; display:block;
+    border:2px solid rgba(0,0,0,.28); box-shadow:inset 0 2px 5px rgba(255,255,255,.45); }
   .pickCell svg, .pickCell img{ width:54px; height:54px; object-fit:contain; display:block; -webkit-user-drag:none; }
   .pickCell:active{ transform:scale(.93); }
   .pickCell.pop{ animation:pickPop .22s ease-out; }
@@ -467,6 +473,12 @@ const ITEMS = {
   // 크리스탈 3번째 — 라우파삿 기둥 찬장(꼬치 순서 5칸)에서. 인형 마법용 수집.
   crystal3:{name:"크리스탈",
     svg:'<svg viewBox="0 0 24 24"><g transform="rotate(10 12 12)"><path d="M12 1.6 L15 6 L15 18 L12 22.4 L9 18 L9 6 Z" fill="#dff0f6"/><path d="M12 1.6 L15 6 L12 8 Z" fill="#f6fcfe"/><path d="M12 1.6 L9 6 L12 8 Z" fill="#c6e3ee"/><path d="M9 6 L12 8 L12 22.4 L9 18 Z" fill="#cfe8f1"/><path d="M15 6 L12 8 L12 22.4 L15 18 Z" fill="#eef8fc"/><path d="M12 8 L12 22.4" stroke="#b9dcE8" stroke-width="0.5"/></g></svg>'},
+  // 용과 — 라우파삿 과일 가판대 상자(색판 4칸)에서. ★더블탭→하얀배경 팝업, 과일칼 골라 들고 누르면 잘림→크리스탈.
+  fruit:{name:"용과", inspect:"fruit",
+    svg:'<svg viewBox="0 0 24 24"><g transform="rotate(-10 12 12)"><path d="M12.2 6.2 Q13 3.4 16 2.4 Q15.6 5.6 13.6 7 Z" fill="#82b45c"/><path d="M6.4 9 Q4 7.6 3.4 4.8 Q6.6 5.6 7.8 7.8 Z" fill="#8fc46a"/><path d="M18 10.4 Q20.4 9.4 21.2 6.8 Q18 7 16.6 8.9 Z" fill="#8fc46a"/><path d="M5.2 15.4 Q2.8 15.2 1.4 13.2 Q4.4 12.6 6.2 13.8 Z" fill="#7cb85c"/><path d="M18.8 16.2 Q21.4 16.4 22.8 14.4 Q19.8 13.6 18 14.8 Z" fill="#7cb85c"/><path d="M8.4 20.6 Q6.8 22.6 4.4 22.8 Q5.6 20.2 7.4 19.2 Z" fill="#82b45c"/><path d="M15.6 20.8 Q17.2 22.8 19.6 22.8 Q18.4 20.2 16.6 19.2 Z" fill="#82b45c"/><ellipse cx="12" cy="13.4" rx="7.4" ry="7.9" fill="#dc3e7c"/><ellipse cx="9.7" cy="10.9" rx="2.3" ry="2.9" fill="#e75d92" opacity=".65"/></g></svg>'},
+  // 크리스탈 5번째 — 라우파삿 용과 속에서(과일칼로 자르면). 인형 마법용 수집. 디자인 동일, 각도만 다름.
+  crystal5:{name:"크리스탈",
+    svg:'<svg viewBox="0 0 24 24"><g transform="rotate(24 12 12)"><path d="M12 1.6 L15 6 L15 18 L12 22.4 L9 18 L9 6 Z" fill="#dff0f6"/><path d="M12 1.6 L15 6 L12 8 Z" fill="#f6fcfe"/><path d="M12 1.6 L9 6 L12 8 Z" fill="#c6e3ee"/><path d="M9 6 L12 8 L12 22.4 L9 18 Z" fill="#cfe8f1"/><path d="M15 6 L12 8 L12 22.4 L15 18 Z" fill="#eef8fc"/><path d="M12 8 L12 22.4" stroke="#b9dcE8" stroke-width="0.5"/></g></svg>'},
   // 입장 티켓 2번째 — ★입수처 북쑥 제작 예정. 유니버설 내부는 두 장(인원 2명) 있어야 입장.
   ticket2:{name:"입장 티켓",
     svg:'<svg viewBox="0 0 24 24"><g transform="rotate(8 12 12)"><rect x="2.6" y="7.4" width="18.8" height="9.2" rx="1.4" fill="#e0b83f"/><rect x="3.8" y="8.6" width="16.4" height="6.8" rx="0.8" fill="none" stroke="#8a6a1a" stroke-width="0.55"/><circle cx="12" cy="12" r="2.6" fill="#c99e2c"/><circle cx="12" cy="12" r="2.6" fill="none" stroke="#8a6a1a" stroke-width="0.5"/><path d="M10.6 11.1 q0.8-0.9 1.6-0.4 q0.9 0.4 1.7-0.1 M10.3 12.4 h3.4 M10.9 13.5 q1.1 0.6 2.2 0" stroke="#8a6a1a" stroke-width="0.45" fill="none"/><path d="M5 9.6 v5.6 M19 9.6 v5.6" stroke="#8a6a1a" stroke-width="0.4" stroke-dasharray="0.7 0.9"/></g></svg>'},
@@ -725,6 +737,33 @@ const MAPS = {
       { x:8,y:63, w:20,h:24, label:"꼬치 굽는 사람", closeup:{
         img:"img/closeup/laupasat_grill.jpg", badge:"🍢",
         caption:"🍢 화로 앞 아저씨가 꼬치를 굽고 있다.\n숯불 위에서 노릇노릇 익어간다…",
+        action:{type:"clue"} }},
+      // ★과일 가판대(북쑥 사진 2026-08-15) — 상자 색판 4칸 로테이션(빨→주→노→초→파랑→하늘), 정답 하·파·빨·주
+      //   (힌트 = 경찰서 무지개 창 ①②③④ 색). 열면 용과 → 가방에서 과일칼로 잘라 크리스탈⑤.
+      { x:63,y:49, w:18,h:14, label:"과일 가판대", hideIf:"lp_fruit_done", closeup:{
+        img:"img/closeup/lps_stall.jpg", badge:"🍈",
+        caption:"🍈 과일이 잔뜩 쌓인 가판대.\n한가운데에 낡은 나무 상자가 놓여 있다.",
+        action:{type:"clue"},
+        subspots:[
+          { x:47,y:72, w:54,h:24, label:"나무 상자",
+            closeup:{ img:"img/closeup/lps_box.jpg", badge:"📦",
+              caption:"📦 굳게 잠긴 나무 상자.\n빈 나무판 네 개와 ①②③④ 각인이 있다.\n어디서 본 순서 같은데…?",
+              action:{type:"crotate", answer:["하","파","빨","주"],
+                cells:[{x:25.7,y:78.2},{x:40.1,y:78.2},{x:59.9,y:78.2},{x:74.5,y:78.2}],
+                cellW:11.1, cellH:26.6,
+                success:"덜컥 — 상자가 열렸다!", setFlag:"lp_box",
+                prize:{ img:"img/closeup/lps_box_open.jpg", badge:"🍈", label:"열린 상자",
+                  caption:"상자 안 짚더미 위에\n처음 보는 분홍 과일이 놓여 있다…!",
+                  action:{type:"clue"},
+                  subspots:[
+                    { x:52,y:40, w:30,h:42, label:"용과",
+                      give:{item:"fruit", success:"용과 획득! 🍈", setFlag:"lp_fruit_done"} },
+                  ] } } } },
+        ] }},
+      // 용과까지 챙긴 뒤 — 상자 팝업 없이 코멘트만 (북쑥 지시: 볼일 끝)
+      { x:63,y:49, w:18,h:14, label:"과일 가판대", showIf:"lp_fruit_done", closeup:{
+        img:"img/closeup/lps_stall.jpg", badge:"🍈",
+        caption:"🍈 과일 가판대.\n더 이상 여기에 볼일은 없어 보인다.",
         action:{type:"clue"} }},
       // ★오른쪽 기둥의 낡은 찬장(북쑥 2026-08-14) — 나무판 5칸을 그릴 꼬치 순서(새우 파 은행 소 닭)로 → 크리스탈③
       { x:92,y:60, w:18,h:22, label:"기둥의 낡은 찬장", closeup:{
@@ -1651,6 +1690,9 @@ function openCloseup(cu, h, id){
   // ★닦기(비보시티 쇼윈도): 손수건 골라 들고 문지르면 먼지가 지워진다
   clearWipe();
   if(a.type==="wipe") buildWipe(a, id);
+  // ★색판 로테이션(라우파삿 과일 상자): 빈 나무판 위 색 오버레이, 탭마다 색 순환
+  clearCrotate();
+  if(a.type==="crotate") buildCrotate(a, id);
   // ★쌍안경 뷰: 검은 원 테두리 오버레이 (바깥 어둡고 안은 사진)
   { const w0=$("#cuImgWrap");
     if(w0){ w0.querySelectorAll(".cu-binoc").forEach(e=>e.remove());
@@ -1718,6 +1760,14 @@ const GOTY_KEYS = "BGEOATSY".split("");   // 8글자 순환 — 정답 GOTY(거�
 const DIGIT_KEYS = "0123456789".split("");
 // 꼬치 5종 아이콘 — 북쑥 라인아트 한 장(1408×768)을 5개로 잘라 투명화 (2026-08-14, 글자 → 그림 교체)
 const MTEN_KEYS = "EHIKLNOSVY".split("");   // 모스표 10글자와 동일 세트 — 경찰서 모스 상자(정답 LOVE)
+const CPANEL_COLORS = [   // 라우파삿 과일 상자 색판 — 로테이션 빨→주→노→초→파랑→하늘, 정답 하·파·빨·주(경찰서 무지개 창 ①②③④)
+  {k:"빨", c:"#e03131"},
+  {k:"주", c:"#f7862c"},
+  {k:"노", c:"#ffd43b"},
+  {k:"초", c:"#37b24d"},
+  {k:"파", c:"#1c6fe0"},
+  {k:"하", c:"#6fd0ff"},
+];
 const SKEWER_ICONS = [
   {k:"새우", img:"img/icon/sk_shrimp.png"},
   {k:"은행", img:"img/icon/sk_ginkgo.png"},
@@ -1733,6 +1783,8 @@ const PICK_SETS = {
            html: i => `<img src="${SKEWER_ICONS[i].img}" alt="${SKEWER_ICONS[i].k}" draggable="false">` },
   mten : { keys: MTEN_KEYS, start:0,
            html: i => `<span class="pickLetter">${MTEN_KEYS[i]}</span>` },
+  cpanel:{ keys: CPANEL_COLORS.map(o=>o.k), start:0,
+           html: i => `<span class="pickColor" style="background:${CPANEL_COLORS[i].c}"></span>` },
   alpha: { keys: ALPHA_KEYS, start:0,
            html: i => `<span class="pickLetter">${ALPHA_KEYS[i]}</span>` },
   digit: { keys: DIGIT_KEYS, start:0,
@@ -1979,6 +2031,45 @@ function togTap(i, a, id){
     if(a.prize) setTimeout(()=>openCloseup(a.prize, {label:a.prize.label||""}, id+"_prize"), 900);
   }
 }
+/* ---- 색판 로테이션 퍼즐 (라우파삿 과일 상자) ----
+   상자 이미지의 빈 나무판 4칸 위에 색 오버레이를 얹는다. 탭할 때마다 CPANEL_COLORS
+   순서(빨→주→노→초→파랑→하늘)로 순환, 시작은 전부 빨강. 4칸이 answer(키 배열)와
+   일치하는 순간 통과. 순서 없음, 리셋 없음(자유 순환) — 토글 퍼즐과 같은 규칙.
+   쓰는 법: action:{type:"crotate", answer:["하","파","빨","주"], cells:[{x,y}], cellW,cellH, success, setFlag, prize} */
+let crState=null;
+function clearCrotate(){ document.querySelectorAll("#cuImgWrap .cu-crcell").forEach(e=>e.remove()); crState=null; }
+function buildCrotate(a, id){
+  clearCrotate();
+  const wrap=$("#cuImgWrap"); if(!wrap) return;
+  const solved=!!state.done[id];
+  crState={ idx:a.cells.map((c,i)=> solved ? Math.max(0,CPANEL_COLORS.findIndex(o=>o.k===a.answer[i])) : 0),
+            lock:solved };
+  a.cells.forEach((c,i)=>{
+    const el=document.createElement("div"); el.className="cu-crcell";
+    el.style.left=c.x+"%"; el.style.top=c.y+"%";
+    el.style.width=(a.cellW||10)+"%"; el.style.height=(a.cellH||9)+"%";
+    el.style.background=CPANEL_COLORS[crState.idx[i]].c;
+    el.title=(i+1)+"번 색판";
+    el.onclick=(ev)=>{ ev.stopPropagation(); crTap(i, a, id); };
+    wrap.appendChild(el);
+  });
+}
+function crTap(i, a, id){
+  if(!crState || crState.lock || state.done[id]) return;
+  crState.idx[i]=(crState.idx[i]+1)%CPANEL_COLORS.length;
+  const cells=[...document.querySelectorAll("#cuImgWrap .cu-crcell")];
+  if(cells[i]) cells[i].style.background=CPANEL_COLORS[crState.idx[i]].c;
+  SFX.key(); vib(10);
+  if(crState.idx.map(x=>CPANEL_COLORS[x].k).join("")===a.answer.join("")){
+    crState.lock=true;
+    SFX.success(); vib([30,40,80]);
+    state.done[id]=true; if(a.setFlag) state.flags[a.setFlag]=true; save();
+    toast(a.success||"덜컥! 열렸다.");
+    $("#cuLockBadge").textContent="✅";
+    render();
+    if(a.prize) setTimeout(()=>openCloseup(a.prize, {label:a.prize.label||""}, id+"_prize"), 900);
+  }
+}
 let seqState=null;
 function clearSeq(){ document.querySelectorAll("#cuImgWrap .cu-seqzone, #cuImgWrap .cu-lamp").forEach(e=>e.remove()); seqState=null; }
 // lampColors용: 램프에 임의 색 점등 / 지우기 (인라인 스타일이 클래스보다 우선이라 반드시 지워야 red·blue가 보인다)
@@ -2185,6 +2276,26 @@ function openInspect(key){
     openCloseup({img:"img/closeup/morse_chart.jpg", badge:"📜",
       caption:"📜 모스부호 표.\n점(·)과 선(–)의 조합이 글자다.",
       action:{type:"clue"}}, {label:"모스부호 표"}, "item_morse");
+    return;
+  }
+  if(key==="fruit"){
+    // ★용과(라우파삿 과일 상자) — 과일칼을 '골라 든' 채 과일을 눌러야 잘린다. 크리스탈 꺼내면 용과는 사라짐.
+    openCloseup({img:"img/closeup/lps_fruit.jpg", badge:"🍈",
+      caption:"🍈 상자에서 나온 신기한 분홍 과일, 용과다.\n맛있어 보이지만… 먹으려면 과일칼이 필요할 것 같아.",
+      action:{type:"clue"},
+      subspots:[
+        { x:50,y:52, w:62,h:78, label:"용과",
+          needSel:{item:"knife",
+            no:"이대로는 못 먹겠는데… 잘 드는 칼이 있으면 좋을 텐데.",
+            pick:"가방에서 🔪과일칼을 골라 들고 잘라보자."},
+          closeup:{ img:"img/closeup/lps_fruit_cut.jpg", badge:"💎",
+            caption:"싹둑 — 과일 안에 크리스탈이 있다…!",
+            action:{type:"clue"},
+            subspots:[
+              { x:51,y:46, w:30,h:26, label:"크리스탈",
+                give:{item:"crystal5", success:"크리스탈 획득! 💎", remove:["fruit"]} },
+            ] } },
+      ]}, {label:"용과"}, "item_fruit");
     return;
   }
   if(key==="radio"){ openRadio(); } else if(key==="mirror"){
