@@ -1638,9 +1638,8 @@ function goTo(to){
     if(key==="ibis>room" && !state.flags.rm_story){ state.flags.rm_story=true; save(); showRmStory(); }
     return; }
   const tr = TRANSITIONS[key] || TRANSITIONS.default;
-  if(tr.transit && selected!=="card"){  // 버스·지하철은 교통카드를 골라야 탑승
-    if(selected) toast((ITEMS[selected]?.name||"그거")+"로는 대중교통을 탈 수 없어🥲");
-    else toast("교통카드를 선택해서 타야 해🥲");
+  if(tr.transit && !has("card")){  // 버스·지하철은 교통카드가 가방에 있으면 OK (선택 불필요 — 북쑥 2026-08-15)
+    toast("교통카드가 있어야 탈 수 있어🥲");
     return;
   }
   showTransition(tr, ()=>{ state.room=to; render();
