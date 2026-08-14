@@ -1242,6 +1242,8 @@ function showStory(i){
     ov.style.display="none"; curStory=STORY;
     if(storyDone){ const f=storyDone; storyDone=null; f(); return; }
     render(); return; }
+  // ★시내 첫 진입 스토리는 배경 = 시내 사진 (북쑥 2026-08-14. 나머지는 기본 하늘)
+  ov.style.backgroundImage = (curStory===DTSTORY) ? 'url("img/downtown.jpg")' : "";
   const s=curStory[i]; SFX.open();
   const last=i>=curStory.length-1;
   const media = s.img ? ('<img class="storyImg" src="'+s.img+'" alt="">')
