@@ -1633,13 +1633,20 @@ const PICK_BLANK=`<svg viewBox="0 0 48 48"><path fill="none" stroke="#141414" st
 const ALPHA_KEYS = "ADEGKLMNPRST".split("");
 const GOTY_KEYS = "BGEOATSY".split("");   // 8글자 순환 — 정답 GOTY(거울 벽 퍼즐의 답)
 const DIGIT_KEYS = "0123456789".split("");
-const SKEWER_KEYS = ["새우","은행","파","소","닭"];   // 로테이션 순서(북쑥 지정). 정답은 그릴 사진 순서 = 새우 파 은행 소 닭
+// 꼬치 5종 아이콘 — 북쑥 라인아트 한 장(1408×768)을 5개로 잘라 투명화 (2026-08-14, 글자 → 그림 교체)
+const SKEWER_ICONS = [
+  {k:"새우", img:"img/icon/sk_shrimp.png"},
+  {k:"은행", img:"img/icon/sk_ginkgo.png"},
+  {k:"파",   img:"img/icon/sk_leek.png"},
+  {k:"소",   img:"img/icon/sk_beef.png"},
+  {k:"닭",   img:"img/icon/sk_chicken.png"},
+];   // 로테이션 순서(북쑥 지정). 정답은 그릴 사진 순서 = 새우 파 은행 소 닭
 const PICK_SETS = {
   food : { keys: PICK_ICONS.map(o=>o.k), start:-1,
            html: i => i<0 ? PICK_BLANK
                           : `<img src="${PICK_ICONS[i].img}" alt="${PICK_ICONS[i].name}" draggable="false">` },
-  skewer:{ keys: SKEWER_KEYS, start:0,
-           html: i => `<span class="pickLetter" style="font-size:22px">${SKEWER_KEYS[i]}</span>` },
+  skewer:{ keys: SKEWER_ICONS.map(o=>o.k), start:0,
+           html: i => `<img src="${SKEWER_ICONS[i].img}" alt="${SKEWER_ICONS[i].k}" draggable="false">` },
   alpha: { keys: ALPHA_KEYS, start:0,
            html: i => `<span class="pickLetter">${ALPHA_KEYS[i]}</span>` },
   digit: { keys: DIGIT_KEYS, start:0,
