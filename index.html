@@ -1125,15 +1125,16 @@ const MAPS = {
   },
 
   supertree:{
-    name:"슈퍼트리 그로브", sub:"밤이면 불이 들어오는 인공나무 숲", photo:"img/supertree.jpg",
+    // (북쑥 2026-08-15) 새 사진 교체(구본=supertree_old_backup.jpg) + 핫스팟 = 북쑥 검은 표시 위치
+    name:"슈퍼트리 그로브", sub:"밤이면 불이 들어오는 인공나무 숲", photo:"img/supertree.jpg?v=2",
     hotspots:[
-      { x:50,y:40, w:72,h:38, label:"슈퍼트리", closeup:{
+      { x:54,y:29, w:75,h:37, label:"슈퍼트리", closeup:{
         anim:["tree_off","tree_red","tree_blue","tree_green","tree_blue","tree_green","tree_red","tree_green"], animMs:2000,
         badge:"🌳", caption:"",
         action:{type:"clue"} }},
       // ★덩굴 덮인 비석(북쑥 제작 2026-08-14) — 각인·덩굴 무늬 = 세로로 늘어난 2947 (폰 눕혀 비스듬히 보면 보임).
       //   힌트 = 바쿠테 등록기 명판 "Long Stone". 답 입력 = 바쿠테 금전등록기.
-      { x:50,y:82, w:40,h:18, label:"덩굴 덮인 비석", closeup:{
+      { x:27,y:68, w:25,h:17, label:"덩굴 덮인 비석", closeup:{
         img:"img/closeup/stree_slab.jpg", badge:"🪨",
         caption:"🪨 기둥 앞에 세워진 길쭉한 돌비석.\n덩굴과 홈이 뒤엉켜 묘한 무늬를 그리고 있다.",
         action:{type:"clue"} }},
