@@ -1086,7 +1086,7 @@ const MAPS = {
       // ★주의: marina.jpg는 세로가 매우 길어 아이폰(402×738)에선 y18~82%만 보인다 — 스팟은 이 범위 안에!
       // (북쑥 2026-08-15) marina.jpg 상단 하늘 20% 컷(원본=marina_precrop_backup.jpg) — 좌표는 새 이미지 기준 환산
       //   하단 상자: 같은 지점 유지 + 넓이 2.5배, 버튼 안 가리게
-      { x:84,y:66, w:35,h:20, label:"난간의 철제 상자", closeup:{
+      { x:84,y:72, w:35,h:20, label:"난간의 철제 상자", closeup:{   // (북쑥: 이동키 바로 위로 내림)
         img:"img/closeup/marina_box.jpg", badge:"🔩",
         caption:"🔩 난간에 붙은 낡은 철제 상자.\n네모난 블록 열두 개가 나란히 박혀 있다.",
         action:{type:"toggle", answer:"111110010011",
@@ -1142,13 +1142,14 @@ const MAPS = {
     hotspots:[
       // 좌측 중앙 — 꽃 일곱 송이 벽(좌→우: 빨·주·보·초·빨·노·하늘). 지금은 구경용 팝업.
       // ★나중에 빨주노초하늘보라 버튼 6개를 이 순서대로 누르는 퍼즐 예정(답=빨주보초빨노하늘, 북쑥 2026-08-12).
-      { x:16,y:48, w:28,h:24, label:"꽃 전시 벽", closeup:{
+      // (북쑥 2026-08-15: 가든 핫스팟 전부 1.5배+시각 정사각(h=w×0.667). 꽃벽은 약간 오른쪽으로)
+      { x:20,y:48, w:39,h:26, label:"꽃 전시 벽", closeup:{
         img:"img/closeup/garden_flowers.jpg", badge:"🌺",
         caption:"🌺 'Orchid Haven' — 형형색색 꽃 일곱 송이가\n벽에 줄지어 빛나고 있다.",
         action:{type:"clue"} }},
       // 우측하단 덩굴 터널 — 처음엔 캄캄. 켜진 손전등(건전지 필수)을 골라 들고
       // 검은 터널을 누르면 손전등 빛에 마루(석상)와 열쇠가 드러난다. 열쇠 클릭=즉시 획득.
-      { x:80,y:78, w:34,h:26, label:"덩굴 터널", hideIf:"tunnel_done", closeup:{
+      { x:80,y:78, w:45,h:30, label:"덩굴 터널", hideIf:"tunnel_done", closeup:{
         img:"img/closeup/garden_tunnel_dark.jpg", badge:"🕳️",
         caption:"🕳️ 덩굴로 뒤덮인 터널.\n어두워서 들어갈 수 없다.",
         action:{type:"clue"},
@@ -1169,13 +1170,13 @@ const MAPS = {
               ] } },
         ] }},
       // 열쇠를 가져간 뒤: 어두운 터널만, 볼일 없음 (북쑥 2026-08-13)
-      { x:80,y:78, w:34,h:26, label:"덩굴 터널", showIf:"tunnel_done", closeup:{
+      { x:80,y:78, w:45,h:30, label:"덩굴 터널", showIf:"tunnel_done", closeup:{
         img:"img/closeup/garden_tunnel_dark.jpg", badge:"✅",
         caption:"더 이상 여기에 볼일은 없어 보인다.",
         action:{type:"clue"} }},
       // ★우측상단 벽장(빌트인) — 색버튼 6개를 꽃벽 순서(빨주보초빨노하늘 7타)로 누르면 크리스탈② (북쑥 2026-08-14)
       //   버튼이 빽빽 → lampColors: 인디케이터에 누른 색이 그대로 뜬다. 램프 7개는 원근 따라 개별 실측(격자).
-      { x:82,y:24, w:26,h:20, label:"벽에 붙은 나무 벽장", closeup:{
+      { x:75,y:24, w:34,h:23, label:"벽에 붙은 나무 벽장", closeup:{   // (북쑥: 약간 중앙으로)
         img:"img/closeup/garden_cab.jpg", badge:"🚪",
         caption:"🚪 이끼 낀 벽에 박힌 작은 나무 벽장.\n색색 버튼 여섯 개 위로 화살표가 새겨져 있다.",
         action:{type:"seq", lampColors:true,
