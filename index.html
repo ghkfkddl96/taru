@@ -854,11 +854,13 @@ const MAPS = {
   },
 
   ibis:{
+    // 배경 = 곰돌이 컨시어지 리셉션(북쑥 AI생성, 2026-08-14 교체. 구사진=ibis_old_backup.jpg).
     name:"이비스 버짓 클락키", sub:"체크인하러 리셉션으로", photo:"img/ibis.jpg",
     hotspots:[
-      { x:62,y:52, w:46,h:34, label:"리셉션", closeup:{
-        img:"TODO", badge:"🛎️",
-        caption:"🛎️ 리셉션 직원에게 체크인!\n\"호텔 체크인을 하시려면 두 분의 여권이 모두 필요합니다.\"",
+      // 곰돌이 클릭 → 귀엽게 웃으며 응대하지만 멘트는 단호(여권 2개). ★확대 이미지(ibis_bear.jpg) 오면 img 교체 예정 — 지금은 전체 사진.
+      { x:47,y:50, w:44,h:40, label:"곰돌이 컨시어지", closeup:{
+        img:"img/ibis.jpg", badge:"🧸",
+        caption:"🧸 곰돌이 컨시어지가 귀엽게 웃으며 맞아준다.\n\"어서 오세요! …호텔 체크인을 하시려면\n두 분의 여권이 모두 필요합니다.\"",
         action:{type:"checkin",
           no:"\"호텔 체크인을 하시려면 두 분의 여권이 모두 필요합니다.\"",
           success:"체크인 완료! 방 열쇠를 받았다. 🔑\n이제 우리 방으로 올라가자.",
