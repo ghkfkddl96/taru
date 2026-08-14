@@ -1327,8 +1327,7 @@ const SFX={
   open(){ const t=actx()?.currentTime||0; _tone(520,.09,"sine",.12); _tone(790,.10,"sine",.07,t+.05); },
   key(){ _tone(680,.028,"square",.05); },
   lock(){ _noise(.08,.13); _tone(170,.08,"square",.10); },            // 자물쇠 철컥(열림)
-  success(){ try{confettiBurst();}catch(e){}   // ★재미요소: 성공 순간 이모지 폭죽 (롤백=이 줄 삭제)
-    const a=actx(); if(!a)return; const t=a.currentTime; [523,659,784,1047].forEach((f,i)=>_tone(f,.3,"sine",.15,t+i*.085)); vib([25,35,55]); },
+  success(){ const a=actx(); if(!a)return; const t=a.currentTime; [523,659,784,1047].forEach((f,i)=>_tone(f,.3,"sine",.15,t+i*.085)); vib([25,35,55]); },   // (성공 컨페티는 북쑥 지시로 제거 2026-08-15)
   item(){ const a=actx(); if(!a)return; const t=a.currentTime; [784,988,1319].forEach((f,i)=>_tone(f,.17,"triangle",.12,t+i*.05)); vib(28); },
   fail(){ const t=actx()?.currentTime||0; _tone(196,.18,"sawtooth",.13); _tone(150,.22,"sawtooth",.11,t+.06); vib(120); },
   move(){ const t=actx()?.currentTime||0; _tone(300,.13,"sine",.09); _tone(400,.13,"sine",.07,t+.07); },
