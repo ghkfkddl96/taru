@@ -444,6 +444,9 @@ const ITEMS = {
   // 크리스탈 2번째 — 가든 벽장(꽃벽 색순서 7타)에서. 인형 마법용 수집. 디자인은 crystal과 동일(북쑥 지시).
   crystal2:{name:"크리스탈",
     svg:'<svg viewBox="0 0 24 24"><g transform="rotate(-24 12 12)"><path d="M12 1.6 L15 6 L15 18 L12 22.4 L9 18 L9 6 Z" fill="#dff0f6"/><path d="M12 1.6 L15 6 L12 8 Z" fill="#f6fcfe"/><path d="M12 1.6 L9 6 L12 8 Z" fill="#c6e3ee"/><path d="M9 6 L12 8 L12 22.4 L9 18 Z" fill="#cfe8f1"/><path d="M15 6 L12 8 L12 22.4 L15 18 Z" fill="#eef8fc"/><path d="M12 8 L12 22.4" stroke="#b9dcE8" stroke-width="0.5"/></g></svg>'},
+  // 크리스탈 3번째 — 라우파삿 기둥 찬장(꼬치 순서 5칸)에서. 인형 마법용 수집.
+  crystal3:{name:"크리스탈",
+    svg:'<svg viewBox="0 0 24 24"><g transform="rotate(10 12 12)"><path d="M12 1.6 L15 6 L15 18 L12 22.4 L9 18 L9 6 Z" fill="#dff0f6"/><path d="M12 1.6 L15 6 L12 8 Z" fill="#f6fcfe"/><path d="M12 1.6 L9 6 L12 8 Z" fill="#c6e3ee"/><path d="M9 6 L12 8 L12 22.4 L9 18 Z" fill="#cfe8f1"/><path d="M15 6 L12 8 L12 22.4 L15 18 Z" fill="#eef8fc"/><path d="M12 8 L12 22.4" stroke="#b9dcE8" stroke-width="0.5"/></g></svg>'},
   // 입장 티켓 2번째 — ★입수처 북쑥 제작 예정. 유니버설 내부는 두 장(인원 2명) 있어야 입장.
   ticket2:{name:"입장 티켓",
     svg:'<svg viewBox="0 0 24 24"><g transform="rotate(8 12 12)"><rect x="2.6" y="7.4" width="18.8" height="9.2" rx="1.4" fill="#e0b83f"/><rect x="3.8" y="8.6" width="16.4" height="6.8" rx="0.8" fill="none" stroke="#8a6a1a" stroke-width="0.55"/><circle cx="12" cy="12" r="2.6" fill="#c99e2c"/><circle cx="12" cy="12" r="2.6" fill="none" stroke="#8a6a1a" stroke-width="0.5"/><path d="M10.6 11.1 q0.8-0.9 1.6-0.4 q0.9 0.4 1.7-0.1 M10.3 12.4 h3.4 M10.9 13.5 q1.1 0.6 2.2 0" stroke="#8a6a1a" stroke-width="0.45" fill="none"/><path d="M5 9.6 v5.6 M19 9.6 v5.6" stroke="#8a6a1a" stroke-width="0.4" stroke-dasharray="0.7 0.9"/></g></svg>'},
@@ -668,6 +671,19 @@ const MAPS = {
         img:"img/closeup/laupasat_grill.jpg", badge:"🍢",
         caption:"🍢 화로 앞 아저씨가 꼬치를 굽고 있다.\n숯불 위에서 노릇노릇 익어간다…",
         action:{type:"clue"} }},
+      // ★오른쪽 기둥의 낡은 찬장(북쑥 2026-08-14) — 나무판 5칸을 그릴 꼬치 순서(새우 파 은행 소 닭)로 → 크리스탈③
+      { x:92,y:60, w:14,h:20, label:"기둥의 낡은 찬장", closeup:{
+        img:"img/closeup/laupasat_cab.jpg", badge:"🗄️",
+        caption:"🗄️ 초록 기둥에 붙은 낡은 찬장.\n문짝에 네모난 나무판 다섯 개가 나란히 붙어 있다.",
+        action:{type:"picker", set:"skewer", answer:["새우","파","은행","소","닭"],
+          success:"덜컥 — 찬장 문이 열렸다.", setFlag:"lp_cab",
+          prize:{ img:"img/closeup/laupasat_cab_open.jpg", badge:"💎", label:"열린 찬장",
+            caption:"문이 열렸다.\n낡은 천 위에 크리스탈이 반짝인다…!",
+            action:{type:"clue"},
+            subspots:[
+              { x:48,y:62, w:30,h:28, label:"크리스탈",
+                give:{item:"crystal3", success:"크리스탈 획득! 💎"} },
+            ] } } }},
     ],
     exits:[{to:"downtown", label:"중심지로", emoji:"🏙️", dir:"left"}]
   },
@@ -1543,10 +1559,13 @@ const PICK_BLANK=`<svg viewBox="0 0 48 48"><path fill="none" stroke="#141414" st
 const ALPHA_KEYS = "ADEGKLMNPRST".split("");
 const GOTY_KEYS = "BGEOATSY".split("");   // 8글자 순환 — 정답 GOTY(거울 벽 퍼즐의 답)
 const DIGIT_KEYS = "0123456789".split("");
+const SKEWER_KEYS = ["새우","은행","파","소","닭"];   // 로테이션 순서(북쑥 지정). 정답은 그릴 사진 순서 = 새우 파 은행 소 닭
 const PICK_SETS = {
   food : { keys: PICK_ICONS.map(o=>o.k), start:-1,
            html: i => i<0 ? PICK_BLANK
                           : `<img src="${PICK_ICONS[i].img}" alt="${PICK_ICONS[i].name}" draggable="false">` },
+  skewer:{ keys: SKEWER_KEYS, start:0,
+           html: i => `<span class="pickLetter" style="font-size:22px">${SKEWER_KEYS[i]}</span>` },
   alpha: { keys: ALPHA_KEYS, start:0,
            html: i => `<span class="pickLetter">${ALPHA_KEYS[i]}</span>` },
   digit: { keys: DIGIT_KEYS, start:0,
