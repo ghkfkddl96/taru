@@ -294,6 +294,10 @@
   #intro #introText{ color:#fff; text-shadow:0 2px 12px rgba(0,0,0,.6); }
   #intro .deco{ opacity:.85; }
   /* 스토리 3페이지 (같은 하늘 배경) */
+  /* ★엔딩: 자고 일어나면 게임 UI(가방·이동버튼·반짝임)가 사라진다 — 현실 복귀 연출 */
+  #invWrap, #navbar{ transition:opacity 1.4s ease; }
+  body.worldBack #invWrap, body.worldBack #navbar{ opacity:0; pointer-events:none; }
+  body.worldBack .spot-dot{ display:none; }
   #story{ background:url("img/sky.jpg") center/cover no-repeat; }
   #story::before{ content:""; position:absolute; inset:0; background:rgba(12,22,45,.42); }
   .storyCard{ position:relative; z-index:1; background:rgba(255,255,255,.95); border-radius:24px; padding:30px 24px 24px; max-width:340px; width:100%; box-shadow:0 20px 50px rgba(0,0,0,.35); animation:pop .3s; }
@@ -1150,15 +1154,32 @@ const DTSTORY=[
   {emoji:"😱", text:"“어…? 분명히 여권을 챙겨 왔는데— 아무리 찾아도 안 보여요…!”"},
   {emoji:"🛂", text:"이것도 세상이 바뀐 탓일까, 화랑이의 여권이 감쪽같이 사라져버렸다. 호텔 체크인엔 두 사람의 여권이 꼭 필요한데… 이 도시 어딘가에 있을 거야. 찾으러 가자!"},
 ];
+/* ★방 입장 → 엔딩 스토리 (북쑥 승인 대본 2026-08-14. "바로 자는 연출") */
+const RMSTORY=[
+  {emoji:"🛏️", text:"정신없는 하루였다.\n온 세상이 방탈출로 변해버리다니…"},
+  {emoji:"🛂", text:"그래도 어떻게든 여권을 되찾고,\n무사히 체크인까지 해냈다."},
+  {emoji:"😌", text:"방탈출을 좋아하는 나로서는\n솔직히… 조금 재미있었다."},
+  {emoji:"😴", text:"그래도 역시 몸은 지쳤어.\n오늘은 어서 자야겠다.", btn:"잔다… 💤"},
+];
+const WAKESTORY=[
+  {emoji:"🌅", text:"…어라?"},
+  {emoji:"👀", text:"자물쇠도, 수수께끼 상자도,\n반짝이던 표시도… 전부 사라졌다."},
+  {emoji:"✨", text:"세상이 다시 돌아왔다!"},
+  {emoji:"🧳", text:"창밖엔 여느 때처럼 반짝이는 싱가포르.\n— 좋아, 이제 진짜 여행을 즐기러 가자!", btn:"여행을 즐기자! 🌅"},
+];
 let curStory=STORY;
+let storyDone=null;   // 스토리 세트가 끝났을 때 1회 실행할 콜백 (방 엔딩 연출용)
 function showStory(i){
   const ov=$("#story");
-  if(i>=curStory.length){ ov.style.display="none"; curStory=STORY; render(); return; }
+  if(i>=curStory.length){
+    ov.style.display="none"; curStory=STORY;
+    if(storyDone){ const f=storyDone; storyDone=null; f(); return; }
+    render(); return; }
   const s=curStory[i]; SFX.open();
   const last=i>=curStory.length-1;
   const media = s.img ? ('<img class="storyImg" src="'+s.img+'" alt="">')
                       : ('<div class="bigemoji">'+(s.emoji||"")+'</div>');
-  const btnLabel = last ? (curStory===STORY ? "여행 시작!" : "알겠어!") : "다음 ▶";
+  const btnLabel = s.btn || (last ? (curStory===STORY ? "여행 시작!" : "알겠어!") : "다음 ▶");
   ov.innerHTML='<div class="storyCard">'+media+
     (s.title ? '<h2>'+s.title+'</h2>' : '')+
     '<p>'+s.text+'</p>'+
@@ -1172,6 +1193,21 @@ function storyNext(i){
   showStory(i+1);
 }
 function showDtStory(){ curStory=DTSTORY; showStory(0); }
+function showRmStory(){ curStory=RMSTORY; storyDone=sleepSequence; showStory(0); }
+function showWakeStory(){ curStory=WAKESTORY; storyDone=showEnding; showStory(0); }
+/* ★자는 연출: 천천히 어두워짐 → (자는 사이 게임 UI가 스르륵 사라짐) → 아침처럼 밝아짐 → 기상 스토리 → 엔딩 */
+function sleepSequence(){
+  const f=$("#blackFade");
+  f.style.transition="opacity 1.8s ease"; f.style.pointerEvents="auto"; f.style.opacity="1";
+  setTimeout(function(){
+    document.body.classList.add("worldBack");   // 현실 복귀 — 가방·이동버튼·반짝임 제거
+    render();
+    setTimeout(function(){
+      f.style.opacity="0";
+      setTimeout(function(){ f.style.transition=""; f.style.pointerEvents="none"; showWakeStory(); }, 1900);
+    }, 1100);
+  }, 2000);
+}
 /* 검은 페이드 깜빡임 — 어두워졌다가 밝아지며 중간에 내용 전환 */
 function fadeBlink(mid){
   const f=$("#blackFade");
@@ -1340,7 +1376,10 @@ function goTo(to){
   if(to==="__ending"){ showEnding(); return; }
   const key=state.room+">"+to;
   if(key==="ibis>room"||key==="room>ibis"||key==="police>policein"||key==="policein>police"){
-    state.room=to; render(); return; }  // 같은 건물 내 이동은 즉시 (★선택아이템 유지)
+    state.room=to; render();  // 같은 건물 내 이동은 즉시 (★선택아이템 유지)
+    // ★방 첫 입장 → 바로 자는 연출로 이어지는 엔딩 스토리 (북쑥 2026-08-14)
+    if(key==="ibis>room" && !state.flags.rm_story){ state.flags.rm_story=true; save(); showRmStory(); }
+    return; }
   const tr = TRANSITIONS[key] || TRANSITIONS.default;
   if(tr.transit && selected!=="card"){  // 버스·지하철은 교통카드를 골라야 탑승
     if(selected) toast((ITEMS[selected]?.name||"그거")+"로는 대중교통을 탈 수 없어🥲");
@@ -2131,8 +2170,9 @@ function showEnding(){
   closeModal(); closeCloseupAll();
   const ov=document.createElement("div"); ov.className="overlay";
   ov.innerHTML=`
-    <div class="bigemoji">🏩</div>
-    <h1>이비스 버짓 클락키 도착! 💗</h1>
+    <div class="bigemoji">🌅</div>
+    <h1>세상이 다시 돌아왔다!</h1>
+    <p>이제 진짜 여행을 즐기자 💗</p>
     <p><b>[ 여기에 선물 힌트 ]</b><br>예) "침대 베개 밑을 확인해봐 🎁"</p>
     <p><b>[ 여기에 편지 ]</b><br><span style="font-size:13px;color:#9a8ba5">둘만 아는 이야기로 채우면 완성 💗</span></p>
     <button class="btn" style="max-width:220px" onclick="location.reload()">다시 보기</button>`;
