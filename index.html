@@ -1028,13 +1028,14 @@ const MAPS = {
     name:"송파 바쿠테", sub:"북적이는 맛집 실내 · 테이블을 눌러 음식을 구경해봐", photo:"img/bakkutteh.jpg",
     hotspots:[
       // 북쑥 지시(2026-08-10): 테이블·간판 두 개만 남김. 둘 다 나중에 방향키 문제의 힌트가 된다.
-      { x:26,y:79, w:34,h:16, label:"우리 테이블", closeup:{
+      // (북쑥 2026-08-15: 바쿠테 핫스팟 2배 + 계산대는 선풍기 아래로)
+      { x:26,y:79, w:48,h:23, label:"우리 테이블", closeup:{
         img:"img/closeup/bkt_soup_new.jpg", badge:"🍲",
         caption:"🍲 바쿠테 한 그릇.\n김이 모락모락… 맛있어 보인다.",
         action:{type:"clue"} }},
       // ★안쪽 계산대의 골동품 금전등록기(북쑥 2026-08-14) — 슈퍼트리 덩굴 숫자(2947) 입력 → 서랍에서 모스부호 표.
       //   위 놋쇠 명판의 점·선 각인 = LOVE 모스(내가 오버레이) — 해독해서 나중에 쓸 힌트.
-      { x:62,y:55, w:16,h:12, label:"안쪽 계산대", closeup:{
+      { x:11,y:48, w:23,h:17, label:"안쪽 계산대", closeup:{
         img:"img/closeup/bkt_reg.jpg", badge:"🧾",
         caption:"🧾 카운터의 골동품 금전등록기.\n위 놋쇠판에 흘림체로 뭔가 적혀 있다.\n금액 4자리를 입력할 수 있을 것 같다.",
         action:{type:"numlock", len:4, answer:"2947",
@@ -1046,7 +1047,7 @@ const MAPS = {
               { x:50,y:84, w:42,h:12, label:"접힌 종이",
                 give:{item:"morse", success:"모스부호 표 획득! 📜"} },
             ] } } }},
-      { x:78,y:44, w:26,h:14, label:"메뉴 간판", closeup:{
+      { x:78,y:44, w:37,h:20, label:"메뉴 간판", closeup:{
         img:"img/closeup/bkt_menu.jpg", badge:"🪵",
         caption:"🪵 나무판에 새긴 메뉴 간판이 벽에 걸려 있다.",
         action:{type:"clue"} }},
@@ -1074,7 +1075,7 @@ const MAPS = {
   },
 
   room:{
-    name:"우리 방", sub:"이비스 버짓 클락키 · 체크인 완료 💗", photo:"img/room.jpg",
+    name:"우리 방", sub:"이비스 버짓 클락키 · 체크인 완료 💗", photo:"img/room.jpg?v=2",
     // 침대·책상(선물힌트·편지 자리) 삭제 — 북쑥 2026-08-14. 방 = 엔딩 스토리 전용.
     hotspots:[
     ],
@@ -1402,18 +1403,19 @@ const DTSTORY=[
   {emoji:"🛂", text:"이것도 세상이 바뀐 탓일까, 화랑이의 여권이 감쪽같이 사라져버렸다. 호텔 체크인엔 두 사람의 여권이 꼭 필요한데… 이 도시 어딘가에 있을 거야. 찾으러 가자!"},
 ];
 /* ★방 입장 → 엔딩 스토리 (북쑥 승인 대본 2026-08-14. "바로 자는 연출") */
+// (북쑥 2026-08-15) 방 대사들 배경 = 우리방 사진(하늘 금지). 밝은 오버레이(bright)는 엔딩 사진 비트만.
 const RMSTORY=[
-  {emoji:"🛏️", text:"정신없는 하루였다.\n온 세상이 방탈출로 변해버리다니…"},
-  {emoji:"🛂", text:"그래도 어떻게든 여권을 되찾고,\n무사히 체크인까지 해냈다."},
-  {emoji:"😌", text:"방탈출을 좋아하는 나로서는\n솔직히… 조금 재미있었다."},
-  {emoji:"😴", text:"그래도 역시 몸은 지쳤어.\n오늘은 어서 자야겠다.", btn:"잔다… 💤"},
+  {emoji:"🛏️", text:"정신없는 하루였다.\n온 세상이 방탈출로 변해버리다니…", bg:"img/room.jpg?v=2"},
+  {emoji:"🛂", text:"그래도 어떻게든 여권을 되찾고,\n무사히 체크인까지 해냈다.", bg:"img/room.jpg?v=2"},
+  {emoji:"😌", text:"방탈출을 좋아하는 나로서는\n솔직히… 조금 재미있었다.", bg:"img/room.jpg?v=2"},
+  {emoji:"😴", text:"그래도 역시 몸은 지쳤어.\n오늘은 어서 자야겠다.", btn:"잔다… 💤", bg:"img/room.jpg?v=2"},
 ];
 const WAKESTORY=[
-  {emoji:"🌅", text:"…어라?"},
-  {emoji:"👀", text:"자물쇠도, 수수께끼 상자도,\n반짝이던 표시도… 전부 사라졌다."},
+  {emoji:"🌅", text:"…어라?", bg:"img/room.jpg?v=2"},
+  {emoji:"👀", text:"자물쇠도, 수수께끼 상자도,\n반짝이던 표시도… 전부 사라졌다.", bg:"img/room.jpg?v=2"},
   // ★이 대사부터 엔딩 사진 배경 + 하얀 페이드 전환 (북쑥 2026-08-15)
-  {emoji:"✨", text:"세상이 다시 돌아온 것 같아..!", bg:"img/ending.jpg", fade:true},
-  {emoji:"🧳", text:"창밖엔 여느 때처럼 반짝이는 싱가포르.\n— 좋아, 이제 진짜 여행을 즐기러 가자!", btn:"여행을 즐기자! 🌅", bg:"img/ending.jpg"},
+  {emoji:"✨", text:"세상이 다시 돌아온 것 같아..!", bg:"img/ending.jpg", fade:true, bright:true},
+  {emoji:"🧳", text:"창밖엔 여느 때처럼 반짝이는 싱가포르.\n— 좋아, 이제 진짜 여행을 즐기러 가자!", btn:"여행을 즐기자! 🌅", bg:"img/ending.jpg", bright:true},
 ];
 let curStory=STORY;
 let storyDone=null;   // 스토리 세트가 끝났을 때 1회 실행할 콜백 (방 엔딩 연출용)
@@ -1430,7 +1432,7 @@ function showStory(i){
   const wantBg = s.bg ? 'url("'+s.bg+'")' : ((curStory===DTSTORY) ? 'url("img/downtown.jpg")' : "");
   const paint = function(){
     ov.style.backgroundImage = wantBg;
-    ov.classList.toggle("brightBg", !!s.bg);   // 엔딩 사진일 땐 어둡기 오버레이 약하게
+    ov.classList.toggle("brightBg", !!s.bright);   // 밝은 오버레이는 엔딩 사진 비트만 (방 사진은 기본 어둡기)
     SFX.open();
     const media = s.img ? ('<img class="storyImg" src="'+s.img+'" alt="">')
                         : ('<div class="bigemoji">'+(s.emoji||"")+'</div>');
