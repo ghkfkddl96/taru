@@ -629,10 +629,11 @@ const MAPS = {
         img:"img/goodsshop.jpg", badge:"🎁",
         caption:"🎁 아기자기한 창이 기념품 가게.", action:{type:"clue"},
         subspots:[
-          {x:22,y:80,w:30,h:28,label:"인형 진열대", closeup:{
+          // (북쑥 2026-08-15: 서브스팟 넓이 2배 확대 — w,h ×1.4)
+          {x:23,y:78,w:42,h:38,label:"인형 진열대", closeup:{
             img:"img/dolls.jpg", badge:"🧸",
             caption:"🧸 귀여운 인형들이 많이 있다! 🐰🐱🦁🐘🐻\n경찰복 입은 애들 너무 귀엽다 💙", action:{type:"clue"} }},
-          {x:63,y:13,w:17,h:19,label:"벽에 걸린 시계", closeup:{
+          {x:63,y:15,w:24,h:26,label:"벽에 걸린 시계", closeup:{
             img:"img/closeup/clock.jpg", badge:"🕰️",
             caption:"🕰️ 로마숫자 벽시계.\n바늘이 헐겁게 달려 있어 — 눌러서 돌릴 수 있겠는데?",
             action:{type:"clock", hour:5, minute:1, second:8,
