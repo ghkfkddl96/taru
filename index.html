@@ -231,6 +231,17 @@
     font-size:13.5px; font-weight:600; opacity:0; transition:.3s; z-index:40; pointer-events:none; max-width:80%; text-align:center; }
   #toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
 
+  /* ★엔딩 GAME CLEAR — 무지개 반짝 글자 + 폭죽 이모지 (북쑥 2026-08-15 "낭낭하게") */
+  .gc-title{ font-size:42px; font-weight:900; letter-spacing:1px; line-height:1.1; margin:6px 0 2px;
+    font-style:italic; text-shadow:none;
+    background:linear-gradient(90deg,#ffd75e,#ff6b9d,#8ec5ff,#7ee0a3,#ffd75e); background-size:300% 100%;
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    animation:gcShine 2.4s linear infinite, gcPop .8s cubic-bezier(.2,1.7,.4,1) both; }
+  @keyframes gcShine{ 0%{background-position:0% 0} 100%{background-position:300% 0} }
+  @keyframes gcPop{ 0%{transform:scale(.2) rotate(-6deg); opacity:0} 60%{transform:scale(1.12) rotate(2deg)} 100%{transform:scale(1) rotate(0)} }
+  .gcConf{ position:absolute; font-size:27px; pointer-events:none;
+    filter:drop-shadow(0 3px 6px rgba(0,0,0,.25)); animation:floaty 3s ease-in-out infinite; }
+
   /* ★화이트 플래시 — 크리스탈 마법으로 물건이 '뿅' 나올 때 화면 전체가 하얗게 번쩍 (북쑥 2026-08-15) */
   #flash{ position:absolute; inset:0; background:#fff; opacity:0; pointer-events:none; z-index:80; display:none; }
   #flash.go{ display:block; animation:flashfx .75s ease-out forwards; }
@@ -1022,7 +1033,8 @@ const MAPS = {
       // ★난간의 철제 정비함(북쑥 2026-08-14) — 12칸 블록을 스카이파크 창문 배열(■■■■■□□■□□■■)대로 누르면 → 손수건
       //   이미지 = 북쑥 AI생성(빈판+엇갈림 샘플) 좌우반전 후 12칸 재합성. 눌림 = marina_press.png 오버레이(같은 사진서 크롭).
       // ★주의: marina.jpg는 세로가 매우 길어 아이폰(402×738)에선 y18~82%만 보인다 — 스팟은 이 범위 안에!
-      { x:84,y:79, w:22,h:12, label:"난간의 철제 상자", closeup:{
+      // (QA 2026-08-15) y79→73: 방향버튼·가방에 64% 가려지던 것을 물가 난간 라인 위로 이동
+      { x:84,y:73, w:22,h:10, label:"난간의 철제 상자", closeup:{
         img:"img/closeup/marina_box.jpg", badge:"🔩",
         caption:"🔩 난간에 붙은 낡은 철제 상자.\n네모난 블록 열두 개가 나란히 박혀 있다.",
         action:{type:"toggle", answer:"111110010011",
@@ -2319,8 +2331,9 @@ function openInspect(key){
             caption:"싹둑 — 과일 안에 크리스탈이 있다…!",
             action:{type:"clue"},
             subspots:[
+              // ★크리스탈 챙기면 용과·과일칼 둘 다 가방에서 정리 (북쑥 QA 지시 2026-08-15 — 쓸모 끝난 물건 잔존 금지)
               { x:51,y:46, w:30,h:26, label:"크리스탈",
-                give:{item:"crystal5", success:"크리스탈 획득! 💎", remove:["fruit"]} },
+                give:{item:"crystal5", success:"크리스탈 획득! 💎\n(다 쓴 과일칼은 정리했다)", remove:["fruit","knife"]} },
             ] } },
       ]}, {label:"용과"}, "item_fruit");
     return;
@@ -2667,16 +2680,28 @@ window.addEventListener("popstate", function(){
   }
 });
 
-/* ---- 엔딩(임시 placeholder) ---- */
+/* ---- 엔딩 GAME CLEAR (북쑥 2026-08-15 "화려하게 축하 낭낭") ---- */
 function showEnding(){
   closeModal(); closeCloseupAll();
   const ov=document.createElement("div"); ov.className="overlay";
   ov.innerHTML=`
-    <div class="bigemoji">🌅</div>
+    <span class="gcConf" style="top:8%;left:10%;animation-delay:.1s">🎊</span>
+    <span class="gcConf" style="top:12%;right:12%;animation-delay:.6s">🎉</span>
+    <span class="gcConf" style="top:26%;left:6%;animation-delay:1.1s">✨</span>
+    <span class="gcConf" style="top:30%;right:7%;animation-delay:.3s">💗</span>
+    <span class="gcConf" style="top:48%;left:9%;animation-delay:.8s">🎈</span>
+    <span class="gcConf" style="top:52%;right:10%;animation-delay:1.4s">✨</span>
+    <span class="gcConf" style="bottom:20%;left:14%;animation-delay:.5s">🎉</span>
+    <span class="gcConf" style="bottom:16%;right:14%;animation-delay:1.0s">🎊</span>
+    <span class="gcConf" style="bottom:34%;left:4%;animation-delay:1.6s">🌟</span>
+    <span class="gcConf" style="bottom:36%;right:4%;animation-delay:.2s">🌟</span>
+    <div class="bigemoji">🏆</div>
+    <div class="gc-title">GAME CLEAR!!</div>
     <h1>세상이 다시 돌아왔다!</h1>
-    <p>이제 진짜 여행을 즐기자 💗</p>
+    <p>싱가포르 여행 대소동 — 탈출 성공! 🎉<br>여권도 되찾았고, 체크인도 끝!<br>이제 진짜 여행을 즐기자 💗</p>
     <button class="btn" style="max-width:220px" onclick="location.reload()">다시 보기</button>`;
   $("#app").appendChild(ov);
+  if(SFX.success)SFX.success(); vib([40,60,120]);
 }
 </script>
 </body>
