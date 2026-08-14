@@ -2671,7 +2671,8 @@ function solveCloseup(a){
     render(); return;
   }
   closeCloseupAll();
-  showModal("🎉","성공!",a.success||"해결했다!");
+  // ★성공 모달: 폭죽 이모지 대신 '열린 자물쇠' 아이콘 + "잠금 해제!" (북쑥 2026-08-15 — 방탈출 몰입감)
+  showModal(UNLOCK_ICON,"잠금 해제!",a.success||"해결했다!");
   render();
 }
 
@@ -2732,6 +2733,15 @@ function submitLock(){
 }
 
 /* ---- 모달 ---- */
+/* ★열린 자물쇠 아이콘 (방탈출 성공 모달용 — 폭죽 이모지 대체, 북쑥 2026-08-15) */
+const UNLOCK_ICON='<svg viewBox="0 0 24 24" style="width:62px;height:62px;display:block;margin:0 auto;">'+
+  '<path d="M14.5 10 V7.2 a3.5 3.5 0 0 1 7 0 V9" fill="none" stroke="#b08d3f" stroke-width="1.9" stroke-linecap="round"/>'+
+  '<rect x="4.2" y="10" width="12.6" height="10.4" rx="2.4" fill="#e6b54c"/>'+
+  '<rect x="4.2" y="10" width="12.6" height="3.2" rx="1.6" fill="#f2cd74"/>'+
+  '<circle cx="10.5" cy="14.8" r="1.7" fill="#8a6a1a"/>'+
+  '<rect x="9.8" y="15.6" width="1.4" height="2.9" rx="0.7" fill="#8a6a1a"/>'+
+  '<path d="M20.8 12.6 l.5 1.1 1.1.5 -1.1.5 -.5 1.1 -.5-1.1 -1.1-.5 1.1-.5 Z" fill="#ffd97d"/>'+
+  '<path d="M2.4 6.8 l.4.9.9.4 -.9.4 -.4.9 -.4-.9 -.9-.4 .9-.4 Z" fill="#ffd97d"/></svg>';
 function showModal(emoji,title,text,btn){
   $("#modal").innerHTML=`
     <div id="modalEmoji">${emoji}</div>
