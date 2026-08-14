@@ -152,6 +152,7 @@
   /* 거울 아이템 더블탭 팝업 — 유리는 하얗고, 긁힌 자국(모음)만 보인다 */
   .mirGlass.white{ background:#f5f6f6; }
   /* 철문 순서 퍼즐 램프 — 평소엔 안 보이고, 누를 때마다 초록/틀리면 빨강/완성 파랑 */
+  .cu-togimg{ position:absolute; transform:translate(-50%,-50%); z-index:4; pointer-events:none; }
   .cu-lamp{ position:absolute; transform:translate(-50%,-50%); border-radius:50%; z-index:5;
     pointer-events:none; opacity:0; transition:opacity .18s ease, box-shadow .18s ease; }
   .cu-lamp.green{ opacity:1; background:radial-gradient(circle, #7dff9a 0%, #2ecc5f 55%, rgba(46,204,95,0) 78%);
@@ -448,6 +449,9 @@ const ITEMS = {
   // 크리스탈 2번째 — 가든 벽장(꽃벽 색순서 7타)에서. 인형 마법용 수집. 디자인은 crystal과 동일(북쑥 지시).
   crystal2:{name:"크리스탈",
     svg:'<svg viewBox="0 0 24 24"><g transform="rotate(-24 12 12)"><path d="M12 1.6 L15 6 L15 18 L12 22.4 L9 18 L9 6 Z" fill="#dff0f6"/><path d="M12 1.6 L15 6 L12 8 Z" fill="#f6fcfe"/><path d="M12 1.6 L9 6 L12 8 Z" fill="#c6e3ee"/><path d="M9 6 L12 8 L12 22.4 L9 18 Z" fill="#cfe8f1"/><path d="M15 6 L12 8 L12 22.4 L15 18 Z" fill="#eef8fc"/><path d="M12 8 L12 22.4" stroke="#b9dcE8" stroke-width="0.5"/></g></svg>'},
+  // 손수건 — 마리나 난간 정비함(12칸 토글)에서. 더러운 유리 닦기 기믹에 사용 예정(닦을 대상 북쑥 미정).
+  hankie:{name:"손수건",
+    svg:'<svg viewBox="0 0 24 24"><g transform="rotate(-6 12 12)"><rect x="3.5" y="7" width="17" height="10.5" rx="1.2" fill="#f7f7f4"/><rect x="3.5" y="7" width="17" height="3.2" rx="1.2" fill="#ffffff"/><path d="M3.5 10.4 h17 M3.5 13.2 h17" stroke="#e3e3db" stroke-width="0.7"/><circle cx="17.2" cy="14.8" r="1.05" fill="#f2a7c3"/><circle cx="16.2" cy="14.1" r="0.5" fill="#f6c1d4"/><circle cx="18.2" cy="14.1" r="0.5" fill="#f6c1d4"/><circle cx="17.2" cy="13.6" r="0.5" fill="#f6c1d4"/><path d="M17.2 15.8 q-0.5 0.9 -1.3 1.2" stroke="#7fae7d" stroke-width="0.5" fill="none"/></g></svg>'},
   // 크리스탈 3번째 — 라우파삿 기둥 찬장(꼬치 순서 5칸)에서. 인형 마법용 수집.
   crystal3:{name:"크리스탈",
     svg:'<svg viewBox="0 0 24 24"><g transform="rotate(10 12 12)"><path d="M12 1.6 L15 6 L15 18 L12 22.4 L9 18 L9 6 Z" fill="#dff0f6"/><path d="M12 1.6 L15 6 L12 8 Z" fill="#f6fcfe"/><path d="M12 1.6 L9 6 L12 8 Z" fill="#c6e3ee"/><path d="M9 6 L12 8 L12 22.4 L9 18 Z" fill="#cfe8f1"/><path d="M15 6 L12 8 L12 22.4 L15 18 Z" fill="#eef8fc"/><path d="M12 8 L12 22.4" stroke="#b9dcE8" stroke-width="0.5"/></g></svg>'},
@@ -875,7 +879,26 @@ const MAPS = {
     // 배경 = 북쑥 실사진(2026-08-13 교체). 팝업 전부 삭제(북쑥 지시) — 구경만 하는 맵.
     name:"마리나베이 샌즈", sub:"배 모양 옥상 아래를 걸어봐", photo:"img/marina.jpg",
     hotspots:[
-      // 스카이파크(배 옥상) — 쌍안경 골라 들고 봐야 확대뷰 (돔과 동일 패턴). 힌트 용도는 북쑥 미정.
+      // ★난간의 철제 정비함(북쑥 2026-08-14) — 12칸 블록을 스카이파크 창문 배열(■■■■■□□■□□■■)대로 누르면 → 손수건
+      //   이미지 = 북쑥 AI생성(빈판+엇갈림 샘플) 좌우반전 후 12칸 재합성. 눌림 = marina_press.png 오버레이(같은 사진서 크롭).
+      { x:62,y:85, w:22,h:10, label:"난간의 철제 상자", closeup:{
+        img:"img/closeup/marina_box.jpg", badge:"🔩",
+        caption:"🔩 난간에 붙은 낡은 철제 상자.\n네모난 블록 열두 개가 나란히 박혀 있다.",
+        action:{type:"toggle", answer:"111110010011",
+          sprite:"img/closeup/marina_press.png",
+          cells:[{x:17.59,y:62.43},{x:23.48,y:62.43},{x:29.37,y:62.43},{x:35.26,y:62.43},
+                 {x:41.16,y:62.43},{x:47.05,y:62.43},{x:52.95,y:62.43},{x:58.84,y:62.43},
+                 {x:64.73,y:62.43},{x:70.63,y:62.43},{x:76.52,y:62.43},{x:82.41,y:62.43}],
+          cellW:5.89, cellH:5.25,
+          success:"철컥! 걸쇠가 풀리며 뚜껑이 들렸다.", setFlag:"mb_box",
+          prize:{ img:"img/closeup/marina_box_open.jpg", badge:"🤍", label:"열린 정비함",
+            caption:"뚜껑이 위로 들렸다.\n안에 곱게 접힌 손수건이 놓여 있다.",
+            action:{type:"clue"},
+            subspots:[
+              { x:46,y:66, w:34,h:18, label:"손수건",
+                give:{item:"hankie", success:"손수건 획득! 🤍"} },
+            ] } } }},
+      // 스카이파크(배 옥상) — 쌍안경 골라 들고 봐야 확대뷰 (돔과 동일 패턴). 힌트 = 창문 배열(12칸 답).
       { x:50,y:35, w:56,h:11, label:"스카이파크",
         needSel:{item:"binoc",
           no:"옥상 쪽에 뭔가 보이는 것 같은데… 너무 멀다.",
@@ -1533,6 +1556,9 @@ function openCloseup(cu, h, id){
   // ★순서 누르기(철문): 동물 클릭영역 + 램프
   clearSeq();
   if(a.type==="seq") buildSeq(a, id);
+  // ★12칸 토글(마리나 정비함): 블록 누르면 들어가고/나오고, 패턴 일치 순간 통과
+  clearToggle();
+  if(a.type==="toggle") buildToggle(a, id);
   // ★쌍안경 뷰: 검은 원 테두리 오버레이 (바깥 어둡고 안은 사진)
   { const w0=$("#cuImgWrap");
     if(w0){ w0.querySelectorAll(".cu-binoc").forEach(e=>e.remove());
@@ -1742,6 +1768,49 @@ function buildMirrorView(a){
    틀리면 전부 빨갛게 번쩍인 뒤 꺼지며 처음부터. 다 맞으면 파랗게 빛나며 달칵.
    쓰는 법: action:{type:"seq", answer:["sparrow",...], zones:[{k,x,y,w,h,label}],
             lamps:[{x,y}], lampW, lampH, success, setFlag} */
+/* ---- 12칸 토글 퍼즐 (마리나 난간 정비함) ----
+   블록을 누르면 눌린 모습(marina_press.png 오버레이)으로 들어가고, 다시 누르면 나온다.
+   현재 패턴이 answer("1"=눌림)와 일치하는 순간 통과. 순서 없음, 리셋 없음(자유 토글).
+   쓰는 법: action:{type:"toggle", answer:"111110010011", sprite, cells:[{x,y}], cellW,cellH, success, setFlag, prize} */
+let togState=null;
+function clearToggle(){ document.querySelectorAll("#cuImgWrap .cu-togzone, #cuImgWrap .cu-togimg").forEach(e=>e.remove()); togState=null; }
+function buildToggle(a, id){
+  clearToggle();
+  const wrap=$("#cuImgWrap"); if(!wrap) return;
+  const solved=!!state.done[id];
+  togState={ on:(solved ? a.answer.split("").map(c=>c==="1") : a.cells.map(()=>false)), lock:solved };
+  a.cells.forEach((c,i)=>{
+    const im=document.createElement("img"); im.className="cu-togimg"; im.src=a.sprite; im.draggable=false;
+    im.style.left=c.x+"%"; im.style.top=c.y+"%";
+    im.style.width=(a.cellW||6)+"%"; im.style.height=(a.cellH||5.5)+"%";
+    im.style.display=togState.on[i]?"block":"none";
+    wrap.appendChild(im);
+    const el=document.createElement("div"); el.className="spot-dot cu-togzone"+(DEBUG?"":" nohint");
+    el.style.left=c.x+"%"; el.style.top=c.y+"%";
+    el.style.width=(a.cellW||6)+"%"; el.style.height=((a.cellH||5.5)+2)+"%";
+    el.title=(i+1)+"번 블록";
+    el.onclick=(ev)=>{ ev.stopPropagation(); togTap(i, a, id); };
+    wrap.appendChild(el);
+  });
+}
+function togTap(i, a, id){
+  if(!togState || togState.lock || state.done[id]) return;
+  togState.on[i]=!togState.on[i];
+  const imgs=[...document.querySelectorAll("#cuImgWrap .cu-togimg")];
+  if(imgs[i]) imgs[i].style.display=togState.on[i]?"block":"none";
+  SFX.key(); vib(10);
+  const cur=togState.on.map(b=>b?"1":"0").join("");
+  if(cur===a.answer){
+    togState.lock=true;
+    SFX.success(); vib([30,40,80]);
+    state.done[id]=true; if(a.setFlag) state.flags[a.setFlag]=true; save();
+    toast(a.success||"덜컥! 열렸다.");
+    document.querySelectorAll("#cuImgWrap .cu-togzone").forEach(e=>e.remove());
+    $("#cuLockBadge").textContent="✅";
+    render();
+    if(a.prize) setTimeout(()=>openCloseup(a.prize, {label:a.prize.label||""}, id+"_prize"), 900);
+  }
+}
 let seqState=null;
 function clearSeq(){ document.querySelectorAll("#cuImgWrap .cu-seqzone, #cuImgWrap .cu-lamp").forEach(e=>e.remove()); seqState=null; }
 // lampColors용: 램프에 임의 색 점등 / 지우기 (인라인 스타일이 클래스보다 우선이라 반드시 지워야 red·blue가 보인다)
