@@ -1027,7 +1027,7 @@ const MAPS = {
           { x:61,y:81, w:50,h:22, label:"낡은 상자", closeup:{
             img:"img/closeup/arab_box.jpg", badge:"📦",
             caption:"📦 황동 버튼 네 개가 박힌 낡은 상자다.",
-            action:{type:"picker", set:"goty", answer:["G","O","T","Y"],
+            action:{type:"picker", set:"goty", answer:["G","O","T","Y"], needItem:"mirror",
               success:"덜컥 — 상자가 열렸다.", setFlag:"arab_box",
               prize:{ img:"img/closeup/arab_box_open.jpg", badge:"💎", label:"열린 상자",
                 caption:"상자가 열렸다.\n안에서 맑은 빛이 새어 나온다.",
@@ -1911,6 +1911,9 @@ function cyclePick(i, a, id){
   if(c){ c.innerHTML=S.html(pickSel[i]); c.classList.remove("pop"); void c.offsetWidth; c.classList.add("pop"); }
   SFX.key(); vib(6);
   const ok = (a.answer||[]).every((k,j)=> pickSel[j]>=0 && S.keys[pickSel[j]]===k);
+  // ★needItem: 이 아이템이 가방에 없으면 정답을 맞춰도 오답처럼 조용히 지나간다
+  //   (예: 아랍 GOTY 상자 = 거울 없이 우연히 GOTY를 맞춰도 안 열림 — 북쑥 2026-08-14)
+  if(ok && a.needItem && !has(a.needItem)) return;
   if(ok){ state.done[id]=true; setTimeout(()=>solveCloseup(a), 380); }
 }
 
