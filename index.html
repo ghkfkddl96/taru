@@ -231,6 +231,11 @@
     font-size:13.5px; font-weight:600; opacity:0; transition:.3s; z-index:40; pointer-events:none; max-width:80%; text-align:center; }
   #toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
 
+  /* ★화이트 플래시 — 크리스탈 마법으로 물건이 '뿅' 나올 때 화면 전체가 하얗게 번쩍 (북쑥 2026-08-15) */
+  #flash{ position:absolute; inset:0; background:#fff; opacity:0; pointer-events:none; z-index:80; display:none; }
+  #flash.go{ display:block; animation:flashfx .75s ease-out forwards; }
+  @keyframes flashfx{ 0%{opacity:0} 10%{opacity:1} 26%{opacity:1} 100%{opacity:0} }
+
   /* 스마트폰 잠금해제 팝업 — ★입력칸·자판을 폰 화면 안에, 화면 크게 */
   #phone{ position:absolute; inset:0; z-index:34; background:rgba(10,6,18,.93); display:none;
     flex-direction:column; align-items:center; justify-content:center; padding:10px; touch-action:manipulation; backdrop-filter:blur(3px); }
@@ -379,6 +384,7 @@
   <div id="blackFade"></div>
   <div id="modalBg"><div id="modal"></div></div>
   <div id="toast"></div>
+  <div id="flash"></div>
 
   <div class="overlay" id="intro">
     <span class="deco" style="top:11%;left:13%;animation-delay:.2s">✨</span>
@@ -2355,6 +2361,12 @@ function openInspect(key){
    한 번 쓴 특징은 회색 비활성(6회 시도/8보기). 사진 = img/closeup/maru_*.jpg
    (지금은 자리표시용 — 북쑥 사진 오면 같은 파일명으로 덮어쓰면 끝). */
 const MARU_IMG="img/closeup/universal_chara.jpg";
+function whiteFlash(){   // ★마법으로 물건이 '뿅' 나올 때 화면 전체 하얀 번쩍
+  const f=$("#flash"); if(!f) return;
+  f.classList.remove("go"); void f.offsetWidth;   // 연속 발동 시 애니 재시작
+  f.classList.add("go");
+  setTimeout(()=>f.classList.remove("go"), 800);
+}
 const MARU_FEATURES=[   // wj = 오답 물건 이름(조사 포함)
   {k:"cube",    label:"네모난 물건",        img:"maru_cube",    wj:"큐브를"},
   {k:"cactus",  label:"초록색 물건",        img:"maru_cactus",  wj:"선인장을"},
@@ -2413,8 +2425,9 @@ function maruPick(f){
   st.given++; if(st.used.indexOf(f.k)<0) st.used.push(f.k);
   save(); renderInv();
   if(SFX.item)SFX.item(); vib([15,25,45]);
-  if(st.given>=MARU_NEED) maruSuccess();
-  else maruOpen("img/closeup/"+f.img+".jpg",
+  if(st.given>=MARU_NEED){ maruSuccess(); return; }
+  whiteFlash();   // ★오답 물건이 '뿅' 나오는 순간 화면 번쩍
+  maruOpen("img/closeup/"+f.img+".jpg",
     "✨ 뿅! 마루가 "+f.wj+" 찾아왔다!\n🧸 \"자, 원하는 물건이 맞아?\"",
     [{t:"…", fn:()=>maruOpen("img/closeup/"+f.img+".jpg",
       "🧸 \"이게 아니야…? 미안하지만\n새로운 크리스탈로 다른 특징을 골라줘!\"",
@@ -2424,7 +2437,7 @@ function maruSuccess(){
   // ★극적 연출 4비트 (북쑥 2026-08-15): 크리스탈 이변 → 여권 등장 → 화랑이 외침 → 마루 환호
   maruOpen(MARU_IMG,
     "✨ 마지막 크리스탈이 지금까지와는 다르게\n눈부시게 빛나기 시작한다…!",
-    [{t:"다음 ▶", fn:()=>maruOpen("img/closeup/maru_passport.jpg",
+    [{t:"다음 ▶", fn:()=>{ whiteFlash(); maruOpen("img/closeup/maru_passport.jpg",
       "뿅! — 마루가 초록색 물건을 들고 나타났다.\n🧸 \"어라…? 이번엔 뭔가 느낌이 달라!\"",
       [{t:"다음 ▶", fn:()=>maruOpen("img/closeup/maru_passport.jpg",
         "그때 — 옆에 있던 화랑이가 소리쳤다.\n😳 \"어!! 잠깐만요…\n그거, 제 여권이 맞는 것 같아요!!\"",
@@ -2436,7 +2449,7 @@ function maruSuccess(){
             if(SFX.success)SFX.success(); vib([30,40,80]);
             toast("화랑이의 여권 획득! 🛂✨");
             maruThanks();
-          }}])}])}])}]);
+          }}])}])}]); }}]);
 }
 function maruThanks(){
   maruOpen(MARU_IMG, "🧸 \"크리스탈 정말 고마워!\n덕분에 힘이 반짝반짝 넘쳐~\n여행 재밌게 해! 잘 가!\"", []);
