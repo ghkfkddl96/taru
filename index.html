@@ -449,6 +449,9 @@ const ITEMS = {
   // 크리스탈 2번째 — 가든 벽장(꽃벽 색순서 7타)에서. 인형 마법용 수집. 디자인은 crystal과 동일(북쑥 지시).
   crystal2:{name:"크리스탈",
     svg:'<svg viewBox="0 0 24 24"><g transform="rotate(-24 12 12)"><path d="M12 1.6 L15 6 L15 18 L12 22.4 L9 18 L9 6 Z" fill="#dff0f6"/><path d="M12 1.6 L15 6 L12 8 Z" fill="#f6fcfe"/><path d="M12 1.6 L9 6 L12 8 Z" fill="#c6e3ee"/><path d="M9 6 L12 8 L12 22.4 L9 18 Z" fill="#cfe8f1"/><path d="M15 6 L12 8 L12 22.4 L15 18 Z" fill="#eef8fc"/><path d="M12 8 L12 22.4" stroke="#b9dcE8" stroke-width="0.5"/></g></svg>'},
+  // 크리스탈 4번째 — 포트캐닝 석판 힌트 후 '뒤로가기'를 누르면(북쑥 C안). 인형 마법용 수집.
+  crystal4:{name:"크리스탈",
+    svg:'<svg viewBox="0 0 24 24"><g transform="rotate(-8 12 12)"><path d="M12 1.6 L15 6 L15 18 L12 22.4 L9 18 L9 6 Z" fill="#dff0f6"/><path d="M12 1.6 L15 6 L12 8 Z" fill="#f6fcfe"/><path d="M12 1.6 L9 6 L12 8 Z" fill="#c6e3ee"/><path d="M9 6 L12 8 L12 22.4 L9 18 Z" fill="#cfe8f1"/><path d="M15 6 L12 8 L12 22.4 L15 18 Z" fill="#eef8fc"/><path d="M12 8 L12 22.4" stroke="#b9dcE8" stroke-width="0.5"/></g></svg>'},
   // 손수건 — 마리나 난간 정비함(12칸 토글)에서. 더러운 유리 닦기 기믹에 사용 예정(닦을 대상 북쑥 미정).
   hankie:{name:"손수건",
     svg:'<svg viewBox="0 0 24 24"><g transform="rotate(-6 12 12)"><rect x="3.5" y="7" width="17" height="10.5" rx="1.2" fill="#f7f7f4"/><rect x="3.5" y="7" width="17" height="3.2" rx="1.2" fill="#ffffff"/><path d="M3.5 10.4 h17 M3.5 13.2 h17" stroke="#e3e3db" stroke-width="0.7"/><circle cx="17.2" cy="14.8" r="1.05" fill="#f2a7c3"/><circle cx="16.2" cy="14.1" r="0.5" fill="#f6c1d4"/><circle cx="18.2" cy="14.1" r="0.5" fill="#f6c1d4"/><circle cx="17.2" cy="13.6" r="0.5" fill="#f6c1d4"/><path d="M17.2 15.8 q-0.5 0.9 -1.3 1.2" stroke="#7fae7d" stroke-width="0.5" fill="none"/></g></svg>'},
@@ -1486,6 +1489,7 @@ function openCloseup(cu, h, id){
         caption:"더 이상 여기에 볼일은 없어 보인다.", action:{type:"clue"}}, h, id+"_looted");
     return openCloseup(cu.action.prize, {label:cu.action.prize.label||""}, id+"_prize");
   }
+  if(cu.seenFlag && !state.flags[cu.seenFlag]){ state.flags[cu.seenFlag]=true; save(); }   // ★'봤음' 플래그 (석판 등)
   cuCtx={cu,h,id};
   const solved=!!state.done[id];
   const hasImg = cu.img && cu.img!=="TODO";
@@ -2233,6 +2237,24 @@ function showModal(emoji,title,text,btn){
 }
 function closeModal(){ $("#modalBg").style.display="none"; lockCtx=null; }
 $("#modalBg").addEventListener("click",e=>{ if(e.target.id==="modalBg") closeModal(); });
+
+/* ★뒤로가기 → 크리스탈 (북쑥 C안, 2026-08-14)
+   포트캐닝 석판(fc_slab)을 본 뒤 브라우저 '뒤로가기'를 누르면 1회 크리스탈.
+   pushState 트랩이라 부수효과로 실수 뒤로가기로 게임에서 튕기는 것도 막아준다. */
+try{ history.pushState({taru:1},""); }catch(e){}
+window.addEventListener("popstate", function(){
+  try{ history.pushState({taru:1},""); }catch(e){}   // 항상 다시 막기 (게임 이탈 방지)
+  if(state.flags.fc_slab && !state.flags.back_gem){
+    state.flags.back_gem=true;
+    if(!state.inv.includes("crystal4")) state.inv.push("crystal4");
+    save();
+    fadeBlink(function(){ render(); });
+    setTimeout(function(){
+      SFX.success(); vib([30,40,80]);
+      showModal("💎","반짝…","순간, 발밑의 그림자가 반짝였다.\n뒤돌아본 길 위에 크리스탈이 떨어져 있다!","주웠다 💎");
+    }, 350);
+  }
+});
 
 /* ---- 엔딩(임시 placeholder) ---- */
 function showEnding(){
