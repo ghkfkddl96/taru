@@ -779,7 +779,7 @@ const MAPS = {
       // ★입장 게이트(왼쪽 아치) — 티켓 2장 있어야 내부 입장. ticket=머라이언 상자, ticket2=입수처 북쑥 제작 예정.
       // (북쑥 2026-08-15: 유니버설 핫스팟 2배 + 게이트를 상점 높이(y58)로 내림)
       { x:9,y:58, w:30,h:27, label:"입장 게이트",
-        gate:{ items:["ticket","ticket2"], to:"universalin",
+        gate:{ items:["ticket","ticket2"], to:"universalin", consume:true, passFlag:"uv_entered",   // 티켓 2장 내고 입장, 이후 자유(북쑥)
           msgs:["입구 직원이 웃으며 막아선다.\"티켓이 있어야 입장하실 수 있어요!\"",
                 "티켓이 한 장뿐이다…\n인원이 둘이라 두 장이 필요해..!"] } },
       // ★기념품 상점(북쑥 사진 2026-08-15) — 크리스탈⑥ = 동전 1개로 구매(자판기 동전의 사용처).
@@ -1679,8 +1679,14 @@ function tap(h,id){
   // ★gate: 아이템을 전부 가져야 통과하는 문 (예: 유니버설 입장 게이트 = 티켓 2장).
   //   msgs[n] = n개 갖고 있을 때 멘트. 전부 있으면 goTo와 같은 맵 이동(이동연출 포함).
   if(h.gate){
-    const g=h.gate, held=(g.items||[]).filter(it=>has(it)).length;
-    if(held>=(g.items||[]).length){ goTo(g.to); return; }
+    const g=h.gate;
+    if(g.passFlag && state.flags[g.passFlag]){ goTo(g.to); return; }   // ★한 번 입장했으면 자유 통행 (북쑥 2026-08-15)
+    const held=(g.items||[]).filter(it=>has(it)).length;
+    if(held>=(g.items||[]).length){
+      if(g.consume){ state.inv=state.inv.filter(k=>!g.items.includes(k));   // ★입장권은 내고 들어감
+        if(g.items.includes(selected)) selected=null; renderInv(); }
+      if(g.passFlag){ state.flags[g.passFlag]=true; }
+      save(); goTo(g.to); return; }
     toast((g.msgs&&g.msgs[held])||"아직 들어갈 수 없다."); return;
   }
   // ★goTo: 팝업 없이 즉시 맵 이동 (예: 열린 철문 → 경찰서 안. 이동연출 없음)
@@ -2542,7 +2548,7 @@ function maruPick(f){
   maruOpen("img/closeup/"+f.img+".jpg",
     "✨ 뿅! 마루가 "+f.wj+" 찾아왔다!\n🧸 \"자, 원하는 물건이 맞아?\"",
     [{t:"…", fn:()=>maruOpen("img/closeup/"+f.img+".jpg",
-      "🧸 \"이게 아니야…? 미안하지만\n새로운 크리스탈로 다른 특징을 골라줘!\"",
+      "🧸 \"이게 아니야…? 미안하지만\n다른 특징을 얘기해줄래?\"",
       [{t:"다른 특징 고르기", fn:maruChoice}])}]);
 }
 function maruSuccess(){
