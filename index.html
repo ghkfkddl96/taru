@@ -455,7 +455,7 @@ const ITEMS = {
   // 크리스탈 2번째 — 가든 벽장(꽃벽 색순서 7타)에서. 인형 마법용 수집. 디자인은 crystal과 동일(북쑥 지시).
   crystal2:{name:"크리스탈",
     svg:'<svg viewBox="0 0 24 24"><g transform="rotate(-24 12 12)"><path d="M12 1.6 L15 6 L15 18 L12 22.4 L9 18 L9 6 Z" fill="#dff0f6"/><path d="M12 1.6 L15 6 L12 8 Z" fill="#f6fcfe"/><path d="M12 1.6 L9 6 L12 8 Z" fill="#c6e3ee"/><path d="M9 6 L12 8 L12 22.4 L9 18 Z" fill="#cfe8f1"/><path d="M15 6 L12 8 L12 22.4 L15 18 Z" fill="#eef8fc"/><path d="M12 8 L12 22.4" stroke="#b9dcE8" stroke-width="0.5"/></g></svg>'},
-  // 유니버설 동전 — 중심지 자판기(빨간점 5칸 토글)에서. 유니버설 입구 상점에서 크리스탈⑤ 구매용.
+  // 유니버설 동전 — 중심지 자판기(빨간점 5칸 토글)에서. 유니버설 입구 상점에서 크리스탈⑥ 구매용.
   coin:{name:"유니버설 동전",
     svg:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.6" fill="#e6c04c"/><circle cx="12" cy="12" r="9.6" fill="none" stroke="#a8842a" stroke-width="1"/><circle cx="12" cy="12" r="7.2" fill="none" stroke="#c9a132" stroke-width="0.8"/><circle cx="12" cy="12" r="4.8" fill="#d4ab38"/><path d="M12 7.2 a4.8 4.8 0 0 1 0 9.6 a4.8 4.8 0 0 1 0 -9.6 M7.2 12 h9.6 M8.6 9.2 q3.4 2.2 6.8 0 M8.6 14.8 q3.4 -2.2 6.8 0" stroke="#8a6a1a" stroke-width="0.5" fill="none"/></svg>'},
   // 크리스탈 4번째 — 포트캐닝 석판 힌트 후 '뒤로가기'를 누르면(북쑥 C안). 인형 마법용 수집.
@@ -479,6 +479,9 @@ const ITEMS = {
   // 크리스탈 5번째 — 라우파삿 용과 속에서(과일칼로 자르면). 인형 마법용 수집. 디자인 동일, 각도만 다름.
   crystal5:{name:"크리스탈",
     svg:'<svg viewBox="0 0 24 24"><g transform="rotate(24 12 12)"><path d="M12 1.6 L15 6 L15 18 L12 22.4 L9 18 L9 6 Z" fill="#dff0f6"/><path d="M12 1.6 L15 6 L12 8 Z" fill="#f6fcfe"/><path d="M12 1.6 L9 6 L12 8 Z" fill="#c6e3ee"/><path d="M9 6 L12 8 L12 22.4 L9 18 Z" fill="#cfe8f1"/><path d="M15 6 L12 8 L12 22.4 L15 18 Z" fill="#eef8fc"/><path d="M12 8 L12 22.4" stroke="#b9dcE8" stroke-width="0.5"/></g></svg>'},
+  // 크리스탈 6번째 — 유니버설 입구 기념품 상점(동전 1개로 구매). 인형 마법용 수집. 디자인 동일, 각도만 다름.
+  crystal6:{name:"크리스탈",
+    svg:'<svg viewBox="0 0 24 24"><g transform="rotate(-16 12 12)"><path d="M12 1.6 L15 6 L15 18 L12 22.4 L9 18 L9 6 Z" fill="#dff0f6"/><path d="M12 1.6 L15 6 L12 8 Z" fill="#f6fcfe"/><path d="M12 1.6 L9 6 L12 8 Z" fill="#c6e3ee"/><path d="M9 6 L12 8 L12 22.4 L9 18 Z" fill="#cfe8f1"/><path d="M15 6 L12 8 L12 22.4 L15 18 Z" fill="#eef8fc"/><path d="M12 8 L12 22.4" stroke="#b9dcE8" stroke-width="0.5"/></g></svg>'},
   // 입장 티켓 2번째 — ★입수처 북쑥 제작 예정. 유니버설 내부는 두 장(인원 2명) 있어야 입장.
   ticket2:{name:"입장 티켓",
     svg:'<svg viewBox="0 0 24 24"><g transform="rotate(8 12 12)"><rect x="2.6" y="7.4" width="18.8" height="9.2" rx="1.4" fill="#e0b83f"/><rect x="3.8" y="8.6" width="16.4" height="6.8" rx="0.8" fill="none" stroke="#8a6a1a" stroke-width="0.55"/><circle cx="12" cy="12" r="2.6" fill="#c99e2c"/><circle cx="12" cy="12" r="2.6" fill="none" stroke="#8a6a1a" stroke-width="0.5"/><path d="M10.6 11.1 q0.8-0.9 1.6-0.4 q0.9 0.4 1.7-0.1 M10.3 12.4 h3.4 M10.9 13.5 q1.1 0.6 2.2 0" stroke="#8a6a1a" stroke-width="0.45" fill="none"/><path d="M5 9.6 v5.6 M19 9.6 v5.6" stroke="#8a6a1a" stroke-width="0.4" stroke-dasharray="0.7 0.9"/></g></svg>'},
@@ -709,6 +712,24 @@ const MAPS = {
         gate:{ items:["ticket","ticket2"], to:"universalin",
           msgs:["입구 직원이 웃으며 막아선다.\"티켓이 있어야 입장하실 수 있어요!\"",
                 "티켓이 한 장뿐이다…\n인원이 둘이라 두 장이 필요해..!"] } },
+      // ★기념품 상점(북쑥 사진 2026-08-15) — 크리스탈⑥ = 동전 1개로 구매(자판기 동전의 사용처).
+      { x:84,y:58, w:18,h:13, label:"기념품 상점", hideIf:"uv_shop_done", closeup:{
+        img:"img/closeup/uv_shop.jpg", badge:"💎",
+        caption:"🛍️ 길가의 작은 기념품 좌판.\n벨벳 방석 위에 크리스탈이 놓여 있다.\n가격표엔… 동전 1개?",
+        action:{type:"clue"},
+        subspots:[
+          { x:35,y:52, w:46,h:20, label:"크리스탈",
+            needSel:{item:"coin",
+              no:"가격표를 보니 동전이 필요하다.\n어디서 동전을 구할 수 없을까…",
+              pick:"가방에서 🪙동전을 골라서 내밀어보자."},
+            give:{item:"crystal6", success:"동전을 내고 크리스탈을 샀다! 💎",
+              remove:["coin"], setFlag:"uv_shop_done"} },
+        ] }},
+      // 크리스탈 판매 후 — 빈 방석 (동전도 크리스탈도 없음)
+      { x:84,y:58, w:18,h:13, label:"기념품 상점", showIf:"uv_shop_done", closeup:{
+        img:"img/closeup/uv_shop_sold.jpg", badge:"💎",
+        caption:"🛍️ 기념품 좌판.\n크리스탈은 팔렸다 — 내가 샀으니까!\n더 이상 여기에 볼일은 없어 보인다.",
+        action:{type:"clue"} }},
     ],
     exits:[{to:"sentosa", label:"센토사로", emoji:"🏖️", dir:"left"}]
   },
