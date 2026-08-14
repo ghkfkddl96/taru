@@ -874,13 +874,8 @@ const MAPS = {
 
   room:{
     name:"우리 방", sub:"이비스 버짓 클락키 · 체크인 완료 💗", photo:"img/room.jpg",
+    // 침대·책상(선물힌트·편지 자리) 삭제 — 북쑥 2026-08-14. 방 = 엔딩 스토리 전용.
     hotspots:[
-      { x:68,y:56, w:42,h:34, label:"침대", closeup:{
-        img:"TODO", badge:"🎁",
-        caption:"🎁 [ 선물 힌트 자리 ]\n예) '베개 밑을 확인해봐!'\n내용은 나중에 채우면 돼.", action:{type:"clue"} }},
-      { x:22,y:62, w:26,h:28, label:"책상", closeup:{
-        img:"TODO", badge:"💌",
-        caption:"💌 [ 편지 자리 ]\n둘만 아는 이야기로 채우면 완성 💗", action:{type:"clue"} }},
     ],
     exits:[{to:"ibis", label:"로비로", emoji:"🛎️", dir:"left"}]
   },
@@ -2282,8 +2277,6 @@ function showEnding(){
     <div class="bigemoji">🌅</div>
     <h1>세상이 다시 돌아왔다!</h1>
     <p>이제 진짜 여행을 즐기자 💗</p>
-    <p><b>[ 여기에 선물 힌트 ]</b><br>예) "침대 베개 밑을 확인해봐 🎁"</p>
-    <p><b>[ 여기에 편지 ]</b><br><span style="font-size:13px;color:#9a8ba5">둘만 아는 이야기로 채우면 완성 💗</span></p>
     <button class="btn" style="max-width:220px" onclick="location.reload()">다시 보기</button>`;
   $("#app").appendChild(ov);
 }
