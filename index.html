@@ -890,7 +890,7 @@ const MAPS = {
       //   위 놋쇠 명판의 점·선 각인 = LOVE 모스(내가 오버레이) — 해독해서 나중에 쓸 힌트.
       { x:62,y:55, w:16,h:12, label:"안쪽 계산대", closeup:{
         img:"img/closeup/bkt_reg.jpg", badge:"🧾",
-        caption:"🧾 카운터의 골동품 금전등록기.\n위 놋쇠판에 점과 선이 새겨져 있다.\n금액 4자리를 입력할 수 있을 것 같다.",
+        caption:"🧾 카운터의 골동품 금전등록기.\n위 놋쇠판에 흘림체로 뭔가 적혀 있다.\n금액 4자리를 입력할 수 있을 것 같다.",
         action:{type:"numlock", len:4, answer:"2947",
           success:"차르릉! 서랍이 열렸다.", setFlag:"bkt_reg",
           prize:{ img:"img/closeup/bkt_reg_open.jpg", badge:"📜", label:"열린 서랍",
@@ -978,9 +978,15 @@ const MAPS = {
   supertree:{
     name:"슈퍼트리 그로브", sub:"밤이면 불이 들어오는 인공나무 숲", photo:"img/supertree.jpg",
     hotspots:[
-      { x:50,y:46, w:72,h:46, label:"슈퍼트리", closeup:{
+      { x:50,y:40, w:72,h:38, label:"슈퍼트리", closeup:{
         anim:["tree_off","tree_red","tree_blue","tree_green","tree_blue","tree_green","tree_red","tree_green"], animMs:2000,
         badge:"🌳", caption:"",
+        action:{type:"clue"} }},
+      // ★덩굴 덮인 비석(북쑥 제작 2026-08-14) — 각인·덩굴 무늬 = 세로로 늘어난 2947 (폰 눕혀 비스듬히 보면 보임).
+      //   힌트 = 바쿠테 등록기 명판 "Long Stone". 답 입력 = 바쿠테 금전등록기.
+      { x:50,y:82, w:40,h:18, label:"덩굴 덮인 비석", closeup:{
+        img:"img/closeup/stree_slab.jpg", badge:"🪨",
+        caption:"🪨 기둥 앞에 세워진 길쭉한 돌비석.\n덩굴과 홈이 뒤엉켜 묘한 무늬를 그리고 있다.",
         action:{type:"clue"} }},
     ],
     exits:[{to:"marina", label:"마리나", emoji:"🏨", dir:"left"}]
