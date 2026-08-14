@@ -689,7 +689,8 @@ const MAPS = {
     name:"비보시티", sub:"센토사로 가는 관문 쇼핑몰", photo:"img/vivocity.jpg",
     hotspots:[
       // ★먼지 낀 쇼윈도(북쑥 2026-08-14) — 손수건 골라 들고 문지르면 먼지가 지워지고 유리 안쪽의 "1461"이 드러난다.
-      { x:22,y:67, w:26,h:16, label:"먼지 낀 쇼윈도", hideIf:"vv_wiped", closeup:{
+      // (북쑥 2026-08-15: 쇼윈도 핫스팟 가로 2배 — 직사각형)
+      { x:26,y:67, w:52,h:16, label:"먼지 낀 쇼윈도", hideIf:"vv_wiped", closeup:{
         img:"img/closeup/vivocity_win.jpg", badge:"🪟",
         caption:"🪟 먼지가 잔뜩 낀 쇼윈도.\n안이 전혀 보이지 않는다.",
         action:{type:"wipe", dirty:"img/closeup/vivocity_win_dirty.jpg",
@@ -699,7 +700,7 @@ const MAPS = {
           doneMsg:"유리가 깨끗해졌다…!\n안쪽에 큼직한 숫자가 쓰여 있다.",
           setFlag:"vv_wiped"} }},
       // 닦은 뒤엔 깨끗한 모습
-      { x:22,y:67, w:26,h:16, label:"쇼윈도", showIf:"vv_wiped", closeup:{
+      { x:26,y:67, w:52,h:16, label:"쇼윈도", showIf:"vv_wiped", closeup:{
         img:"img/closeup/vivocity_win.jpg", badge:"🪟",
         caption:"🪟 깨끗해진 쇼윈도.\n유리 안쪽에 큼직한 숫자가 쓰여 있다.",
         action:{type:"clue"} }},
@@ -776,12 +777,13 @@ const MAPS = {
     name:"유니버설 스튜디오", sub:"지구본 앞 입구 광장", photo:"img/universal.jpg",
     hotspots:[
       // ★입장 게이트(왼쪽 아치) — 티켓 2장 있어야 내부 입장. ticket=머라이언 상자, ticket2=입수처 북쑥 제작 예정.
-      { x:9,y:46, w:21,h:19, label:"입장 게이트",
+      // (북쑥 2026-08-15: 유니버설 핫스팟 2배 + 게이트를 상점 높이(y58)로 내림)
+      { x:9,y:58, w:30,h:27, label:"입장 게이트",
         gate:{ items:["ticket","ticket2"], to:"universalin",
           msgs:["입구 직원이 웃으며 막아선다.\"티켓이 있어야 입장하실 수 있어요!\"",
                 "티켓이 한 장뿐이다…\n인원이 둘이라 두 장이 필요해..!"] } },
       // ★기념품 상점(북쑥 사진 2026-08-15) — 크리스탈⑥ = 동전 1개로 구매(자판기 동전의 사용처).
-      { x:84,y:58, w:18,h:13, label:"기념품 상점", hideIf:"uv_shop_done", closeup:{
+      { x:84,y:58, w:25,h:18, label:"기념품 상점", hideIf:"uv_shop_done", closeup:{
         img:"img/closeup/uv_shop.jpg", badge:"💎",
         caption:"🛍️ 길가의 작은 기념품 좌판.\n벨벳 방석 위에 크리스탈이 놓여 있다.\n가격표를 보니… 특별한 동전이 필요해 보인다!",
         action:{type:"clue"},
@@ -794,7 +796,7 @@ const MAPS = {
               remove:["coin"], setFlag:"uv_shop_done"} },
         ] }},
       // 크리스탈 판매 후 — 빈 방석 (동전도 크리스탈도 없음)
-      { x:84,y:58, w:18,h:13, label:"기념품 상점", showIf:"uv_shop_done", closeup:{
+      { x:84,y:58, w:25,h:18, label:"기념품 상점", showIf:"uv_shop_done", closeup:{
         img:"img/closeup/uv_shop_sold.jpg", badge:"💎",
         caption:"🛍️ 기념품 좌판.\n크리스탈은 팔렸다 — 내가 샀으니까!\n더 이상 여기에 볼일은 없어 보인다.",
         action:{type:"clue"} }},
@@ -820,13 +822,14 @@ const MAPS = {
     name:"라우파삿", sub:"옛 시장 호커센터", photo:"img/laupasat.jpg",
     hotspots:[
       // 왼쪽 화로에서 꼬치 굽는 사람 → 그릴 위 꼬치 5종 확대 (북쑥 제공 이미지)
-      { x:8,y:63, w:20,h:24, label:"꼬치 굽는 사람", closeup:{
+      // (북쑥 2026-08-15: 라우파삿 핫스팟 전부 넓이 2배)
+      { x:8,y:63, w:28,h:34, label:"꼬치 굽는 사람", closeup:{
         img:"img/closeup/laupasat_grill.jpg", badge:"🍢",
         caption:"🍢 화로 앞 아저씨가 꼬치를 굽고 있다.\n숯불 위에서 노릇노릇 익어간다…",
         action:{type:"clue"} }},
       // ★과일 가판대(북쑥 사진 2026-08-15) — 상자 색판 4칸 로테이션(빨→주→노→초→파랑→하늘), 정답 하·파·빨·주
       //   (힌트 = 경찰서 무지개 창 ①②③④ 색). 열면 용과 → 가방에서 과일칼로 잘라 크리스탈⑤.
-      { x:63,y:49, w:18,h:14, label:"과일 가판대", hideIf:"lp_fruit_done", closeup:{
+      { x:63,y:49, w:25,h:20, label:"과일 가판대", hideIf:"lp_fruit_done", closeup:{
         img:"img/closeup/lps_stall.jpg", badge:"🍈",
         caption:"🍈 과일이 잔뜩 쌓인 가판대.\n한가운데에 낡은 나무 상자가 놓여 있다.",
         action:{type:"clue"},
@@ -847,12 +850,12 @@ const MAPS = {
                   ] } } } },
         ] }},
       // 용과까지 챙긴 뒤 — 상자 팝업 없이 코멘트만 (북쑥 지시: 볼일 끝)
-      { x:63,y:49, w:18,h:14, label:"과일 가판대", showIf:"lp_fruit_done", closeup:{
+      { x:63,y:49, w:25,h:20, label:"과일 가판대", showIf:"lp_fruit_done", closeup:{
         img:"img/closeup/lps_stall.jpg", badge:"🍈",
         caption:"🍈 과일 가판대.\n더 이상 여기에 볼일은 없어 보인다.",
         action:{type:"clue"} }},
       // ★오른쪽 기둥의 낡은 찬장(북쑥 2026-08-14) — 나무판 5칸을 그릴 꼬치 순서(새우 파 은행 소 닭)로 → 크리스탈③
-      { x:92,y:60, w:18,h:22, label:"기둥의 낡은 찬장", closeup:{
+      { x:92,y:60, w:25,h:31, label:"기둥의 낡은 찬장", closeup:{
         img:"img/closeup/laupasat_cab.jpg", badge:"🗄️",
         caption:"🗄️ 초록 기둥에 붙은 낡은 찬장.\n문짝에 네모난 나무판 다섯 개가 나란히 붙어 있다.",
         action:{type:"picker", set:"skewer", answer:["새우","파","은행","소","닭"],
@@ -869,7 +872,7 @@ const MAPS = {
   },
 
   police:{
-    name:"올드힐스트리트 경찰서", sub:"창문이 무지개색인 옛 경찰서", photo:"img/police.jpg",
+    name:"올드힐스트리트 경찰서", sub:"창문이 무지개색인 옛 경찰서", photo:"img/police.jpg?v=2",
     hotspots:[
       // ★초록 철문 (건물 우측 1층) — 동물 6개를 '크기 순서'(크레센도)대로 누르는 문제.
       //   힌트 = 공항 토이샵 인형 6종(전부 경찰모자) + 문에 그려진 크레센도·경찰모.
@@ -878,7 +881,8 @@ const MAPS = {
       //   dolls.jpg 픽셀 실측(키): 참새158 < 고양이194 < 코끼리228 < 곰276 < 토끼300 < 사자334
       //   맞을 때마다 초록 램프, 틀리면 빨강 번쩍+리셋, 완성 시 파랑+달칵(police_door).
       //   문 열리면 나오는 것(보상)은 북쑥 미정 — police_door 플래그에 붙이면 됨.
-      { x:92,y:87, w:15,h:14, label:"초록 철문", hideIf:"police_door", closeup:{
+      // (북쑥 2026-08-15) police.jpg 상단 30% 컷(원본=police_precrop_backup.jpg) — 좌표 환산(y-30)/0.7, h/0.7 + 넓이 2배
+      { x:92,y:81, w:21,h:28, label:"초록 철문", hideIf:"police_door", closeup:{
         img:"img/closeup/police_door.jpg", badge:"🚪",
         caption:"🚪 건물 옆 초록 철문.\n동물 문양 여섯 개와 불 꺼진 홈 여섯 개가 있다.",
         action:{type:"seq",
@@ -900,13 +904,13 @@ const MAPS = {
             action:{type:"clue"},
             subspots:[ {x:50,y:50,w:96,h:92,label:"안으로", goTo:"policein"} ] } } }},
       // 문이 열린 뒤: 같은 자리 클릭 → 열린 문 사진 팝업 → 사진 누르면 경찰서 안으로 (북쑥 지시)
-      { x:92,y:87, w:15,h:14, label:"열린 철문", showIf:"police_door", closeup:{
+      { x:92,y:81, w:21,h:28, label:"열린 철문", showIf:"police_door", closeup:{
         img:"img/closeup/police_door_open.jpg", badge:"🚪",
         caption:"🚪 문이 열려 있다.",
         action:{type:"clue"},
         subspots:[ {x:50,y:50,w:96,h:92,label:"안으로", goTo:"policein"} ] }},
       // 도로에 선 초록 2층버스 → 경찰차 클로즈업 → 트렁크 3자리 자물쇠
-      { x:57,y:86, w:30,h:12, label:"도로에 선 버스", closeup:{
+      { x:57,y:80, w:42,h:24, label:"도로에 선 버스", closeup:{
         img:"img/closeup/police_car.jpg", badge:"🚓",
         caption:"🚓 경찰차가 정차해 있다.",
         action:{type:"clue"},
@@ -1011,7 +1015,7 @@ const MAPS = {
             ] } } }},
       // ★고대 석판(북쑥 2026-08-14) — 이걸 본 뒤 브라우저 '뒤로가기'를 누르면 크리스탈④ (C안, popstate 트랩)
       { x:80,y:83, w:22,h:14, label:"벽에 박힌 석판", closeup:{
-        img:"img/closeup/fc_slab.jpg", badge:"🪨", seenFlag:"fc_slab",
+        img:"img/closeup/fc_slab.jpg?v=2", badge:"🪨", seenFlag:"fc_slab",   // v2=각인 4줄 합성본
         caption:"🪨 이끼 낀 고대 석판.\n새겨져 있던 글자는 닳았지만, 이렇게 읽힌다 —\n\n'앞으로만 달려온 자여,\n때로는 뒤를 돌아볼 필요가 있다.'",
         action:{type:"clue"} }},
     ],
@@ -1181,18 +1185,20 @@ const MAPS = {
         caption:"🚪 이끼 낀 벽에 박힌 작은 나무 벽장.\n색색 버튼 여섯 개 위로 화살표가 새겨져 있다.",
         action:{type:"seq", lampColors:true,
           answer:["r","o","p","g","r","y","s"],   // 꽃벽 일곱 송이 순서 그대로 = 빨 주 보 초 빨 노 하늘
+          // (2026-08-15 격자 재실측: 버튼 중심 y49.3, 존을 버튼 크기에 맞춤)
           zones:[
-            {k:"r", x:30.0,y:47.5, w:6.2,h:11, label:"빨간 버튼", color:"#e23b3b"},
-            {k:"o", x:37.0,y:47.4, w:6.2,h:11, label:"주황 버튼", color:"#f6942c"},
-            {k:"y", x:44.0,y:47.3, w:6.2,h:11, label:"노란 버튼", color:"#f2cc2a"},
-            {k:"g", x:50.8,y:47.2, w:6.0,h:11, label:"초록 버튼", color:"#58c85a"},
-            {k:"s", x:56.7,y:47.2, w:5.6,h:11, label:"하늘 버튼", color:"#54bdf0"},
-            {k:"p", x:62.2,y:47.2, w:5.6,h:11, label:"보라 버튼", color:"#8a4fd0"},
+            {k:"r", x:30.3,y:49.3, w:7,h:5.5, label:"빨간 버튼", color:"#e23b3b"},
+            {k:"o", x:36.9,y:49.3, w:7,h:5.5, label:"주황 버튼", color:"#f6942c"},
+            {k:"y", x:43.3,y:49.3, w:7,h:5.5, label:"노란 버튼", color:"#f2cc2a"},
+            {k:"g", x:49.8,y:49.3, w:7,h:5.5, label:"초록 버튼", color:"#58c85a"},
+            {k:"s", x:56.2,y:49.3, w:7,h:5.5, label:"하늘 버튼", color:"#54bdf0"},
+            {k:"p", x:62.3,y:49.3, w:7,h:5.5, label:"보라 버튼", color:"#8a4fd0"},
           ],
-          // 램프 = 확대 스트립 재실측(2026-08-14 북쑥 '위로 뜬다' 지적 → 구멍 px 312~600, y862→855 슬랜트 교정)
-          lamps:[{x:28.7,y:59.5},{x:33.4,y:59.5},{x:38.1,y:59.4},{x:42.7,y:59.3},
-                 {x:47.1,y:59.2},{x:51.3,y:59.1},{x:55.2,y:59.1}],
-          lampW:4.2, lampH:3.2,
+          // 램프 = 구멍 7개 격자 재실측(2026-08-15 북쑥 '왼쪽 쏠림' — 기존 간격 4.6→실제 5.15, 우상향 슬랜트)
+          //   크기도 검은 구멍에 맞춤(북쑥)
+          lamps:[{x:30.1,y:60.3},{x:35.2,y:60.1},{x:40.4,y:59.8},{x:45.5,y:59.6},
+                 {x:50.6,y:59.4},{x:55.8,y:59.1},{x:60.9,y:58.9}],
+          lampW:3.0, lampH:2.2,
           success:"달칵! 벽장 문이 열렸다.", setFlag:"garden_cab",
           prize:{ img:"img/closeup/garden_cab_open.jpg", badge:"💎", label:"열린 벽장",
             caption:"문이 열렸다.\n이끼 위에 크리스탈이 반짝인다…!",
@@ -1262,7 +1268,8 @@ const MAPS = {
       // 등쪽 열쇠 홈 — 터널에서 얻은 앤틱 열쇠(key5)를 꽂는 곳. 꽂으면 ml_key.
       // ★이후 기믹(북쑥 예고): 머라이언 물줄기가 강·약으로 나가는 연출 — 순서는 [강 약 중 강 중 약].
       //   강/약 이미지는 북쑥이 보내줄 예정. 오면 ml_key 상태의 맵 배경 애니로 붙인다.
-      { x:11,y:67, w:20,h:19, label:"머라이언 등쪽", hideIf:"ml_key", closeup:{
+      // (북쑥 2026-08-15: 맵 핫스팟 2배 + 등쪽은 사자상 몸통 위치로 올림 y67→58)
+      { x:11,y:58, w:28,h:26, label:"머라이언 등쪽", hideIf:"ml_key", closeup:{
         img:"img/closeup/merlion_back.jpg", badge:"🗝️",
         caption:"🗝️ 등에 열쇠 모양 홈이 파여 있다.",
         action:{type:"clue"},
@@ -1277,7 +1284,7 @@ const MAPS = {
                 action:{type:"clue"} } } },
         ] }},
       // 열쇠 꽂은 뒤엔 꽂힌 모습으로
-      { x:11,y:67, w:20,h:19, label:"머라이언 등쪽", showIf:"ml_key", closeup:{
+      { x:11,y:58, w:28,h:26, label:"머라이언 등쪽", showIf:"ml_key", closeup:{
         img:"img/closeup/merlion_back_key.jpg", badge:"🗝️",
         caption:"🗝️ 열쇠가 등에 꽂혀 있다.",
         action:{type:"clue"} }},
@@ -1285,7 +1292,7 @@ const MAPS = {
       // ★물가 나무 상자 — 물줄기 문양 버튼 6타 [강약중강중약] → 유니버설 입장 티켓 (북쑥 2026-08-13)
       //   2026-08-14 원본(비반전)으로 복귀 + 위치를 사자상 앞 '곶'(전망 데크)으로 — 곶에서 보면 원래 방향이 맞음(북쑥).
       //   버튼 왼→오 = 약·중·강 (원본). 정답은 여전히 강약중강중약(라벨 기준이라 로직 무변).
-      { x:48,y:63, w:24,h:10, label:"물가의 나무 상자", closeup:{
+      { x:48,y:63, w:34,h:14, label:"물가의 나무 상자", closeup:{   // (북쑥: 넓이 2배)
         img:"img/closeup/merlion_box.jpg", badge:"📦",
         caption:"📦 물가 돌턱에 놓인 나무 상자.\n물줄기 문양 버튼 세 개와 작은 구멍 여섯 개가 있다.",
         action:{type:"seq",
@@ -1295,9 +1302,10 @@ const MAPS = {
             {k:"m", x:50,y:62, w:17,h:16, label:"중간 물줄기 버튼"},
             {k:"s", x:74,y:62, w:17,h:16, label:"센 물줄기 버튼"},
           ],
-          lamps:[{x:28.1,y:73.2},{x:37.0,y:73.2},{x:45.9,y:73.2},
-                 {x:54.7,y:73.2},{x:63.7,y:73.2},{x:72.6,y:73.2}],
-          lampW:5.5, lampH:4.1,
+          // (2026-08-15 격자 재실측: 구멍 6개 y75.4 — 기존 73.2가 위로 쏠림. 크기도 구멍에 맞춤)
+          lamps:[{x:29.7,y:75.4},{x:38.5,y:75.4},{x:47.1,y:75.4},
+                 {x:55.5,y:75.4},{x:63.9,y:75.4},{x:72.5,y:75.4}],
+          lampW:3.2, lampH:2.6,
           success:"딸깍! 걸쇠가 풀리며 뚜껑이 열렸다.", setFlag:"ml_box",
           prize:{ img:"img/closeup/merlion_box_open.jpg", badge:"🎫", label:"열린 상자",
             caption:"뚜껑이 열렸다.\n안에서 황금빛이 새어 나온다…!",
@@ -1866,7 +1874,7 @@ const CPANEL_COLORS = [   // 라우파삿 과일 상자 색판 — 로테이션 
   {k:"주", c:"#f7862c"},
   {k:"노", c:"#ffd43b"},
   {k:"초", c:"#37b24d"},
-  {k:"파", c:"#1c6fe0"},
+  {k:"파", c:"#1b3fc0"},   // (북쑥 2026-08-15: 더 찐한 남색 수준으로)
   {k:"하", c:"#6fd0ff"},
 ];
 const SKEWER_ICONS = [
@@ -2029,11 +2037,15 @@ function buildMirrorView(a){
    threshold(기본 0.68) 이상 지우면 완료 — 남은 먼지는 서서히 사라짐.
    쓰는 법: action:{type:"wipe", dirty:"img/...", needItem:"hankie", no, pick, doneMsg, setFlag} */
 let wipeCtx=null;
-function clearWipe(){ const c=document.querySelector("#cuImgWrap .cu-wipe"); if(c) c.remove(); wipeCtx=null; }
+function clearWipe(){ const c=document.querySelector("#cuImgWrap .cu-wipe"); if(c) c.remove(); wipeCtx=null;
+  const im=$("#cuImg"); if(im) im.style.visibility=""; }   // (2026-08-15) 아래 숨김 원복
 function buildWipe(a, id){
   clearWipe();
   const wrap=$("#cuImgWrap"); if(!wrap) return;
   if(state.done[id]){ $("#cuLockBadge").textContent="✅"; return; }   // 이미 닦음 → 깨끗한 사진만
+  // ★깨끗한(정답) 사진이 먼지 캔버스보다 먼저 떠서 잠깐 보이는 문제(북쑥 2026-08-15) →
+  //   먼지 캔버스가 그려질 때까지 밑 사진을 숨긴다
+  $("#cuImg").style.visibility="hidden";
   const cv=document.createElement("canvas"); cv.className="cu-wipe";
   cv.style.cssText="position:absolute;inset:0;width:100%;height:100%;z-index:6;touch-action:none;cursor:pointer;";
   wrap.appendChild(cv);
@@ -2043,7 +2055,9 @@ function buildWipe(a, id){
     const ctx=cv.getContext("2d");
     ctx.drawImage(img,0,0,cv.width,cv.height);
     wipeCtx={cv,ctx,n:0,warned:false};
+    $("#cuImg").style.visibility="";   // 먼지가 덮였으니 밑 사진 복귀
   };
+  img.onerror=function(){ $("#cuImg").style.visibility=""; };
   img.src=a.dirty;
   const rub=(ev)=>{
     if(!wipeCtx||state.done[id]) return;
