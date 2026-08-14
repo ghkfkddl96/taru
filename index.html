@@ -458,6 +458,9 @@ const ITEMS = {
   // 손수건 — 마리나 난간 정비함(12칸 토글)에서. 더러운 유리 닦기 기믹에 사용 예정(닦을 대상 북쑥 미정).
   hankie:{name:"손수건",
     svg:'<svg viewBox="0 0 24 24"><g transform="rotate(-6 12 12)"><rect x="3.5" y="7" width="17" height="10.5" rx="1.2" fill="#f7f7f4"/><rect x="3.5" y="7" width="17" height="3.2" rx="1.2" fill="#ffffff"/><path d="M3.5 10.4 h17 M3.5 13.2 h17" stroke="#e3e3db" stroke-width="0.7"/><circle cx="17.2" cy="14.8" r="1.05" fill="#f2a7c3"/><circle cx="16.2" cy="14.1" r="0.5" fill="#f6c1d4"/><circle cx="18.2" cy="14.1" r="0.5" fill="#f6c1d4"/><circle cx="17.2" cy="13.6" r="0.5" fill="#f6c1d4"/><path d="M17.2 15.8 q-0.5 0.9 -1.3 1.2" stroke="#7fae7d" stroke-width="0.5" fill="none"/></g></svg>'},
+  // 모스부호 표 — 바쿠테 금전등록기(2947)에서. ★더블탭→표 크게. 등록기 명판 각인(LOVE) 해독용.
+  morse:{name:"모스부호 표", inspect:"morse",
+    svg:'<svg viewBox="0 0 24 24"><rect x="4.5" y="2.8" width="15" height="18.4" rx="1.2" fill="#f7f6f1"/><rect x="4.5" y="2.8" width="15" height="18.4" rx="1.2" fill="none" stroke="#c9c4b4" stroke-width="0.6"/><circle cx="8" cy="7" r="1" fill="#22242a"/><rect x="10.5" y="6.2" width="4" height="1.6" rx="0.8" fill="#22242a"/><circle cx="8" cy="10.5" r="1" fill="#22242a"/><circle cx="10.8" cy="10.5" r="1" fill="#22242a"/><rect x="13" y="9.7" width="4" height="1.6" rx="0.8" fill="#22242a"/><rect x="7" y="13.2" width="4" height="1.6" rx="0.8" fill="#22242a"/><circle cx="13.8" cy="14" r="1" fill="#22242a"/><circle cx="8" cy="17.5" r="1" fill="#22242a"/><circle cx="10.8" cy="17.5" r="1" fill="#22242a"/><circle cx="13.6" cy="17.5" r="1" fill="#22242a"/></svg>'},
   // 크리스탈 3번째 — 라우파삿 기둥 찬장(꼬치 순서 5칸)에서. 인형 마법용 수집.
   crystal3:{name:"크리스탈",
     svg:'<svg viewBox="0 0 24 24"><g transform="rotate(10 12 12)"><path d="M12 1.6 L15 6 L15 18 L12 22.4 L9 18 L9 6 Z" fill="#dff0f6"/><path d="M12 1.6 L15 6 L12 8 Z" fill="#f6fcfe"/><path d="M12 1.6 L9 6 L12 8 Z" fill="#c6e3ee"/><path d="M9 6 L12 8 L12 22.4 L9 18 Z" fill="#cfe8f1"/><path d="M15 6 L12 8 L12 22.4 L15 18 Z" fill="#eef8fc"/><path d="M12 8 L12 22.4" stroke="#b9dcE8" stroke-width="0.5"/></g></svg>'},
@@ -883,6 +886,20 @@ const MAPS = {
         img:"img/closeup/bkt_soup_new.jpg", badge:"🍲",
         caption:"🍲 바쿠테 한 그릇.\n김이 모락모락… 맛있어 보인다.",
         action:{type:"clue"} }},
+      // ★안쪽 계산대의 골동품 금전등록기(북쑥 2026-08-14) — 슈퍼트리 덩굴 숫자(2947) 입력 → 서랍에서 모스부호 표.
+      //   위 놋쇠 명판의 점·선 각인 = LOVE 모스(내가 오버레이) — 해독해서 나중에 쓸 힌트.
+      { x:62,y:55, w:16,h:12, label:"안쪽 계산대", closeup:{
+        img:"img/closeup/bkt_reg.jpg", badge:"🧾",
+        caption:"🧾 카운터의 골동품 금전등록기.\n위 놋쇠판에 점과 선이 새겨져 있다.\n금액 4자리를 입력할 수 있을 것 같다.",
+        action:{type:"numlock", len:4, answer:"2947",
+          success:"차르릉! 서랍이 열렸다.", setFlag:"bkt_reg",
+          prize:{ img:"img/closeup/bkt_reg_open.jpg", badge:"📜", label:"열린 서랍",
+            caption:"서랍 안에 돈 대신\n접힌 종이 한 장이 들어 있다.",
+            action:{type:"clue"},
+            subspots:[
+              { x:50,y:84, w:42,h:12, label:"접힌 종이",
+                give:{item:"morse", success:"모스부호 표 획득! 📜"} },
+            ] } } }},
       { x:78,y:44, w:26,h:14, label:"메뉴 간판", closeup:{
         img:"img/closeup/bkt_menu.jpg", badge:"🪵",
         caption:"🪵 나무판에 새긴 메뉴 간판이 벽에 걸려 있다.",
@@ -2137,6 +2154,13 @@ function openRadio(){
   }).catch(()=>{});   // 파일 없음/자동재생 차단 → 기본(잡음) 멘트 유지
 }
 function openInspect(key){
+  if(key==="morse"){
+    // ★모스부호 표 — 더블탭하면 크게 보기 (10글자 축약본, 등록기 명판 각인 해독용)
+    openCloseup({img:"img/closeup/morse_chart.jpg", badge:"📜",
+      caption:"📜 모스부호 표.\n점(·)과 선(–)의 조합이 글자다.",
+      action:{type:"clue"}}, {label:"모스부호 표"}, "item_morse");
+    return;
+  }
   if(key==="radio"){ openRadio(); } else if(key==="mirror"){
     openCloseup({img:MIRROR_BG, badge:"🪞",
       caption:"🪞 손거울.\n유리가 약간 지저분하다.",
