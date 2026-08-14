@@ -826,6 +826,11 @@ const MAPS = {
                 caption:"🪞 작은 거울이다.",
                 action:{type:"give", give:["mirror"], success:"거울 획득! 🪞"} }},
             ] } } }},
+      // ★고대 석판(북쑥 2026-08-14) — 이걸 본 뒤 브라우저 '뒤로가기'를 누르면 크리스탈④ (C안, popstate 트랩)
+      { x:80,y:83, w:22,h:14, label:"벽에 박힌 석판", closeup:{
+        img:"img/closeup/fc_slab.jpg", badge:"🪨", seenFlag:"fc_slab",
+        caption:"🪨 이끼 낀 고대 석판.\n새겨져 있던 글자는 닳았지만, 이렇게 읽힌다 —\n\n'앞으로만 달려온 자여,\n때로는 뒤를 돌아볼 필요가 있다.'",
+        action:{type:"clue"} }},
     ],
     exits:[
       {to:"police", label:"경찰서로", emoji:"🚔", dir:"left"},
