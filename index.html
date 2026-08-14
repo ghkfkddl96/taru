@@ -599,6 +599,21 @@ const MAPS = {
   vivocity:{
     name:"비보시티", sub:"센토사로 가는 관문 쇼핑몰", photo:"img/vivocity.jpg",
     hotspots:[
+      // ★먼지 낀 쇼윈도(북쑥 2026-08-14) — 손수건 골라 들고 문지르면 먼지가 지워지고 유리 안쪽의 "1461"이 드러난다.
+      { x:22,y:67, w:26,h:16, label:"먼지 낀 쇼윈도", hideIf:"vv_wiped", closeup:{
+        img:"img/closeup/vivocity_win.jpg", badge:"🪟",
+        caption:"🪟 먼지가 잔뜩 낀 쇼윈도.\n안이 전혀 보이지 않는다.",
+        action:{type:"wipe", dirty:"img/closeup/vivocity_win_dirty.jpg",
+          needItem:"hankie",
+          no:"맨손으로 문질러도 꿈쩍도 안 한다…",
+          pick:"가방에서 🤍손수건을 골라서 닦아보자.",
+          doneMsg:"유리가 깨끗해졌다…!\n안쪽에 큼직한 숫자가 쓰여 있다.",
+          setFlag:"vv_wiped"} }},
+      // 닦은 뒤엔 깨끗한 모습
+      { x:22,y:67, w:26,h:16, label:"쇼윈도", showIf:"vv_wiped", closeup:{
+        img:"img/closeup/vivocity_win.jpg", badge:"🪟",
+        caption:"🪟 깨끗해진 쇼윈도.\n유리 안쪽에 큼직한 숫자가 쓰여 있다.",
+        action:{type:"clue"} }},
       { x:35,y:50, w:30,h:11, label:"송파 바쿠테", closeup:{
         img:"img/closeup/vivo_songfa.jpg", badge:"🍲",
         caption:"🍲 몰 안에도 송파 바쿠테가 있다.\n점심때라 자리가 거의 찼다.",
@@ -1589,6 +1604,9 @@ function openCloseup(cu, h, id){
   // ★12칸 토글(마리나 정비함): 블록 누르면 들어가고/나오고, 패턴 일치 순간 통과
   clearToggle();
   if(a.type==="toggle") buildToggle(a, id);
+  // ★닦기(비보시티 쇼윈도): 손수건 골라 들고 문지르면 먼지가 지워진다
+  clearWipe();
+  if(a.type==="wipe") buildWipe(a, id);
   // ★쌍안경 뷰: 검은 원 테두리 오버레이 (바깥 어둡고 안은 사진)
   { const w0=$("#cuImgWrap");
     if(w0){ w0.querySelectorAll(".cu-binoc").forEach(e=>e.remove());
@@ -1805,6 +1823,72 @@ function buildMirrorView(a){
    틀리면 전부 빨갛게 번쩍인 뒤 꺼지며 처음부터. 다 맞으면 파랗게 빛나며 달칵.
    쓰는 법: action:{type:"seq", answer:["sparrow",...], zones:[{k,x,y,w,h,label}],
             lamps:[{x,y}], lampW, lampH, success, setFlag} */
+/* ---- 닦기 퍼즐 (비보시티 쇼윈도) ----
+   closeup.img = 깨끗한 사진(1461). 그 위 캔버스에 더러운 사진(a.dirty)을 그려 두고,
+   손수건(a.needItem)을 골라 든 채 문지르면 destination-out 브러시로 지워진다.
+   threshold(기본 0.68) 이상 지우면 완료 — 남은 먼지는 서서히 사라짐.
+   쓰는 법: action:{type:"wipe", dirty:"img/...", needItem:"hankie", no, pick, doneMsg, setFlag} */
+let wipeCtx=null;
+function clearWipe(){ const c=document.querySelector("#cuImgWrap .cu-wipe"); if(c) c.remove(); wipeCtx=null; }
+function buildWipe(a, id){
+  clearWipe();
+  const wrap=$("#cuImgWrap"); if(!wrap) return;
+  if(state.done[id]){ $("#cuLockBadge").textContent="✅"; return; }   // 이미 닦음 → 깨끗한 사진만
+  const cv=document.createElement("canvas"); cv.className="cu-wipe";
+  cv.style.cssText="position:absolute;inset:0;width:100%;height:100%;z-index:6;touch-action:none;cursor:pointer;";
+  wrap.appendChild(cv);
+  const img=new Image();
+  img.onload=function(){
+    cv.width=Math.round(img.naturalWidth/2); cv.height=Math.round(img.naturalHeight/2);
+    const ctx=cv.getContext("2d");
+    ctx.drawImage(img,0,0,cv.width,cv.height);
+    wipeCtx={cv,ctx,n:0,warned:false};
+  };
+  img.src=a.dirty;
+  const rub=(ev)=>{
+    if(!wipeCtx||state.done[id]) return;
+    if(a.needItem && selected!==a.needItem){
+      if(!wipeCtx.warned){ wipeCtx.warned=true; setTimeout(()=>{ if(wipeCtx) wipeCtx.warned=false; },1500);
+        toast(has(a.needItem)?(a.pick||"가방에서 골라서 닦아봐."):(a.no||"맨손으론 닦이지 않는다…")); }
+      return;
+    }
+    ev.preventDefault();
+    const r=cv.getBoundingClientRect();
+    const pts=ev.touches?[...ev.touches]:[ev];
+    const ctx=wipeCtx.ctx;
+    ctx.globalCompositeOperation="destination-out";
+    for(const p of pts){
+      const x=(p.clientX-r.left)/r.width*cv.width, y=(p.clientY-r.top)/r.height*cv.height;
+      const rad=cv.width*0.085;
+      const g=ctx.createRadialGradient(x,y,0,x,y,rad);
+      g.addColorStop(0,"rgba(0,0,0,1)"); g.addColorStop(0.7,"rgba(0,0,0,0.9)"); g.addColorStop(1,"rgba(0,0,0,0)");
+      ctx.fillStyle=g; ctx.beginPath(); ctx.arc(x,y,rad,0,7); ctx.fill();
+    }
+    if(++wipeCtx.n%10===0) checkWipe(a,id);
+  };
+  cv.addEventListener("pointerdown",(e)=>{ rub(e); });
+  cv.addEventListener("pointermove",(e)=>{ if(e.buttons>0||e.pressure>0) rub(e); });
+  cv.addEventListener("touchmove",rub,{passive:false});
+}
+function checkWipe(a,id){
+  if(!wipeCtx||state.done[id]) return;
+  const cv=wipeCtx.cv, ctx=wipeCtx.ctx;
+  let clear=0,total=0;
+  try{
+    const d=ctx.getImageData(0,0,cv.width,cv.height).data;
+    for(let i=3;i<d.length;i+=4*97){ total++; if(d[i]<40) clear++; }
+  }catch(e){ return; }
+  if(total>0 && clear/total >= (a.threshold||0.68)){
+    state.done[id]=true; if(a.setFlag) state.flags[a.setFlag]=true; save();
+    SFX.success(); vib([30,40,80]);
+    cv.style.transition="opacity 1.2s ease"; cv.style.opacity="0";
+    setTimeout(()=>{ clearWipe(); },1300);
+    toast(a.doneMsg||"유리가 깨끗해졌다…!");
+    $("#cuLockBadge").textContent="✅";
+    render();
+  }
+}
+
 /* ---- 12칸 토글 퍼즐 (마리나 난간 정비함) ----
    블록을 누르면 눌린 모습(marina_press.png 오버레이)으로 들어가고, 다시 누르면 나온다.
    현재 패턴이 answer("1"=눌림)와 일치하는 순간 통과. 순서 없음, 리셋 없음(자유 토글).
