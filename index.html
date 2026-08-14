@@ -246,6 +246,26 @@
   #flash{ position:absolute; inset:0; background:#fff; opacity:0; pointer-events:none; z-index:80; display:none; }
   #flash.go{ display:block; animation:flashfx .75s ease-out forwards; }
   @keyframes flashfx{ 0%{opacity:0} 10%{opacity:1} 26%{opacity:1} 100%{opacity:0} }
+  /* 느린 하얀 페이드 (엔딩 사진 전환) */
+  #flash.fade{ display:block; animation:fadefx 1.6s ease-in-out forwards; }
+  @keyframes fadefx{ 0%{opacity:0} 34%{opacity:1} 52%{opacity:1} 100%{opacity:0} }
+  /* 엔딩 사진 배경일 땐 스토리 어둡기 오버레이 약하게 (밝은 아침 분위기 유지) */
+  #story.brightBg::before{ background:rgba(12,22,45,.16); }
+  /* ★GAME CLEAR 화면 = 엔딩 사진 배경 + 반투명 유리 카드 (북쑥 2026-08-15) */
+  .overlay.gcEnd{ background:url("img/ending.jpg") center/cover no-repeat; }
+  .overlay.gcEnd::before{ content:""; position:absolute; inset:0;
+    background:linear-gradient(180deg, rgba(255,255,255,0) 34%, rgba(255,255,255,.34) 70%, rgba(255,255,255,.55)); }
+  .gcCard{ position:relative; background:rgba(255,255,255,.80); backdrop-filter:blur(7px);
+    border-radius:26px; padding:20px 18px 18px; margin:0 4px; width:100%; max-width:330px;
+    border:2px solid rgba(255,255,255,.95); box-shadow:0 20px 48px rgba(30,60,100,.30); }
+  .gcCard .bigemoji{ font-size:56px; }
+  /* ★재미요소: 성공 폭죽 파티클 */
+  .confP{ position:absolute; z-index:85; pointer-events:none; opacity:0;
+    transform:translate(-50%,-50%) scale(.4);
+    animation:confP 1.2s cubic-bezier(.16,.8,.36,1) forwards; }
+  @keyframes confP{ 0%{opacity:0; transform:translate(-50%,-50%) scale(.4)}
+    12%{opacity:1}
+    100%{opacity:0; transform:translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1.05) rotate(70deg)} }
 
   /* ═══════ UI 스킨 (북쑥 2026-08-15 "무료 게임 UI킷 느낌") ═══════
      게임 로직 무변경 — 순수 CSS 오버라이드만. 롤백 = 이 블록 통삭제
@@ -1307,7 +1327,8 @@ const SFX={
   open(){ const t=actx()?.currentTime||0; _tone(520,.09,"sine",.12); _tone(790,.10,"sine",.07,t+.05); },
   key(){ _tone(680,.028,"square",.05); },
   lock(){ _noise(.08,.13); _tone(170,.08,"square",.10); },            // 자물쇠 철컥(열림)
-  success(){ const a=actx(); if(!a)return; const t=a.currentTime; [523,659,784,1047].forEach((f,i)=>_tone(f,.3,"sine",.15,t+i*.085)); vib([25,35,55]); },
+  success(){ try{confettiBurst();}catch(e){}   // ★재미요소: 성공 순간 이모지 폭죽 (롤백=이 줄 삭제)
+    const a=actx(); if(!a)return; const t=a.currentTime; [523,659,784,1047].forEach((f,i)=>_tone(f,.3,"sine",.15,t+i*.085)); vib([25,35,55]); },
   item(){ const a=actx(); if(!a)return; const t=a.currentTime; [784,988,1319].forEach((f,i)=>_tone(f,.17,"triangle",.12,t+i*.05)); vib(28); },
   fail(){ const t=actx()?.currentTime||0; _tone(196,.18,"sawtooth",.13); _tone(150,.22,"sawtooth",.11,t+.06); vib(120); },
   move(){ const t=actx()?.currentTime||0; _tone(300,.13,"sine",.09); _tone(400,.13,"sine",.07,t+.07); },
@@ -1377,8 +1398,9 @@ const RMSTORY=[
 const WAKESTORY=[
   {emoji:"🌅", text:"…어라?"},
   {emoji:"👀", text:"자물쇠도, 수수께끼 상자도,\n반짝이던 표시도… 전부 사라졌다."},
-  {emoji:"✨", text:"세상이 다시 돌아왔다!"},
-  {emoji:"🧳", text:"창밖엔 여느 때처럼 반짝이는 싱가포르.\n— 좋아, 이제 진짜 여행을 즐기러 가자!", btn:"여행을 즐기자! 🌅"},
+  // ★이 대사부터 엔딩 사진 배경 + 하얀 페이드 전환 (북쑥 2026-08-15)
+  {emoji:"✨", text:"세상이 다시 돌아온 것 같아..!", bg:"img/ending.jpg", fade:true},
+  {emoji:"🧳", text:"창밖엔 여느 때처럼 반짝이는 싱가포르.\n— 좋아, 이제 진짜 여행을 즐기러 가자!", btn:"여행을 즐기자! 🌅", bg:"img/ending.jpg"},
 ];
 let curStory=STORY;
 let storyDone=null;   // 스토리 세트가 끝났을 때 1회 실행할 콜백 (방 엔딩 연출용)
@@ -1388,20 +1410,27 @@ function showStory(i){
     ov.style.display="none"; curStory=STORY;
     if(storyDone){ const f=storyDone; storyDone=null; f(); return; }
     render(); return; }
-  // ★시내 첫 진입 스토리는 배경 = 시내 사진 (북쑥 2026-08-14. 나머지는 기본 하늘)
-  ov.style.backgroundImage = (curStory===DTSTORY) ? 'url("img/downtown.jpg")' : "";
-  const s=curStory[i]; SFX.open();
+  const s=curStory[i];
   const last=i>=curStory.length-1;
-  const media = s.img ? ('<img class="storyImg" src="'+s.img+'" alt="">')
-                      : ('<div class="bigemoji">'+(s.emoji||"")+'</div>');
-  const btnLabel = s.btn || (last ? (curStory===STORY ? "여행 시작!" : "알겠어!") : "다음 ▶");
-  ov.innerHTML='<div class="storyCard">'+media+
-    (s.title ? '<h2>'+s.title+'</h2>' : '')+
-    '<p>'+s.text+'</p>'+
-    '<button class="btn" onclick="SFX.tap();storyNext('+i+')">'+btnLabel+'</button>'+
-    '<div class="storyDots">'+curStory.map(function(_,j){ return '<span class="'+(j===i?'on':'')+'"></span>'; }).join("")+
-    '</div></div>';
-  ov.style.display="flex";
+  // ★비트별 배경(s.bg) + 하얀 페이드 전환(s.fade) — 엔딩 사진 등장 연출 (북쑥 2026-08-15)
+  //   기본: 시내 첫 진입 스토리만 시내 사진, 나머지는 기본 하늘
+  const wantBg = s.bg ? 'url("'+s.bg+'")' : ((curStory===DTSTORY) ? 'url("img/downtown.jpg")' : "");
+  const paint = function(){
+    ov.style.backgroundImage = wantBg;
+    ov.classList.toggle("brightBg", !!s.bg);   // 엔딩 사진일 땐 어둡기 오버레이 약하게
+    SFX.open();
+    const media = s.img ? ('<img class="storyImg" src="'+s.img+'" alt="">')
+                        : ('<div class="bigemoji">'+(s.emoji||"")+'</div>');
+    const btnLabel = s.btn || (last ? (curStory===STORY ? "여행 시작!" : "알겠어!") : "다음 ▶");
+    ov.innerHTML='<div class="storyCard">'+media+
+      (s.title ? '<h2>'+s.title+'</h2>' : '')+
+      '<p>'+s.text+'</p>'+
+      '<button class="btn" onclick="SFX.tap();storyNext('+i+')">'+btnLabel+'</button>'+
+      '<div class="storyDots">'+curStory.map(function(_,j){ return '<span class="'+(j===i?'on':'')+'"></span>'; }).join("")+
+      '</div></div>';
+    ov.style.display="flex";
+  };
+  if(s.fade) whiteFade(paint); else paint();
 }
 function storyNext(i){
   if(curStory===STORY && i===0){ fadeBlink(function(){ showStory(1); }); return; }   // 대본1→2 검은 깜빡임
@@ -2405,9 +2434,32 @@ function openInspect(key){
 const MARU_IMG="img/closeup/universal_chara.jpg";
 function whiteFlash(){   // ★마법으로 물건이 '뿅' 나올 때 화면 전체 하얀 번쩍
   const f=$("#flash"); if(!f) return;
-  f.classList.remove("go"); void f.offsetWidth;   // 연속 발동 시 애니 재시작
+  f.classList.remove("go","fade"); void f.offsetWidth;   // 연속 발동 시 애니 재시작
   f.classList.add("go");
   setTimeout(()=>f.classList.remove("go"), 800);
+}
+/* ★재미요소(2026-08-15): 퍼즐 성공 순간 이모지 폭죽 — SFX.success에서 호출. 롤백=이 함수+호출 삭제 */
+function confettiBurst(){
+  const host=$("#app"); if(!host) return;
+  const EMO=["🎉","✨","⭐","💗","🎊"];
+  for(let i=0;i<14;i++){
+    const e=document.createElement("span"); e.className="confP"; e.textContent=EMO[i%EMO.length];
+    const ang=Math.random()*Math.PI*2, dist=90+Math.random()*130;
+    e.style.left="50%"; e.style.top="44%";
+    e.style.setProperty("--dx",(Math.cos(ang)*dist)+"px");
+    e.style.setProperty("--dy",(Math.sin(ang)*dist*0.85-46)+"px");
+    e.style.animationDelay=(Math.random()*.1)+"s";
+    e.style.fontSize=(15+Math.random()*14)+"px";
+    host.appendChild(e);
+    setTimeout(()=>e.remove(), 1500);
+  }
+}
+function whiteFade(mid){   // ★느린 하얀 페이드인→(정점에서 mid 실행: 배경 교체 등)→아웃 (엔딩 전환용)
+  const f=$("#flash"); if(!f){ if(mid)mid(); return; }
+  f.classList.remove("go","fade"); void f.offsetWidth;
+  f.classList.add("fade");
+  setTimeout(()=>{ if(mid)mid(); }, 600);
+  setTimeout(()=>f.classList.remove("fade"), 1650);
 }
 const MARU_FEATURES=[   // wj = 오답 물건 이름(조사 포함)
   {k:"cube",    label:"네모난 물건",        img:"maru_cube",    wj:"큐브를"},
@@ -2712,7 +2764,7 @@ window.addEventListener("popstate", function(){
 /* ---- 엔딩 GAME CLEAR (북쑥 2026-08-15 "화려하게 축하 낭낭") ---- */
 function showEnding(){
   closeModal(); closeCloseupAll();
-  const ov=document.createElement("div"); ov.className="overlay";
+  const ov=document.createElement("div"); ov.className="overlay gcEnd";   // ★배경 = 엔딩 사진(머라이언)
   ov.innerHTML=`
     <span class="gcConf" style="top:8%;left:10%;animation-delay:.1s">🎊</span>
     <span class="gcConf" style="top:12%;right:12%;animation-delay:.6s">🎉</span>
@@ -2724,11 +2776,13 @@ function showEnding(){
     <span class="gcConf" style="bottom:16%;right:14%;animation-delay:1.0s">🎊</span>
     <span class="gcConf" style="bottom:34%;left:4%;animation-delay:1.6s">🌟</span>
     <span class="gcConf" style="bottom:36%;right:4%;animation-delay:.2s">🌟</span>
-    <div class="bigemoji">🏆</div>
-    <div class="gc-title">GAME CLEAR!!</div>
-    <h1>세상이 다시 돌아왔다!</h1>
-    <p>싱가포르 여행 대소동 — 탈출 성공! 🎉<br>여권도 되찾았고, 체크인도 끝!<br>이제 진짜 여행을 즐기자 💗</p>
-    <button class="btn" style="max-width:220px" onclick="location.reload()">다시 보기</button>`;
+    <div class="gcCard">
+      <div class="bigemoji">🏆</div>
+      <div class="gc-title">GAME CLEAR!!</div>
+      <h1>세상이 다시 돌아왔다!</h1>
+      <p>싱가포르 여행 대소동 — 탈출 성공! 🎉<br>여권도 되찾았고, 체크인도 끝!<br>이제 진짜 여행을 즐기자 💗</p>
+      <button class="btn" style="max-width:220px" onclick="location.reload()">다시 보기</button>
+    </div>`;
   $("#app").appendChild(ov);
   if(SFX.success)SFX.success(); vib([40,60,120]);
 }
