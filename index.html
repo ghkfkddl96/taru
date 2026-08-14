@@ -622,18 +622,18 @@ const MAPS = {
     name:"주얼 · 레인 보텍스", sub:"천장에서 쏟아지는 40m 실내폭포", photo:"img/jewel.jpg",
     hotspots:[
       // 팝업 사진이 폭포 천장(깔때기) 쪽이라 누르는 위치도 위로 (북쑥 2026-08-13). 벽시계 518의 힌트가 이 사진에 있음.
-      { x:52,y:30, w:30,h:28, label:"레인 보텍스", closeup:{
+      { x:52,y:30, w:52,h:48, label:"레인 보텍스", closeup:{   // (북쑥 2026-08-15: 넓이 3배)
         img:"img/closeup/waterfall.jpg", badge:"💧",
         caption:"💧 최대 규모의 실내 폭포가 시원하게 떨어지고 있다.", action:{type:"clue"} }},
-      { x:20,y:73, w:26,h:14, label:"기념품샵", closeup:{
+      { x:23,y:71, w:44,h:23, label:"기념품샵", closeup:{   // (북쑥 2026-08-15: 주얼 맵 핫스팟 전부 넓이 3배)
         img:"img/goodsshop.jpg", badge:"🎁",
         caption:"🎁 아기자기한 창이 기념품 가게.", action:{type:"clue"},
         subspots:[
-          // (북쑥 2026-08-15: 서브스팟 넓이 2배 확대 — w,h ×1.4)
-          {x:23,y:78,w:42,h:38,label:"인형 진열대", closeup:{
+          // (북쑥 2026-08-15: 서브스팟 넓이 2배 → 추가 2배(원본 대비 4배))
+          {x:30,y:73,w:58,h:52,label:"인형 진열대", closeup:{
             img:"img/dolls.jpg", badge:"🧸",
             caption:"🧸 귀여운 인형들이 많이 있다! 🐰🐱🦁🐘🐻\n경찰복 입은 애들 너무 귀엽다 💙", action:{type:"clue"} }},
-          {x:63,y:15,w:24,h:26,label:"벽에 걸린 시계", closeup:{
+          {x:64,y:19,w:34,h:36,label:"벽에 걸린 시계", closeup:{
             img:"img/closeup/clock.jpg", badge:"🕰️",
             caption:"🕰️ 로마숫자 벽시계.\n바늘이 헐겁게 달려 있어 — 눌러서 돌릴 수 있겠는데?",
             action:{type:"clock", hour:5, minute:1, second:8,
