@@ -1630,7 +1630,7 @@ const TRANSITIONS = {
   "universalin>universal":{img:"img/transit/walk.jpg", icon:"🚶", text:"걸어서 이동 중"},
   "default":         {img:"img/transit/bus.jpg",    icon:"🚌", text:"버스 타고 이동 중", transit:true},
 };
-const TRANSIT_MS = 3000;  // 3초 자동 진행 (북쑥 2026-08-13: 5초 너무 길다) (디버그: 탭 즉시스킵 + 0.9초 자동)
+const TRANSIT_MS = 2000;  // 2초 자동 진행 (북쑥 2026-08-15: 3초도 길다) (디버그: 탭 즉시스킵 + 0.9초 자동)
 function goTo(to){
   if(to==="__ending"){ showEnding(); return; }
   const key=state.room+">"+to;
