@@ -1475,6 +1475,8 @@ function fadeBlink(mid){
     setTimeout(function(){ f.style.pointerEvents="none"; }, 500); }, 500);
 }
 window.addEventListener("load",()=>{
+  // ★오프라인 지원(2026-08-15): 서비스워커가 게임 전체를 기기에 저장 — 기내/오프라인에서도 완전 동작
+  if("serviceWorker" in navigator){ navigator.serviceWorker.register("sw.js").catch(()=>{}); }
   // 배경/클로즈업/이동 사진 미리 로드
   Object.values(MAPS).forEach(m=>{ if(m.photo){const i=new Image(); i.src=m.photo;}
     if(m.bgAnim) m.bgAnim.frames.forEach(f=>{const i=new Image(); i.src=f;});   // 물줄기 강약 프레임 미리받기
