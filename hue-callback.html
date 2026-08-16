@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>타루 · Hue 연결</title>
+<style>
+  body{margin:0;font-family:-apple-system,system-ui,sans-serif;background:#101418;color:#e8edf2;
+       display:flex;min-height:100vh;align-items:center;justify-content:center;padding:24px}
+  .card{max-width:420px;width:100%;background:#1a2129;border:1px solid #2a333e;border-radius:16px;padding:28px;text-align:center}
+  h1{font-size:20px;margin:0 0 8px}
+  p{color:#9fb0c0;font-size:14px;line-height:1.6;margin:8px 0}
+  .code{margin:18px 0;padding:14px;background:#0d1115;border:1px dashed #3a4652;border-radius:10px;
+        font-family:ui-monospace,monospace;font-size:13px;word-break:break-all;color:#7fd18a}
+  button{margin-top:6px;padding:12px 20px;font-size:15px;border:0;border-radius:10px;background:#3b82f6;color:#fff;font-weight:600;width:100%}
+  button:active{opacity:.8}
+  .ok{color:#7fd18a;font-weight:600}
+  .warn{color:#e0b34c}
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>💡 타루 · Hue 연결</h1>
+  <div id="content">
+    <p>주소를 확인하는 중…</p>
+  </div>
+</div>
+<script>
+  const q = new URLSearchParams(location.search);
+  const code = q.get('code');
+  const el = document.getElementById('content');
+  if (code) {
+    el.innerHTML =
+      '<p class="ok">승인 성공! 아래 코드를 타루에게 보내면 끝이야.</p>' +
+      '<div class="code" id="codebox">' + code.replace(/[<>&]/g,'') + '</div>' +
+      '<button onclick="copyCode()">코드 복사</button>' +
+      '<p>복사해서 디스코드에 붙여넣기만 하면 돼.<br>(이 코드는 몇 분 뒤 만료되니 바로 보내줘)</p>';
+  } else if (q.get('error')) {
+    el.innerHTML = '<p class="warn">승인이 거절되거나 실패했어: ' + (q.get('error_description')||q.get('error')).replace(/[<>&]/g,'') + '</p>' +
+      '<p>타루에게 이 화면을 알려줘.</p>';
+  } else {
+    el.innerHTML = '<p>여기는 타루의 Hue 연결용 페이지야.<br>필립스 휴 승인 후 자동으로 코드가 표시돼.</p>';
+  }
+  function copyCode(){
+    navigator.clipboard.writeText(document.getElementById('codebox').textContent.trim())
+      .then(()=>{ document.querySelector('button').textContent='복사됨 ✓'; });
+  }
+</script>
+</body>
+</html>
