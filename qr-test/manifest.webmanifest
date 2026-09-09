@@ -1,0 +1,16 @@
+{
+  "name": "QR 테스트",
+  "short_name": "QR테스트",
+  "description": "아이폰 사파리에서 카메라 미리보기 + 실물 QR 인식이 오프라인에서도 되는지 확인하는 테스트 페이지",
+  "lang": "ko",
+  "dir": "ltr",
+  "display": "standalone",
+  "orientation": "portrait",
+  "start_url": "./index.html",
+  "scope": "./",
+  "background_color": "#0b1220",
+  "theme_color": "#0b1220",
+  "icons": [
+    { "src": "./icon.png", "sizes": "180x180", "type": "image/png", "purpose": "any" }
+  ]
+}
