@@ -1,5 +1,5 @@
 /* 오디세이 × 발리 — 오프라인 서비스워커 (자동 생성) */
-const CACHE = "odyssey-ODY-S1-20260910-1629";
+const CACHE = "odyssey-ODY-S1-20260910-1737";
 const PRECACHE = [
  "./",
  "./index.html",

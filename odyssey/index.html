@@ -10751,7 +10751,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 (function () {
   "use strict";
 
-  var BUILD = "ODY-S1-20260910-1629";
+  var BUILD = "ODY-S1-20260910-1737";
   var LSKEY = "odyssey.s1.v1";
 
   var qs = new URLSearchParams(location.search);
@@ -11049,10 +11049,10 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   /* ★v0.5.1 #25 색상판 4종 — 실제 사진(ref/choi-first-blocks.jpg)의 블록 앞면 텍스처.
      추출: node tools/extract-tiles.mjs  (평균색은 BUILD_NOTES 참고) */
   var TILES = {
-    black: { id: "black", label: "검정", hex: "#171617", img: IMG + "tile_black.jpg" },
-    brown: { id: "brown", label: "갈색", hex: "#562c0c", img: IMG + "tile_brown.jpg" },
-    dark: { id: "dark", label: "짙은갈색", hex: "#1e110e", img: IMG + "tile_dark.jpg" },
-    beige: { id: "beige", label: "베이지", hex: "#8a5a28", img: IMG + "tile_beige.jpg" }
+    black: { id: "black", label: "검정", hex: "#171616", img: IMG + "tile_black.jpg" },   /* L* 7.4 */
+    brown: { id: "brown", label: "갈색", hex: "#7f4d13", img: IMG + "tile_brown.jpg" },   /* L* 37.5 */
+    dark: { id: "dark", label: "짙은갈색", hex: "#573822", img: IMG + "tile_dark.jpg" },  /* L* 26.5 */
+    beige: { id: "beige", label: "베이지", hex: "#a67538", img: IMG + "tile_beige.jpg" }  /* L* 53.0 */
   };
 
   /* ─────────────────────────────────────────────────────────
