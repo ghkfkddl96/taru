@@ -98,6 +98,9 @@ body.hints .spot .lbl{opacity:.9}
 
 /* ───────── 인벤 ───────── */
 #invWrap{
+  /* ★v0.9 position/z-index — 팝업(.sheet z:30)이 떠도 인벤은 그 위에 남아 그대로 보이고 눌린다.
+     폰(34)·전체화면(40)·스토리(46)보다는 아래라 그쪽은 예전처럼 인벤을 덮는다. */
+  position:relative;z-index:33;
   flex:0 0 auto;display:flex;align-items:center;gap:10px;padding:10px 14px calc(var(--safeB) + 10px);
   background:var(--n1);border-top:1px solid var(--line);
 }
@@ -116,11 +119,15 @@ body.hints .spot .lbl{opacity:.9}
 /* ───────── 시트(클로즈업/확대) ───────── */
 /* ★v0.2: 팝업 뒤로 현재 맵이 블러로 비친다(검은 단절 제거) */
 .sheet{
-  position:absolute;inset:0;z-index:30;display:none;flex-direction:column;
+  /* ★v0.9 inset:0 → 아래 끝을 인벤 높이(--invH)만큼 띄운다.
+     --invH 는 core.js 가 #invWrap 실제 높이를 재서 넣는다(ResizeObserver + resize/orientationchange).
+     safeB·디버그바·아이템 유무로 인벤 높이가 변해도 팝업 아래끝 = 인벤 위끝 이 유지된다.
+     인벤이 safeB 를 이미 먹고 있으므로 팝업 하단 패딩에서는 safeB 를 뺀다. */
+  position:absolute;top:0;left:0;right:0;bottom:var(--invH,0px);z-index:30;display:none;flex-direction:column;
   background:rgba(0,0,0,.28);
   -webkit-backdrop-filter:blur(12px);
   backdrop-filter:blur(12px);
-  padding:calc(var(--safeT) + 44px) 16px calc(var(--safeB) + 16px);
+  padding:calc(var(--safeT) + 44px) 16px 14px;
 }
 .sheet.show{display:flex}
 .sheetClose{position:absolute;top:calc(var(--safeT) + 8px);right:12px;z-index:5;width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:transparent;font-size:20px;line-height:1;color:var(--n8)}
@@ -128,7 +135,7 @@ body.hints .spot .lbl{opacity:.9}
 .sheetStage{flex:1 1 auto;position:relative;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .sheetStage img.main{max-width:100%;max-height:100%;object-fit:contain;border-radius:var(--r)}
 .sheetPanel{flex:0 0 auto;padding-top:14px}
-.sheetCaption{flex:0 0 auto;font-size:12px;color:var(--dim);text-align:center;padding-top:10px;min-height:16px;white-space:pre-line;line-height:1.6}
+.sheetCaption{flex:0 0 auto;font-size:12px;color:#ffffff;text-align:center;padding-top:10px;min-height:16px;white-space:pre-line;line-height:1.6}
 
 /* ───────── 자물쇠 공통 ───────── */
 .lock{display:flex;flex-direction:column;align-items:center;gap:12px}
@@ -354,7 +361,7 @@ body.hints .ifeHot{box-shadow:0 0 0 1px rgba(255,255,255,.5), 0 0 12px rgba(255,
 #transitBarWrap{width:56%;height:2px;background:var(--n4);border-radius:2px;overflow:hidden}
 #transitBar{height:100%;width:0;background:var(--accent)}
 
-#toast{position:absolute;left:50%;bottom:104px;transform:translateX(-50%);z-index:60;
+#toast{position:absolute;left:50%;bottom:calc(var(--invH, 88px) + 14px);transform:translateX(-50%);z-index:60;   /* ★v0.9 인벤 위로 — 인벤이 항상 보이게 됐다 */
   background:var(--n2);border:1px solid var(--line2);border-radius:var(--r);padding:11px 16px;font-size:13px;
   max-width:82%;text-align:center;opacity:0;pointer-events:none;transition:opacity .2s;white-space:pre-line;line-height:1.5}
 #toast.show{opacity:1}
@@ -370,8 +377,8 @@ body.hints .ifeHot{box-shadow:0 0 0 1px rgba(255,255,255,.5), 0 0 12px rgba(255,
 .dbgAns{color:#e8cdcd;font-weight:700}
 /* 디버그 바가 하단 UI를 가리지 않게 */
 body.dbg .fullFoot{padding-bottom:calc(var(--safeB) + 46px)}
-body.dbg #invWrap{padding-bottom:calc(var(--safeB) + 46px)}
-body.dbg .sheet{padding-bottom:calc(var(--safeB) + 50px)}
+body.dbg #invWrap{padding-bottom:calc(var(--dbgH, 46px) + 8px)}   /* ★v0.9 디버그바 실측 높이(줄바꿈 포함)만큼 비운다 — safeB 는 디버그바가 이미 먹었다 */
+body.dbg .sheet{padding-bottom:14px}   /* ★v0.9 인벤이 디버그바를 피해 있고 팝업은 인벤 위에서 끝난다 */
 body.dbg #story,body.dbg .overlay{padding-bottom:calc(var(--safeB) + 56px)}
 
 .chip{display:inline-block;background:var(--n2);border:1px solid var(--line);border-radius:6px;padding:4px 10px;font-size:12px;margin:3px;color:var(--n8)}
@@ -381,7 +388,7 @@ body.dbg #story,body.dbg .overlay{padding-bottom:calc(var(--safeB) + 56px)}
 
 /* ★v0.2 폴백: backdrop-filter 미지원 브라우저에서는 맵 자체를 블러 처리한다 */
 @supports not ((-webkit-backdrop-filter: blur(2px)) or (backdrop-filter: blur(2px))){
-  body.ovl #scene,body.ovl #invWrap,body.ovl #topbar{filter:blur(10px)}
+  body.ovl #scene,body.ovl #topbar{filter:blur(10px)}   /* ★v0.9 #invWrap 제외 — 인벤은 흐려지면 안 된다 */
   .sheet,#phoneWrap{background:rgba(11,11,12,.72)}
   #full,#story,#transit{background:rgba(11,11,12,.86)}
 }
@@ -575,6 +582,28 @@ body.hints .cvcell.snackSlot{box-shadow:inset 0 0 0 2px rgba(255,255,255,.35)}
   60%{opacity:.35}100%{opacity:1;transform:scale(1)}}
 @media(prefers-reduced-motion:reduce){.trkPop{animation:none}}
 
+/* ★v0.9 팝업(.sheet) 안 "안내 문장" 은 전부 흰색 — 회색이라 안 보인다는 지적.
+   .sheet 로 한정해서 폰(#phoneWrap)·전체화면(#full)·스토리(#story)의 같은 클래스는 그대로 둔다.
+   작은 번호 라벨(.slot .cnum)·단위 라벨(.frag span)은 안내문구가 아니라 제외. */
+.sheet .lockMsg{color:#ffffff}
+.sheet .lockMsg.bad{color:var(--bad)}
+.sheet .lockMsg.ok{color:var(--ok)}
+.sheet .cycTip{color:#ffffff}
+.sheet .ladderTag{color:#ffffff}
+
+/* ★v0.9 2층 팝업 — 확대(#zoom)가 클로즈업(#closeup) 위에 뜬다. 인벤(33)보다는 아래. */
+#zoom{z-index:32}
+
+/* ★v0.9 사진 속 "누를 수 있는 패널" 표시 — 은은한 링 + 작은 라벨 */
+.cvcell.panelHot{box-shadow:inset 0 0 0 2px rgba(255,255,255,.32);border-radius:10px}
+.cvcell.panelHot:active{box-shadow:inset 0 0 0 3px rgba(255,255,255,.7)}
+.cvcell.panelHot .cv{min-width:0;min-height:0;padding:3px 11px;font-size:11px;letter-spacing:.5px;
+  background:rgba(6,6,8,.5);color:#fff;border-radius:999px}
+body.hints .cvcell.panelHot{box-shadow:inset 0 0 0 2px rgba(255,255,255,.55);animation:glow 2.6s ease-in-out infinite}
+
+/* ★v0.9 확대 팝업 안 패턴 자물쇠는 스테이지에 꽉 차게(정사각) — 실제 크기는 main.js 가 넣는다 */
+#zoomStage #patWrap{margin:0 auto;max-width:none}
+
 </style>
 </head>
 <body>
@@ -662,7 +691,7 @@ body.hints .cvcell.snackSlot{box-shadow:inset 0 0 0 2px rgba(255,255,255,.35)}
 
 </div>
 
-<script>window.__AUDIO = ["song1.mp3","song2.mp3","song3.mp3","song4.mp3","song5.mp3"];</script>
+<script>window.__AUDIO = ["song1.mp3","song2.mp3","song3.mp3","song4.mp3","song5.mp3"]; window.__IMG = ["app_kakao.png","app_map.png","app_minigame.png","app_qr.png","archer.jpg","bin_L1.jpg","bin_L1_open_case.jpg","bin_L1_open_empty.jpg","bin_L2.jpg","bin_R1.jpg","bin_R1_open_card.jpg","bin_R1_open_empty.jpg","bin_R2.jpg","blanket_zoom.jpg","case_open_empty.jpg","case_open_headset.jpg","ceiling_open_cardkey.jpg","ceiling_open_empty.jpg","char_front.jpg","char_happy.jpg","char_hipL.jpg","char_hipR.jpg","char_hungry.jpg","crew_blanket.jpg","crew_tray.jpg","food_bread.png","food_cake.png","food_omu.png","food_salad.png","galley_cart.jpg","galley_drawer.jpg","galley_snack.jpg","galley_upper.jpg","gamecard.jpg","headphones.jpg","headset_case.jpg","headset_worn.jpg","ic_blanket.png","ic_butter.jpg","ic_cardkey.jpg","ic_cardkey.png","ic_case.png","ic_cellophane.png","ic_dna.jpg","ic_drop.jpg","ic_dynamite.jpg","ic_fire.jpg","ic_gamecard.png","ic_goldkey.jpg","ic_goldkey.png","ic_headphones.jpg","ic_headphones.png","ic_ladder.png","ic_pamphlet.png","ic_passport.png","ic_peanut.png","ic_phone.png","ic_silverkey.jpg","ic_silverkey.png","ic_telescope.png","ic_ticket.png","ic_tile_beige.png","ic_tile_black.png","ic_tile_brown.png","ic_tile_dark.png","ife_off.jpg","ife_on.jpg","ife_photo1.jpg","ife_photo2.jpg","ife_photo3.jpg","ife_photo4.jpg","lav_ceiling.jpg","lav_tissue.jpg","lav_tissue_idle.jpg","map_aisle.jpg","map_seat.jpg","map_seat_tray.jpg","meal_tray.jpg","passport.jpg","tile_beige.jpg","tile_black.jpg","tile_brown.jpg","tile_dark.jpg","travel1.jpg","travel2.jpg","travel3.jpg","travel4.jpg","window_open.jpg","window_shade.jpg"];</script>
 <script>
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -10772,7 +10801,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 (function () {
   "use strict";
 
-  var BUILD = "ODY-S1-20260910-2352";
+  var BUILD = "ODY-S1-20260911-0714";
   var LSKEY = "odyssey.s1.v1";
 
   var qs = new URLSearchParams(location.search);
@@ -10997,6 +11026,43 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     }
   }
 
+  /* ───────── ★v0.9 인벤 높이를 CSS 변수 --invH 로 넘긴다 ─────────
+     .sheet 가 bottom:var(--invH) 로 끝나므로 "팝업 아래끝 = 인벤 위끝" 이 항상 유지된다.
+     인벤 높이는 safeB(회전·기종)·디버그바·아이템 유무로 변하니 고정 px 를 쓰지 않는다. */
+  var lastInvH = -1, lastDbgH = -1;
+  function syncInvH() {
+    /* 디버그 바는 줄바꿈으로 높이가 변해서(2줄이 되면 인벤을 덮는다) 실측해서 넘긴다 */
+    var d = document.getElementById("debugBar");
+    var dh = (d && d.classList.contains("show")) ? Math.round(d.getBoundingClientRect().height) : 0;
+    if (dh !== lastDbgH) {
+      lastDbgH = dh;
+      document.documentElement.style.setProperty("--dbgH", dh + "px");
+    }
+    var w = document.getElementById("invWrap");
+    if (!w) return;
+    var h = Math.round(w.getBoundingClientRect().height);
+    if (h === lastInvH) return;
+    lastInvH = h;
+    document.documentElement.style.setProperty("--invH", h + "px");
+  }
+  function startInvH() {
+    syncInvH();
+    var w = document.getElementById("invWrap");
+    if (w && window.ResizeObserver) {
+      try {
+        var ro = new ResizeObserver(syncInvH);
+        ro.observe(w);
+        var d2 = document.getElementById("debugBar");
+        if (d2) ro.observe(d2);
+      } catch (e) {}
+    }
+    window.addEventListener("resize", syncInvH);
+    window.addEventListener("orientationchange", function () { setTimeout(syncInvH, 60); setTimeout(syncInvH, 400); });
+    if (window.visualViewport) window.visualViewport.addEventListener("resize", syncInvH);
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", startInvH);
+  else startInvH();
+
   /* ───────── 오버레이 열림 감지 (blur 폴백용 body 클래스) ───────── */
   function syncOverlay() {
     var ids = ["closeup", "zoom", "phoneWrap", "full", "story", "transit"];
@@ -11007,7 +11073,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     }
     document.body.classList.toggle("ovl", on);
   }
-  setInterval(syncOverlay, 250);
+  setInterval(function () { syncOverlay(); syncInvH(); }, 250);   /* ★v0.9 ResizeObserver 미지원 대비 안전망 */
 
   /* ───────── 시드 난수 (칸별 후보 목록 고정용) ───────── */
   function hashSeed(str) {
@@ -11027,7 +11093,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     flag: flag, setFlag: setFlag, has: has, give: give, take: take,
     solved: solved, markSolved: markSolved,
     $: $, el: el, clear: clear, on: on, toast: toast,
-    beep: beep, sfxOk: sfxOk, sfxBad: sfxBad, sfxTap: sfxTap, buzz: buzz, audio: audio,
+    beep: beep, sfxOk: sfxOk, sfxBad: sfxBad, sfxTap: sfxTap, buzz: buzz, audio: audio, syncInvH: syncInvH,
     sha256: sha256, drag: drag, tapper: tapper
   };
 })();
@@ -11240,6 +11306,17 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
      cells: 실제 다이얼/칸 자리 (탭 영역 + 값 표시 위치)
      ───────────────────────────────────────────────────────── */
   var LOCKS = {
+    /* ★v0.9 #13 갤리 상단 수납함 — 풀린 뒤 "문 열린 사진 + 팜플렛 직접 탭" 흐름용 자리.
+       사진 2장이 아직 없어서(gen/44·45 작업 중) 파일이 들어오기 전에는 코드가 자동으로
+       기존 표시(풀리는 즉시 보상)로 되돌아간다. prizeCell 좌표는 사진 도착 후 채운다. */
+    p13: {
+      openImg: "galley_upper_open.jpg",      /* 문 열린 수납함 + 팜플렛 */
+      emptyImg: "galley_upper_empty.jpg",    /* 문 열린 빈 수납함 */
+      /* 원본 이미지 기준 % — 사진이 오면 실측값으로 교체 */
+      prizeCell: { x: 34, y: 38, w: 32, h: 26 },
+      /* ★v0.9 galley_upper.jpg(1000×671) 의 검정 터치패널 실측 bbox(%) — 여기를 탭하면 패턴 자물쇠 팝업 */
+      panelCell: { x: 25.8, y: 27.9, w: 47.8, h: 47.0 }
+    },
     /* ★v0.4: cells 는 전부 tools/scan-dials.mjs 의 픽셀 스캔 결과(눈대중 아님).
        재측정: node .cache/odyssey-escape/tools/scan-dials.mjs → gen/_tmp/scan/cells.json */
     p12: {
@@ -13233,6 +13310,11 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   var el = G.el, clear = G.clear, $ = G.$, S = G.S;
 
   /* ═══════════ 공용: 이미지 + 좌표 오버레이 (W.cropView 위임) ═══════════ */
+  /* ★v0.9 빌드에 실제로 들어 있는 이미지인지 (아직 안 들어온 사진 참조 → 깨진 이미지 방지) */
+  function hasImg(file) {
+    return !!file && Array.isArray(window.__IMG) && window.__IMG.indexOf(file) >= 0;
+  }
+
   function imgStage(src, spots, opts) {
     /* spots: [{x,y,w,h,t,onTap,cls}] — 원본 이미지 기준 % */
     var ov = (spots || []).map(function (sp) {
@@ -13384,6 +13466,13 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     S.sel = (S.sel === id) ? null : id;
     G.sfxTap();
     renderInv();
+    /* ★v0.9 팝업이 열린 채로 인벤을 누를 수 있게 되면서 —
+       이 게임의 아이템 사용은 "고르고 대상을 연다"(openCU 진입 시 USE 실행) 한 가지 흐름뿐이라,
+       이미 그 대상 클로즈업이 열려 있으면 닫았다 열 필요 없이 여기서 같은 USE 를 태운다.
+       (USE 는 맞는 아이템이 아니면 부작용 없이 false 를 돌려주므로 틀린 아이템엔 아무 일도 없다) */
+    if (S.sel && cuId && USE[cuId] && $("closeup").classList.contains("show")) {
+      if (useItem(cuId)) { reopenCU(); return; }
+    }
     if (S.sel) G.toast(DATA.ITEMS[id].name + " 선택 — 쓸 곳을 눌러봐", 1500);
   }
   function inspect(id) {
@@ -13438,7 +13527,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       c.cap("쌍안경으로 창밖을 봤다.");
       var t = el("div");
       t.style.cssText = "text-align:center;font-size:13px;color:var(--n8);line-height:1.7";
-      t.innerHTML = "저 멀리 구름 사이로 <b>무언가</b>가 보인다…<br><span style='color:var(--n6);font-size:11px'>(#23 — 보이는 내용 미정, 자리표시자)</span>";
+      t.innerHTML = "저 멀리 구름 사이로 <b>무언가</b>가 보인다…<br><span style='color:#ffffff;opacity:.75;font-size:11px'>(#23 — 보이는 내용 미정, 자리표시자)</span>";
       c.panel.appendChild(t);
       S.sel = null; renderInv();
       G.setFlag("p23seen");
@@ -13789,24 +13878,67 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     c.cap("국기 4칸과 열쇠 구멍. 둘 다 맞아야 열린다.");
   };
 
+  /* ★v0.9 #13 갤리 상단 수납함 — 2층 팝업 구조.
+       ① 클로즈업에는 **사진만**. 사진 속 검정 터치패널을 탭하면
+       ② 그 위로 확대(#zoom) 팝업이 한 층 더 떠면서 패턴 자물쇠를 보여 준다.
+       ③ 풀리면 zoom 이 닫히고 클로즈업이 갱신된다 — 짐칸 L1 처럼
+          "문 열린 수납함 + 팔플렛" 사진이 뜨고 사진 속 팔플렛을 직접 탭해 꺼난다.
+          (사진 2장이 아직 없으면 예전처럼 "풀리는 즉시 보상" 으로 자동 폴백) */
+  function sizePatternLock() {
+    var st = $("zoomStage"), pw = document.getElementById("patWrap");
+    if (!st || !pw || !$("zoom").classList.contains("show")) return;
+    var r = st.getBoundingClientRect();
+    var s2 = Math.floor(Math.min(r.width, r.height) * 0.9);
+    if (s2 > 40) { pw.style.width = s2 + "px"; pw.style.height = s2 + "px"; }
+  }
+  window.addEventListener("resize", sizePatternLock);
+
   CU.upper = function (c) {
     c.title("갤리 상단 수납함");
-    if (!G.solved("p13")) {
-      c.stage.appendChild(imgStage(DATA.IMG + "galley_upper.jpg", []));
-      c.panel.appendChild(W.patternLock({
-        answer: DATA.ANS.p13,
+    var L13 = DATA.LOCKS.p13 || {};
+    var ready = hasImg(L13.openImg) && hasImg(L13.emptyImg);
+    var pc = L13.panelCell || { x: 25.8, y: 27.9, w: 47.8, h: 47.0 };
+
+    function openPatternZoom() {
+      var already = G.solved("p13");
+      var node = W.patternLock({
+        answer: DATA.ANS.p13, pre: already,
         onSolve: function () {
           G.markSolved("p13");
-          prize(DATA.TEMP.p13Prize, "수납함이 열렸다");
-          reopenCU();
+          if (ready) G.toast("수납함이 열렸다", 1600);
+          else prize(DATA.TEMP.p13Prize, "수납함이 열렸다");   /* 사진 없을 때: 기존 그대로 */
+          setTimeout(function () { closeZoom(); reopenCU(); }, 420);
         }
-      }));
-      c.cap("검정 패널에 흰 점 9개. 이어 그리는 패턴 자물쇠.");
+      });
+      openZoom({
+        id: "p13lock", title: "패턴 자물쇠", node: node,
+        cap: already ? "이미 그은 패턴이다." : "점 9개를 이어 그려봐."
+      });
+      sizePatternLock();
+      setTimeout(sizePatternLock, 60);
+      setTimeout(sizePatternLock, 300);
+    }
+
+    if (!G.solved("p13") || !ready) {
+      c.stage.appendChild(imgStage(DATA.IMG + "galley_upper.jpg", [{
+        x: pc.x, y: pc.y, w: pc.w, h: pc.h, t: "p13panel", cls: "panelHot",
+        build: function (n) { var v = el("div", "cv", "패널"); v._noFit = true; n.appendChild(v); },
+        onTap: openPatternZoom
+      }]));
+      c.cap(G.solved("p13")
+        ? "이미 열었다. (패널을 누르면 그은 선을 다시 볼 수 있다)"
+        : "검정 터치패널이 보인다. 눌러봐.");
       return;
     }
-    c.stage.appendChild(imgStage(DATA.IMG + "galley_upper.jpg", []));
-    c.panel.appendChild(W.patternLock({ answer: DATA.ANS.p13, pre: true, onSolve: function () {} }));
-    c.cap("이미 열었다. (그은 선은 그대로 남아 있다)");
+
+    var got = G.has(DATA.TEMP.p13Prize) || G.flag("tookUpperPrize");
+    var cell = L13.prizeCell || { x: 34, y: 38, w: 32, h: 26 };
+    c.stage.appendChild(imgStage(DATA.IMG + (got ? L13.emptyImg : L13.openImg),
+      got ? [] : [{
+        x: cell.x, y: cell.y, w: cell.w, h: cell.h, t: "takeUpperPrize",
+        onTap: function () { G.setFlag("tookUpperPrize"); prize(DATA.TEMP.p13Prize, ""); reopenCU(); }
+      }]));
+    c.cap(got ? "비어 있다." : "문이 열렸다. 안에 뭔가 들어 있다.");
   };
 
   CU.drawer = function (c) {
@@ -13987,17 +14119,9 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 
     c.stage.appendChild(W.cropView(L.img, L.crop, overlays, { nw: L.nw, nh: L.nh }));
     paint();
-    c.cap("색상판을 순서대로 끼워 넣는 것 같다.\n(홈을 다시 누르면 뺄 수 있다)");
-
-    var tips = el("div", "row");
-    ["tileBlack", "tileBrown", "tileDark", "tileBeige"].forEach(function (id) {
-      if (!G.has(id)) return;
-      var b3 = el("button", "chip", DATA.ITEMS[id].name);
-      b3.setAttribute("data-t", "pick_" + id);
-      b3.onclick = function () { G.S.sel = id; renderInv(); G.toast(DATA.ITEMS[id].name + " 선택 — 홈을 눌러 끼워봐", 1500); };
-      tips.appendChild(b3);
-    });
-    c.panel.appendChild(tips);
+    /* ★v0.9 색상판 선택 칩 제거 — 가방(인벤)에서 직접 골라 홈에 끼우는 흐름만 남긴다.
+       (팝업이 떠도 인벤이 보이고 눌리게 바뀌었으므로 칩은 중복이다) */
+    c.cap("가방에서 색상판을 골라 홈에 끼워 넣는 것 같다.\n(홈을 다시 누르면 뺄 수 있다)");
 
     function itemOf(tile) {
       var k = { black: "tileBlack", brown: "tileBrown", dark: "tileDark", beige: "tileBeige" };
