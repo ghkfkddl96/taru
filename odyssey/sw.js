@@ -1,5 +1,5 @@
 /* 오디세이 × 발리 — 오프라인 서비스워커 (자동 생성) */
-const CACHE = "odyssey-ODY-S1-20260910-2314";
+const CACHE = "odyssey-ODY-S1-20260910-2352";
 const PRECACHE = [
  "./",
  "./index.html",
@@ -93,7 +93,12 @@ const PRECACHE = [
  "./img/travel3.jpg",
  "./img/travel4.jpg",
  "./img/window_open.jpg",
- "./img/window_shade.jpg"
+ "./img/window_shade.jpg",
+ "./audio/song1.mp3",
+ "./audio/song2.mp3",
+ "./audio/song3.mp3",
+ "./audio/song4.mp3",
+ "./audio/song5.mp3"
 ];
 
 self.addEventListener("install", (e) => {
