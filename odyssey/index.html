@@ -419,6 +419,62 @@ input,textarea{-webkit-user-select:text;user-select:text;-webkit-touch-callout:d
 #cello,#cello *,
 #arch,#arch *{touch-action:none}
 
+/* ★v0.3 이미지 위 인라인 입력 */
+.imgLockHost{width:100%;height:100%;display:flex;align-items:center;justify-content:center}
+.cropView{position:relative;overflow:hidden;border-radius:var(--r);flex:0 0 auto}
+.cropInner{position:relative;overflow:hidden;width:100%;height:100%;border-radius:var(--r)}
+.cropInner.noimg{background:linear-gradient(160deg,#2a2a2f,#141416);border:1px solid var(--line2)}
+.cropImg{position:absolute;max-width:none;max-height:none;display:block}
+.cvcell{position:absolute;border:0;background:transparent;padding:0;display:flex;align-items:center;justify-content:center;border-radius:5px}
+.cvcell .cv{min-width:72%;min-height:64%;padding:1px 3px;border-radius:5px;background:rgba(6,6,8,.62);
+  color:#fff;font-weight:800;line-height:1;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 1px 4px rgba(0,0,0,.4)}
+.cvcell.icon .cv{background:rgba(6,6,8,.34);min-width:78%;min-height:78%}
+.cvcell.icon .cv img,.cvcell.icon .cv .cvsvg{width:78%;height:78%;object-fit:contain}
+.cvcell.icon .cv .cvsvg svg{width:100%;height:100%;display:block}
+.cvcell:active .cv{background:rgba(6,6,8,.82)}
+.cvcell.done .cv{background:rgba(24,62,44,.78);color:var(--ok)}
+body.hints .cvcell{box-shadow:inset 0 0 0 2px rgba(255,255,255,.30)}
+body.hints .cvcell.extra{box-shadow:inset 0 0 0 2px rgba(255,255,255,.45);border-radius:50%;animation:glow 2.6s ease-in-out infinite}
+.cvcell.extra .cv{background:rgba(6,6,8,.5);font-size:13px !important}
+/* IFE 인디케이터 */
+.ifeDot{position:absolute;border-radius:50%;border:2px solid rgba(255,255,255,.55);background:rgba(255,255,255,.06);
+  transition:background .18s, border-color .18s}
+.ifeDot.on{background:#5bbf7a;border-color:#8fe0a5}
+.ifeDot.ok{background:#5aa0e8;border-color:#9cc9f5}
+.ifeDot.bad{background:#d0605c;border-color:#f0a3a0}
+
+/* ★v0.3 IFE 오버레이 (cropView 위) */
+.cvcell.hot{background:transparent}
+body.hints .cvcell.hot.ifeBtn,body.hints .cvcell.hot.ifeTile{box-shadow:inset 0 0 0 2px rgba(255,255,255,.45);border-radius:8px;animation:glow 2.6s ease-in-out infinite}
+.cvcell.hot.ifeBtn:active,.cvcell.hot.ifeTile:active{box-shadow:inset 0 0 0 3px rgba(255,255,255,.9)}
+.ifeScreenOv{position:absolute;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#000}
+.ifeScreenOv img{max-width:100%;max-height:100%;object-fit:contain}
+.cvcell.extra.lbl{pointer-events:none}
+.cvcell.extra.lbl .cv{background:transparent;box-shadow:none;font-size:20px !important}
+
+/* ★v0.3b IFE 화면 안 조작 */
+.cvcell.ifeTile{border-radius:8px}
+.cvcell.ifeTile .tileIn{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  background:rgba(6,6,8,.28);border-radius:8px}
+.cvcell.ifeTile .ti{font-size:min(6vw,26px);line-height:1}
+.cvcell.ifeTile .tl{font-size:min(3.1vw,13px);font-weight:700;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.7)}
+.cvcell.ifeTile:active .tileIn{background:rgba(6,6,8,.5)}
+.cvcell.ifeBack{border-radius:6px}
+.cvcell.ifeBack .cv{background:rgba(6,6,8,.6);min-width:100%;min-height:100%;font-size:15px !important}
+.ifeDotsBar{position:absolute;left:0;right:0;bottom:4%;display:flex;gap:5px;justify-content:center;pointer-events:none}
+.ifeDotsBar i{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.35);display:block}
+.ifeDotsBar i.on{background:#fff}
+
+/* ★v0.3b 다마고치 */
+.tamaTop{padding:8px 12px 0;text-align:center}
+.tamaCode{font-size:9px;color:var(--n7);font-family:ui-monospace,Menlo,monospace;word-break:break-all}
+.tamaOk{font-size:11px;color:var(--ok);font-weight:700;margin-top:3px}
+.tamaStage{flex:1;min-height:0;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:0 10px 10px}
+.tamaBubble{background:#ececee;color:#141416;border-radius:12px;padding:7px 12px;font-size:12px;font-weight:700;margin-bottom:8px;position:relative}
+.tamaBubble:after{content:"";position:absolute;left:50%;bottom:-6px;transform:translateX(-50%);border:6px solid transparent;border-top-color:#ececee}
+.tamaChar{width:56%;max-width:150px;height:auto;filter:drop-shadow(0 4px 10px rgba(0,0,0,.4))}
+
 </style>
 </head>
 <body>
@@ -10616,7 +10672,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 (function () {
   "use strict";
 
-  var BUILD = "ODY-S1-20260910-1259";
+  var BUILD = "ODY-S1-20260910-1338";
   var LSKEY = "odyssey.s1.v1";
 
   var qs = new URLSearchParams(location.search);
@@ -10907,12 +10963,15 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     p16Prize: "silverKey",                       // Q5 #16 보상(은색 열쇠)
     p9Prize: "goldKey",                          // Q6 #9 카트 보상(금색 열쇠)
     p14Prize: "frag1",                           // Q7 #14 서랍 보상
-    p18Answer: "TARU-QR-TEST-2026",              // Q8 #18 명함 QR 값
+    p18Answer: "https://m.site.naver.com/1DmdB", // ★실물 명함 QR 해독값(2026-09-10, jsQR)
     p18Prize: "frag2",                           // Q9 #18 보상
     p22Prize: "frag3",                           // Q10 #22 네모로직 보상
     p22Picture: "숫자 7",                        // Q11 #22 완성 그림
     songOrder: ["blood", "fire", "dna", "butter", "dynamite"], // Q12 노래 순서
     p23From: "화장실 수납장1",                   // Q13 #23 망원경 출처
+    p24PeanutFrom: "화장실 수납장2",             // Q16 #24 땅콩 출처
+    p24DanceLock: "화장실 수납장3",              // Q17 춤 순서를 입력하는 곳
+    p24Dance: ["L", "R", "R", "L", "R"],       // Q18 춤(골반 씰룩) 순서
     gmapPass: "2579",                            // Q14 구글맵 비번(조각 ①②③④)
     pamphletText: "A"                            // Q15 팜플렛 문구(후보 A)
   };
@@ -10934,6 +10993,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     pamphlet: { name: "팜플렛", emoji: "📄", zoom: "pamphlet" },
     cellophane: { name: "셀로판", emoji: "🟣", zoomText: "투명한 셀로판지.\n동그라미가 다섯 개 뚫려 있다.\n팜플렛에 겹쳐 보면?" },
     telescope: { name: "망원경", emoji: "🔭", zoomText: "작은 망원경.\n창문에 대고 보면 될 것 같다." },
+    peanut: { name: "땅콩", emoji: "🥜", zoomText: "기내에서 주는 땅콩 한 봉지.\n누가 배고파하던데…" },
     frag1: { name: "비번 조각 ①", frag: [1, "2"] },
     frag2: { name: "비번 조각 ②", frag: [2, "5"] },
     frag3: { name: "비번 조각 ③", frag: [3, "7"] },
@@ -11063,7 +11123,149 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
      ───────────────────────────────────────────────────────── */
   var KAKAO_MSG = "선배님 근데 8월 26일 언제 출근하셨는지 아세요?ㅠㅠ 근태입력해야되는데...";
 
+  /* ─────────────────────────────────────────────────────────
+     ★v0.3 인라인 자물쇠 좌표 — 전부 "원본 이미지 기준 %".
+     crop: 자물쇠가 화면 가로의 1/2 이상 차지하도록 확대해 보여줄 영역
+     cells: 실제 다이얼/칸 자리 (탭 영역 + 값 표시 위치)
+     ───────────────────────────────────────────────────────── */
+  var LOCKS = {
+    /* 복도 왼쪽 짐칸1 — 알파벳 4칸 (1000x667) */
+    p12: {
+      img: IMG + "bin_L1.jpg", nw: 1000, nh: 667,
+      crop: { x: 31, y: 33, w: 38, h: 32 },
+      cells: [
+        { x: 37.8, y: 43.8, w: 5.2, h: 10.5 },
+        { x: 44.4, y: 43.8, w: 5.2, h: 10.5 },
+        { x: 50.8, y: 43.8, w: 5.2, h: 10.5 },
+        { x: 57.2, y: 43.8, w: 5.2, h: 10.5 }
+      ]
+    },
+    /* 복도 왼쪽 짐칸2 — 히라가나 5칸 (1000x667) */
+    p10: {
+      img: IMG + "bin_L2.jpg", nw: 1000, nh: 667,
+      crop: { x: 33.5, y: 35, w: 34, h: 22 },
+      cells: [
+        { x: 38.5, y: 42.0, w: 3.8, h: 7.6 },
+        { x: 43.3, y: 42.0, w: 3.8, h: 7.6 },
+        { x: 48.1, y: 42.0, w: 3.8, h: 7.6 },
+        { x: 53.0, y: 42.0, w: 3.8, h: 7.6 },
+        { x: 57.8, y: 42.0, w: 3.8, h: 7.6 }
+      ]
+    },
+    /* 복도 오른쪽 짐칸1 — 파스텔 4색 칸(음식 아이콘) (1000x667) */
+    p15: {
+      img: IMG + "bin_R1.jpg", nw: 1000, nh: 667,
+      crop: { x: 31, y: 35, w: 38, h: 28 },
+      cells: [
+        { x: 35.8, y: 41.7, w: 5.4, h: 14.5 },
+        { x: 43.5, y: 41.7, w: 5.4, h: 14.5 },
+        { x: 51.2, y: 41.7, w: 5.4, h: 14.5 },
+        { x: 58.8, y: 41.7, w: 5.4, h: 14.5 }
+      ]
+    },
+    /* 복도 오른쪽 짐칸2 — 숫자 3칸 (카톡 로고 포함해서 크롭) (1000x667) */
+    p16: {
+      img: IMG + "bin_R2.jpg", nw: 1000, nh: 667,
+      crop: { x: 34, y: 19, w: 32, h: 58 },
+      cells: [
+        { x: 40.8, y: 60.0, w: 5.0, h: 9.7 },
+        { x: 47.2, y: 60.0, w: 5.0, h: 9.7 },
+        { x: 53.8, y: 60.0, w: 5.0, h: 9.7 }
+      ]
+    },
+    /* 헤드셋 케이스 — 네모 4칸 BOSE (900x604) */
+    p5: {
+      img: IMG + "headset_case.jpg", nw: 900, nh: 604,
+      crop: { x: 26, y: 34, w: 48, h: 32 },
+      cells: [
+        { x: 32.0, y: 44.4, w: 7.1, h: 10.3 },
+        { x: 41.3, y: 44.4, w: 7.1, h: 10.3 },
+        { x: 50.7, y: 44.4, w: 7.1, h: 10.3 },
+        { x: 60.0, y: 44.4, w: 7.1, h: 10.3 }
+      ]
+    },
+    /* 갤리 카트 — 국기 4칸 + 열쇠 구멍 (1000x667) */
+    p9: {
+      img: IMG + "galley_cart.jpg", nw: 1000, nh: 667,
+      crop: { x: 20, y: 19, w: 60, h: 38 },
+      cells: [
+        { x: 25.8, y: 37.5, w: 9.6, h: 13.2 },
+        { x: 38.5, y: 37.5, w: 9.6, h: 13.2 },
+        { x: 51.2, y: 37.5, w: 9.6, h: 13.2 },
+        { x: 64.5, y: 37.5, w: 9.6, h: 13.2 }
+      ],
+      keyhole: { x: 46.3, y: 24.3, w: 7.4, h: 9.9 }
+    },
+    /* #24 춤 순서 — 화장실 수납장3, 좌/우 5칸 (이미지 없음) */
+    p24: {
+      img: null, nw: 1000, nh: 380,
+      crop: { x: 0, y: 0, w: 100, h: 100 },
+      cells: [
+        { x: 5, y: 32, w: 15, h: 40 },
+        { x: 23, y: 32, w: 15, h: 40 },
+        { x: 41, y: 32, w: 15, h: 40 },
+        { x: 59, y: 32, w: 15, h: 40 },
+        { x: 77, y: 32, w: 15, h: 40 }
+      ]
+    },
+    /* #8 식기 개수 다이얼 — 이미지 없음(자리표시 패널). 좌표는 패널 기준 % */
+    p8: {
+      img: null, nw: 1000, nh: 420,
+      crop: { x: 0, y: 0, w: 100, h: 100 },
+      cells: [
+        { x: 9, y: 40, w: 17, h: 40 },
+        { x: 31, y: 40, w: 17, h: 40 },
+        { x: 53, y: 40, w: 17, h: 40 },
+        { x: 75, y: 40, w: 17, h: 40 }
+      ],
+      labels: [{ x: 9, y: 12, w: 17, h: 22 }, { x: 31, y: 12, w: 17, h: 22 },
+               { x: 53, y: 12, w: 17, h: 22 }, { x: 75, y: 12, w: 17, h: 22 }]
+    }
+  };
+
+  /* #3/#7/#9/#10 IFE — ★v0.3b: 조작을 전부 "화면 안"에서. 스크린이 뷰 가로의 93% 를 차지하도록 크롭 */
+  var IFE = {
+    nw: 1100, nh: 738,
+    crop: { x: 25.2, y: 16, w: 48, h: 60 },
+    screen: { x: 26.9, y: 19.5, w: 44.7, h: 42.8 },
+    dots: { y: 37.6, size: 4.4, sizeY: 6.56, x0: 31.5, gap: 6.6 },
+    back: { x: 28.2, y: 21.0, w: 9.5, h: 6.2 },
+    buttons: [
+      { id: "plane", x: 39.5, y: 65.5, w: 6.0, h: 8.6 },
+      { id: "tv", x: 47.5, y: 65.5, w: 6.0, h: 8.6 },
+      { id: "music", x: 55.3, y: 65.5, w: 6.0, h: 8.6 }
+    ],
+    tiles: [
+      { id: "meal", x: 29.7, y: 27.4, w: 12.8, h: 27, icon: "🍱", label: "기내식" },
+      { id: "tv", x: 44.0, y: 27.4, w: 12.7, h: 27, icon: "📺", label: "TV" },
+      { id: "blanket", x: 58.0, y: 27.4, w: 12.8, h: 27, icon: "🧣", label: "담요" }
+    ],
+    /* ★슬라이드는 파일 경로만 바꾸면 되게 분리.
+       mode "letterbox" = 지금(IFE 스크린 영역 안에 사진을 레터박스로)
+       mode "full"      = 나중에 gen/34_ife_photo_1~4 처럼 "IFE에 사진이 떠 있는 합성본"이 오면
+                          그 이미지를 통째로 보여준다(크롭 없음). files 만 갈아끼우면 됨. */
+    slides: {
+      mode: "letterbox",
+      files: [IMG + "travel1.jpg", IMG + "travel2.jpg", IMG + "travel3.jpg", IMG + "travel4.jpg"]
+    }
+  };
+
+  /* ★v0.3b #24 다마고치 (뼈대) — 이미지는 자리표시자, 나중에 gen 35~39 로 교체 */
+  var TAMA = {
+    img: {
+      hungry: IMG + "char_hungry.svg",
+      happy: IMG + "char_happy.svg",
+      front: IMG + "char_front.svg",
+      hipL: IMG + "char_hipL.svg",
+      hipR: IMG + "char_hipR.svg"
+    },
+    hungryLine: "배고파…",
+    happyLine: "고마워! 춤춰줄게!",
+    danceMs: 1000
+  };
+
   window.DATA = {
+    LOCKS: LOCKS, IFE: IFE, TAMA: TAMA,
     IMG: IMG, TEMP: TEMP, ITEMS: ITEMS, MAPS: MAPS, ANS: ANS, PIN_HASH: PIN_HASH,
     FOOD: FOOD, FOOD_BG: FOOD_BG, FLAGS: FLAGS, UTENSIL: UTENSIL, IFE_ICONS: IFE_ICONS,
     KANA: KANA, SONGS: SONGS,
@@ -11115,6 +11317,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       s.setAttribute("data-t", "slot" + i);
       if (opt.labels && opt.labels[i]) s.appendChild(el("i", "cnum", opt.labels[i]));
       var v = el("b", "v", cands[i][idx[i]]);
+      s.setAttribute("data-v", cands[i][idx[i]]);
       s.appendChild(v);
       G.tapper(s, {
         tap: function () { idx[i] = (idx[i] + 1) % cands[i].length; G.sfxTap(); paint(); check(); },
@@ -11127,7 +11330,10 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     box.appendChild(el("div", "cycTip", "칸을 누르면 바뀐다 · 길게 누르면 뒤로"));
 
     function paint() {
-      for (var i = 0; i < opt.n; i++) slots[i].querySelector(".v").textContent = cands[i][idx[i]];
+      for (var i = 0; i < opt.n; i++) {
+        slots[i].querySelector(".v").textContent = cands[i][idx[i]];
+        slots[i].setAttribute("data-v", cands[i][idx[i]]);
+      }
     }
     function value() { return idx.map(function (v, i) { return cands[i][v]; }).join(""); }
     function check() { if (value() === String(opt.answer)) win(); }
@@ -11145,6 +11351,158 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       }
     });
     return box;
+  }
+
+  /* ════════════════ 0-b. 크롭 이미지 뷰 (★v0.3) ════════════════
+     원본 이미지 %좌표를 그대로 쓰면서 crop rect 만큼 확대해 보여준다.
+     overlays 의 x/y/w/h 는 "원본 이미지 기준 %" — 크롭해도 좌표가 안 어긋난다.  */
+  function cropView(src, crop, overlays, opts) {
+    var wrap = el("div", "cropView");
+    var inner = el("div", "cropInner");
+    var img = new Image();
+    img.className = "cropImg";
+    if (src) inner.appendChild(img);
+    else inner.classList.add("noimg");
+    wrap.appendChild(inner);
+
+    var nodes = [];
+    (overlays || []).forEach(function (o) {
+      var n = el(o.onTap || o.onLong ? "button" : "div", "cvcell " + (o.cls || ""));
+      if (o.t) n.setAttribute("data-t", o.t);
+      if (o.onTap || o.onLong) G.tapper(n, { tap: o.onTap, long: o.onLong });
+      if (o.build) o.build(n);
+      inner.appendChild(n);
+      nodes.push({ o: o, n: n });
+    });
+
+    function fit() {
+      var stage = wrap.parentNode;
+      if (!stage) return;
+      var r = stage.getBoundingClientRect();
+      var nw = img.naturalWidth || (opts && opts.nw) || 1000;
+      var nh = img.naturalHeight || (opts && opts.nh) || 667;
+      if (!r.width || !r.height) return;
+      var c = crop || { x: 0, y: 0, w: 100, h: 100 };
+      var cw = c.w / 100 * nw, ch = c.h / 100 * nh;      /* 크롭 영역 픽셀 크기 */
+      var ar = ch / cw;
+      var W = Math.min(r.width, r.height / ar);
+      var H = W * ar;
+      var dispW = W * 100 / c.w, dispH = H * 100 / c.h;
+      var ox = -(c.x / 100) * dispW, oy = -(c.y / 100) * dispH;
+      wrap.style.width = W + "px"; wrap.style.height = H + "px";
+      inner.style.width = W + "px"; inner.style.height = H + "px";
+      if (src) {
+        img.style.width = dispW + "px"; img.style.height = dispH + "px";
+        img.style.left = ox + "px"; img.style.top = oy + "px";
+      }
+      nodes.forEach(function (q) {
+        var o = q.o, n = q.n;
+        n.style.left = (ox + o.x / 100 * dispW) + "px";
+        n.style.top = (oy + o.y / 100 * dispH) + "px";
+        n.style.width = (o.w / 100 * dispW) + "px";
+        n.style.height = (o.h / 100 * dispH) + "px";
+        var v = n.querySelector(".cv");
+        if (v) v.style.fontSize = Math.max(11, Math.round(o.h / 100 * dispH * 0.52)) + "px";
+        if (o.onFit) o.onFit(n, { dispW: dispW, dispH: dispH, ox: ox, oy: oy });
+      });
+    }
+    img.onload = fit;
+    setTimeout(fit, 20); setTimeout(fit, 180); setTimeout(fit, 600);
+    window.addEventListener("resize", fit);
+    if (src) img.src = src;
+    wrap._fit = fit;
+    wrap._cells = nodes;
+    return wrap;
+  }
+
+  /* ════════════════ 0-c. 이미지 위 인라인 자물쇠 (★v0.3) ════════════════
+     별도 입력줄 없이, 클로즈업 이미지의 실제 다이얼 자리를 탭해서 값을 순환시킨다.  */
+  function imgLock(opt) {
+    /* opt: {id, img, crop, cells:[{x,y,w,h}], answer, pool, size, kind:"text"|"icon",
+             cands:[{id,label,emoji,svg,img}], extras:[{x,y,w,h,t,onTap,cls}], onSolve} */
+    var isIcon = opt.kind === "icon";
+    var n = opt.cells.length;
+    var ansArr = isIcon ? opt.answer.slice() : String(opt.answer).split("");
+    var pool = isIcon ? opt.cands.map(function (c) { return c.id; }) : opt.pool;
+    var size = Math.min(opt.size || (isIcon ? pool.length : 12), pool.length);
+
+    var cands = [], idx = [], vnodes = [];
+    for (var i = 0; i < n; i++) {
+      var rnd = G.lcg(G.hashSeed((opt.id || "lock") + "#" + i + "#" + ansArr[i]));
+      var a = ansArr[i];
+      var rest = pool.filter(function (c) { return c !== a; });
+      for (var k = rest.length - 1; k > 0; k--) { var j = (rnd() * (k + 1)) | 0; var t = rest[k]; rest[k] = rest[j]; rest[j] = t; }
+      var list = rest.slice(0, size - 1).concat([a]);
+      for (k = list.length - 1; k > 0; k--) { j = (rnd() * (k + 1)) | 0; t = list[k]; list[k] = list[j]; list[j] = t; }
+      cands.push(list);
+      var st = (rnd() * list.length) | 0;
+      while (list[st] === a) st = (st + 1) % list.length;
+      idx.push(st);
+    }
+
+    var solved = false;
+    if (opt.pre) { for (i = 0; i < n; i++) idx[i] = cands[i].indexOf(ansArr[i]); solved = true; }
+    var cellNodes = [];
+    var overlays = opt.cells.map(function (c, i) {
+      return {
+        x: c.x, y: c.y, w: c.w, h: c.h, t: "slot" + i,
+        cls: isIcon ? "icon" : "",
+        build: function (nd) { var v = el("div", "cv"); nd.appendChild(v); vnodes[i] = v; cellNodes[i] = nd; if (opt.pre) nd.classList.add("done"); },
+        onTap: function () { if (solved) return; idx[i] = (idx[i] + 1) % cands[i].length; G.sfxTap(); paint(); check(); },
+        onLong: function () { if (solved) return; idx[i] = (idx[i] - 1 + cands[i].length) % cands[i].length; G.sfxTap(); paint(); check(); }
+      };
+    });
+    (opt.extras || []).forEach(function (e) {
+      overlays.push({
+        x: e.x, y: e.y, w: e.w, h: e.h, t: e.t, cls: "extra " + (e.cls || ""),
+        build: function (nd) { if (e.label) { var v = el("div", "cv"); v.textContent = e.label; nd.appendChild(v); } },
+        onTap: e.onTap
+      });
+    });
+
+    var host = el("div", "imgLockHost");
+    var view = cropView(opt.img, opt.crop, overlays, { nw: opt.nw, nh: opt.nh });
+    host.appendChild(view);
+
+    function paint() {
+      for (var i = 0; i < n; i++) {
+        var v = vnodes[i]; if (!v) continue;
+        var val = cands[i][idx[i]];
+        if (cellNodes[i]) cellNodes[i].setAttribute("data-v", val);
+        if (isIcon) {
+          var c = opt.cands.filter(function (x) { return x.id === val; })[0];
+          clear(v);
+          if (c && c.svg) { var d = el("div", "cvsvg"); d.innerHTML = c.svg; v.appendChild(d); }
+          else if (c && c.img) { var im = new Image(); im.src = c.img; v.appendChild(im); }
+          else v.textContent = c ? (c.emoji || c.label) : "?";
+        } else v.textContent = val;
+      }
+    }
+    function value() { return idx.map(function (v, i) { return cands[i][v]; }); }
+    function check() {
+      var got = value();
+      for (var i = 0; i < n; i++) if (got[i] !== ansArr[i]) return;
+      win();
+    }
+    function win() {
+      if (solved) return;
+      solved = true;
+      G.sfxOk(); G.buzz([30, 40, 60]);
+      view._cells.forEach(function (q) { q.n.classList.add("done"); });
+      unregister();
+      setTimeout(function () { opt.onSolve && opt.onSolve(); }, 460);
+    }
+    if (!opt.pre) register({
+      answer: isIcon
+        ? ansArr.map(function (a) { var c = opt.cands.filter(function (x) { return x.id === a; })[0]; return c ? c.label : a; }).join(" ")
+        : ansArr.join(""),
+      cands: cands,
+      force: function () { for (var i = 0; i < n; i++) idx[i] = cands[i].indexOf(ansArr[i]); paint(); check(); }
+    });
+    paint();
+    host._paint = paint;
+    host._solvedGetter = function () { return solved; };
+    return host;
   }
 
   /* ════════════════ 1. 키패드형 자물쇠 (폰 잠금 외에는 v0.2에서 미사용) ════════════════ */
@@ -11618,7 +11976,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   }
 
   window.W = {
-    cycleLock: cycleLock, keypadLock: keypadLock, rotateLock: rotateLock, seqLock: seqLock,
+    cropView: cropView, imgLock: imgLock, cycleLock: cycleLock, keypadLock: keypadLock, rotateLock: rotateLock, seqLock: seqLock,
     patternLock: patternLock, shade: shade, tissue: tissue, pamphlet: pamphlet, slides: slides,
     currentLock: function () { return current; }, unregister: unregister
   };
@@ -12361,6 +12719,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   }
 
   function viewQR() {
+    if (G.flag("p18")) return viewTama();
     var sc = screen();
     sc.appendChild(statusbar());
     var body = el("div", "pBody");
@@ -12402,7 +12761,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         hint.textContent = "인식됨 ✓";
         MAIN.prize(DATA.TEMP.p18Prize, "QR 인식 성공!");
         G.setFlag("p18");
-        setTimeout(function () { go("home"); }, 900);
+        setTimeout(function () { go("qr"); }, 900);   /* → #24 다마고치 화면 */
       } else {
         hint.textContent = "이 코드는 아닌 것 같아";
         G.sfxBad();
@@ -12444,6 +12803,95 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         scanTimer = setTimeout(tick, 150);
       })();
     })();
+  }
+
+  /* ═══════════ #24 다마고치 (★v0.3b 뼈대 — 이미지는 자리표시자) ═══════════ */
+  var danceTimer = null;
+  function tamaState() {
+    if (!G.S.misc.tama) G.S.misc.tama = { state: "hungry" };
+    return G.S.misc.tama;
+  }
+  function viewTama() {
+    if (danceTimer) { clearInterval(danceTimer); danceTimer = null; }
+    var t = tamaState();
+    var sc = screen();
+    sc.appendChild(statusbar());
+    var body = el("div", "pBody");
+    body.appendChild(header("QR CODE", function () { go("home"); }));
+
+    var top = el("div", "tamaTop");
+    top.appendChild(el("div", "tamaCode", DATA.TEMP.p18Answer));
+    top.appendChild(el("div", "tamaOk", "인식 완료 ✓"));
+    body.appendChild(top);
+
+    var stage = el("div", "tamaStage");
+    stage.setAttribute("data-t", "tama");
+    var bubble = el("div", "tamaBubble");
+    stage.appendChild(bubble);
+    var img = new Image(); img.className = "tamaChar";
+    stage.appendChild(img);
+    body.appendChild(stage);
+    sc.appendChild(body);
+
+    function setImg(k) { img.src = DATA.TAMA.img[k]; }
+
+    if (t.state === "hungry") {
+      bubble.textContent = DATA.TAMA.hungryLine;
+      setImg("hungry");
+      G.tapper(stage, {
+        tap: function () {
+          if (G.S.sel === "peanut") { feed(); return; }
+          bubble.textContent = DATA.TAMA.hungryLine;
+          G.beep(300, .08, "sine", .07);
+        }
+      });
+      var fb = el("button", "btn ghost", "🥜 땅콩 주기");
+      fb.setAttribute("data-t", "tamaFeed");
+      fb.style.cssText = "margin:6px 10px 10px;font-size:12px;padding:8px 12px";
+      fb.onclick = function () {
+        if (!G.has("peanut")) { G.toast("땅콩이 없어"); return; }
+        feed();
+      };
+      body.appendChild(fb);
+    } else {
+      bubble.textContent = DATA.TAMA.happyLine;
+      setImg("happy");
+      var db = el("button", "btn ghost", "💃 춤춰줘");
+      db.setAttribute("data-t", "tamaDance");
+      db.style.cssText = "margin:6px 10px 10px;font-size:12px;padding:8px 12px";
+      db.onclick = dance;
+      body.appendChild(db);
+      G.tapper(stage, { tap: dance });
+    }
+
+    function feed() {
+      if (!G.has("peanut")) { G.toast("땅콩이 없어"); return; }
+      G.take("peanut"); G.S.sel = null; MAIN.renderInv();
+      t.state = "happy"; G.save();
+      G.sfxOk();
+      G.toast("땅콩을 줬다!", 1600);
+      setTimeout(viewTama, 300);
+    }
+    function dance() {
+      if (danceTimer) return;
+      var seq = DATA.TEMP.p24Dance;
+      var i = 0;
+      bubble.textContent = "🎵";
+      setImg("front");
+      danceTimer = setInterval(function () {
+        if (i >= seq.length) {
+          clearInterval(danceTimer); danceTimer = null;
+          setImg("happy"); bubble.textContent = DATA.TAMA.happyLine;
+          G.setFlag("sawDance");
+          return;
+        }
+        setImg(seq[i] === "L" ? "hipL" : "hipR");
+        G.beep(seq[i] === "L" ? 440 : 660, .09, "triangle", .08);
+        i++;
+      }, DATA.TAMA.danceMs);
+    }
+    window.__tamaFeed = feed;
+    window.__tamaDance = dance;
   }
 
   /* ═══════════ 구글맵 (#11 · 1차 결말) ═══════════ */
@@ -12543,40 +12991,13 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   "use strict";
   var el = G.el, clear = G.clear, $ = G.$, S = G.S;
 
-  /* ═══════════ 공용: 이미지 + 좌표 오버레이 ═══════════ */
+  /* ═══════════ 공용: 이미지 + 좌표 오버레이 (W.cropView 위임) ═══════════ */
   function imgStage(src, spots, opts) {
-    /* spots: [{x,y,w,h,label,onTap,cls}] — 이미지 기준 % */
-    var wrap = el("div", "ifeWrap");
-    wrap.style.position = "relative";
-    var img = new Image();
-    img.className = "main";
-    img.src = src;
-    img.style.display = "block";
-    wrap.appendChild(img);
-    (spots || []).forEach(function (sp) {
-      var b = el("button", "ifeHot " + (sp.cls || ""));
-      b.style.cssText = "position:absolute;left:" + sp.x + "%;top:" + sp.y + "%;width:" + sp.w + "%;height:" + sp.h + "%";
-      if (sp.t) b.setAttribute("data-t", sp.t);
-      b.onclick = function (e) { e.stopPropagation(); sp.onTap && sp.onTap(b); };
-      wrap.appendChild(b);
+    /* spots: [{x,y,w,h,t,onTap,cls}] — 원본 이미지 기준 % */
+    var ov = (spots || []).map(function (sp) {
+      return { x: sp.x, y: sp.y, w: sp.w, h: sp.h, t: sp.t, cls: "hot " + (sp.cls || ""), onTap: sp.onTap, build: sp.build, onFit: sp.onFit };
     });
-    function fit() {
-      var stage = wrap.parentNode;
-      if (!stage) return;
-      var r = stage.getBoundingClientRect();
-      var nw = img.naturalWidth || 4, nh = img.naturalHeight || 3;
-      if (!r.width || !r.height) return;
-      var s = Math.min(r.width / nw, r.height / nh);
-      var w = Math.floor(nw * s), h = Math.floor(nh * s);
-      wrap.style.width = w + "px"; wrap.style.height = h + "px";
-      img.style.width = w + "px"; img.style.height = h + "px";
-    }
-    img.onload = fit;
-    setTimeout(fit, 30); setTimeout(fit, 200);
-    window.addEventListener("resize", fit);
-    wrap._fit = fit;
-    if (opts && opts.after) opts.after(wrap);
-    return wrap;
+    return W.cropView(src, (opts && opts.crop) || null, ov, opts);
   }
 
   /* ═══════════ 시트(클로즈업/확대) ═══════════ */
@@ -12796,44 +13217,53 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 
   /* #3 / #7 IFE */
   CU.ife = function (c) {
+    var F = DATA.IFE;
+
+    /* ── 꺼진 화면: 인디케이터 6개 + 물리 버튼 3개(전부 이미지 위) ── */
     if (!G.flag("ifeOn")) {
       c.title("좌석 화면 (꺼짐)");
-      var trail = el("div", "slots");
-      var got = [];
       var order = DATA.ANS.p3;
+      var got = [], dots = [], locked = false;
+      var overlays = [];
+      for (var i = 0; i < 6; i++) {
+        (function (i) {
+          overlays.push({
+            x: F.dots.x0 + F.dots.gap * i, y: F.dots.y, w: F.dots.size, h: F.dots.sizeY,
+            build: function (n) { n.className = "ifeDot"; n.setAttribute("data-t", "ifeDot" + i); dots[i] = n; }
+          });
+        })(i);
+      }
+      F.buttons.forEach(function (bt) {
+        overlays.push({
+          x: bt.x, y: bt.y, w: bt.w, h: bt.h, t: "ifeb_" + bt.id, cls: "ifeBtn",
+          onTap: function () { press(bt.id); }
+        });
+      });
+      c.stage.appendChild(W.cropView(DATA.IMG + "ife_off.jpg", F.crop, overlays, { nw: F.nw, nh: F.nh }));
+
       function paint() {
-        clear(trail);
-        for (var i = 0; i < order.length; i++) {
-          var s = el("div", "slot small", got[i] ? DATA.IFE_ICONS[got[i]] : "·");
-          trail.appendChild(s);
-        }
+        for (var i = 0; i < 6; i++) dots[i].className = "ifeDot" + (i < got.length ? " on" : "");
       }
       function press(id) {
-        got.push(id); G.sfxTap(); paint();
-        if (got.length >= order.length) {
+        if (locked || got.length >= 6) return;
+        got.push(id);
+        G.beep(560, .05, "sine", .08);
+        paint();
+        if (got.length === 6) {
+          locked = true;
           var ok = got.every(function (v, i) { return v === order[i]; });
           if (ok) {
+            dots.forEach(function (d) { d.className = "ifeDot ok"; });
             G.sfxOk(); G.setFlag("ifeOn"); G.markSolved("p3");
-            setTimeout(function () { reopenCU(); }, 500);
-          } else { G.sfxBad(); got = []; setTimeout(paint, 480); c.cap("…아무 일도 없다"); }
+            setTimeout(function () { reopenCU(); }, 800);
+          } else {
+            dots.forEach(function (d) { d.className = "ifeDot bad"; });
+            G.sfxBad(); G.buzz(140);
+            setTimeout(function () { got = []; locked = false; paint(); }, 700);
+          }
         }
       }
-      var hot = [
-        { x: 39.5, y: 65.5, w: 6, h: 8, t: "ife_plane", onTap: function () { press("plane"); } },
-        { x: 47.5, y: 65.5, w: 6, h: 8, t: "ife_tv", onTap: function () { press("tv"); } },
-        { x: 55.3, y: 65.5, w: 6, h: 8, t: "ife_music", onTap: function () { press("music"); } }
-      ];
-      c.stage.appendChild(imgStage(DATA.IMG + "ife_off.jpg", hot));
       paint();
-      c.panel.appendChild(trail);
-      var row = el("div", "row");
-      [["plane", "✈️"], ["tv", "📺"], ["music", "🎵"]].forEach(function (p) {
-        var b = el("button", "btn", p[1]);
-        b.setAttribute("data-t", "ifeb_" + p[0]);
-        b.onclick = function () { press(p[0]); };
-        row.appendChild(b);
-      });
-      c.panel.appendChild(row);
       c.cap("화면 아래 버튼 3개. 순서가 있을 것 같다.");
       W.unregister();
       window.__lock = {
@@ -12842,63 +13272,99 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       };
       return;
     }
-    c.title("좌석 화면");
-    var hot2 = [
-      { x: 29.7, y: 27.4, w: 12.8, h: 27, t: "tile_meal", onTap: function () { tileMeal(); } },
-      { x: 44.0, y: 27.4, w: 12.7, h: 27, t: "tile_tv", onTap: function () { tileTV(); } },
-      { x: 58.0, y: 27.4, w: 12.8, h: 27, t: "tile_blanket", onTap: function () { tileBlanket(); } }
-    ];
-    var wrap = imgStage(DATA.IMG + "ife_on.jpg", hot2);
-    c.stage.appendChild(wrap);
-    var row = el("div", "row");
-    [["meal", "🍱 기내식", tileMeal], ["tv", "📺 TV", tileTV], ["blanket", "🧣 담요", tileBlanket]].forEach(function (p) {
-      var b = el("button", "btn", p[1]);
-      b.setAttribute("data-t", "tileb_" + p[0]);
-      b.onclick = p[2];
-      row.appendChild(b);
-    });
-    c.panel.appendChild(row);
-    c.cap("메뉴가 세 개 떴다.");
+
+    /* ── 켜진 화면: 메뉴 / TV 둘 다 화면 안에서 ── */
+    var view = "menu";
+    drawOn();
+
+    function drawOn() {
+      clear(c.stage); clear(c.panel);
+      c.title("좌석 화면");
+      if (view === "menu") return drawMenu();
+      return drawTV();
+    }
+
+    function drawMenu() {
+      var ov = F.tiles.map(function (t) {
+        return {
+          x: t.x, y: t.y, w: t.w, h: t.h, t: "tile_" + t.id, cls: "ifeTile",
+          build: function (n) {
+            var box = el("div", "tileIn");
+            box.appendChild(el("div", "ti", t.icon));
+            box.appendChild(el("div", "tl", t.label));
+            n.appendChild(box);
+          },
+          onTap: function () { t.id === "meal" ? tileMeal() : t.id === "tv" ? (view = "tv", drawOn()) : tileBlanket(); }
+        };
+      });
+      c.stage.appendChild(W.cropView(DATA.IMG + "ife_on.jpg", F.crop, ov, { nw: F.nw, nh: F.nh }));
+      c.cap("화면 안 메뉴를 눌러봐.");
+    }
+
+    function drawTV() {
+      var files = F.slides.files, n = files.length;
+      var i = 0, im = null, dotEls = [];
+      var ov = [];
+      if (F.slides.mode === "full") {
+        /* 사진이 IFE에 떠 있는 합성본 — 이미지를 통째로 */
+        var host = el("div", "imgLockHost");
+        var v = W.cropView(files[0], null, [{
+          x: F.back.x, y: F.back.y, w: F.back.w, h: F.back.h, t: "ifeBack", cls: "ifeBack",
+          build: function (n2) { n2.appendChild(el("div", "cv", "‹")); },
+          onTap: function () { view = "menu"; drawOn(); }
+        }], {});
+        host.appendChild(v);
+        c.stage.appendChild(host);
+        return;
+      }
+      ov.push({
+        x: F.screen.x, y: F.screen.y, w: F.screen.w, h: F.screen.h, cls: "ifeScreenOv",
+        build: function (n2) {
+          n2.className = "ifeScreenOv";
+          n2.setAttribute("data-t", "slideNext");
+          im = new Image(); n2.appendChild(im);
+          var dw = el("div", "ifeDotsBar");
+          for (var k = 0; k < n; k++) { var d = el("i"); dotEls.push(d); dw.appendChild(d); }
+          n2.appendChild(dw);
+          /* 탭=다음, 좌우 스와이프=이전/다음 (drag 하나로 처리 —
+             pointerdown 에서 preventDefault 하므로 tapper 와 같이 쓰면 탭이 죽는다) */
+          var sx = 0;
+          G.drag(n2, {
+            start: function (q) { sx = q.x; },
+            end: function (q) {
+              var dx = q.x - sx;
+              if (dx > 30) show(i - 1);
+              else if (dx < -30) show(i + 1);
+              else show(i + 1);
+            }
+          });
+        }
+      });
+      ov.push({
+        x: F.back.x, y: F.back.y, w: F.back.w, h: F.back.h, t: "ifeBack", cls: "ifeBack",
+        build: function (n2) { n2.appendChild(el("div", "cv", "‹")); },
+        onTap: function () { view = "menu"; drawOn(); }
+      });
+      c.stage.appendChild(W.cropView(DATA.IMG + "ife_on.jpg", F.crop, ov, { nw: F.nw, nh: F.nh }));
+      c.cap("좌우로 넘겨봐. 우리가 갔던 곳들이다.");
+      function show(k) {
+        i = (k + n) % n;
+        if (im) im.src = files[i];
+        dotEls.forEach(function (d, q) { d.className = q === i ? "on" : ""; });
+        if (i === n - 1) G.setFlag("sawSlides");
+      }
+      setTimeout(function () { show(0); }, 40);
+      var timer = setInterval(function () {
+        if (!$("closeup").classList.contains("show") || view !== "tv") { clearInterval(timer); return; }
+        show(i + 1);
+      }, 3000);
+    }
 
     function tileMeal() {
       if (G.flag("mealTray")) { G.toast("이미 받았어. 자리 테이블에 있어"); return; }
       G.setFlag("mealTray");
       closeCU();
       story([DATA.IMG + "crew_tray.jpg", "승무원이 기내식을 가져다줬다.\n트레이는 자리 테이블 위에 놓았다."], function () { render(); });
-    }
-    function tileTV() {
-      c.title("여행 사진");
-      clear(c.stage); clear(c.panel);
-      var list = [1, 2, 3, 4].map(function (n) { return { src: DATA.IMG + "travel" + n + ".jpg" }; });
-      var box = el("div");
-      box.style.cssText = "width:100%;height:100%;display:flex;align-items:center;justify-content:center";
-      var wr = imgStage(DATA.IMG + "ife_on.jpg", []);
-      box.appendChild(wr);
-      /* IFE 화면 영역 안에 사진 재생 */
-      var sc = el("div", "ifeScreen");
-      sc.style.cssText = "position:absolute;left:26.9%;top:19.5%;width:44.7%;height:42.8%";
-      var im = new Image(); sc.appendChild(im);
-      wr.appendChild(sc);
-      c.stage.appendChild(box);
-      var i = 0;
-      function show(n) {
-        i = (n + 4) % 4; im.src = list[i].src;
-        dots.forEach(function (d, k) { d.className = k === i ? "on" : ""; });
-        if (i === 3) G.setFlag("sawSlides");
-      }
-      var dotWrap = el("div", "slideDots"), dots = [];
-      for (var k = 0; k < 4; k++) { var d = el("i"); dots.push(d); dotWrap.appendChild(d); }
-      c.panel.appendChild(dotWrap);
-      var row2 = el("div", "row");
-      var pv = el("button", "btn ghost", "‹"); pv.onclick = function () { show(i - 1); };
-      var nx = el("button", "btn ghost", "›"); nx.setAttribute("data-t", "slideNext"); nx.onclick = function () { show(i + 1); };
-      row2.appendChild(pv); row2.appendChild(nx);
-      c.panel.appendChild(row2);
-      var bk = el("button", "btn", "← 메뉴로"); bk.onclick = function () { reopenCU(); };
-      c.panel.appendChild(bk);
-      c.cap("우리가 갔던 곳들이다.");
-      show(0);
-      var timer = setInterval(function () { if (!$("closeup").classList.contains("show")) { clearInterval(timer); return; } show(i + 1); }, 2800);
     }
     function tileBlanket() {
       if (G.has("blanket")) { G.toast("이미 담요를 받았어"); return; }
@@ -12911,7 +13377,6 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     }
   };
 
-  /* #7 트레이 / 테이블 */
   CU.tray = function (c) {
     if (!G.flag("mealTray")) {
       c.title("테이블");
@@ -12930,12 +13395,13 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   CU.binL1 = function (c) {
     c.title("왼쪽 짐칸 1");
     if (!G.solved("p12")) {
-      c.stage.appendChild(imgStage(DATA.IMG + "bin_L1.jpg", []));
-      c.panel.appendChild(W.cycleLock({
-        id: "p12", n: 4, pool: "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(""), size: 12, answer: DATA.ANS.p12,
+      var L = DATA.LOCKS.p12;
+      c.stage.appendChild(W.imgLock({
+        id: "p12", img: L.img, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells,
+        pool: "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(""), size: 12, answer: DATA.ANS.p12,
         onSolve: function () { G.markSolved("p12"); reopenCU(); }
       }));
-      c.cap("알파벳 4칸 자물쇠.");
+      c.cap("알파벳 4칸 자물쇠.\n칸을 눌러 글자를 맞춰봐 (길게 누르면 뒤로)");
       return;
     }
     var got = G.has("headsetCase") || G.flag("tookCase");
@@ -12951,29 +13417,34 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 
   CU.binL2 = function (c) {
     c.title("왼쪽 짐칸 2");
-    c.stage.appendChild(imgStage(DATA.IMG + "bin_L2.jpg", []));
     if (!G.solved("p10")) {
-      c.panel.appendChild(W.cycleLock({
-        id: "p10", n: 5, pool: DATA.KANA, size: 12, answer: DATA.ANS.p10,
+      var L = DATA.LOCKS.p10;
+      c.stage.appendChild(W.imgLock({
+        id: "p10", img: L.img, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells,
+        pool: DATA.KANA, size: 12, answer: DATA.ANS.p10,
         onSolve: function () {
           G.markSolved("p10");
           prize(DATA.TEMP.p10Prize, "짐칸이 열렸다");
           reopenCU();
         }
       }));
-      c.cap("히라가나 5칸 자물쇠.");
-    } else c.cap("이미 열었다. 비어 있다.");
+      c.cap("히라가나 5칸 자물쇠.\n칸을 눌러 글자를 맞춰봐");
+      return;
+    }
+    c.stage.appendChild(imgStage(DATA.IMG + "bin_L2.jpg", []));
+    c.cap("이미 열었다. 비어 있다.");
   };
 
   CU.binR1 = function (c) {
     c.title("오른쪽 짐칸 1");
     if (!G.solved("p15")) {
-      c.stage.appendChild(imgStage(DATA.IMG + "bin_R1.jpg", []));
-      c.panel.appendChild(W.rotateLock({
-        n: 4, cands: DATA.FOOD, answer: DATA.ANS.p15, bg: DATA.FOOD_BG,
+      var L = DATA.LOCKS.p15;
+      c.stage.appendChild(W.imgLock({
+        id: "p15", img: L.img, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells,
+        kind: "icon", cands: DATA.FOOD, answer: DATA.ANS.p15,
         onSolve: function () { G.markSolved("p15"); reopenCU(); }
       }));
-      c.cap("칸마다 배경색이 다르다. 색에 맞는 음식은?");
+      c.cap("칸마다 색이 다르다. 색에 맞는 음식은?");
       return;
     }
     var got = G.has("gamecard") || G.flag("tookCard");
@@ -12989,53 +13460,59 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 
   CU.binR2 = function (c) {
     c.title("오른쪽 짐칸 2");
-    c.stage.appendChild(imgStage(DATA.IMG + "bin_R2.jpg", []));
     if (!G.solved("p16")) {
-      c.panel.appendChild(W.cycleLock({
-        id: "p16", n: 3, pool: "0123456789".split(""), size: 10, answer: DATA.ANS.p16,
+      var L = DATA.LOCKS.p16;
+      c.stage.appendChild(W.imgLock({
+        id: "p16", img: L.img, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells,
+        pool: "0123456789".split(""), size: 10, answer: DATA.ANS.p16,
         onSolve: function () {
           G.markSolved("p16");
           prize(DATA.TEMP.p16Prize, "짐칸이 열렸다");
           reopenCU();
         }
       }));
-      c.cap("말풍선 로고가 양각으로 새겨져 있고, 그 아래 숫자 3칸.");
-    } else c.cap("이미 열었다.");
+      c.cap("말풍선 로고 아래 숫자 3칸.");
+      return;
+    }
+    c.stage.appendChild(imgStage(DATA.IMG + "bin_R2.jpg", []));
+    c.cap("이미 열었다.");
   };
 
-  /* 갤리 */
   CU.cart = function (c) {
     c.title("갤리 카트");
-    c.stage.appendChild(imgStage(DATA.IMG + "galley_cart.jpg", []));
-    if (G.solved("p9")) { c.cap("카트가 열려 있다."); return; }
-    var keyed = G.flag("cartKeyed");
-    var flagsOk = G.flag("cartFlags");
-    var info = el("div", "row");
-    info.appendChild(el("div", "chip", (flagsOk ? "✅" : "⬜") + " 국기 4칸"));
-    info.appendChild(el("div", "chip", (keyed ? "✅" : "⬜") + " 열쇠 구멍"));
-    c.panel.appendChild(info);
-    if (!flagsOk) {
-      c.panel.appendChild(W.rotateLock({
-        n: 4, cands: DATA.FLAGS, answer: DATA.ANS.p9,
-        onSolve: function () { G.setFlag("cartFlags"); tryOpen(); reopenCU(); }
-      }));
+    if (G.solved("p9")) {
+      c.stage.appendChild(imgStage(DATA.IMG + "galley_cart.jpg", []));
+      c.cap("카트가 열려 있다.");
+      return;
     }
-    if (!keyed) {
-      var b = el("button", "btn", "🔑 은색 열쇠 꽂기");
-      b.setAttribute("data-t", "cartKey");
-      b.onclick = function () {
-        if (!G.has("silverKey")) { G.toast("은색 열쇠가 없어"); return; }
-        G.take("silverKey"); G.setFlag("cartKeyed"); G.sfxOk(); tryOpen(); reopenCU();
-      };
-      c.panel.appendChild(b);
-    }
-    c.cap("국기 4칸과 열쇠 구멍. 둘 다 맞아야 열릴 것 같다.");
+    var L = DATA.LOCKS.p9;
     function tryOpen() {
       if (G.flag("cartFlags") && G.flag("cartKeyed")) {
         G.markSolved("p9");
         prize(DATA.TEMP.p9Prize, "카트가 열렸다");
+        setTimeout(reopenCU, 300);
       }
     }
+    c.stage.appendChild(W.imgLock({
+      id: "p9", img: L.img, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells,
+      kind: "icon", cands: DATA.FLAGS, answer: DATA.ANS.p9, pre: G.flag("cartFlags"),
+      extras: [{
+        x: L.keyhole.x, y: L.keyhole.y, w: L.keyhole.w, h: L.keyhole.h, t: "cartKey",
+        label: G.flag("cartKeyed") ? "✓" : "🔑",
+        onTap: function () {
+          if (G.flag("cartKeyed")) return;
+          if (!G.has("silverKey")) { G.toast("은색 열쇠가 없어"); return; }
+          G.take("silverKey"); G.setFlag("cartKeyed"); G.sfxOk();
+          tryOpen(); reopenCU();
+        }
+      }],
+      onSolve: function () { G.setFlag("cartFlags"); tryOpen(); if (!G.solved("p9")) reopenCU(); }
+    }));
+    var info = el("div", "row");
+    info.appendChild(el("div", "chip", (G.flag("cartFlags") ? "✅" : "⬜") + " 국기 4칸"));
+    info.appendChild(el("div", "chip", (G.flag("cartKeyed") ? "✅" : "⬜") + " 열쇠 구멍"));
+    c.panel.appendChild(info);
+    c.cap("국기 4칸과 열쇠 구멍. 둘 다 맞아야 열린다.");
   };
 
   CU.upper = function (c) {
@@ -13077,24 +13554,30 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   /* #8 다이얼 상자 (임시 위치: 갤리 작은 상자) */
   CU.dialbox = function (c) {
     c.title("작은 상자");
-    var d = el("div", null, "📦");
-    d.style.cssText = "font-size:64px;text-align:center";
-    c.stage.appendChild(d);
     if (!G.solved("p8")) {
-      c.panel.appendChild(W.cycleLock({
-        id: "p8", n: 4, pool: "0123456789".split(""), size: 10, answer: DATA.ANS.p8,
-        labels: DATA.UTENSIL.map(function (u) { return u.emoji; }),
+      var L = DATA.LOCKS.p8;
+      var extras = L.labels.map(function (r, i) {
+        return { x: r.x, y: r.y, w: r.w, h: r.h, cls: "lbl", label: DATA.UTENSIL[i].emoji };
+      });
+      c.stage.appendChild(W.imgLock({
+        id: "p8", img: null, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells,
+        pool: "0123456789".split(""), size: 10, answer: DATA.ANS.p8,
+        extras: extras,
         onSolve: function () {
           G.markSolved("p8");
           prize(DATA.TEMP.p8Prize, "상자가 열렸다");
           reopenCU();
         }
       }));
-      c.cap("숟가락·포크·젓가락·나이프 그림 아래 숫자 4칸.\n(임시 배치 — 위치 미정)");
-    } else c.cap("이미 열었다.");
+      c.cap("식기 그림 아래 숫자 4칸.\n(임시 배치 — 위치 미정)");
+      return;
+    }
+    var d = el("div", null, "📦");
+    d.style.cssText = "font-size:64px;text-align:center";
+    c.stage.appendChild(d);
+    c.cap("이미 열었다.");
   };
 
-  /* 화장실 */
   CU.tissue = function (c) {
     c.title("휴지롤");
     c.stage.appendChild(W.tissue({
@@ -13141,14 +13624,37 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       c.cap("잠겨 있지 않다.\n(임시 — #23 망원경 출처 미정)");
     } else c.cap("비어 있다.");
   };
-  CU.cab2 = function (c) { lockedCab(c, "수납장 2"); };
-  CU.cab3 = function (c) { lockedCab(c, "수납장 3"); };
-  function lockedCab(c, t) {
-    c.title(t);
-    var d = el("div", null, "🔒"); d.style.cssText = "font-size:60px;text-align:center";
+  CU.cab2 = function (c) {
+    c.title("수납장 2");
+    var d = el("div", null, "🗄️"); d.style.cssText = "font-size:60px;text-align:center";
     c.stage.appendChild(d);
-    c.cap("잠겨 있다.\n(문제 미정 — 준비 중)");
-  }
+    if (!G.has("peanut") && !G.flag("tookPeanut")) {
+      var b = el("button", "btn primary", "열어보기");
+      b.setAttribute("data-t", "openCab2");
+      b.onclick = function () { G.setFlag("tookPeanut"); prize("peanut", "수납장을 열었다"); reopenCU(); };
+      c.panel.appendChild(b);
+      c.cap("잠겨 있지 않다.\n(임시 — #24 땅콩 출처 미정)");
+    } else c.cap("비어 있다.");
+  };
+
+  CU.cab3 = function (c) {
+    c.title("수납장 3");
+    if (!G.solved("p24")) {
+      var L = DATA.LOCKS.p24;
+      c.stage.appendChild(W.imgLock({
+        id: "p24", img: null, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells,
+        pool: ["L", "R"], size: 2, answer: DATA.TEMP.p24Dance.join(""),
+        onSolve: function () { G.markSolved("p24"); G.toast("수납장 3이 열렸다!", 2200); reopenCU(); }
+      }));
+      c.cap("좌·우 5칸. 뭔가의 순서인 것 같다.\n(임시 — #24 춤 순서)");
+      return;
+    }
+    var d2 = el("div", null, "🗄️"); d2.style.cssText = "font-size:60px;text-align:center";
+    c.stage.appendChild(d2);
+    c.cap("열려 있다. 안은 비어 있다.\n(보상 미정)");
+  };
+
+
 
   /* ═══════════ 아이템 확대(ZOOM) ═══════════ */
   var ZOOM = {};
@@ -13182,12 +13688,15 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       });
       return;
     }
-    var lock = W.cycleLock({
-      id: "p5", n: 4, pool: "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(""), size: 12, answer: DATA.ANS.p5,
+    var L = DATA.LOCKS.p5;
+    var node = W.imgLock({
+      id: "p5", img: L.img, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells,
+      pool: "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(""), size: 12, answer: DATA.ANS.p5,
       onSolve: function () { G.markSolved("p5"); closeZoom(); setTimeout(function () { ZOOM.case(); }, 120); }
     });
-    openZoom({ id: "case", title: "헤드셋 케이스", img: DATA.IMG + "headset_case.jpg", panel: lock, cap: "로고 자리에 빈칸 네 개(OOOO)." });
+    openZoom({ id: "case", title: "헤드셋 케이스", node: node, cap: "로고 자리의 네모 4칸.\n칸을 눌러 글자를 맞춰봐" });
   };
+
   ZOOM.headphones = function () {
     var panel = el("div");
     var b = el("button", "btn primary", "🎧 써보기 (재생)");
