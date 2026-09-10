@@ -10751,7 +10751,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 (function () {
   "use strict";
 
-  var BUILD = "ODY-S1-20260910-1611";
+  var BUILD = "ODY-S1-20260910-1629";
   var LSKEY = "odyssey.s1.v1";
 
   var qs = new URLSearchParams(location.search);
@@ -11046,26 +11046,13 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     pamphletText: "A"                            // Q15 팜플렛 문구(후보 A)
   };
 
-  /* ★v0.5 #25 색상판 4종 — 엔진 SVG(살짝 질감) */
-  function tileSvg(hex, grain, id) {
-    /* 나무 블록 질감: 가로 나뭇결 + 옅은 옹이 (ref/choi-first-blocks.jpg 기준) */
-    var u = "g" + id;
-    return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(
-      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">' +
-      '<defs><pattern id="' + u + '" width="64" height="9" patternUnits="userSpaceOnUse">' +
-      '<rect width="64" height="9" fill="' + hex + '"/>' +
-      '<path d="M0 2 Q16 0.6 32 2 T64 2" fill="none" stroke="' + grain + '" stroke-width="1.1"/>' +
-      '<path d="M0 6 Q20 7.4 40 6 T64 6" fill="none" stroke="' + grain + '" stroke-width="0.8"/>' +
-      '</pattern></defs>' +
-      '<rect x="2" y="2" width="60" height="60" rx="5" fill="url(#' + u + ')" stroke="rgba(0,0,0,.5)" stroke-width="2"/>' +
-      '<ellipse cx="44" cy="24" rx="5" ry="3" fill="none" stroke="' + grain + '" stroke-width="0.9"/>' +
-      '<rect x="5" y="5" width="54" height="54" rx="4" fill="none" stroke="rgba(255,255,255,.14)"/></svg>');
-  }
+  /* ★v0.5.1 #25 색상판 4종 — 실제 사진(ref/choi-first-blocks.jpg)의 블록 앞면 텍스처.
+     추출: node tools/extract-tiles.mjs  (평균색은 BUILD_NOTES 참고) */
   var TILES = {
-    black: { id: "black", label: "검정", hex: "#151515", img: tileSvg("#151515", "rgba(255,255,255,.13)", "b") },
-    brown: { id: "brown", label: "갈색", hex: "#8a5a36", img: tileSvg("#8a5a36", "rgba(60,32,14,.42)", "r") },
-    dark: { id: "dark", label: "짙은갈색", hex: "#2b1a10", img: tileSvg("#2b1a10", "rgba(190,140,95,.30)", "d") },
-    beige: { id: "beige", label: "베이지", hex: "#d9c39c", img: tileSvg("#d9c39c", "rgba(120,90,55,.38)", "g") }
+    black: { id: "black", label: "검정", hex: "#171617", img: IMG + "tile_black.jpg" },
+    brown: { id: "brown", label: "갈색", hex: "#562c0c", img: IMG + "tile_brown.jpg" },
+    dark: { id: "dark", label: "짙은갈색", hex: "#1e110e", img: IMG + "tile_dark.jpg" },
+    beige: { id: "beige", label: "베이지", hex: "#8a5a28", img: IMG + "tile_beige.jpg" }
   };
 
   /* ─────────────────────────────────────────────────────────
@@ -11310,11 +11297,12 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
          최대 높이 = 홈 높이의 60%(21.41×0.6 = 12.85%), 비율 1.00 : 0.85 : 0.72 : 0.60.
          ★명판(아래 32.5%)~홈(위 39.7%) 사이 간격은 7.2%밖에 안 돼 이 높이가 안 들어가므로
            홈 아래 빈 면에 배치한다(명판·홈과 겹침 없음). */
+      /* ★v0.5.1: 폭 = 홈 폭의 30%(4.42%), 각 홈 중앙 정렬 */
       bars: [
-        { x: 20.68, y: 64.15, w: 8.84, h: 12.85 },
-        { x: 37.50, y: 66.08, w: 8.84, h: 10.92 },
-        { x: 54.31, y: 67.75, w: 8.84, h: 9.25 },
-        { x: 71.13, y: 69.29, w: 8.84, h: 7.71 }
+        { x: 22.89, y: 64.15, w: 4.42, h: 12.85 },
+        { x: 39.71, y: 66.08, w: 4.42, h: 10.92 },
+        { x: 56.52, y: 67.75, w: 4.42, h: 9.25 },
+        { x: 73.34, y: 69.29, w: 4.42, h: 7.71 }
       ],
       plateText: "CHOI. FIRST?"
     },
