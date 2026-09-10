@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 140" width="120" height="140">
-<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
-<stop offset="0" stop-color="#e7e2d6"/><stop offset="1" stop-color="#c9c3b4"/></linearGradient></defs>
-<g transform="rotate(-12 60 90)"><ellipse cx="60" cy="82" rx="34" ry="38" fill="url(#g)" stroke="#8b8d95" stroke-width="2"/><circle cx="48" cy="74" r="4.5" fill="#2a2a2f"/><circle cx="72" cy="74" r="4.5" fill="#2a2a2f"/><path d="M50 88 Q60 98 70 88" stroke="#2a2a2f" stroke-width="2.5" fill="none" stroke-linecap="round"/><ellipse cx="34" cy="96" rx="7" ry="10" fill="#d8d3c8" stroke="#8b8d95" stroke-width="1.5"/><ellipse cx="86" cy="96" rx="7" ry="10" fill="#d8d3c8" stroke="#8b8d95" stroke-width="1.5"/><ellipse cx="48" cy="122" rx="9" ry="5" fill="#b8b2a3"/><ellipse cx="72" cy="122" rx="9" ry="5" fill="#b8b2a3"/></g><text x="18" y="30" font-size="18" fill="#5a5b63" font-family="sans-serif">L</text>
-<text x="60" y="136" font-size="8" text-anchor="middle" fill="#8b8d95" font-family="sans-serif">자리표시자</text>
-</svg>
