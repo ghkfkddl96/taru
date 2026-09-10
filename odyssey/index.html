@@ -10766,7 +10766,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 (function () {
   "use strict";
 
-  var BUILD = "ODY-S1-20260910-2128";
+  var BUILD = "ODY-S1-20260910-2307";
   var LSKEY = "odyssey.s1.v1";
 
   var qs = new URLSearchParams(location.search);
@@ -11050,7 +11050,9 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     p18Prize: "tileBeige",                       // ★15:54: #18 QR 보상 = 베이지 색상판
     p22Prize: "tileDark",                        // ★15:54: #22 보상 = 짙은갈색 색상판
     p22Picture: "숫자 7",                        // Q11 #22 완성 그림
-    songOrder: ["blood", "fire", "dna", "butter", "dynamite"], // Q12 노래 순서
+    /* ★22:48 확정(v0.7): 불타오르네 → 피 땀 눈물 → DNA → Butter → Dynamite.
+       #5 재생 순서이자 #21 화살 과녁 정답 순서(불→물방울→DNA→버터→다이너마이트). */
+    songOrder: ["fire", "blood", "dna", "butter", "dynamite"],
     p23From: "화장실 수납장1",                   // Q13 #23 쌍안경 출처
     p24PeanutFrom: "갤리 간식 수납칸(#25 색상판 자물쇠)",  // ★15:54: 잠금 생김
     cab2Prize: "tileBrown",                      // ★15:54: 화장실 상단 수납장2 = 갈색 색상판(문제 미정)
@@ -13272,7 +13274,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     if (o.panel) $("zoomPanel").appendChild(o.panel);
     z.classList.add("show");
   }
-  function closeZoom() { zoomId = null; $("zoom").classList.remove("show"); clear($("zoomStage")); clear($("zoomPanel")); }
+  function closeZoom() { if (zoomId === "songs") stopSongs(); zoomId = null; $("zoom").classList.remove("show"); clear($("zoomStage")); clear($("zoomPanel")); }
 
   /* ═══════════ 보상 ═══════════ */
   function prize(itemId, msg) {
@@ -14094,14 +14096,8 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     openZoom({ id: "case", title: "헤드셋 케이스", node: node, cap: "로고 자리의 네모 4칸.\n칸을 눌러 글자를 맞춰봐" });
   };
 
-  ZOOM.headphones = function () {
-    var panel = el("div");
-    var b = el("button", "btn primary", "🎧 써보기 (재생)");
-    b.setAttribute("data-t", "playSongs");
-    b.onclick = playSongs;
-    panel.appendChild(b);
-    openZoom({ id: "headphones", title: "헤드폰", img: DATA.IMG + "headphones.jpg", panel: panel, cap: "더블탭하면 써볼 수 있다." });
-  };
+  /* ★v0.7 — 헤드셋 더블탭 = 착용 뒷모습 화면에서 5곡 연속 재생. 언제나 첫 곱부터. */
+  ZOOM.headphones = function () { playSongs(); };
   ZOOM.gamecard = function () {
     var node = el("div");
     node.style.cssText = "position:relative;width:100%;max-width:330px";
@@ -14134,65 +14130,191 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     openZoom({ id: "pamphlet", title: "팜플렛 + 셀로판", node: pam, cap: "셀로판을 드래그해서 로고에 맞춰봐." });
   };
 
-  /* #5 노래 재생 (음원 없으면 신호음) */
+  /* ═══════════ #5 헤드셋 — 5곡 연속 재생 (★v0.7) ═══════════
+     · 헤드셋 더블탭 → 착용 뒷모습 화면에서 songOrder 순서대로 5곡 **연속** 재생
+     · 각 곡 페이드인 1초 / 페이드아웃 1초 (Web Audio GainNode)
+     · 곡이 바뀔 때마다 지금 나오는 곡 아이콘·제목을 크게 표시
+     · 5곡이 다 끝나면 "더 이상 노래가 흘러나오지 않는다"
+     · 다시 열면(또는 '처음부터 다시 듣기') 언제나 첫 곱부터
+     · 음원 파일(audio/songN.mp3)이 없으면 기존 신호음으로 대체                     */
+  var FADE = 1.0;              /* 페이드 인/아웃 초 */
+  var TONE_STEP = 1400;        /* 음원 없을 때 곡당 ms */
+  var songRun = 0;             /* 재생 세션 번호 — 새로 시작하면 이전 세션은 스스로 멈춘다 */
+  var songTimers = [];
+  var songNodes = {};          /* url -> {au, gain, dead}  (MediaElementSource 는 요소당 1번만) */
+
+  function songChain(url) {
+    if (songNodes[url]) return songNodes[url];
+    var au = new Audio(url);
+    au.preload = "auto";
+    var rec = { au: au, gain: null, dead: false };
+    au.addEventListener("error", function () { rec.dead = true; });
+    var a = G.audio && G.audio();
+    if (a && a.createMediaElementSource) {
+      try {
+        var src = a.createMediaElementSource(au);
+        var g = a.createGain();
+        g.gain.value = 0.0001;
+        src.connect(g); g.connect(a.destination);
+        rec.gain = g;
+      } catch (e) { rec.gain = null; }
+    }
+    songNodes[url] = rec;
+    return rec;
+  }
+  /* GainNode 가 있으면 그걸로, 없으면 element.volume 으로 같은 모양의 페이드 */
+  function fadeTo(rec, to, sec) {
+    var a = G.audio && G.audio();
+    if (rec.gain && a) {
+      var t = a.currentTime;
+      try {
+        rec.gain.gain.cancelScheduledValues(t);
+        rec.gain.gain.setValueAtTime(Math.max(0.0001, rec.gain.gain.value), t);
+        rec.gain.gain.linearRampToValueAtTime(Math.max(0.0001, to), t + sec);
+      } catch (e) {}
+      return;
+    }
+    try {
+      var from = rec.au.volume, steps = Math.max(1, Math.round(sec * 30)), k = 0;
+      var iv = setInterval(function () {
+        k++;
+        try { rec.au.volume = Math.max(0, Math.min(1, from + (to - from) * (k / steps))); } catch (e) {}
+        if (k >= steps) clearInterval(iv);
+      }, (sec * 1000) / steps);
+      songTimers.push({ iv: iv });
+    } catch (e) {}
+  }
+  function stopSongs() {
+    songRun++;
+    songTimers.forEach(function (t) { if (t && t.iv) clearInterval(t.iv); else clearTimeout(t); });
+    songTimers = [];
+    Object.keys(songNodes).forEach(function (u) {
+      var r = songNodes[u];
+      try { r.au.pause(); r.au.currentTime = 0; } catch (e) {}
+      if (r.gain) { try { r.gain.gain.cancelScheduledValues(0); r.gain.gain.value = 0.0001; } catch (e) {} }
+    });
+  }
+  function later(fn, ms) { var t = setTimeout(fn, ms); songTimers.push(t); return t; }
+  /* 검증용 훅 — 지금 재생 상태(게인/재생위치)를 그대로 보여준다 */
+  window.__songState = function () {
+    return {
+      run: songRun,
+      now: (document.querySelector('[data-t="nowPlaying"] div') || {}).textContent || "",
+      ended: !!(document.querySelector('[data-t="songsEnd"]') || {}).style
+        && (document.querySelector('[data-t="songsEnd"]') || { style: {} }).style.display === "block",
+      nodes: Object.keys(songNodes).map(function (u) {
+        var r = songNodes[u];
+        return { url: u, gain: r.gain ? +r.gain.gain.value.toFixed(3) : null,
+                 t: +(r.au.currentTime || 0).toFixed(2), paused: !!r.au.paused, dead: r.dead };
+      })
+    };
+  };
+
   function playSongs() {
+    stopSongs();
     var order = DATA.TEMP.songOrder;
+    var run = songRun;
+
     var node = el("div");
     node.style.cssText = "text-align:center";
     var im = new Image(); im.src = DATA.IMG + "headset_worn.jpg";
-    im.style.cssText = "max-width:100%;max-height:44vh;border-radius:12px;margin:0 auto";
+    im.style.cssText = "max-width:100%;max-height:36vh;border-radius:12px;margin:0 auto;display:block";
     node.appendChild(im);
+
+    /* 지금 나오는 곡 */
+    var now = el("div");
+    now.setAttribute("data-t", "nowPlaying");
+    now.style.cssText = "margin:10px auto 4px;display:flex;align-items:center;justify-content:center;gap:9px;min-height:42px";
+    var nowIc = new Image();
+    nowIc.style.cssText = "width:36px;height:36px;object-fit:contain;border-radius:8px;background:#fff;visibility:hidden";
+    var nowNm = el("div", null, "");
+    nowNm.style.cssText = "font-size:15px;font-weight:700;color:var(--n9)";
+    now.appendChild(nowIc); now.appendChild(nowNm);
+    node.appendChild(now);
+
     var list = el("div");
-    list.style.cssText = "margin-top:10px;display:flex;flex-direction:column;gap:5px";
-    var rows = order.map(function (id, i) {
+    list.style.cssText = "margin-top:2px;display:flex;flex-direction:column;gap:5px";
+    var rows = order.map(function (id, i2) {
       var r = el("div", "chip");
       r.style.cssText = "display:flex;align-items:center;gap:8px;opacity:.35";
       var ic = new Image(); ic.src = DATA.SONGS[id].icon; ic.style.cssText = "width:22px;height:22px;object-fit:contain;border-radius:5px";
-      r.appendChild(el("span", null, String(i + 1) + "."));
+      r.appendChild(el("span", null, String(i2 + 1) + "."));
       r.appendChild(ic);
       r.appendChild(el("span", null, DATA.SONGS[id].name));
       list.appendChild(r);
       return r;
     });
     node.appendChild(list);
-    openZoom({ id: "songs", title: "🎧 재생 중", node: node, cap: "다섯 곡이 순서대로 나온다." });
+
+    var end = el("div", null, "더 이상 노래가 흘러나오지 않는다.");
+    end.setAttribute("data-t", "songsEnd");
+    end.style.cssText = "display:none;margin-top:12px;font-size:13.5px;font-weight:600;color:var(--n8)";
+    node.appendChild(end);
+
+    var panel = el("div");
+    var again = el("button", "btn ghost", "🎧 처음부터 다시 듣기");
+    again.setAttribute("data-t", "playSongs");
+    again.onclick = function () { playSongs(); };
+    panel.appendChild(again);
+
+    openZoom({ id: "songs", title: "🎧 재생 중", node: node, panel: panel, cap: "다섯 곡이 순서대로 나온다." });
+
     var i = 0;
     (function next() {
-      if (i >= order.length) { G.setFlag("heardSongs"); return; }
+      if (run !== songRun) return;
       if (!$("zoom").classList.contains("show")) return;
-      var id = order[i];
-      rows[i].style.opacity = "1";
-      rows[i].style.borderColor = "var(--accent)";
-      playSong(id);
+      if (i >= order.length) {
+        G.setFlag("heardSongs");
+        nowIc.style.visibility = "hidden";
+        nowNm.textContent = "";
+        rows.forEach(function (r) { r.style.borderColor = ""; });
+        end.style.display = "block";
+        $("zoomCaption").textContent = "더 이상 노래가 흘러나오지 않는다.";
+        return;
+      }
+      var id = order[i], sg = DATA.SONGS[id];
+      rows.forEach(function (r, k) {
+        r.style.opacity = k <= i ? "1" : ".35";
+        r.style.borderColor = k === i ? "var(--accent)" : "";
+      });
+      nowIc.src = sg.icon; nowIc.style.visibility = "visible";
+      nowNm.textContent = sg.name;
       i++;
-      setTimeout(next, 1500);
+      playSong(id, function () { if (run === songRun) next(); });
     })();
   }
-  var audioCache = {};
-  function playSong(id) {
-    var idx = Object.keys(DATA.SONGS).indexOf(id);
+
+  function playSong(id, done) {
     var n = DATA.TEMP.songOrder.indexOf(id) + 1;
     var file = "song" + n + ".mp3";
-    var url = "audio/" + file;
     var have = Array.isArray(window.__AUDIO) && window.__AUDIO.indexOf(file) >= 0;
-    if (!have) { tone(id); return; }
-    if (audioCache[url] === undefined) {
-      var a = new Audio(url);
-      a.addEventListener("error", function () { audioCache[url] = null; });
-      audioCache[url] = a;
+    var fired = false;
+    function finish(rec) { if (fired) return; fired = true; if (rec) { try { rec.au.pause(); } catch (e) {} } done(); }
+    if (!have) { tone(id); later(function () { finish(null); }, TONE_STEP); return; }
+
+    var rec = songChain("audio/" + file);
+    if (rec.dead) { tone(id); later(function () { finish(null); }, TONE_STEP); return; }
+    var au = rec.au;
+    try { au.currentTime = 0; } catch (e) {}
+    if (!rec.gain) { try { au.volume = 0; } catch (e) {} }
+
+    function go() {
+      var dur = (au.duration && isFinite(au.duration) && au.duration > 0.2) ? au.duration : 10;
+      fadeTo(rec, 1, FADE);                                                              /* 페이드인 1초 */
+      later(function () { fadeTo(rec, 0.0001, FADE); }, Math.max(0, (dur - FADE) * 1000)); /* 끝나기 1초 전 페이드아웃 */
+      later(function () { finish(rec); }, dur * 1000 + 80);
+      au.addEventListener("ended", function () { finish(rec); }, { once: true });
     }
-    var au = audioCache[url];
-    if (au) {
-      au.currentTime = 0;
-      var p = au.play();
-      if (p && p.catch) p.catch(function () { tone(id); });
-      setTimeout(function () { try { au.pause(); } catch (e) {} }, 1300);
-    } else tone(id);
+    var p;
+    try { p = au.play(); } catch (e) { p = null; }
+    if (p && p.catch) p.catch(function () { rec.dead = true; tone(id); later(function () { finish(null); }, TONE_STEP); });
+    if (au.readyState >= 1) go(); else au.addEventListener("loadedmetadata", go, { once: true });
   }
+
   function tone(id) {
     var f = DATA.SONGS[id].tone;
     G.beep(f, .28, "triangle", .14);
-    setTimeout(function () { G.beep(f * 1.5, .3, "sine", .12); }, 300);
+    later(function () { G.beep(f * 1.5, .3, "sine", .12); }, 300);
   }
 
   /* ═══════════ 아이템 사용(선택 후 대상 탭) ═══════════ */
