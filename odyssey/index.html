@@ -113,12 +113,16 @@ body.hints .spot .lbl{opacity:.9}
 .invEmpty{font-size:11px;color:var(--n6);padding:6px 2px}
 
 /* ───────── 시트(클로즈업/확대) ───────── */
+/* ★v0.2: 팝업 뒤로 현재 맵이 블러로 비친다(검은 단절 제거) */
 .sheet{
   position:absolute;inset:0;z-index:30;display:none;flex-direction:column;
-  background:rgba(11,11,12,.97);padding:calc(var(--safeT) + 44px) 16px calc(var(--safeB) + 16px);
+  background:rgba(0,0,0,.28);
+  -webkit-backdrop-filter:blur(12px);
+  backdrop-filter:blur(12px);
+  padding:calc(var(--safeT) + 44px) 16px calc(var(--safeB) + 16px);
 }
 .sheet.show{display:flex}
-.sheetClose{position:absolute;top:calc(var(--safeT) + 8px);right:12px;z-index:5;width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:transparent;font-size:16px;color:var(--n8)}
+.sheetClose{position:absolute;top:calc(var(--safeT) + 8px);right:12px;z-index:5;width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:transparent;font-size:20px;line-height:1;color:var(--n8)}
 .sheetTitle{flex:0 0 auto;font-size:13px;font-weight:700;letter-spacing:.6px;text-align:center;margin:0 44px 12px;min-height:18px;color:var(--n8)}
 .sheetStage{flex:1 1 auto;position:relative;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .sheetStage img.main{max-width:100%;max-height:100%;object-fit:contain;border-radius:var(--r)}
@@ -217,7 +221,7 @@ body.hints .ifeHot{box-shadow:0 0 0 1px rgba(255,255,255,.5), 0 0 12px rgba(255,
 .ifeScreen img{max-width:100%;max-height:100%;object-fit:contain}
 
 /* ───────── 폰 ───────── */
-#phoneWrap{position:absolute;inset:0;z-index:34;display:none;align-items:center;justify-content:center;background:rgba(11,11,12,.96);padding:calc(var(--safeT) + 38px) 8px calc(var(--safeB) + 10px)}
+#phoneWrap{position:absolute;inset:0;z-index:34;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.30);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);padding:calc(var(--safeT) + 38px) 8px calc(var(--safeB) + 10px)}
 #phoneWrap.show{display:flex}
 #iphone{position:relative;width:min(300px,86vw);aspect-ratio:9/19.5;max-height:100%;border-radius:38px;background:#000;border:7px solid var(--n3);box-shadow:0 10px 30px rgba(0,0,0,.6);overflow:hidden}
 #island{position:absolute;top:8px;left:50%;transform:translateX(-50%);width:78px;height:22px;border-radius:13px;background:#000;z-index:6}
@@ -227,12 +231,14 @@ body.hints .ifeHot{box-shadow:0 0 0 1px rgba(255,255,255,.5), 0 0 12px rgba(255,
 .pBody{flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden}
 .pApps{display:grid;grid-template-columns:repeat(4,1fr);gap:16px 4px;padding:28px 12px 0}
 .pApp{background:none;border:0;padding:0;display:flex;flex-direction:column;align-items:center;gap:5px}
-.pApp .ico{width:50px;height:50px;border-radius:12px;overflow:hidden;background:var(--n3);position:relative}
+.pApp .ico{width:52px;height:52px;border-radius:22%;overflow:hidden;background:var(--n3);position:relative}
 .pApp .ico img{width:100%;height:100%;object-fit:cover}
 .pApp .lbl{font-size:9px;color:var(--n8);letter-spacing:.2px}
 .pApp .badge{position:absolute;right:-3px;top:-3px;width:17px;height:17px;border-radius:50%;background:var(--n9);color:var(--n0);font-size:10px;font-weight:700;display:grid;place-items:center;border:2px solid var(--n1)}
-.pApp .dl{position:absolute;left:5px;right:5px;bottom:4px;height:3px;border-radius:2px;background:rgba(255,255,255,.22);overflow:hidden}
-.pApp .dl i{display:block;height:100%;width:0;background:var(--n9);transition:width .12s linear}
+/* v0.2 설치 진행바: 아이콘 바로 아래, 아이콘 가로폭 */
+.pApp .dlbar{width:52px;height:3px;border-radius:2px;background:rgba(255,255,255,.2);overflow:hidden;margin-top:3px}
+.pApp .dlbar i{display:block;height:100%;width:0;background:#7fbf8a;transition:width .1s linear}
+.pApp .badge.dlb{background:var(--n8);color:var(--n0);font-size:11px;line-height:1}
 .pApp.locked .ico{filter:grayscale(1) brightness(.65)}
 .pLock{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:12px}
 .pLock .clock{font-size:38px;font-weight:200;letter-spacing:-1px;color:var(--n9)}
@@ -252,7 +258,7 @@ body.hints .ifeHot{box-shadow:0 0 0 1px rgba(255,255,255,.5), 0 0 12px rgba(255,
 .kkTime{font-size:9px;color:var(--n6);margin:4px 0 0 2px}
 
 /* ───────── 전체화면 게임 ───────── */
-#full{position:absolute;inset:0;z-index:40;display:none;flex-direction:column;background:var(--n0)}
+#full{position:absolute;inset:0;z-index:40;display:none;flex-direction:column;background:rgba(0,0,0,.45);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
 #full.show{display:flex}
 .fullTop{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;padding:calc(var(--safeT) + 12px) 16px 8px;font-size:12px;font-weight:700;letter-spacing:1px;color:var(--n7)}
 .fullBody{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px 12px;overflow:hidden}
@@ -334,12 +340,14 @@ body.hints .ifeHot{box-shadow:0 0 0 1px rgba(255,255,255,.5), 0 0 12px rgba(255,
 .buildId{position:absolute;bottom:calc(var(--safeB) + 8px);font-size:9px;color:var(--n5);font-family:ui-monospace,Menlo,monospace;letter-spacing:.5px}
 
 #story{position:absolute;inset:0;z-index:46;display:none;flex-direction:column;align-items:center;justify-content:center;
-  gap:16px;padding:calc(var(--safeT) + 24px) 24px calc(var(--safeB) + 24px);text-align:center;background:var(--n0)}
+  gap:16px;padding:calc(var(--safeT) + 24px) 24px calc(var(--safeB) + 24px);text-align:center;
+  background:rgba(0,0,0,.52);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
 #story.show{display:flex}
 #story img{max-width:100%;max-height:46%;object-fit:contain;border-radius:var(--r)}
 #story .txt{font-size:15px;line-height:1.85;color:var(--n8);white-space:pre-line}
 
-#transit{position:absolute;inset:0;z-index:44;display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:var(--n0)}
+#transit{position:absolute;inset:0;z-index:44;display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;
+  background:rgba(0,0,0,.52);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
 #transit.show{display:flex}
 #transitText{font-size:14px;color:var(--n7);letter-spacing:.3px}
 #transitBarWrap{width:56%;height:2px;background:var(--n4);border-radius:2px;overflow:hidden}
@@ -369,6 +377,32 @@ body.dbg #story,body.dbg .overlay{padding-bottom:calc(var(--safeB) + 56px)}
 .frag{display:inline-flex;flex-direction:column;align-items:center;background:var(--n2);border:1px solid var(--line2);border-radius:6px;padding:7px 12px;margin:3px}
 .frag b{font-size:21px;color:var(--accent);font-weight:700}
 .frag span{font-size:9px;color:var(--n6)}
+
+/* ★v0.2 폴백: backdrop-filter 미지원 브라우저에서는 맵 자체를 블러 처리한다 */
+@supports not ((-webkit-backdrop-filter: blur(2px)) or (backdrop-filter: blur(2px))){
+  body.ovl #scene,body.ovl #invWrap,body.ovl #topbar{filter:blur(10px)}
+  .sheet,#phoneWrap{background:rgba(11,11,12,.72)}
+  #full,#story,#transit{background:rgba(11,11,12,.86)}
+}
+/* 순환식 입력칸 */
+.slot .v{display:block;font-weight:600;line-height:1}
+.slot.cyc{cursor:pointer}
+.slot.cyc:active{border-color:var(--accent)}
+.cycTip{font-size:11px;color:var(--n6);letter-spacing:.2px}
+
+/* ★v0.2 컷신 이미지: safe-area 안에서 최대 크기(잘림 없이 contain) */
+#story.big{gap:12px;padding-top:calc(var(--safeT) + 10px);padding-bottom:calc(var(--safeB) + 10px)}
+#story img.cut{flex:1 1 auto;min-height:0;width:100%;max-width:100%;max-height:none;height:auto;object-fit:contain;border-radius:var(--r)}
+#story.big .txt{flex:0 0 auto;font-size:14px;line-height:1.7}
+body.dbg #story.big{padding-bottom:calc(var(--safeB) + 50px)}
+
+/* v0.2 폰 위 작은 설치 시트 */
+.pSheet{position:absolute;left:10px;right:10px;bottom:14px;z-index:8;background:var(--n2);
+  border:1px solid var(--line2);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:7px;
+  box-shadow:0 -8px 24px rgba(0,0,0,.55)}
+.pSheetT{font-size:13px;font-weight:700;color:var(--n9)}
+.pSheetD{font-size:11px;color:var(--n7)}
+.pSheet .btn{padding:8px 14px;font-size:13px;margin:0}
 
 </style>
 </head>
@@ -401,7 +435,7 @@ body.dbg #story,body.dbg .overlay{padding-bottom:calc(var(--safeB) + 56px)}
 
   <!-- 클로즈업 -->
   <div class="sheet" id="closeup">
-    <button class="sheetClose" data-t="cuClose">✕</button>
+    <button class="sheetClose" data-t="cuClose">×</button>
     <div class="sheetTitle" id="cuTitle"></div>
     <div class="sheetStage" id="cuStage"></div>
     <div class="sheetPanel" id="cuPanel"></div>
@@ -410,7 +444,7 @@ body.dbg #story,body.dbg .overlay{padding-bottom:calc(var(--safeB) + 56px)}
 
   <!-- 아이템 확대 -->
   <div class="sheet" id="zoom">
-    <button class="sheetClose" data-t="zoomClose">✕</button>
+    <button class="sheetClose" data-t="zoomClose">×</button>
     <div class="sheetTitle" id="zoomTitle"></div>
     <div class="sheetStage" id="zoomStage"></div>
     <div class="sheetPanel" id="zoomPanel"></div>
@@ -419,7 +453,7 @@ body.dbg #story,body.dbg .overlay{padding-bottom:calc(var(--safeB) + 56px)}
 
   <!-- 폰 -->
   <div id="phoneWrap">
-    <button class="sheetClose" data-t="phoneClose">✕</button>
+    <button class="sheetClose" data-t="phoneClose">×</button>
     <div id="iphone">
       <div id="island"></div>
       <div id="phoneScreen"></div>
@@ -10567,7 +10601,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 (function () {
   "use strict";
 
-  var BUILD = "ODY-S1-20260910-1133";
+  var BUILD = "ODY-S1-20260910-1219";
   var LSKEY = "odyssey.s1.v1";
 
   var qs = new URLSearchParams(location.search);
@@ -10775,8 +10809,32 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     node.addEventListener("mouseup", end);
   }
 
+  /* ───────── 오버레이 열림 감지 (blur 폴백용 body 클래스) ───────── */
+  function syncOverlay() {
+    var ids = ["closeup", "zoom", "phoneWrap", "full", "story", "transit"];
+    var on = false;
+    for (var i = 0; i < ids.length; i++) {
+      var n = document.getElementById(ids[i]);
+      if (n && n.classList.contains("show")) { on = true; break; }
+    }
+    document.body.classList.toggle("ovl", on);
+  }
+  setInterval(syncOverlay, 250);
+
+  /* ───────── 시드 난수 (칸별 후보 목록 고정용) ───────── */
+  function hashSeed(str) {
+    var h = 2166136261 >>> 0;
+    for (var i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
+    return h >>> 0;
+  }
+  function lcg(seed) {
+    var s = seed >>> 0;
+    return function () { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 4294967296; };
+  }
+
   window.G = {
     BUILD: BUILD, DEBUG: DEBUG, HINTS: HINTS, S: S,
+    syncOverlay: syncOverlay, hashSeed: hashSeed, lcg: lcg,
     save: save, load: load, wipe: wipe,
     flag: flag, setFlag: setFlag, has: has, give: give, take: take,
     solved: solved, markSolved: markSolved,
@@ -10985,7 +11043,68 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   function msgLine() { return el("div", "lockMsg"); }
   function say(m, t, cls) { m.textContent = t || ""; m.className = "lockMsg " + (cls || ""); }
 
-  /* ════════════════ 1. 키패드형 자물쇠 (숫자·알파벳·히라가나) ════════════════ */
+  /* ════════════════ 0. 순환식 입력칸 자물쇠 (★v0.2 — 키패드 폐지) ════════════════
+     칸을 탭하면 값이 한 단계씩 바뀐다. 칸마다 후보 = 정답 글자를 포함한 N개(기본 12,
+     후보 풀이 N개 이하면 전부). 후보 목록·순서·초기값은 칸별 시드로 고정돼 재접속해도 같다.
+     길게 누르면 이전 값. 다 맞으면 자동 판정.                                        */
+  function cycleLock(opt) {
+    /* opt: {id, n, pool:[문자], answer:"...", size, labels:[], onSolve} */
+    var size = Math.min(opt.size || 12, opt.pool.length);
+    var ans = String(opt.answer).split("");
+    var cands = [], idx = [], slots = [];
+    for (var i = 0; i < opt.n; i++) {
+      var rnd = G.lcg(G.hashSeed((opt.id || "lock") + "#" + i + "#" + ans[i]));
+      var a = ans[i];
+      var rest = opt.pool.filter(function (c) { return c !== a; });
+      for (var k = rest.length - 1; k > 0; k--) { var j = (rnd() * (k + 1)) | 0; var t = rest[k]; rest[k] = rest[j]; rest[j] = t; }
+      var list = rest.slice(0, size - 1).concat([a]);
+      for (k = list.length - 1; k > 0; k--) { j = (rnd() * (k + 1)) | 0; t = list[k]; list[k] = list[j]; list[j] = t; }
+      cands.push(list);
+      var start = (rnd() * list.length) | 0;
+      while (list[start] === a) start = (start + 1) % list.length;   /* 초기 표시값은 정답이 아닌 것 */
+      idx.push(start);
+    }
+
+    var box = el("div", "lock");
+    var slotWrap = el("div", "slots");
+    for (i = 0; i < opt.n; i++) (function (i) {
+      var s = el("button", "slot cyc" + (opt.n > 4 ? " small" : ""));
+      s.setAttribute("data-t", "slot" + i);
+      if (opt.labels && opt.labels[i]) s.appendChild(el("i", "cnum", opt.labels[i]));
+      var v = el("b", "v", cands[i][idx[i]]);
+      s.appendChild(v);
+      G.tapper(s, {
+        tap: function () { idx[i] = (idx[i] + 1) % cands[i].length; G.sfxTap(); paint(); check(); },
+        long: function () { idx[i] = (idx[i] - 1 + cands[i].length) % cands[i].length; G.sfxTap(); paint(); check(); }
+      });
+      slots.push(s); slotWrap.appendChild(s);
+    })(i);
+    box.appendChild(slotWrap);
+    var msg = msgLine(); box.appendChild(msg);
+    box.appendChild(el("div", "cycTip", "칸을 누르면 바뀐다 · 길게 누르면 뒤로"));
+
+    function paint() {
+      for (var i = 0; i < opt.n; i++) slots[i].querySelector(".v").textContent = cands[i][idx[i]];
+    }
+    function value() { return idx.map(function (v, i) { return cands[i][v]; }).join(""); }
+    function check() { if (value() === String(opt.answer)) win(); }
+    function win() {
+      say(msg, "열렸다!", "ok"); G.sfxOk(); G.buzz([30, 40, 60]);
+      slots.forEach(function (s) { s.disabled = true; s.classList.remove("cyc"); });
+      unregister();
+      setTimeout(function () { opt.onSolve && opt.onSolve(); }, 420);
+    }
+    register({
+      answer: String(opt.answer), cands: cands,
+      force: function () {
+        for (var i = 0; i < opt.n; i++) idx[i] = cands[i].indexOf(ans[i]);
+        paint(); win();
+      }
+    });
+    return box;
+  }
+
+  /* ════════════════ 1. 키패드형 자물쇠 (폰 잠금 외에는 v0.2에서 미사용) ════════════════ */
   function keypadLock(opt) {
     /* opt: {n, chars:[...], answer:"...", labels:[..], cols, onSolve, hint} */
     var box = el("div", "lock");
@@ -11456,7 +11575,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   }
 
   window.W = {
-    keypadLock: keypadLock, rotateLock: rotateLock, seqLock: seqLock,
+    cycleLock: cycleLock, keypadLock: keypadLock, rotateLock: rotateLock, seqLock: seqLock,
     patternLock: patternLock, shade: shade, tissue: tissue, pamphlet: pamphlet, slides: slides,
     currentLock: function () { return current; }, unregister: unregister
   };
@@ -11490,6 +11609,15 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     var root = $("full");
     clear(root); root.classList.remove("show");
   }
+  /** ★디버그 전용 "바로 풀기" — ?debug=1 이 아니면 DOM에 아예 만들지 않는다 */
+  function dbgSolveBtn(fn) {
+    if (!G.DEBUG) return document.createComment("");
+    var b = el("button", "fbtn", "⚡ 바로 풀기");
+    b.setAttribute("data-t", "dbgSolve");
+    b.onclick = fn;
+    return b;
+  }
+
   function backBtn(fn, label) {
     var b = el("button", "fbtn", label || "↩ 돌아가기");
     b.setAttribute("data-t", "gameBack");
@@ -11557,6 +11685,57 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     return g;
   }
 
+  /** 단일 후보(naked/hidden single)만으로 끝까지 풀리는가 — 고급 기법 불필요 판별 */
+  function solvableBySingles(p) {
+    var g = p.slice();
+    function cands(i) {
+      var r = (i / 9) | 0, c = i % 9, br = r - r % 3, bc = c - c % 3, used = {};
+      for (var k = 0; k < 9; k++) {
+        used[g[r * 9 + k]] = 1; used[g[k * 9 + c]] = 1;
+        used[g[(br + ((k / 3) | 0)) * 9 + bc + (k % 3)]] = 1;
+      }
+      var out = [];
+      for (var v = 1; v <= 9; v++) if (!used[v]) out.push(v);
+      return out;
+    }
+    var units = [];
+    for (var u = 0; u < 9; u++) {
+      var row = [], col = [], box = [];
+      for (var k = 0; k < 9; k++) {
+        row.push(u * 9 + k); col.push(k * 9 + u);
+        box.push((Math.floor(u / 3) * 3 + Math.floor(k / 3)) * 9 + (u % 3) * 3 + (k % 3));
+      }
+      units.push(row, col, box);
+    }
+    var progress = true;
+    while (progress) {
+      progress = false;
+      for (var i = 0; i < 81; i++) {
+        if (g[i]) continue;
+        var cd = cands(i);
+        if (cd.length === 0) return false;
+        if (cd.length === 1) { g[i] = cd[0]; progress = true; }
+      }
+      if (progress) continue;
+      for (var ui = 0; ui < units.length && !progress; ui++) {
+        var un = units[ui];
+        for (var v = 1; v <= 9 && !progress; v++) {
+          var spot = -1, cnt = 0, already = false;
+          for (var k2 = 0; k2 < 9; k2++) {
+            var idx = un[k2];
+            if (g[idx] === v) { already = true; break; }
+            if (!g[idx] && cands(idx).indexOf(v) >= 0) { cnt++; spot = idx; }
+          }
+          if (already) continue;
+          if (cnt === 0) return false;
+          if (cnt === 1) { g[spot] = v; progress = true; }
+        }
+      }
+    }
+    for (i = 0; i < 81; i++) if (!g[i]) return false;
+    return true;
+  }
+
   /** 유일해 스도쿠 생성 (seed 고정 → 항상 같은 판) */
   function genSudoku(seed, targetClues) {
     var rnd = rng(seed);
@@ -11574,14 +11753,30 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     return { puzzle: puz, solution: sol, clues: clues };
   }
 
+  /* ★v0.2: 난이도 한 단계 완화 — 단서 34~36개 + "단일 후보만으로 풀림" 조건.
+     시드를 고정 시작점에서 올려가며 조건을 만족하는 첫 판을 쓴다(결과는 항상 동일). */
+  var SUD_SEED0 = 20260916;
   var SUD = null;
   function sudoku() {
-    if (!SUD) SUD = genSudoku(20260916, 30);
-    return SUD;
+    if (SUD) return SUD;
+    var best = null;
+    for (var s = SUD_SEED0; s < SUD_SEED0 + 400; s++) {
+      var g = genSudoku(s, 35);
+      if (!best) best = g;
+      if (g.clues >= 34 && g.clues <= 36 && solvableBySingles(g.puzzle) && solveCount(g.puzzle.slice(), 2) === 1) {
+        g.seed = s; SUD = g; return SUD;
+      }
+    }
+    best.seed = -1; SUD = best; return SUD;
   }
   window.__sudokuInfo = function () {
     var s = sudoku();
-    return { clues: s.clues, unique: solveCount(s.puzzle.slice(), 3) === 1, puzzle: s.puzzle.join(""), solution: s.solution.join("") };
+    return {
+      seed: s.seed, clues: s.clues,
+      unique: solveCount(s.puzzle.slice(), 3) === 1,
+      singles: solvableBySingles(s.puzzle),
+      puzzle: s.puzzle.join(""), solution: s.solution.join("")
+    };
   };
 
   function openSudoku(onWin, onBack) {
@@ -11609,7 +11804,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         })(n);
         var er = el("button", null, "⌫"); er.setAttribute("data-n", "0"); er.onclick = function () { put(0); }; pad.appendChild(er);
         body.appendChild(pad);
-        foot.appendChild(el("div", null, ""));
+        foot.appendChild(dbgSolveBtn(function () { cur = s.solution.slice(); G.S.misc.sud = cur.slice(); G.save(); paint(); setTimeout(onWin, 250); }));
         foot.appendChild(backBtn(onBack));
 
         function put(n) {
@@ -11768,6 +11963,11 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         fb.setAttribute("data-t", "fire");
         fb.onclick = fire;
         foot.appendChild(fb);
+        foot.appendChild(dbgSolveBtn(function () {
+          targets.forEach(function (t) { t.hit = true; t.node.classList.add("hit"); });
+          step = need.length; msg.textContent = "명중! 전부 맞췄다";
+          setTimeout(onWin, 350);
+        }));
         foot.appendChild(backBtn(onBack));
 
         window.__archSolve = function () {
@@ -11852,6 +12052,10 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         var mb = el("button", "fbtn", "✏️ 칠하기");
         mb.onclick = function () { mode = mode === 1 ? 2 : 1; mb.textContent = mode === 1 ? "✏️ 칠하기" : "✖️ 표시"; };
         foot.appendChild(mb);
+        foot.appendChild(dbgSolveBtn(function () {
+          for (var r = 0; r < N; r++) for (var c = 0; c < N; c++) state[r * N + c] = NONO[r][c] ? 1 : 0;
+          G.S.misc.nono = state.slice(); G.save(); paint(); check();
+        }));
         foot.appendChild(backBtn(onBack));
 
         function paint() {
@@ -11885,7 +12089,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   window.GAMES = {
     openFull: openFull, closeFull: closeFull, backBtn: backBtn,
     openSudoku: openSudoku, openAd: openAd, openArchery: openArchery, openNono: openNono,
-    genSudoku: genSudoku, solveCount: solveCount, sudoku: sudoku, NONO: NONO
+    genSudoku: genSudoku, solveCount: solveCount, solvableBySingles: solvableBySingles, sudoku: sudoku, NONO: NONO
   };
 })();
 
@@ -11978,14 +12182,19 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   }
 
   /* ═══════════ 홈화면 ═══════════ */
+  var mgNode = null;   /* 미니게임 앱 아이콘 노드(설치 애니메이션용) */
   function appIcon(id, label, img, opts) {
     var b = el("button", "pApp" + (opts && opts.locked ? " locked" : ""));
     b.setAttribute("data-t", "app_" + id);
     var ico = el("div", "ico");
     var im = new Image(); im.src = img; ico.appendChild(im);
-    if (opts && opts.badge) { ico.appendChild(el("div", "badge", opts.badge)); }
-    if (opts && opts.dl) { var d = el("div", "dl"); d.appendChild(el("i")); ico.appendChild(d); }
+    if (opts && opts.badge) ico.appendChild(el("div", "badge", opts.badge));
+    if (opts && opts.dlBadge) ico.appendChild(el("div", "badge dlb", "\u2193"));
     b.appendChild(ico);
+    /* v0.2: 진행바는 아이콘 바로 아래, 아이콘 가로폭만큼 */
+    var bar = el("div", "dlbar"); bar.appendChild(el("i"));
+    if (!(opts && opts.dl)) bar.style.visibility = "hidden";
+    b.appendChild(bar);
     b.appendChild(el("div", "lbl", label));
     b.onclick = function () { G.sfxTap(); opts && opts.onTap && opts.onTap(b); };
     return b;
@@ -12000,71 +12209,62 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     apps.appendChild(appIcon("qr", "QR CODE", DATA.IMG + "app_qr.jpg", { onTap: function () { go("qr"); } }));
     apps.appendChild(appIcon("map", "구글맵", DATA.IMG + "app_map.jpg", { onTap: function () { go("gmap"); } }));
     var installed = G.flag("mgInstalled");
-    apps.appendChild(appIcon("minigame", "미니게임", DATA.IMG + "app_minigame.jpg", {
-      locked: !installed, dl: !installed,
+    mgNode = appIcon("minigame", "미니게임", DATA.IMG + "app_minigame.jpg", {
+      locked: !installed, dlBadge: !installed,
       onTap: function (node) { installed ? MAIN.openMinigame() : askInstall(node); }
-    }));
+    });
+    apps.appendChild(mgNode);
     body.appendChild(apps);
-    var tip = el("div", null, G.flag("mgInstalled") ? "" : "");
-    tip.style.cssText = "margin-top:auto;text-align:center;font-size:10px;color:var(--n6);padding:0 14px 10px";
-    body.appendChild(tip);
     sc.appendChild(body);
   }
 
-  /* ═══════════ 미니게임 앱 설치 (#19) ═══════════ */
+  /* ═══════════ 미니게임 앱 설치 (#19) — v0.2: 홈 화면 위 작은 시트 + 아이콘 자리 진행바 ═══════════ */
   function askInstall(node) {
-    var sc = screen();
-    sc.appendChild(statusbar());
-    var body = el("div", "pBody");
-    body.style.cssText += ";justify-content:center;align-items:center;padding:14px";
-    body.appendChild(el("div", null, "🎮"));
-    var t = el("div", null, "미니게임");
-    t.style.cssText = "font-weight:700;margin:4px 0 2px";
-    body.appendChild(t);
-    body.appendChild(el("div", null, "설치하려면 비밀번호를 입력하세요"));
+    var sc = $("phoneScreen");
+    if (sc.querySelector(".pSheet")) return;
+    var sh = el("div", "pSheet");
+    sh.appendChild(el("div", "pSheetT", "미니게임 설치"));
+    sh.appendChild(el("div", "pSheetD", "설치하려면 비밀번호를 입력하세요"));
     var inp = el("input"); inp.type = "text"; inp.setAttribute("data-t", "mgPass");
     inp.setAttribute("autocapitalize", "off"); inp.setAttribute("autocorrect", "off");
-    inp.placeholder = "password";
-    inp.style.cssText = "margin:10px 0;font-size:13px";
-    body.appendChild(inp);
-    var msg = el("div", "lockMsg"); body.appendChild(msg);
+    inp.placeholder = "password"; inp.style.fontSize = "13px";
+    sh.appendChild(inp);
+    var msg = el("div", "lockMsg"); sh.appendChild(msg);
     var row = el("div", "row");
     var ok = el("button", "btn primary", "설치"); ok.setAttribute("data-t", "mgInstall");
     ok.onclick = function () {
-      if (inp.value.trim().toLowerCase() === DATA.ANS.p19) { downloadAnim(); }
+      if (inp.value.trim().toLowerCase() === DATA.ANS.p19) { sh.remove(); runInstall(node); }
       else { msg.textContent = "비밀번호가 달라"; msg.className = "lockMsg bad"; G.sfxBad(); }
     };
-    var cc = el("button", "btn ghost", "취소"); cc.onclick = function () { go("home"); };
+    var cc = el("button", "btn ghost", "취소"); cc.onclick = function () { sh.remove(); };
     row.appendChild(ok); row.appendChild(cc);
-    body.appendChild(row);
-    sc.appendChild(body);
+    sh.appendChild(row);
+    sc.appendChild(sh);
+    setTimeout(function () { try { inp.focus(); } catch (e) {} }, 60);
   }
 
-  function downloadAnim() {
-    var sc = screen();
-    sc.appendChild(statusbar());
-    var body = el("div", "pBody");
-    var apps = el("div", "pApps");
-    var node = appIcon("minigame", "미니게임", DATA.IMG + "app_minigame.jpg", { dl: true, locked: true });
-    apps.appendChild(node);
-    body.appendChild(apps);
-    var t = el("div", null, "설치 중…");
-    t.style.cssText = "margin-top:16px;text-align:center;font-size:11px;color:var(--n8)";
-    body.appendChild(t);
-    sc.appendChild(body);
-    var bar = node.querySelector(".dl i");
-    var p = 0;
+  /** 홈 화면은 그대로 두고, 미니게임 아이콘 자리에서만 설치 진행 */
+  function runInstall(node) {
+    node = node || mgNode;
+    if (!node) { G.setFlag("mgInstalled"); go("home"); return; }
+    var badge = node.querySelector(".badge");
+    if (badge) badge.remove();
+    var bar = node.querySelector(".dlbar");
+    bar.style.visibility = "visible";
+    var fill = bar.querySelector("i");
+    var p = 0, T = 2400, t0 = Date.now();
+    G.beep(520, 0.06, "sine", 0.07);
     var iv = setInterval(function () {
-      p += 7 + Math.random() * 9;
-      bar.style.width = Math.min(100, p) + "%";
+      p = Math.min(100, (Date.now() - t0) / T * 100);
+      fill.style.width = p + "%";
       if (p >= 100) {
         clearInterval(iv);
         G.setFlag("mgInstalled");
-        t.textContent = "설치 완료!";
+        node.classList.remove("locked");
         G.sfxOk();
-        setTimeout(function () { go("home"); }, 650);
+        setTimeout(function () { bar.style.visibility = "hidden"; go("home"); }, 500);
       }
-    }, 110);
+    }, 60);
   }
 
   /* ═══════════ 카카오톡 (#16 힌트) ═══════════ */
@@ -12227,39 +12427,12 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         frags.appendChild(f);
       });
       box.appendChild(frags);
-      var slots = el("div", "slots");
-      var vals = ["", "", "", ""], cur = 0, cells = [];
-      for (var i = 0; i < 4; i++) (function (i) {
-        var s = el("button", "slot small", "·");
-        s.setAttribute("data-t", "gm" + i);
-        s.onclick = function () { cur = i; paint(); };
-        cells.push(s); slots.appendChild(s);
-      })(i);
-      box.appendChild(slots);
-      var msg = el("div", "lockMsg"); box.appendChild(msg);
-      var pad = el("div", "keypad k5");
-      pad.style.cssText = "grid-template-columns:repeat(5,1fr);max-width:210px";
-      "0123456789".split("").forEach(function (n) {
-        var k = el("button", "key sm", n);
-        k.setAttribute("data-k", n);
-        k.onclick = function () {
-          vals[cur] = n; G.sfxTap(); if (cur < 3) cur++; paint();
-          if (vals.indexOf("") < 0) {
-            if (vals.join("") === DATA.ANS.p11) { G.sfxOk(); G.setFlag("gmapOpen"); setTimeout(function () { render(); }, 400); }
-            else { msg.textContent = "안 맞아"; msg.className = "lockMsg bad"; G.sfxBad(); }
-          }
-        };
-        pad.appendChild(k);
-      });
-      box.appendChild(pad);
-      function paint() {
-        cells.forEach(function (c, i) { c.textContent = vals[i] || "·"; c.className = "slot small" + (i === cur ? " on" : ""); });
-      }
-      paint();
+      box.appendChild(W.cycleLock({
+        id: "p11", n: 4, pool: "0123456789".split(""), size: 10, answer: DATA.ANS.p11,
+        onSolve: function () { G.setFlag("gmapOpen"); render(); }
+      }));
       body.appendChild(box);
       sc.appendChild(body);
-      W.unregister();
-      window.__lock = { answer: DATA.ANS.p11, force: function () { G.setFlag("gmapOpen"); render(); } };
       return;
     }
 
@@ -12715,8 +12888,8 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     c.title("왼쪽 짐칸 1");
     if (!G.solved("p12")) {
       c.stage.appendChild(imgStage(DATA.IMG + "bin_L1.jpg", []));
-      c.panel.appendChild(W.keypadLock({
-        n: 4, chars: "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(""), cols: 7, answer: DATA.ANS.p12,
+      c.panel.appendChild(W.cycleLock({
+        id: "p12", n: 4, pool: "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(""), size: 12, answer: DATA.ANS.p12,
         onSolve: function () { G.markSolved("p12"); reopenCU(); }
       }));
       c.cap("알파벳 4칸 자물쇠.");
@@ -12737,8 +12910,8 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     c.title("왼쪽 짐칸 2");
     c.stage.appendChild(imgStage(DATA.IMG + "bin_L2.jpg", []));
     if (!G.solved("p10")) {
-      c.panel.appendChild(W.keypadLock({
-        n: 5, chars: DATA.KANA, cols: 10, answer: DATA.ANS.p10,
+      c.panel.appendChild(W.cycleLock({
+        id: "p10", n: 5, pool: DATA.KANA, size: 12, answer: DATA.ANS.p10,
         onSolve: function () {
           G.markSolved("p10");
           prize(DATA.TEMP.p10Prize, "짐칸이 열렸다");
@@ -12775,8 +12948,8 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     c.title("오른쪽 짐칸 2");
     c.stage.appendChild(imgStage(DATA.IMG + "bin_R2.jpg", []));
     if (!G.solved("p16")) {
-      c.panel.appendChild(W.keypadLock({
-        n: 3, chars: "0123456789".split(""), cols: 5, answer: DATA.ANS.p16,
+      c.panel.appendChild(W.cycleLock({
+        id: "p16", n: 3, pool: "0123456789".split(""), size: 10, answer: DATA.ANS.p16,
         onSolve: function () {
           G.markSolved("p16");
           prize(DATA.TEMP.p16Prize, "짐칸이 열렸다");
@@ -12865,8 +13038,8 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     d.style.cssText = "font-size:64px;text-align:center";
     c.stage.appendChild(d);
     if (!G.solved("p8")) {
-      c.panel.appendChild(W.keypadLock({
-        n: 4, chars: "0123456789".split(""), cols: 5, answer: DATA.ANS.p8,
+      c.panel.appendChild(W.cycleLock({
+        id: "p8", n: 4, pool: "0123456789".split(""), size: 10, answer: DATA.ANS.p8,
         labels: DATA.UTENSIL.map(function (u) { return u.emoji; }),
         onSolve: function () {
           G.markSolved("p8");
@@ -12966,8 +13139,8 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       });
       return;
     }
-    var lock = W.keypadLock({
-      n: 4, chars: "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(""), cols: 7, answer: DATA.ANS.p5,
+    var lock = W.cycleLock({
+      id: "p5", n: 4, pool: "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(""), size: 12, answer: DATA.ANS.p5,
       onSolve: function () { G.markSolved("p5"); closeZoom(); setTimeout(function () { ZOOM.case(); }, 120); }
     });
     openZoom({ id: "case", title: "헤드셋 케이스", img: DATA.IMG + "headset_case.jpg", panel: lock, cap: "로고 자리에 빈칸 네 개(OOOO)." });
@@ -13127,19 +13300,24 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   function story(parts, done) {
     var s = $("story");
     clear(s); s.classList.add("show");
+    s.classList.remove("big");
     parts.forEach(function (p) {
       if (typeof p === "string" && /\.(jpg|png|webp)$/i.test(p)) {
-        var im = new Image(); im.src = p; s.appendChild(im);
+        var im = new Image(); im.src = p; im.className = "cut"; s.appendChild(im);
+        s.classList.add("big");
       } else if (typeof p === "string" && p.length <= 4) {
         s.appendChild(el("div", "bigemoji", p));
       } else {
         s.appendChild(el("div", "txt", p));
       }
     });
+    var fired = false;
+    function next() { if (fired) return; fired = true; s.classList.remove("show", "big"); clear(s); G.syncOverlay(); done && done(); }
     var b = el("button", "btn primary", "계속");
     b.setAttribute("data-t", "storyNext");
-    b.onclick = function () { s.classList.remove("show"); clear(s); done && done(); };
+    b.onclick = function (e) { e.stopPropagation(); next(); };
     s.appendChild(b);
+    s.onclick = next;   /* 아무 데나 탭해도 넘어감 */
   }
 
   function ending() {
