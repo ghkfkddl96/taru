@@ -554,6 +554,15 @@ body.hints .cvcell.snackSlot{box-shadow:inset 0 0 0 2px rgba(255,255,255,.35)}
 .cvcell.snackBar .cv{background:rgba(58,58,58,.90) !important;border-radius:2px;
   box-shadow:0 1px 0 rgba(255,255,255,.25) !important}
 
+/* ★v0.6 인벤 아이콘: 슬롯 배경 흰색 + 얇은 연회색 테두리 (인벤 바 자체 톤은 모노 유지) */
+.invItem{background:#ffffff;border:1px solid #d8d8dc}
+.invItem img{width:100%;height:100%;object-fit:contain;background:#fff}
+.invItem .nm{background:rgba(255,255,255,.90);color:#3a3a41;font-weight:600}
+.invItem.sel{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent)}
+.invItem:active{background:#f1f1f3}
+
+.invItem .nm{font-size:7.5px;letter-spacing:-.2px}
+
 </style>
 </head>
 <body>
@@ -10751,7 +10760,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 (function () {
   "use strict";
 
-  var BUILD = "ODY-S1-20260910-1746";
+  var BUILD = "ODY-S1-20260910-1759";
   var LSKEY = "odyssey.s1.v1";
 
   var qs = new URLSearchParams(location.search);
@@ -11059,25 +11068,26 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
      아이템
      ───────────────────────────────────────────────────────── */
   var ITEMS = {
-    passport: { name: "여권", emoji: "🛂", zoomText: "대한민국 여권.\n사진 속 표정이 좀 딱딱하다." },
-    phone: { name: "폰", emoji: "📱", action: "phone" },
-    ticket: { name: "탑승권", emoji: "🎫", zoom: "ticket" },
-    blanket: { name: "담요", img: IMG + "blanket_zoom.jpg", zoom: "blanket" },
-    headsetCase: { name: "헤드셋 케이스", img: IMG + "headset_case.jpg", zoom: "case" },
-    headphones: { name: "헤드폰", img: IMG + "ic_headphones.jpg", zoom: "headphones" },
-    gamecard: { name: "GAME CARD", img: IMG + "gamecard.jpg", zoom: "gamecard" },
-    silverKey: { name: "은색 열쇠", img: IMG + "ic_silverkey.jpg", zoomText: "은색 열쇠.\n어딘가의 열쇠 구멍에 맞을 것 같다." },
-    goldKey: { name: "금색 열쇠", img: IMG + "ic_goldkey.jpg", zoomText: "금색 열쇠.\n둥근 사각형 문에 맞을 것 같다." },
-    cardKey: { name: "카드키", img: IMG + "ic_cardkey.jpg", zoomText: "흰 플라스틱 카드키.\n카드 슬롯에 넣는 물건." },
-    pamphlet: { name: "팜플렛", emoji: "📄", zoom: "pamphlet" },
-    cellophane: { name: "셀로판", emoji: "🟣", zoomText: "투명한 셀로판지.\n동그라미가 다섯 개 뚫려 있다.\n팜플렛에 겹쳐 보면?" },
-    telescope: { name: "망원경", emoji: "🔭", zoomText: "작은 망원경.\n창문에 대고 보면 될 것 같다." },
-    tileBlack: { name: "검정 판", img: TILES.black.img, tile: "black", zoomText: "검정색 정사각 판." },
-    tileBrown: { name: "갈색 판", img: TILES.brown.img, tile: "brown", zoomText: "갈색 정사각 판." },
-    tileDark: { name: "짙은갈색 판", img: TILES.dark.img, tile: "dark", zoomText: "짙은 갈색 정사각 판." },
-    tileBeige: { name: "베이지 판", img: TILES.beige.img, tile: "beige", zoomText: "베이지색 정사각 판." },
-    ladder: { name: "사다리", emoji: "🪜", zoomText: "접이식 사다리.\n높은 데 올라갈 때 쓴다." },
-    peanut: { name: "땅콩", emoji: "🥜", zoomText: "기내에서 주는 땅콩 한 봉지.\n누가 배고파하던데…" },
+    /* ★v0.6: 인벤 아이콘은 전부 96×96 흰 배경 PNG (tools/make-icons.mjs 로 생성·검증) */
+    passport: { name: "여권", img: IMG + "ic_passport.png", zoom: "passport" },
+    phone: { name: "폰", img: IMG + "ic_phone.png", action: "phone" },
+    ticket: { name: "탑승권", img: IMG + "ic_ticket.png", zoom: "ticket" },
+    blanket: { name: "담요", img: IMG + "ic_blanket.png", zoom: "blanket" },
+    headsetCase: { name: "헤드셋 케이스", img: IMG + "ic_case.png", zoom: "case" },
+    headphones: { name: "헤드폰", img: IMG + "ic_headphones.png", zoom: "headphones" },
+    gamecard: { name: "GAME CARD", img: IMG + "ic_gamecard.png", zoom: "gamecard" },
+    silverKey: { name: "은색 열쇠", img: IMG + "ic_silverkey.png", zoomText: "은색 열쇠.\n어딘가의 열쇠 구멍에 맞을 것 같다." },
+    goldKey: { name: "금색 열쇠", img: IMG + "ic_goldkey.png", zoomText: "금색 열쇠.\n둥근 사각형 문에 맞을 것 같다." },
+    cardKey: { name: "카드키", img: IMG + "ic_cardkey.png", zoomText: "흰 플라스틱 카드키.\n카드 슬롯에 넣는 물건." },
+    pamphlet: { name: "팜플렛", img: IMG + "ic_pamphlet.png", zoom: "pamphlet" },
+    cellophane: { name: "셀로판", img: IMG + "ic_cellophane.png", zoomText: "투명한 셀로판지.\n동그라미가 다섯 개 뚫려 있다.\n팜플렛에 겹쳐 보면?" },
+    telescope: { name: "망원경", img: IMG + "ic_telescope.png", zoomText: "작은 망원경.\n창문에 대고 보면 될 것 같다." },
+    peanut: { name: "땅콩", img: IMG + "ic_peanut.png", zoomText: "기내에서 주는 땅콩 한 봉지.\n누가 배고파하던데…" },
+    ladder: { name: "사다리", img: IMG + "ic_ladder.png", zoomText: "접이식 사다리.\n높은 데 올라갈 때 쓴다." },
+    tileBlack: { name: "색상판(검정)", img: IMG + "ic_tile_black.png", tile: "black", zoomText: "검정색 나무 판." },
+    tileBrown: { name: "색상판(갈색)", img: IMG + "ic_tile_brown.png", tile: "brown", zoomText: "갈색 나무 판." },
+    tileDark: { name: "색상판(짙은갈색)", img: IMG + "ic_tile_dark.png", tile: "dark", zoomText: "짙은 갈색 나무 판." },
+    tileBeige: { name: "색상판(베이지)", img: IMG + "ic_tile_beige.png", tile: "beige", zoomText: "베이지색 나무 판." },
     frag1: { name: "비번 조각 ①", frag: [1, "2"] },
     frag2: { name: "비번 조각 ②", frag: [2, "5"] },
     frag3: { name: "비번 조각 ③", frag: [3, "7"] },
@@ -13345,7 +13355,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       if (it.img) { var im = new Image(); im.src = it.img; b.appendChild(im); }
       else if (it.frag) { var f = el("div", null, it.frag[1]); f.style.cssText = "font-size:22px;color:var(--accent);font-weight:700"; b.appendChild(f); }
       else b.appendChild(el("div", null, it.emoji || "❔"));
-      b.appendChild(el("div", "nm", it.name.length > 5 ? it.name.slice(0, 5) : it.name));
+      b.appendChild(el("div", "nm", it.name.length > 7 ? it.name.slice(0, 7) : it.name));
       G.tapper(b, {
         tap: function () { selectItem(id); },
         dbl: function () { inspect(id); },
@@ -14030,6 +14040,9 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 
   /* ═══════════ 아이템 확대(ZOOM) ═══════════ */
   var ZOOM = {};
+  ZOOM.passport = function () {
+    openZoom({ id: "passport", title: "여권", img: DATA.IMG + "passport.jpg", cap: "대한민국 여권." });
+  };
   ZOOM.ticket = function () {
     var node = el("div");
     node.style.cssText = "width:100%;max-width:330px;background:#faf7f0;color:#2b2b2b;border-radius:6px;padding:14px 14px 10px;position:relative";
