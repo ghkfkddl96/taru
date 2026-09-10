@@ -1,0 +1,21 @@
+{
+  "name": "오디세이 × 발리",
+  "short_name": "오디세이",
+  "description": "비행기 안에서 하는 방탈출 (1차)",
+  "lang": "ko",
+  "dir": "ltr",
+  "display": "standalone",
+  "orientation": "portrait",
+  "start_url": "./index.html",
+  "scope": "./",
+  "background_color": "#0b0b0c",
+  "theme_color": "#0b0b0c",
+  "icons": [
+    {
+      "src": "./icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
