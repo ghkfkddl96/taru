@@ -36,7 +36,8 @@
   --safeT:env(safe-area-inset-top); --safeB:env(safe-area-inset-bottom);
   --r:8px;                          /* 기본 라운드 (작게) */
 }
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+/* v0.2.1: 사파리 더블탭 확대 차단 — 모든 요소 기본 manipulation */
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;touch-action:manipulation;-webkit-touch-callout:none}
 [hidden]{display:none !important}
 html,body{margin:0;padding:0;height:100%;overflow:hidden;overscroll-behavior:none}
 body{
@@ -403,6 +404,20 @@ body.dbg #story.big{padding-bottom:calc(var(--safeB) + 50px)}
 .pSheetT{font-size:13px;font-weight:700;color:var(--n9)}
 .pSheetD{font-size:11px;color:var(--n7)}
 .pSheet .btn{padding:8px 14px;font-size:13px;margin:0}
+
+/* ★v0.2.1 터치 동작 정리
+   · 기본: manipulation (더블탭 확대·지연 없음)
+   · 스크롤이 필요한 곳만 pan 허용
+   · 드래그 컴포넌트는 자손까지 none (스크롤/줌이 드래그를 가로채지 않게) */
+#inventory{touch-action:pan-x}
+.pScroll,.kkRoom{touch-action:pan-y}
+input,textarea{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default;touch-action:manipulation}
+#shadeWrap,#shadeWrap *,
+#tissueWrap,#tissueWrap *,
+#patWrap,#patWrap *,
+#pamStage,#pamStage *,
+#cello,#cello *,
+#arch,#arch *{touch-action:none}
 
 </style>
 </head>
@@ -10601,7 +10616,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 (function () {
   "use strict";
 
-  var BUILD = "ODY-S1-20260910-1219";
+  var BUILD = "ODY-S1-20260910-1259";
   var LSKEY = "odyssey.s1.v1";
 
   var qs = new URLSearchParams(location.search);
@@ -10808,6 +10823,34 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     node.addEventListener("mousemove", move);
     node.addEventListener("mouseup", end);
   }
+
+  /* ───────── ★v0.2.1 사파리 더블탭 확대 / 핀치줌 차단 ─────────
+     · CSS touch-action:manipulation 이 1차 방어(iOS 9.3+ 지원).
+     · 아래는 폴백 — 300ms 안에 "거의 같은 자리"를 두 번 탭하면 기본 동작만 막는다.
+       ★버튼/입력 요소는 제외한다: 다이얼·키패드처럼 같은 자리를 연타하는 UI가 있어서
+         무조건 preventDefault 하면 두 번째 탭의 click 이 사라진다.
+     · 게임 자체 더블탭(헤드셋 착용·담요 확대·인벤 롱프레스)은 touch 이벤트로 판정하므로 그대로 동작. */
+  (function () {
+    var lastEnd = 0, lx = 0, ly = 0;
+    document.addEventListener("touchend", function (e) {
+      var t = (e.changedTouches && e.changedTouches[0]) || null;
+      var x = t ? t.clientX : 0, y = t ? t.clientY : 0;
+      var now = Date.now();
+      var near = Math.abs(x - lx) < 40 && Math.abs(y - ly) < 40;
+      var interactive = e.target && e.target.closest &&
+        e.target.closest("button,input,select,textarea,a,[contenteditable]");
+      if (now - lastEnd <= 300 && near && !interactive && e.cancelable) e.preventDefault();
+      lastEnd = now; lx = x; ly = y;
+    }, { passive: false });
+    /* 핀치줌(사파리 제스처) 차단 */
+    ["gesturestart", "gesturechange", "gestureend"].forEach(function (ev) {
+      document.addEventListener(ev, function (e) { if (e.cancelable) e.preventDefault(); }, { passive: false });
+    });
+    /* 두 손가락 이상 터치도 확대 시도로 보고 차단(입력 요소 제외) */
+    document.addEventListener("touchmove", function (e) {
+      if (e.touches && e.touches.length > 1 && e.cancelable) e.preventDefault();
+    }, { passive: false });
+  })();
 
   /* ───────── 오버레이 열림 감지 (blur 폴백용 body 클래스) ───────── */
   function syncOverlay() {
