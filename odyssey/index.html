@@ -569,6 +569,12 @@ body.hints .cvcell.snackSlot{box-shadow:inset 0 0 0 2px rgba(255,255,255,.35)}
   background:radial-gradient(circle farthest-side at 50% 52%,
     rgba(0,0,0,0) 70%, rgba(0,0,0,.42) 79%, rgba(3,2,6,.97) 88%, #030206 100%)}
 
+/* ★v0.7.1 곱이 바뀔 때 트랙 번호가 살짝 깜빡다 */
+.trkPop{animation:trkPop .5s ease-out}
+@keyframes trkPop{0%{opacity:.15;transform:scale(1.18)}45%{opacity:1;transform:scale(1)}
+  60%{opacity:.35}100%{opacity:1;transform:scale(1)}}
+@media(prefers-reduced-motion:reduce){.trkPop{animation:none}}
+
 </style>
 </head>
 <body>
@@ -10766,7 +10772,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 (function () {
   "use strict";
 
-  var BUILD = "ODY-S1-20260910-2307";
+  var BUILD = "ODY-S1-20260910-2314";
   var LSKEY = "odyssey.s1.v1";
 
   var qs = new URLSearchParams(location.search);
@@ -14096,7 +14102,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     openZoom({ id: "case", title: "헤드셋 케이스", node: node, cap: "로고 자리의 네모 4칸.\n칸을 눌러 글자를 맞춰봐" });
   };
 
-  /* ★v0.7 — 헤드셋 더블탭 = 착용 뒷모습 화면에서 5곡 연속 재생. 언제나 첫 곱부터. */
+  /* ★v0.7 — 헤드셋 더블탭 = 착용 뒷모습 화면에서 5곡 연속 재생. 언제나 첫 곡부터. */
   ZOOM.headphones = function () { playSongs(); };
   ZOOM.gamecard = function () {
     var node = el("div");
@@ -14135,7 +14141,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
      · 각 곡 페이드인 1초 / 페이드아웃 1초 (Web Audio GainNode)
      · 곡이 바뀔 때마다 지금 나오는 곡 아이콘·제목을 크게 표시
      · 5곡이 다 끝나면 "더 이상 노래가 흘러나오지 않는다"
-     · 다시 열면(또는 '처음부터 다시 듣기') 언제나 첫 곱부터
+     · 다시 열면(또는 '처음부터 다시 듣기') 언제나 첫 곡부터
      · 음원 파일(audio/songN.mp3)이 없으면 기존 신호음으로 대체                     */
   var FADE = 1.0;              /* 페이드 인/아웃 초 */
   var TONE_STEP = 1400;        /* 음원 없을 때 곡당 ms */
@@ -14197,11 +14203,14 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   function later(fn, ms) { var t = setTimeout(fn, ms); songTimers.push(t); return t; }
   /* 검증용 훅 — 지금 재생 상태(게인/재생위치)를 그대로 보여준다 */
   window.__songState = function () {
+    var h = document.querySelector('[data-t="trackNo"]');
+    var e = document.querySelector('[data-t="songsEnd"]');
+    var d = document.querySelector('[data-t="dbgSongName"] div');
     return {
       run: songRun,
-      now: (document.querySelector('[data-t="nowPlaying"] div') || {}).textContent || "",
-      ended: !!(document.querySelector('[data-t="songsEnd"]') || {}).style
-        && (document.querySelector('[data-t="songsEnd"]') || { style: {} }).style.display === "block",
+      track: h ? h.textContent : "",              /* "3/5" — 화면에 실제로 보이는 것 */
+      now: d ? d.textContent : "",                /* 곡 제목은 debug 에서만 존재 */
+      ended: !!(e && e.style.display === "block"),
       nodes: Object.keys(songNodes).map(function (u) {
         var r = songNodes[u];
         return { url: u, gain: r.gain ? +r.gain.gain.value.toFixed(3) : null,
@@ -14210,6 +14219,10 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     };
   };
 
+  /* ★v0.7.1 — 재생 화면에는 **곡 제목·아이콘·목록을 절대 띄우지 않는다**.
+     #21 화살 정답이 곡 순서→아이콘이라, 목록을 보여 주면 퍼즐이 통째로 드러난다.
+     보이는 건 트랙 번호(3/5)와 곡 안 진행 바뿐 — 제목·아이콘은 ?debug=1 에서만. */
+  var songTick = null;
   function playSongs() {
     stopSongs();
     var order = DATA.TEMP.songOrder;
@@ -14218,37 +14231,46 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     var node = el("div");
     node.style.cssText = "text-align:center";
     var im = new Image(); im.src = DATA.IMG + "headset_worn.jpg";
-    im.style.cssText = "max-width:100%;max-height:36vh;border-radius:12px;margin:0 auto;display:block";
+    im.style.cssText = "max-width:100%;max-height:44vh;border-radius:12px;margin:0 auto;display:block";
     node.appendChild(im);
 
-    /* 지금 나오는 곡 */
-    var now = el("div");
-    now.setAttribute("data-t", "nowPlaying");
-    now.style.cssText = "margin:10px auto 4px;display:flex;align-items:center;justify-content:center;gap:9px;min-height:42px";
-    var nowIc = new Image();
-    nowIc.style.cssText = "width:36px;height:36px;object-fit:contain;border-radius:8px;background:#fff;visibility:hidden";
-    var nowNm = el("div", null, "");
-    nowNm.style.cssText = "font-size:15px;font-weight:700;color:var(--n9)";
-    now.appendChild(nowIc); now.appendChild(nowNm);
-    node.appendChild(now);
+    /* 트랙 번호만 — "🎧 재생 중 · 3/5" */
+    var head = el("div");
+    head.setAttribute("data-t", "nowPlaying");
+    head.style.cssText = "margin:14px auto 8px;font-size:15px;font-weight:700;color:var(--n9);letter-spacing:.3px;min-height:22px";
+    node.appendChild(head);
+    var num = el("span", null, "");
+    num.setAttribute("data-t", "trackNo");
+    head.appendChild(el("span", null, "🎧 재생 중 · "));
+    head.appendChild(num);
 
-    var list = el("div");
-    list.style.cssText = "margin-top:2px;display:flex;flex-direction:column;gap:5px";
-    var rows = order.map(function (id, i2) {
-      var r = el("div", "chip");
-      r.style.cssText = "display:flex;align-items:center;gap:8px;opacity:.35";
-      var ic = new Image(); ic.src = DATA.SONGS[id].icon; ic.style.cssText = "width:22px;height:22px;object-fit:contain;border-radius:5px";
-      r.appendChild(el("span", null, String(i2 + 1) + "."));
-      r.appendChild(ic);
-      r.appendChild(el("span", null, DATA.SONGS[id].name));
-      list.appendChild(r);
-      return r;
-    });
-    node.appendChild(list);
+    /* 곡 안 진행 바 */
+    var barWrap = el("div");
+    barWrap.setAttribute("data-t", "songBar");
+    barWrap.style.cssText = "width:min(72%,260px);height:5px;margin:0 auto;border-radius:3px;background:var(--n3);overflow:hidden";
+    var bar = el("div");
+    bar.style.cssText = "height:100%;width:0%;background:var(--accent);border-radius:3px;transition:width .18s linear";
+    barWrap.appendChild(bar);
+    node.appendChild(barWrap);
+
+    /* ★디버그에서만 곡 제목·아이콘 (검수용) */
+    var dbg = null, dbgIc = null, dbgNm = null;
+    if (G.DEBUG) {
+      dbg = el("div");
+      dbg.setAttribute("data-t", "dbgSongName");
+      dbg.style.cssText = "margin:10px auto 0;display:flex;align-items:center;justify-content:center;gap:8px;opacity:.8";
+      dbgIc = new Image();
+      dbgIc.style.cssText = "width:26px;height:26px;object-fit:contain;border-radius:6px;background:#fff;visibility:hidden";
+      dbgNm = el("div", null, "");
+      dbgNm.style.cssText = "font-size:12px;color:var(--n7)";
+      dbg.appendChild(dbgIc); dbg.appendChild(dbgNm);
+      dbg.appendChild(el("span", null, "(debug)"));
+      node.appendChild(dbg);
+    }
 
     var end = el("div", null, "더 이상 노래가 흘러나오지 않는다.");
     end.setAttribute("data-t", "songsEnd");
-    end.style.cssText = "display:none;margin-top:12px;font-size:13.5px;font-weight:600;color:var(--n8)";
+    end.style.cssText = "display:none;margin-top:16px;font-size:13.5px;font-weight:600;color:var(--n8)";
     node.appendChild(end);
 
     var panel = el("div");
@@ -14257,7 +14279,19 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     again.onclick = function () { playSongs(); };
     panel.appendChild(again);
 
-    openZoom({ id: "songs", title: "🎧 재생 중", node: node, panel: panel, cap: "다섯 곡이 순서대로 나온다." });
+    openZoom({ id: "songs", title: "🎧 재생 중", node: node, panel: panel, cap: "누가 부른 무슨 노래인지 잘 들어 봐." });
+
+    /* 진행 바 티커 — 지금 곡의 재생 위치를 120ms 마다 그린다 */
+    var cur = { rec: null, dur: 10, t0: 0, tone: false };
+    if (songTick) clearInterval(songTick);
+    songTick = setInterval(function () {
+      if (run !== songRun) { clearInterval(songTick); songTick = null; return; }
+      var p = 0;
+      if (cur.tone) p = Math.min(1, (Date.now() - cur.t0) / TONE_STEP);
+      else if (cur.rec && cur.rec.au && cur.dur > 0) p = Math.min(1, (cur.rec.au.currentTime || 0) / cur.dur);
+      bar.style.width = (p * 100).toFixed(1) + "%";
+    }, 120);
+    songTimers.push({ iv: songTick });
 
     var i = 0;
     (function next() {
@@ -14265,41 +14299,44 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       if (!$("zoom").classList.contains("show")) return;
       if (i >= order.length) {
         G.setFlag("heardSongs");
-        nowIc.style.visibility = "hidden";
-        nowNm.textContent = "";
-        rows.forEach(function (r) { r.style.borderColor = ""; });
+        head.style.display = "none";
+        barWrap.style.display = "none";
+        if (dbg) dbg.style.display = "none";
         end.style.display = "block";
         $("zoomCaption").textContent = "더 이상 노래가 흘러나오지 않는다.";
         return;
       }
       var id = order[i], sg = DATA.SONGS[id];
-      rows.forEach(function (r, k) {
-        r.style.opacity = k <= i ? "1" : ".35";
-        r.style.borderColor = k === i ? "var(--accent)" : "";
-      });
-      nowIc.src = sg.icon; nowIc.style.visibility = "visible";
-      nowNm.textContent = sg.name;
+      num.textContent = (i + 1) + "/" + order.length;
+      /* 곡이 바뀔 때 번호를 살짝 깜빡 */
+      num.classList.remove("trkPop");
+      void num.offsetWidth;
+      num.classList.add("trkPop");
+      bar.style.width = "0%";
+      if (dbg) { dbgIc.src = sg.icon; dbgIc.style.visibility = "visible"; dbgNm.textContent = sg.name; }
       i++;
-      playSong(id, function () { if (run === songRun) next(); });
+      playSong(id, function () { if (run === songRun) next(); }, cur);
     })();
   }
 
-  function playSong(id, done) {
+  function playSong(id, done, cur) {
+    cur = cur || {};
     var n = DATA.TEMP.songOrder.indexOf(id) + 1;
     var file = "song" + n + ".mp3";
     var have = Array.isArray(window.__AUDIO) && window.__AUDIO.indexOf(file) >= 0;
     var fired = false;
     function finish(rec) { if (fired) return; fired = true; if (rec) { try { rec.au.pause(); } catch (e) {} } done(); }
-    if (!have) { tone(id); later(function () { finish(null); }, TONE_STEP); return; }
+    if (!have) { cur.tone = true; cur.rec = null; cur.t0 = Date.now(); tone(id); later(function () { finish(null); }, TONE_STEP); return; }
 
     var rec = songChain("audio/" + file);
-    if (rec.dead) { tone(id); later(function () { finish(null); }, TONE_STEP); return; }
+    if (rec.dead) { cur.tone = true; cur.rec = null; cur.t0 = Date.now(); tone(id); later(function () { finish(null); }, TONE_STEP); return; }
     var au = rec.au;
     try { au.currentTime = 0; } catch (e) {}
     if (!rec.gain) { try { au.volume = 0; } catch (e) {} }
 
     function go() {
       var dur = (au.duration && isFinite(au.duration) && au.duration > 0.2) ? au.duration : 10;
+      cur.tone = false; cur.rec = rec; cur.dur = dur; cur.t0 = Date.now();
       fadeTo(rec, 1, FADE);                                                              /* 페이드인 1초 */
       later(function () { fadeTo(rec, 0.0001, FADE); }, Math.max(0, (dur - FADE) * 1000)); /* 끝나기 1초 전 페이드아웃 */
       later(function () { finish(rec); }, dur * 1000 + 80);
@@ -14307,7 +14344,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     }
     var p;
     try { p = au.play(); } catch (e) { p = null; }
-    if (p && p.catch) p.catch(function () { rec.dead = true; tone(id); later(function () { finish(null); }, TONE_STEP); });
+    if (p && p.catch) p.catch(function () { rec.dead = true; cur.tone = true; cur.rec = null; cur.t0 = Date.now(); tone(id); later(function () { finish(null); }, TONE_STEP); });
     if (au.readyState >= 1) go(); else au.addEventListener("loadedmetadata", go, { once: true });
   }
 
