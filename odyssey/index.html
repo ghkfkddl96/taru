@@ -533,6 +533,27 @@ body.hints .cvcell.hot.ifeBtn,body.hints .cvcell.hot.ifeTile{box-shadow:inset 0 
 .cvcell.icon .cv img{width:100%;height:100%;object-fit:contain}
 .cvcell.icon .cv .cvem{display:flex;align-items:center;justify-content:center;line-height:1}
 
+/* ★v0.5 #25 간식 수납칸 */
+.cropInner.noimg{background:linear-gradient(160deg,#3a3a41,#1b1b1f)}
+.cvcell.snackPlate{pointer-events:none}
+.cvcell.snackPlate .cv{background:#e9e4d8;color:#2a2a2f;border-radius:4px;font-weight:800;letter-spacing:1px;
+  border:1px solid #b9b3a5;box-shadow:none}
+.cvcell.snackBar{pointer-events:none}
+.cvcell.snackBar .cv{background:#8b8d95;border-radius:2px;box-shadow:none;min-width:100%;min-height:100%}
+.cvcell.snackSlot{border-radius:6px}
+.cvcell.snackSlot .cv{background:rgba(0,0,0,.55);border:2px solid rgba(255,255,255,.25);border-radius:6px;
+  box-shadow:inset 0 2px 6px rgba(0,0,0,.6)}
+.cvcell.snackSlot .cv img{width:100%;height:100%;object-fit:contain;border-radius:4px}
+body.hints .cvcell.snackSlot{box-shadow:inset 0 0 0 2px rgba(255,255,255,.35)}
+.gmHint{font-size:12px;color:var(--n6);border:1px dashed var(--line2);border-radius:8px;padding:8px 14px}
+
+/* ★v0.5 수정: 명판은 새 박스를 얹지 않고 이미지 명판 자리에 각인 텍스트만 */
+.cvcell.snackPlate .cv{background:transparent !important;border:0 !important;box-shadow:none !important;
+  color:#222222;font-weight:800;letter-spacing:1px;text-shadow:0 1px 0 rgba(255,255,255,.45)}
+/* 힌트 막대: 짙은 회색 계단, 금속 위에서 또렷하게 */
+.cvcell.snackBar .cv{background:rgba(58,58,58,.90) !important;border-radius:2px;
+  box-shadow:0 1px 0 rgba(255,255,255,.25) !important}
+
 </style>
 </head>
 <body>
@@ -10730,7 +10751,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 (function () {
   "use strict";
 
-  var BUILD = "ODY-S1-20260910-1545";
+  var BUILD = "ODY-S1-20260910-1611";
   var LSKEY = "odyssey.s1.v1";
 
   var qs = new URLSearchParams(location.search);
@@ -11004,24 +11025,47 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
      ───────────────────────────────────────────────────────── */
   var TEMP = {
     p8Place: "갤리 카트 옆 작은 상자",          // Q1 #8 다이얼 상자 위치
-    p8Prize: "frag4",                            // Q2 #8 보상
+    p8Prize: "tileBlack",                        // ★15:54: #8 보상 = 검정 색상판
     p10Prize: "cellophane",                      // #10 보상 = 셀로판(#17용) — 15:40 정정으로 원복
     p13Prize: "pamphlet",                        // Q4 #13 보상(팜플렛)
     p16Prize: "silverKey",                       // Q5 #16 보상(은색 열쇠)
     p9Prize: "goldKey",                          // Q6 #9 카트 보상(금색 열쇠)
-    p14Prize: "frag1",                           // #14 서랍장 보상 = 조각①(임시, 북쑥 답 오면 망원경 등으로 교체)
+    p14Prize: "telescope",                       // ★15:54 확정: #14 서랍장 보상 = 망원경
     p18Answer: "https://m.site.naver.com/1DmdB", // ★실물 명함 QR 해독값(2026-09-10, jsQR)
-    p18Prize: "frag2",                           // Q9 #18 보상
-    p22Prize: "frag3",                           // Q10 #22 네모로직 보상
+    p18Prize: "tileBeige",                       // ★15:54: #18 QR 보상 = 베이지 색상판
+    p22Prize: "tileDark",                        // ★15:54: #22 보상 = 짙은갈색 색상판
     p22Picture: "숫자 7",                        // Q11 #22 완성 그림
     songOrder: ["blood", "fire", "dna", "butter", "dynamite"], // Q12 노래 순서
     p23From: "화장실 수납장1",                   // Q13 #23 망원경 출처
-    p24PeanutFrom: "갤리 간식 수납칸",            // ★북쑥 확정 15:33: 잠금 없음, 열면 땅콩
+    p24PeanutFrom: "갤리 간식 수납칸(#25 색상판 자물쇠)",  // ★15:54: 잠금 생김
+    cab2Prize: "tileBrown",                      // ★15:54: 화장실 상단 수납장2 = 갈색 색상판(문제 미정)
     p24DanceLock: "화장실 하단 수납장(수납장1)",  // Q17 춤 순서(◀▶ 5회) 입력 위치
     ladderFrom: "화장실 하단 수납장(수납장1)",    // Q19 사다리 출처 = 춤 순서 자물쇠 보상
     p24Dance: ["L", "R", "R", "L", "R"],       // Q18 춤(골반 씰룩) 순서
     gmapPass: "2579",                            // Q14 구글맵 비번(조각 ①②③④)
     pamphletText: "A"                            // Q15 팜플렛 문구(후보 A)
+  };
+
+  /* ★v0.5 #25 색상판 4종 — 엔진 SVG(살짝 질감) */
+  function tileSvg(hex, grain, id) {
+    /* 나무 블록 질감: 가로 나뭇결 + 옅은 옹이 (ref/choi-first-blocks.jpg 기준) */
+    var u = "g" + id;
+    return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">' +
+      '<defs><pattern id="' + u + '" width="64" height="9" patternUnits="userSpaceOnUse">' +
+      '<rect width="64" height="9" fill="' + hex + '"/>' +
+      '<path d="M0 2 Q16 0.6 32 2 T64 2" fill="none" stroke="' + grain + '" stroke-width="1.1"/>' +
+      '<path d="M0 6 Q20 7.4 40 6 T64 6" fill="none" stroke="' + grain + '" stroke-width="0.8"/>' +
+      '</pattern></defs>' +
+      '<rect x="2" y="2" width="60" height="60" rx="5" fill="url(#' + u + ')" stroke="rgba(0,0,0,.5)" stroke-width="2"/>' +
+      '<ellipse cx="44" cy="24" rx="5" ry="3" fill="none" stroke="' + grain + '" stroke-width="0.9"/>' +
+      '<rect x="5" y="5" width="54" height="54" rx="4" fill="none" stroke="rgba(255,255,255,.14)"/></svg>');
+  }
+  var TILES = {
+    black: { id: "black", label: "검정", hex: "#151515", img: tileSvg("#151515", "rgba(255,255,255,.13)", "b") },
+    brown: { id: "brown", label: "갈색", hex: "#8a5a36", img: tileSvg("#8a5a36", "rgba(60,32,14,.42)", "r") },
+    dark: { id: "dark", label: "짙은갈색", hex: "#2b1a10", img: tileSvg("#2b1a10", "rgba(190,140,95,.30)", "d") },
+    beige: { id: "beige", label: "베이지", hex: "#d9c39c", img: tileSvg("#d9c39c", "rgba(120,90,55,.38)", "g") }
   };
 
   /* ─────────────────────────────────────────────────────────
@@ -11041,6 +11085,10 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     pamphlet: { name: "팜플렛", emoji: "📄", zoom: "pamphlet" },
     cellophane: { name: "셀로판", emoji: "🟣", zoomText: "투명한 셀로판지.\n동그라미가 다섯 개 뚫려 있다.\n팜플렛에 겹쳐 보면?" },
     telescope: { name: "망원경", emoji: "🔭", zoomText: "작은 망원경.\n창문에 대고 보면 될 것 같다." },
+    tileBlack: { name: "검정 판", img: TILES.black.img, tile: "black", zoomText: "검정색 정사각 판." },
+    tileBrown: { name: "갈색 판", img: TILES.brown.img, tile: "brown", zoomText: "갈색 정사각 판." },
+    tileDark: { name: "짙은갈색 판", img: TILES.dark.img, tile: "dark", zoomText: "짙은 갈색 정사각 판." },
+    tileBeige: { name: "베이지 판", img: TILES.beige.img, tile: "beige", zoomText: "베이지색 정사각 판." },
     ladder: { name: "사다리", emoji: "🪜", zoomText: "접이식 사다리.\n높은 데 올라갈 때 쓴다." },
     peanut: { name: "땅콩", emoji: "🥜", zoomText: "기내에서 주는 땅콩 한 봉지.\n누가 배고파하던데…" },
     frag1: { name: "비번 조각 ①", frag: [1, "2"] },
@@ -11114,6 +11162,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     p15: ["omu", "bread", "cake", "salad"],                    // #15 빨·초·파·노
     p16: "858",                                                  // #16 카톡 숫자
     p19: "soeasytoyou",                                          // #19 미니게임 앱 비번
+    p25: ["black", "brown", "dark", "beige"],                    // ★v0.5 #25 색상판 순서(왼→오)
     p11: TEMP.gmapPass                                           // #11 구글맵(임시)
   };
 
@@ -11244,6 +11293,31 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       ],
       keyhole: { x: 46.3, y: 24.3, w: 7.4, h: 9.9 }
     },
+    /* ★v0.5 #25 갤리 간식 수납칸 — 정사각 홈 4개.
+       gen/43_galley_snack_cab/pick.png 이 오면 img 만 채우고 cells 를 스캔값으로 바꾸면 된다. */
+    p25: {
+      img: IMG + "galley_snack.jpg", nw: 1100, nh: 738,
+      crop: { x: 14, y: 16, w: 72, h: 66 },
+      /* 홈 4개 — tools/scan-dials.mjs 픽셀 스캔값 */
+      cells: [
+        { x: 17.73, y: 39.7, w: 14.73, h: 21.41 },
+        { x: 34.55, y: 39.7, w: 14.73, h: 21.41 },
+        { x: 51.36, y: 39.7, w: 14.73, h: 21.41 },
+        { x: 68.18, y: 39.7, w: 14.73, h: 21.41 }
+      ],
+      plate: { x: 39.7, y: 19.6, w: 21.4, h: 12.9 },
+      /* 힌트 막대(계단): 폭 = 홈 폭의 60%, 각 홈 중앙 정렬, 바닥 정렬(y+h=77),
+         최대 높이 = 홈 높이의 60%(21.41×0.6 = 12.85%), 비율 1.00 : 0.85 : 0.72 : 0.60.
+         ★명판(아래 32.5%)~홈(위 39.7%) 사이 간격은 7.2%밖에 안 돼 이 높이가 안 들어가므로
+           홈 아래 빈 면에 배치한다(명판·홈과 겹침 없음). */
+      bars: [
+        { x: 20.68, y: 64.15, w: 8.84, h: 12.85 },
+        { x: 37.50, y: 66.08, w: 8.84, h: 10.92 },
+        { x: 54.31, y: 67.75, w: 8.84, h: 9.25 },
+        { x: 71.13, y: 69.29, w: 8.84, h: 7.71 }
+      ],
+      plateText: "CHOI. FIRST?"
+    },
     /* #8 식기 개수 다이얼 — 이미지 없음(자리표시 패널). 좌표는 패널 기준 % */
     p8: {
       img: null, nw: 1000, nh: 420,
@@ -11302,7 +11376,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   };
 
   window.DATA = {
-    LOCKS: LOCKS, IFE: IFE, TAMA: TAMA,
+    LOCKS: LOCKS, IFE: IFE, TAMA: TAMA, TILES: TILES,
     IMG: IMG, TEMP: TEMP, ITEMS: ITEMS, MAPS: MAPS, ANS: ANS, PIN_HASH: PIN_HASH,
     FOOD: FOOD, FOOD_BG: FOOD_BG, FLAGS: FLAGS, UTENSIL: UTENSIL, IFE_ICONS: IFE_ICONS,
     KANA: KANA, SONGS: SONGS,
@@ -11403,12 +11477,14 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   function fitText(v, cw, ch) {
     var txt = (v.textContent || "").trim();
     if (!txt) return;
-    var fam = getComputedStyle(v).fontFamily || "sans-serif";
+    var cs = getComputedStyle(v);
+    var fam = cs.fontFamily || "sans-serif";
+    var ls = parseFloat(cs.letterSpacing) || 0;      /* letter-spacing 도 폭에 포함 */
     var px = Math.max(9, ch * 0.62);
     var maxW = cw * 0.80;
-    for (var i = 0; i < 24 && px > 8; i++) {
-      if (measureW(txt, px, fam) <= maxW) break;
-      px -= 1;
+    for (var i = 0; i < 40 && px > 7; i++) {
+      if (measureW(txt, px, fam) + ls * txt.length <= maxW) break;
+      px -= 0.5;
     }
     v.style.fontSize = px.toFixed(1) + "px";
   }
@@ -13067,17 +13143,9 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       box.style.cssText = "flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:14px";
       box.appendChild(el("div", null, "🔒"));
       box.appendChild(el("div", null, "잠긴 앱 — 4자리 비밀번호"));
-      var frags = el("div");
-      frags.style.cssText = "display:flex;flex-wrap:wrap;justify-content:center";
-      var got = 0;
-      [1, 2, 3, 4].forEach(function (n) {
-        var id = "frag" + n;
-        var f = el("div", "frag");
-        if (G.has(id)) { f.appendChild(el("b", null, DATA.ITEMS[id].frag[1])); got++; }
-        else f.appendChild(el("b", null, "?"));
-        f.appendChild(el("span", null, "조각 " + "①②③④"[n - 1]));
-        frags.appendChild(f);
-      });
+      /* ★v0.5: 조각 아이템이 색상판으로 대체돼 힌트 출처가 빠짐 → 게임 내 힌트는 "준비 중"
+         (정답은 ?debug=1 의 '정답' 표시로만 확인) */
+      var frags = el("div", "gmHint", "힌트 준비 중");
       box.appendChild(frags);
       box.appendChild(W.cycleLock({
         id: "p11", n: 4, pool: "0123456789".split(""), size: 10, answer: DATA.ANS.p11,
@@ -13832,8 +13900,6 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         onSolve: function () {
           G.markSolved("p24");
           prize("ladder", "수납장이 열렸다");
-          if (!G.has("telescope")) G.give("telescope");
-          renderInv();
           reopenCU();
         }
       }));
@@ -13847,23 +13913,124 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 
   CU.cab2 = function (c) {
     c.title("수납장 2");
-    var d = el("div", null, "🔒"); d.style.cssText = "font-size:54px;text-align:center";
+    var d = el("div", null, "🗄️"); d.style.cssText = "font-size:54px;text-align:center";
     c.stage.appendChild(d);
-    c.cap("잠겨 있다.\n(문제 미정 — 준비 중)");
+    if (!G.has("tileBrown") && !G.flag("tookBrown")) {
+      var b = el("button", "btn primary", "열어보기");
+      b.setAttribute("data-t", "openCab2");
+      b.onclick = function () { G.setFlag("tookBrown"); prize(DATA.TEMP.cab2Prize, "수납장을 열었다"); reopenCU(); };
+      c.panel.appendChild(b);
+      c.cap("잠겨 있지 않다.\n(문제 미정 — 지금은 열면 바로 나옴)");
+    } else c.cap("비어 있다.");
   };
 
-  /* ★북쑥 확정 15:33: 갤리 간식 수납칸 — 잠금 없음, 열면 땅콩 (자리표시자 이미지) */
+  /* ★v0.5 #25 갤리 간식 수납칸 — 정사각 홈 4개에 색상판을 순서대로 끼운다.
+     힌트: 명판 "CHOI. FIRST?" + 왼쪽이 가장 높고 오른쪽으로 낮아지는 막대 4개. */
   CU.snack = function (c) {
     c.title("간식 수납칸");
-    var ds = el("div", null, "🥫"); ds.style.cssText = "font-size:54px;text-align:center";
-    c.stage.appendChild(ds);
-    if (!G.has("peanut") && !G.flag("tookPeanut")) {
-      var b = el("button", "btn primary", "열어보기");
-      b.setAttribute("data-t", "openSnack");
-      b.onclick = function () { G.setFlag("tookPeanut"); prize("peanut", "수납칸을 열었다"); reopenCU(); };
-      c.panel.appendChild(b);
-      c.cap("승무원용 간식이 들어 있다.\n(자리표시자 이미지 — 나중에 교체)");
-    } else c.cap("비어 있다.");
+    if (G.solved("p25")) {
+      var got = G.has("peanut") || G.flag("tookPeanut");
+      var d0 = el("div", null, "🥫"); d0.style.cssText = "font-size:54px;text-align:center";
+      c.stage.appendChild(d0);
+      if (!got) {
+        var pb = el("button", "btn primary", "땅콩 꺼내기");
+        pb.setAttribute("data-t", "openSnack");
+        pb.onclick = function () { G.setFlag("tookPeanut"); prize("peanut", ""); reopenCU(); };
+        c.panel.appendChild(pb);
+        c.cap("안에 땅콩 봉지가 있다.");
+      } else c.cap("비어 있다.");
+      return;
+    }
+    var L = DATA.LOCKS.p25;
+    var slots = (G.S.misc.p25 && G.S.misc.p25.length === 4) ? G.S.misc.p25.slice() : [null, null, null, null];
+    var vnodes = [];
+
+    var overlays = [];
+    /* 명판 텍스트 */
+    overlays.push({
+      x: L.plate.x, y: L.plate.y, w: L.plate.w, h: L.plate.h, cls: "snackPlate",
+      build: function (n) { var v = el("div", "cv", L.plateText); n.appendChild(v); }
+    });
+    /* 힌트 막대 (왼쪽이 가장 높다) */
+    L.bars.forEach(function (b2, i) {
+      overlays.push({
+        x: b2.x, y: b2.y, w: b2.w, h: b2.h, cls: "snackBar",
+        build: function (n) { n.setAttribute("data-t", "snackBar" + i); var v = el("div", "cv"); v._noFit = true; n.appendChild(v); }
+      });
+    });
+    /* 정사각 홈 4개 */
+    L.cells.forEach(function (cell, i) {
+      overlays.push({
+        x: cell.x, y: cell.y, w: cell.w, h: cell.h, t: "slot" + i, cls: "snackSlot",
+        build: function (n) { var v = el("div", "cv"); v._noFit = true; n.appendChild(v); vnodes[i] = v; },
+        onTap: function () { tapSlot(i); }
+      });
+    });
+
+    c.stage.appendChild(W.cropView(L.img, L.crop, overlays, { nw: L.nw, nh: L.nh }));
+    paint();
+    c.cap("색상판을 순서대로 끼워 넣는 것 같다.\n(홈을 다시 누르면 뺄 수 있다)");
+
+    var tips = el("div", "row");
+    ["tileBlack", "tileBrown", "tileDark", "tileBeige"].forEach(function (id) {
+      if (!G.has(id)) return;
+      var b3 = el("button", "chip", DATA.ITEMS[id].name);
+      b3.setAttribute("data-t", "pick_" + id);
+      b3.onclick = function () { G.S.sel = id; renderInv(); G.toast(DATA.ITEMS[id].name + " 선택 — 홈을 눌러 끼워봐", 1500); };
+      tips.appendChild(b3);
+    });
+    c.panel.appendChild(tips);
+
+    function itemOf(tile) {
+      var k = { black: "tileBlack", brown: "tileBrown", dark: "tileDark", beige: "tileBeige" };
+      return k[tile];
+    }
+    function tapSlot(i) {
+      if (slots[i]) {                       /* 빼기 */
+        G.give(itemOf(slots[i]));
+        slots[i] = null; save(); G.sfxTap(); paint(); renderInv();
+        return;
+      }
+      var sel = G.S.sel;
+      var it = sel && DATA.ITEMS[sel];
+      if (!it || !it.tile) { G.toast("색상판을 먼저 골라줘"); return; }
+      if (slots.indexOf(it.tile) >= 0) { G.toast("이미 끼운 색이야"); return; }
+      slots[i] = it.tile;
+      G.take(sel); G.S.sel = null; save(); G.sfxTap(); paint(); renderInv();
+      check();
+    }
+    function save() { G.S.misc.p25 = slots.slice(); G.save(); }
+    function paint() {
+      for (var i = 0; i < 4; i++) {
+        var v = vnodes[i]; if (!v) continue;
+        clear(v);
+        var t = slots[i];
+        v.parentNode.setAttribute("data-v", t || "-");
+        if (t) { var im = new Image(); im.src = DATA.TILES[t].img; v.appendChild(im); }
+      }
+    }
+    function check() {
+      if (slots.indexOf(null) >= 0) return;
+      var ok = slots.every(function (v, i) { return v === DATA.ANS.p25[i]; });
+      if (ok) {
+        G.sfxOk(); G.buzz([30, 40, 60]);
+        G.markSolved("p25");
+        G.S.misc.p25 = slots.slice(); G.save();
+        setTimeout(reopenCU, 500);
+      } else {
+        G.sfxBad(); G.buzz(140);
+        G.toast("순서가 아닌 것 같다", 1500);
+      }
+    }
+    W.unregister();
+    window.__lock = {
+      answer: DATA.ANS.p25.map(function (t) { return DATA.TILES[t].label; }).join(" → "),
+      force: function () {
+        slots = DATA.ANS.p25.slice();
+        ["tileBlack", "tileBrown", "tileDark", "tileBeige"].forEach(function (id) { G.take(id); });
+        save(); paint(); renderInv(); check();
+      }
+    };
   };
 
   CU.cab3 = function (c) {
