@@ -547,8 +547,17 @@ body.dbg .cvcell.hot.ifeBtn:active,body.dbg .cvcell.hot.ifeTile:active{box-shado
 /* v0.4 수정: 글자 칩은 칸 전체를 채운다(라인박스가 칩 밖으로 삐져나오지 않게).
    아이콘 칩은 칸의 70% 정중앙(북쑥 지시). */
 .cvcell .cv{min-width:100%;min-height:100%;width:100%;height:100%;overflow:hidden}
-/* ★v0.12.1 앞면 칩 — 칸이 아니라 다이얼 앞면 사각형에 맞춰 인라인 좌표로 놓인다 */
-.cvcell .cv.faceBox{position:absolute;min-width:0;min-height:0;max-width:none;max-height:none}
+/* ★v0.12.1 앞면 칩 — 칸이 아니라 다이얼 앞면 사각형에 맞춰 인라인 좌표로 놓인다.
+   ★v0.12.2 배경 상자(칩) 자체를 없앤다 — 글자가 다이얼 앞면에 직접 인쇄된 것처럼.
+   (배경 박스가 앞면보다 커서 다이얼 테두리를 덮던 문제. 이제 칠해지는 건 글자뿐) */
+.cvcell .cv.faceBox{position:absolute;min-width:0;min-height:0;max-width:none;max-height:none;
+  background:transparent !important;box-shadow:none !important;
+  color:#fff;text-shadow:0 0 2px rgba(0,0,0,.9),0 0 4px rgba(0,0,0,.6)}
+.cvcell .cv.faceBox.light{color:#26282e;text-shadow:0 0 2px rgba(255,255,255,.95),0 0 4px rgba(255,255,255,.8)}
+/* 눌림 피드백도 앞면 안에서만 — 글자만 흐려진다(상자 없음) */
+.cvcell:active .cv.faceBox{opacity:.5}
+.cvcell.done .cv.faceBox{color:var(--ok);text-shadow:0 0 2px rgba(0,0,0,.9)}
+.cvcell.done .cv.faceBox.light{color:#17683f;text-shadow:0 0 2px rgba(255,255,255,.95)}
 .cvcell.icon .cv{min-width:70%;min-height:70%;width:70%;height:70%}
 .cvcell.extra .cv,.cvcell.ifeBack .cv{width:100%;height:100%;min-width:100%;min-height:100%}
 
@@ -568,8 +577,10 @@ body.dbg .cvcell.hot.ifeBtn:active,body.dbg .cvcell.hot.ifeTile:active{box-shado
 .cvcell.snackBar{pointer-events:none}
 .cvcell.snackBar .cv{background:#8b8d95;border-radius:2px;box-shadow:none;min-width:100%;min-height:100%}
 .cvcell.snackSlot{border-radius:6px}
+/* ★v0.12.2 칩은 홈(대상 bbox)보다 사방 2px 안쪽으로 — 테두리를 덮지 않게 */
 .cvcell.snackSlot .cv{background:rgba(0,0,0,.55);border:2px solid rgba(255,255,255,.25);border-radius:6px;
-  box-shadow:inset 0 2px 6px rgba(0,0,0,.6)}
+  box-shadow:inset 0 2px 6px rgba(0,0,0,.6);
+  width:calc(100% - 4px);height:calc(100% - 4px);min-width:0;min-height:0}
 .cvcell.snackSlot .cv img{width:100%;height:100%;object-fit:contain;border-radius:4px}
 body.dbg.hints .cvcell.snackSlot{box-shadow:inset 0 0 0 2px rgba(255,255,255,.35)}
 .gmHint{font-size:12px;color:var(--n6);border:1px dashed var(--line2);border-radius:8px;padding:8px 14px}
@@ -10847,7 +10858,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 (function () {
   "use strict";
 
-  var BUILD = "ODY-S1-20260911-1229";
+  var BUILD = "ODY-S1-20260911-1307";
   var LSKEY = "odyssey.s1.v1";
 
   var qs = new URLSearchParams(location.search);
@@ -11170,22 +11181,22 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
      ───────────────────────────────────────────────────────── */
   var TEMP = {
     p8Place: "갤리 카트 옆 작은 상자",          // Q1 #8 다이얼 상자 위치
-    p8Prize: "tileBlack",                        // ★15:54: #8 보상 = 검정 색상판
+    p8Prize: "tileDark",                         // ★v0.13 임시(북쑥 확인 전): 검정판은 #26 전용이 됐고 #22 보상이 없어져 짙은갈색을 여기로
     p10Prize: "cellophane",                      // #10 보상 = 셀로판(#17용) — 15:40 정정으로 원복
     p13Prize: "pamphlet",                        // Q4 #13 보상(팜플렛)
     p16Prize: "silverKey",                       // Q5 #16 보상(은색 열쇠)
     p9Prize: "goldKey",                          // Q6 #9 카트 보상(금색 열쇠)
     p14Prize: "telescope",                       // ★15:54 확정: #14 서랍장 보상 = 쌍안경
     p18Answer: "https://m.site.naver.com/1DmdB", // ★실물 명함 QR 해독값(2026-09-10, jsQR)
-    p18Prize: "tileBeige",                       // ★15:54: #18 QR 보상 = 베이지 색상판
-    p22Prize: "tileDark",                        // ★15:54: #22 보상 = 짙은갈색 색상판
+    p18Prize: "tileBeige",                       // ★임시(북쑥 확인 전): #18 QR 보상 = 베이지 색상판
+    /* ★v0.13 #22(노노그램) 보상 삭제 — 완성 이펙트만. 색상판은 #8·cab2·#18·#26 에서 나온다 */
     p22Picture: "숫자 7",                        // Q11 #22 완성 그림
     /* ★22:48 확정(v0.7): 불타오르네 → 피 땀 눈물 → DNA → Butter → Dynamite.
        #5 재생 순서이자 #21 화살 과녁 정답 순서(불→물방울→DNA→버터→다이너마이트). */
     songOrder: ["fire", "blood", "dna", "butter", "dynamite"],
     p23From: "화장실 수납장1",                   // Q13 #23 쌍안경 출처
     p24PeanutFrom: "갤리 간식 수납칸(#25 색상판 자물쇠)",  // ★15:54: 잠금 생김
-    cab2Prize: "tileBrown",                      // ★15:54: 화장실 상단 수납장2 = 갈색 색상판(문제 미정)
+    cab2Prize: "tileBrown",                      // ★임시(북쑥 확인 전): 화장실 상단 수납장2 = 갈색 색상판(문제 미정)
     p24DanceLock: "화장실 하단 수납장(수납장1)",  // Q17 춤 순서(◀▶ 5회) 입력 위치
     ladderFrom: "화장실 하단 수납장(수납장1)",    // Q19 사다리 출처 = 춤 순서 자물쇠 보상
     p24Dance: ["L", "R", "R", "L", "R"],       // Q18 춤(골반 씰룩) 순서
@@ -11286,6 +11297,10 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
      ───────────────────────────────────────────────────────── */
   var PIN_HASH = "c597ad7908c4f67a078510363f014415fb002a42a681b9e74a0672522bd9dbc3";
 
+  /* ★v0.13 #26 화장실 상단 수납장1 — 6자리. #4 와 같은 취급: 평문 없음.
+     엔진이 sha256("odyssey:"+입력) 을 이 값과 비교만 한다(소스·빌드·로그 어디에도 정답 없음). */
+  var P26_HASH = "11b7988be0bb2ac626dbd5edf61123db9bc2df1679030bf490fae1214292815a";
+
   var ANS = {
     p3: ["plane", "music", "tv", "music", "plane", "tv"],      // #3 IFE 아이콘 6회
     p5: "BOSE",                                                  // #5 헤드셋 케이스
@@ -11364,6 +11379,45 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
      cells: 실제 다이얼/칸 자리 (탭 영역 + 값 표시 위치)
      ───────────────────────────────────────────────────────── */
   var LOCKS = {
+    /* ★v0.13 #26 화장실 상단 수납장1 — 사진(50) 속 숫자 다이얼 6칸.
+       정답은 P26_HASH 로만 비교한다(평문 없음). 좌표는 전부 원본(1264×848) 기준 %.
+       crop: 다이얼 6개 중심(632.25px = 50.02%)·격자 중심(633px)·베젤 홈(439~827px, 중심 633px)이
+             모두 같은 세로축에 있다 → 크롭 중심 = 50.04%.
+             가로 = 패널 바깥(437~828px, 31.0%) + 좌우 여백 각 5.97% → 35.13%
+             세로 = 격자 위 22px 여유(y=118px) ~ 문 아래 턱(y=726px) → 13.92 ~ 85.62%
+             이 비율(608/444=1.369)이면 402×660 에서도 다이얼 칸이 32.7px (기준 30px) 이상.
+       cells 는 다이얼 중심(픽셀 실측: 오른쪽 어두운 모서리 524.5·573.5·622.5·671.5·720.5·769.5,
+             주기 49px, 다이얼 실폭 29.5px)에 맞춘 탭 영역이고, 글자는 faces(앞면)에 놓인다. */
+    p26: {
+      img: IMG + "lav_cabtop.jpg", nw: 1264, nh: 848,
+      crop: { x: 32.48, y: 13.92, w: 35.13, h: 71.70 },
+      cells: [
+        { x: 38.53, y: 60.44, w: 3.60, h: 12.50 },
+        { x: 42.41, y: 60.44, w: 3.60, h: 12.50 },
+        { x: 46.28, y: 60.44, w: 3.60, h: 12.50 },
+        { x: 50.16, y: 60.44, w: 3.60, h: 12.50 },
+        { x: 54.04, y: 60.44, w: 3.60, h: 12.50 },
+        { x: 57.91, y: 60.44, w: 3.60, h: 12.50 }
+      ],
+      /* ★앞면 = 다이얼 원통의 금속 정면(슬롯 검은 테두리 안쪽). 실측: 다이얼 폭 29.5px(2.33%),
+         슬롯 세로 518~613px → 금속면 525~605px. 가운데 가로줄 2개는 원통의 널링(테)이지
+         홈 그림자가 아니라서 앞면에 포함한다(tools/scan-faces.mjs 는 이 줄에서 멈춰
+         28px 짜리 띠만 잡는다 — 그 값으로는 숫자가 10px 밖에 안 돼 읽을 수 없다).
+         guide: shots/v13/guide_p26.png */
+      faces: [
+        { x: 39.18, y: 62.44, w: 2.30, h: 8.50 },
+        { x: 43.06, y: 62.44, w: 2.30, h: 8.50 },
+        { x: 46.93, y: 62.44, w: 2.30, h: 8.50 },
+        { x: 50.81, y: 62.44, w: 2.30, h: 8.50 },
+        { x: 54.69, y: 62.44, w: 2.30, h: 8.50 },
+        { x: 58.56, y: 62.44, w: 2.30, h: 8.50 }
+      ],
+      /* 풀린 뒤 — 문 열린 사진 2장은 crop 없이 전체 표시 */
+      openImg: "lav_cabtop_open.jpg",
+      emptyImg: "lav_cabtop_empty.jpg",
+      /* 검정판 실측 x35.9 y66.3 w26.4 h13.1 → 세로 탭 높이 44px 확보용으로 상하 패딩 */
+      prizeCell: { x: 35.9, y: 62.85, w: 26.4, h: 20.0 }
+    },
     /* ★v0.11.1 #24 화장실 하단 수납장 — 사진(47) 위에 ◀ ▶ 버튼과 표시등 5개가 실물로 찍혀 있다.
        기존 W.arrowLock 의 누르기·표시등 로직을 그대로 사진 오버레이로 옮긴다.
        좌표는 전부 원본(1264×847) 기준 %.
@@ -11416,12 +11470,14 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       ],
       /* ★v0.12.1 앞면(face) = 글자가 인쇄되는 평평한 정면. 칸(cells)=탭 영역은 홈 그림자까지
          포함하므로 글자를 칸 한가운데 두면 그림자 위에 얹힌다. 값은 tools/scan-faces.mjs 픽셀 산출.
-         (guide: shots/v121/guide_<id>.png — 빨강=앞면, 초록=칸) */
+         ★v0.12.2 한 자물쇠의 칸은 **같은 y·같은 높이·같은 폭** — 세로는 모든 칸 앞면의 교집합 띠
+         하나만 쓰고 가로 위치만 칸마다 다르다(칸별로 글자 높이가 달라 보이던 문제).
+         (guide: shots/v122/guide_<id>.png — 빨강=공통 띠, 초록=칸) */
       faces: [
         { x: 38.4, y: 44.83, w: 2.9, h: 7.5 },
         { x: 45.2, y: 44.83, w: 2.9, h: 7.5 },
-        { x: 51.1, y: 45.43, w: 2.9, h: 7.5 },
-        { x: 57.9, y: 45.73, w: 2.9, h: 7.5 }
+        { x: 51.1, y: 44.83, w: 2.9, h: 7.5 },
+        { x: 57.9, y: 44.83, w: 2.9, h: 7.5 }
       ]
     },
     p10: {
@@ -11436,13 +11492,15 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       ],
       /* ★v0.12.1 앞면(face) = 글자가 인쇄되는 평평한 정면. 칸(cells)=탭 영역은 홈 그림자까지
          포함하므로 글자를 칸 한가운데 두면 그림자 위에 얹힌다. 값은 tools/scan-faces.mjs 픽셀 산출.
-         (guide: shots/v121/guide_<id>.png — 빨강=앞면, 초록=칸) */
+         ★v0.12.2 한 자물쇠의 칸은 **같은 y·같은 높이·같은 폭** — 세로는 모든 칸 앞면의 교집합 띠
+         하나만 쓰고 가로 위치만 칸마다 다르다(칸별로 글자 높이가 달라 보이던 문제).
+         (guide: shots/v122/guide_<id>.png — 빨강=공통 띠, 초록=칸) */
       faces: [
-        { x: 39, y: 42.73, w: 2.7, h: 6.45 },
+        { x: 39, y: 42.13, w: 2.7, h: 6.45 },
         { x: 43.8, y: 42.13, w: 2.7, h: 6.45 },
-        { x: 48.7, y: 42.73, w: 2.7, h: 6.45 },
-        { x: 53.5, y: 42.43, w: 2.7, h: 6.45 },
-        { x: 58.3, y: 42.58, w: 2.7, h: 6.45 }
+        { x: 48.7, y: 42.13, w: 2.7, h: 6.45 },
+        { x: 53.5, y: 42.13, w: 2.7, h: 6.45 },
+        { x: 58.3, y: 42.13, w: 2.7, h: 6.45 }
       ]
     },
     p15: {
@@ -11465,7 +11523,9 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       ],
       /* ★v0.12.1 앞면(face) = 글자가 인쇄되는 평평한 정면. 칸(cells)=탭 영역은 홈 그림자까지
          포함하므로 글자를 칸 한가운데 두면 그림자 위에 얹힌다. 값은 tools/scan-faces.mjs 픽셀 산출.
-         (guide: shots/v121/guide_<id>.png — 빨강=앞면, 초록=칸) */
+         ★v0.12.2 한 자물쇠의 칸은 **같은 y·같은 높이·같은 폭** — 세로는 모든 칸 앞면의 교집합 띠
+         하나만 쓰고 가로 위치만 칸마다 다르다(칸별로 글자 높이가 달라 보이던 문제).
+         (guide: shots/v122/guide_<id>.png — 빨강=공통 띠, 초록=칸) */
       faces: [
         { x: 41.5, y: 61.47, w: 2.9, h: 8.1 },
         { x: 48.5, y: 61.47, w: 2.9, h: 8.1 },
@@ -11475,6 +11535,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     /* ★v0.4: 케이스 전체가 보이게(v0.2 수준) 되돌림 */
     p5: {
       img: IMG + "headset_case.jpg", nw: 900, nh: 604,
+      faceLight: true,        /* ★v0.12.2 앞면이 밝은 크림색 → 글자를 짙은 회색으로 */
       crop: { x: 5, y: 6, w: 90, h: 88 },
       cells: [
         { x: 31.56, y: 43.38, w: 7.89, h: 11.92 },
@@ -11484,7 +11545,9 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       ],
       /* ★v0.12.1 앞면(face) = 글자가 인쇄되는 평평한 정면. 칸(cells)=탭 영역은 홈 그림자까지
          포함하므로 글자를 칸 한가운데 두면 그림자 위에 얹힌다. 값은 tools/scan-faces.mjs 픽셀 산출.
-         (guide: shots/v121/guide_<id>.png — 빨강=앞면, 초록=칸) */
+         ★v0.12.2 한 자물쇠의 칸은 **같은 y·같은 높이·같은 폭** — 세로는 모든 칸 앞면의 교집합 띠
+         하나만 쓰고 가로 위치만 칸마다 다르다(칸별로 글자 높이가 달라 보이던 문제).
+         (guide: shots/v122/guide_<id>.png — 빨강=공통 띠, 초록=칸) */
       faces: [
         { x: 32.44, y: 45.53, w: 6.89, h: 9.77 },
         { x: 42.11, y: 45.53, w: 6.89, h: 9.77 },
@@ -11534,6 +11597,13 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       img: null, nw: 1000, nh: 420,
       crop: { x: 0, y: 0, w: 100, h: 100 },
       cells: [
+        { x: 9, y: 40, w: 17, h: 40 },
+        { x: 31, y: 40, w: 17, h: 40 },
+        { x: 53, y: 40, w: 17, h: 40 },
+        { x: 75, y: 40, w: 17, h: 40 }
+      ],
+      /* ★v0.12.2 사진이 없는 자리표시 패널이라 앞면 = 칸 그대로. 배경 상자 없이 글자만. */
+      faces: [
         { x: 9, y: 40, w: 17, h: 40 },
         { x: 31, y: 40, w: 17, h: 40 },
         { x: 53, y: 40, w: 17, h: 40 },
@@ -11603,7 +11673,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 
   window.DATA = {
     LOCKS: LOCKS, IFE: IFE, TAMA: TAMA, TILES: TILES,
-    IMG: IMG, TEMP: TEMP, ITEMS: ITEMS, MAPS: MAPS, ANS: ANS, PIN_HASH: PIN_HASH,
+    IMG: IMG, TEMP: TEMP, ITEMS: ITEMS, MAPS: MAPS, ANS: ANS, PIN_HASH: PIN_HASH, P26_HASH: P26_HASH,
     FOOD: FOOD, FOOD_BG: FOOD_BG, FLAGS: FLAGS, UTENSIL: UTENSIL, IFE_ICONS: IFE_ICONS,
     KANA: KANA, SONGS: SONGS,
     PAMPHLET: PAMPHLET_A, PAMPHLET_TARGETS: PAMPHLET_TARGETS, KAKAO_MSG: KAKAO_MSG
@@ -11718,7 +11788,8 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
        (a) 자물쇠 전체가 **같은 글자 크기**를 쓰고(칸마다 커졌다 작아졌다 하지 않게)
        (b) 글자마다 translate 로 잉크 중심을 칸 중심에 맞춘다.
      크기 기준(칸 기준): 잉크 폭 <= 60% · 잉크 높이 <= 76% → 좌우 여백 20% · 상하 12% 가 저절로 나온다. */
-  var TXT_W = 0.60, TXT_H = 0.70;   /* ★v0.12.1 앞면 기준: 잉크 폭<=60% 높이<=70% */
+  var TXT_W = 0.56, TXT_H = 0.68;   /* ★v0.12.2 앞면 기준 목표치 — 규칙은 폭 60%·높이 70% 이하지만
+                                     캔버스 측정보다 실제 렌더(특히 WebKit)가 1~2% 넓게 나와 여유를 둔다 */
   var _mcv = null;
   function _mctx() {
     if (!_mcv) _mcv = document.createElement("canvas");
@@ -11936,6 +12007,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
           var boxW = o.w / 100 * dispW, boxH = o.h / 100 * dispH;
           if (o.face) {
             v.classList.add("faceBox");
+            if (o.faceLight) v.classList.add("light");
             boxW = o.face.w / 100 * dispW; boxH = o.face.h / 100 * dispH;
             v.style.left = ((o.face.x - o.x) / 100 * dispW) + "px";
             v.style.top = ((o.face.y - o.y) / 100 * dispH) + "px";
@@ -11962,8 +12034,11 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     /* opt: {id, img, crop, cells:[{x,y,w,h}], answer, pool, size, kind:"text"|"icon",
              cands:[{id,label,emoji,svg,img}], extras:[{x,y,w,h,t,onTap,cls}], onSolve} */
     var isIcon = opt.kind === "icon";
+    /* ★v0.13 해시 모드(#26) — 정답 문자열을 코드가 아예 모른다.
+       입력값을 sha256("odyssey:"+입력) 해서 opt.hash 와만 비교한다(#4 폰 비번과 같은 방식). */
+    var isHash = !!opt.hash;
     var n = opt.cells.length;
-    var ansArr = isIcon ? opt.answer.slice() : String(opt.answer).split("");
+    var ansArr = isIcon ? opt.answer.slice() : (isHash ? [] : String(opt.answer).split(""));
     var pool = isIcon ? opt.cands.map(function (c) { return c.id; }) : opt.pool;
     var size = Math.min(opt.size || (isIcon ? pool.length : 12), pool.length);
 
@@ -11979,6 +12054,10 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         for (k = list.length - 1; k > 0; k--) { j = (rnd() * (k + 1)) | 0; t = list[k]; list[k] = list[j]; list[j] = t; }
         cands.push(list);
         idx.push(-1);
+      } else if (isHash) {
+        /* 정답을 모르므로 후보는 풀 그대로(숫자 0~9). 초기 표시 = 0 */
+        cands.push(pool.slice(0, size));
+        idx.push(0);
       } else {
         /* ★v0.10 문자형은 풀 순서 그대로의 연속 구간, 초기 표시 = 구간 첫 글자 */
         cands.push(orderedWindow(pool, ansArr[i], size, (opt.id || "lock") + "#" + i + "#" + ansArr[i]));
@@ -11994,6 +12073,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         x: c.x, y: c.y, w: c.w, h: c.h, t: "slot" + i,
         /* ★v0.12.1 탭 영역은 칸 전체, 글자칩은 다이얼 앞면에만 */
         face: opt.faces && opt.faces[i] ? opt.faces[i] : null,
+        faceLight: !!opt.faceLight,
         cls: isIcon ? "icon" : "",
         build: function (nd) {
           var v = el("div", "cv");
@@ -12050,7 +12130,12 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     function value() { return idx.map(function (v, i) { return v < 0 ? null : cands[i][v]; }); }
     function check() {
       var got = value();
-      for (var i = 0; i < n; i++) if (got[i] !== ansArr[i]) return;
+      for (var i = 0; i < n; i++) if (got[i] === null) return;
+      if (isHash) {
+        if (G.sha256("odyssey:" + got.join("")) !== opt.hash) return;
+      } else {
+        for (i = 0; i < n; i++) if (got[i] !== ansArr[i]) return;
+      }
       win();
     }
     function win() {
@@ -12062,11 +12147,14 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       setTimeout(function () { opt.onSolve && opt.onSolve(); }, 460);
     }
     if (!opt.pre) register({
-      answer: isIcon
+      /* ★해시 모드는 디버그에도 정답을 내놓지 않는다(#4 와 동일) */
+      answer: isHash ? "(비공개 · 해시로만 비교)" : (isIcon
         ? ansArr.map(function (a) { var c = opt.cands.filter(function (x) { return x.id === a; })[0]; return c ? c.label : a; }).join(" ")
-        : ansArr.join(""),
-      cands: cands,
-      force: function () { for (var i = 0; i < n; i++) idx[i] = cands[i].indexOf(ansArr[i]); paint(); check(); }
+        : ansArr.join("")),
+      cands: isHash ? null : cands,
+      force: isHash
+        ? function () { win(); }
+        : function () { for (var i = 0; i < n; i++) idx[i] = cands[i].indexOf(ansArr[i]); paint(); check(); }
     });
     function refit() {
       if (view && view._fit) view._fit();
@@ -14138,7 +14226,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     if (!G.solved("p12")) {
       var L = DATA.LOCKS.p12;
       c.stage.appendChild(W.imgLock({
-        id: "p12", img: L.img, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells, faces: L.faces,
+        id: "p12", img: L.img, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells, faces: L.faces, faceLight: L.faceLight,
         pool: "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(""), size: 12, answer: DATA.ANS.p12,
         onSolve: function () { G.markSolved("p12"); reopenCU(); }
       }));
@@ -14156,7 +14244,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     if (!G.solved("p10")) {
       var L = DATA.LOCKS.p10;
       c.stage.appendChild(W.imgLock({
-        id: "p10", img: L.img, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells, faces: L.faces,
+        id: "p10", img: L.img, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells, faces: L.faces, faceLight: L.faceLight,
         pool: DATA.KANA, size: 12, answer: DATA.ANS.p10,
         onSolve: function () {
           G.markSolved("p10");
@@ -14176,7 +14264,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     if (!G.solved("p15")) {
       var L = DATA.LOCKS.p15;
       c.stage.appendChild(W.imgLock({
-        id: "p15", img: L.img, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells, faces: L.faces,
+        id: "p15", img: L.img, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells, faces: L.faces, faceLight: L.faceLight,
         kind: "icon", cands: DATA.FOOD, answer: DATA.ANS.p15,
         onSolve: function () { G.markSolved("p15"); reopenCU(); }
       }));
@@ -14194,7 +14282,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     if (!G.solved("p16")) {
       var L = DATA.LOCKS.p16;
       c.stage.appendChild(W.imgLock({
-        id: "p16", img: L.img, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells, faces: L.faces,
+        id: "p16", img: L.img, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells, faces: L.faces, faceLight: L.faceLight,
         pool: "0123456789".split(""), size: 10, answer: DATA.ANS.p16,
         onSolve: function () {
           G.markSolved("p16");
@@ -14225,7 +14313,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       }
     }
     c.stage.appendChild(W.imgLock({
-      id: "p9", img: L.img, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells, faces: L.faces,
+      id: "p9", img: L.img, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells, faces: L.faces, faceLight: L.faceLight,
       kind: "icon", cands: DATA.FLAGS, answer: DATA.ANS.p9, pre: G.flag("cartFlags"),
       extras: [{
         x: L.keyhole.x, y: L.keyhole.y, w: L.keyhole.w, h: L.keyhole.h, t: "cartKey",
@@ -14344,7 +14432,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         return { x: r.x, y: r.y, w: r.w, h: r.h, cls: "lbl", label: DATA.UTENSIL[i].emoji };
       });
       c.stage.appendChild(W.imgLock({
-        id: "p8", img: null, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells, faces: L.faces,
+        id: "p8", img: null, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells, faces: L.faces, faceLight: L.faceLight,
         pool: "0123456789".split(""), size: 10, answer: DATA.ANS.p8,
         extras: extras,
         onSolve: function () {
@@ -14595,11 +14683,39 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     };
   };
 
+  /* ★v0.13 #26 화장실 상단 수납장1 — 사진 속 숫자 다이얼 6칸.
+     정답은 DATA.P26_HASH 로만 비교한다(소스에 평문 없음, #4 폰 비번과 같은 취급). */
   CU.cab3 = function (c) {
-    c.title("수납장 3");
-    var d = el("div", null, "🔒"); d.style.cssText = "font-size:54px;text-align:center";
-    c.stage.appendChild(d);
-    c.cap("잠겨 있다.\n(문제 미정 — 준비 중)");
+    c.title("상단 수납장 1");
+    var L = DATA.LOCKS.p26 || {};
+    var ready = hasImg("lav_cabtop.jpg") && hasImg(L.openImg) && hasImg(L.emptyImg);
+
+    if (!G.solved("p26")) {
+      if (!ready) {
+        var d = el("div", null, "\uD83D\uDD12"); d.style.cssText = "font-size:54px;text-align:center";
+        c.stage.appendChild(d);
+        c.cap("\uc7a0\uaca8 \uc788\ub2e4.");
+        return;
+      }
+      c.stage.appendChild(W.imgLock({
+        id: "p26", img: L.img, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells, faces: L.faces, faceLight: L.faceLight,
+        pool: "0123456789".split(""), size: 10, hash: DATA.P26_HASH,
+        onSolve: function () { G.markSolved("p26"); reopenCU(); }
+      }));
+      c.cap("숫자 여섯 칸. 위에 작은 격자 무늬가 새겨져 있다.");
+      return;
+    }
+
+    if (!ready) {
+      var d2 = el("div", null, "\uD83D\uDDC4\uFE0F"); d2.style.cssText = "font-size:54px;text-align:center";
+      c.stage.appendChild(d2);
+      c.cap("열려 있다. 안은 비어 있다.");
+      return;
+    }
+    var got = G.has("tileBlack") || G.flag("tookBlack");
+    c.stage.appendChild(imgStage(DATA.IMG + (got ? L.emptyImg : L.openImg),
+      got ? [] : [pick(L.prizeCell, "takeTileBlack", "tileBlack", "tookBlack")]));
+    c.cap(got ? "비어 있다." : "문이 열렸다. 안에 검은 나무 판이 있다.");
   };
 
   /* ═══════════ 아이템 확대(ZOOM) ═══════════ */
@@ -14636,7 +14752,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     }
     var L = DATA.LOCKS.p5;
     var node = W.imgLock({
-      id: "p5", img: L.img, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells, faces: L.faces,
+      id: "p5", img: L.img, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells, faces: L.faces, faceLight: L.faceLight,
       pool: "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(""), size: 12, answer: DATA.ANS.p5,
       onSolve: function () { G.markSolved("p5"); closeZoom(); setTimeout(function () { ZOOM.case(); }, 120); }
     });
@@ -14907,9 +15023,10 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
           G.setFlag("archDone");
           GAMES.closeFull();
           GAMES.openNono(function () {
+            /* ★v0.13 #22 보상(색상판) 삭제 — 완성 이펙트만 보여 주고 완료 플래그만 남긴다 */
             G.setFlag("nonoDone");
             GAMES.closeFull();
-            prize(DATA.TEMP.p22Prize, "미니게임 클리어!");
+            G.toast("그림이 완성됐다.", 1800);
           }, function () { GAMES.closeFull(); });
         }, function () { GAMES.closeFull(); });
       });
