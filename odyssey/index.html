@@ -197,6 +197,7 @@ input:focus{outline:none;border-color:var(--accent)}
 #shadeWrap img{height:100%;width:auto;max-width:100%;object-fit:contain;border-radius:var(--r)}
 #shadeWrap .shadeImg{position:absolute;inset:0;height:100%;width:100%;object-fit:contain}
 /* 가리개에 인쇄된 코드 — 디제틱(그림 일부)이라 로고와 같은 붉은색 유지 */
+#shadeWrap .shadeGlass{position:absolute;inset:0;pointer-events:none}
 #shadeWrap .shadeCodeClip{position:absolute;inset:0;pointer-events:none}
 #shadeCode{position:absolute;left:50%;transform:translate(-50%,0);will-change:transform;font-size:clamp(13px,4.4vw,21px);letter-spacing:2px;color:#b03a3a;font-weight:700;white-space:nowrap}
 /* ★v0.10 line-height 1.25 는 글자 상자보다 짧아 글자 상자가 2px 샐져나갔다 → 1.45 */
@@ -282,7 +283,8 @@ body.dbg .ifeHot:active{box-shadow:0 0 0 2px rgba(255,255,255,.95)}
 .kkTime{font-size:9px;color:var(--n6);margin:4px 0 0 2px}
 
 /* ───────── 전체화면 게임 ───────── */
-#full{position:absolute;inset:0;z-index:40;display:none;flex-direction:column;background:rgba(0,0,0,.45);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+/* ★v0.13.1 전체화면 위젯은 **불투명** — 상단바·인벤이 비쳐 글자가 겹치던 문제 */
+#full{position:absolute;inset:0;z-index:40;display:none;flex-direction:column;background:#0c0c0e}
 #full.show{display:flex}
 .fullTop{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;padding:calc(var(--safeT) + 12px) 16px 8px;font-size:12px;font-weight:700;letter-spacing:1px;color:var(--n7)}
 .fullBody{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px 12px;overflow:hidden}
@@ -345,13 +347,7 @@ body.dbg .ifeHot:active{box-shadow:0 0 0 2px rgba(255,255,255,.95)}
 .ntool.on{background:#2f3440;color:#fff;border-color:#4b525f}
 .nonoFx{position:absolute;inset:0;pointer-events:none;opacity:0}
 #nono{position:relative}
-#nono.win .nonoFx{opacity:1;background:
-  radial-gradient(circle at 30% 35%,rgba(255,255,255,.85) 0 2px,transparent 3px),
-  radial-gradient(circle at 68% 22%,rgba(255,255,255,.8) 0 2px,transparent 3px),
-  radial-gradient(circle at 52% 70%,rgba(255,255,255,.8) 0 2px,transparent 3px),
-  radial-gradient(circle at 20% 78%,rgba(255,255,255,.75) 0 2px,transparent 3px),
-  radial-gradient(circle at 80% 62%,rgba(255,255,255,.75) 0 2px,transparent 3px);
-  animation:nonoSpark 1.5s ease-out 1}
+#nono.win .nonoFx{opacity:0}   /* ★v0.13.1 흩뿌린 흰 점 제거 — 격자 테두리 글로우만 */
 #nono.win #nonoGrid{animation:nonoGlow 1.5s ease-out 1}
 @keyframes nonoSpark{0%{opacity:0;transform:scale(.9)}25%{opacity:1}100%{opacity:0;transform:scale(1.15)}}
 @keyframes nonoGlow{0%{box-shadow:0 0 0 0 rgba(255,255,255,0)}30%{box-shadow:0 0 22px 6px rgba(255,255,255,.55)}100%{box-shadow:0 0 0 0 rgba(255,255,255,0)}}
@@ -430,7 +426,7 @@ body.dbg #story,body.dbg .overlay{padding-bottom:calc(var(--safeB) + 56px)}
 @supports not ((-webkit-backdrop-filter: blur(2px)) or (backdrop-filter: blur(2px))){
   body.ovl #scene,body.ovl #topbar{filter:blur(10px)}   /* ★v0.9 #invWrap 제외 — 인벤은 흐려지면 안 된다 */
   .sheet,#phoneWrap{background:rgba(11,11,12,.72)}
-  #full,#story,#transit{background:rgba(11,11,12,.86)}
+  #full,#story,#transit{background:#0c0c0e}
 }
 /* 순환식 입력칸 */
 .slot .v{display:block;font-weight:400;line-height:1}
@@ -543,11 +539,7 @@ body.dbg .cvcell.hot.ifeBtn:active,body.dbg .cvcell.hot.ifeTile:active{box-shado
 #tissueWrap .tissueLayer{position:absolute;inset:0}
 #tissueWrap .tissueLayer .tissueImg{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
 /* ★v0.12.3 그림은 종이에 인쇄된 것 — patClip 이 롤 선 위쪽을 잘라내고, pat 이 종이와 함께 내려온다 */
-#tissueWrap .tissuePatClip{position:absolute;inset:0;pointer-events:none}
-/* .tissuePat 은 위치 기준만(투명). 보이는 그림은 .tissueArt 캔버스가 곡면 투영해 그린다 */
-#tissueWrap .tissuePat{position:absolute;left:34%;top:50%;width:32%;opacity:0;will-change:transform}
 #tissueWrap .tissueArt{position:absolute;left:0;top:0;pointer-events:none}
-#tissueWrap .tissuePat svg{width:100%;height:auto;display:block}
 
 /* ◀▶ 화살표 자물쇠 */
 .arrowLock{gap:14px}
@@ -668,6 +660,7 @@ body.dbg.hints .cvcell.panelHot{box-shadow:inset 0 0 0 2px rgba(255,255,255,.55)
    (사진 stage 는 블러 뒤에 그대로 남는다) 제목·캡션·× 가 두 겹으로 겹쳐 보이던 문제. */
 /* 시트가 열리면 상단바(방 이름·☰)를 숨긴다 — 시트 제목/× 자리와 정확히 겹친다 */
 body.sheetOpen #topbar{visibility:hidden}
+body.fullOpen #topbar{visibility:hidden}
 
 body.zoomOpen #closeup .sheetTitle,
 body.zoomOpen #closeup .sheetCaption,
@@ -10887,7 +10880,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 (function () {
   "use strict";
 
-  var BUILD = "ODY-S1-20260911-1345";
+  var BUILD = "ODY-S1-20260911-1412";
   var LSKEY = "odyssey.s1.v1";
 
   var qs = new URLSearchParams(location.search);
@@ -12510,30 +12503,35 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       '<b class="dg">1</b><b class="dg">2</b><span style="letter-spacing:1px">OO</span><b class="dg">4</b><b class="dg">3</b>';
     codeClip.appendChild(code);
     layer.appendChild(codeClip);
-    stack.appendChild(layer);
+    /* ★v0.13.1 유리 구멍 모양으로 한 번 더 자른다 — 가리개 사진이 같이 움직이므로
+       창틀 영역까지 보이면 "창 안에 창"이 겹쳐 보인다. 유리 실측 x29.5~71.5% · y18~71%. */
+    var glass = el("div", "shadeGlass");
+    glass.appendChild(layer);
+    stack.appendChild(glass);
     var hint = el("div", "dragHint", "\u2195");
     stack.appendChild(hint);
     wrap.appendChild(stack);
 
     /* 유리 영역: 이미지 세로 19% ~ 70% */
     var TOP = 19, BOT = 70;
-    var EMERGE = 19;            /* 하우징 하단선 — 가리개(와 인쇄된 코드)가 여기부터 나온다 */
-    var PEEK = 0.13;            /* 안 내린 상태에서 하우징 아래로 보이는 코드 높이 비율(단서) */
-    var CODE_TOP = 44;          /* 끝까지 내렸을 때 코드 top (이미지 세로 %) — 기존 디자인 그대로 */
     var p = opt.closed ? 1 : 0;
+    /* ★v0.13.1 가리개는 **천 한 장**이다 — 사진(로고 인쇄됨)도 코드줄도 같은 양만큼 내려온다.
+       화면 = "다 내린 프레임을 (1-p)*유리높이 만큼 위로 민 뒤 하우징 선 위를 잘라낸 것".
+       (v0.12.3 은 코드만 움직이고 로고는 사진에 박혀 그대로 있어서, 부분 당김 프레임이
+        최종 프레임의 크롭이 아니었다 — 30% 에서 코드가 로고보다 위에 보이던 원인) */
     function apply() {
       var Hs = stack.getBoundingClientRect().height || 0;
-      code.style.top = CODE_TOP + "%";
-      var Hc = code.getBoundingClientRect().height || Hs * 0.06;
-      var finalTop = CODE_TOP / 100 * Hs;
-      var initTop = EMERGE / 100 * Hs - (1 - PEEK) * Hc;
-      var dy = (initTop - finalTop) * (1 - p);
+      var travel = (BOT - TOP) / 100 * Hs;          /* 가리개가 내려오는 총 거리 = 유리 높이 */
+      var dy = -(1 - p) * travel;
+      code.style.top = TOP + (BOT - TOP) * 0.49 + "%";   /* 최종 위치(로고 아래) — 기존과 동일 */
       code.style.transform = "translate(-50%," + dy.toFixed(1) + "px)";
-      var ccp = "inset(" + EMERGE.toFixed(2) + "% 0 0 0)";
+      sh.style.transform = "translateY(" + dy.toFixed(1) + "px)";
+      var ccp = "inset(" + TOP.toFixed(2) + "% 0 0 0)";
       codeClip.style.clipPath = ccp; codeClip.style.webkitClipPath = ccp;
-      var minCut = EMERGE + (Hs ? ((PEEK * Hc) / Hs * 100) : 0) + 1;
-      var cut = Math.max(minCut, TOP + (BOT - TOP) * p);
-      var cp = "inset(0 0 " + (100 - cut).toFixed(2) + "% 0)";
+      var cut = TOP + (BOT - TOP) * p;
+      var gcp = "inset(18% 28.5% 29% 29.5% round 9%)";
+      glass.style.clipPath = gcp; glass.style.webkitClipPath = gcp;
+      var cp = "inset(" + TOP.toFixed(2) + "% 0 " + (100 - cut).toFixed(2) + "% 0)";
       layer.style.clipPath = cp;
       layer.style.webkitClipPath = cp;
       hint.style.display = p > 0.985 ? "none" : "block";
@@ -12558,130 +12556,137 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     register({ answer: "가리개를 끝까지 내려", force: function () { p = 1; apply(); if (opt.onClosed) opt.onClosed(); } });
     wrap._setP = function (v) { p = Math.max(0, Math.min(1, v)); apply(); };   /* 검증용 */
     wrap._getP = function () { return p; };
+    wrap._geom = function () {
+      var Hs = stack.getBoundingClientRect().height || 0;
+      return { D: (BOT - TOP) / 100 * Hs, top: TOP / 100 * Hs, bot: BOT / 100 * Hs };
+    };
     return wrap;
   }
 
   /* ════════════════ 6. 휴지롤 풀기 (#13 힌트) ════════════════
      ★v0.4: 롤 아래를 완전히 가린 상태에서 시작해, 드래그하면 휴지가 롤에서 이어져 내려온다.
      패턴 그림은 "휴지 레이어" 안에 그려서 휴지와 같이 드러난다(화면 고정 아님). */
+  /* ══════════ 휴지롤 (#16) — ★v0.13.1 표면 좌표계 모델 ══════════
+     종이를 "한 장의 표면"으로 보고, 그 위 고정 좌표 c 에 그림이 인쇄돼 있다고 본다.
+       · c 는 종이 위 위치(px). 값이 클수록 롤 안쪽(위쪽).
+       · 당김량 d 만큼 종이가 나오면 접선에 있는 종이 좌표 t = t0 + d 로 **정확히 d 만큼** 이동한다.
+         (비례 배치·중간 정렬 없음 — 줄에 매달린 표식처럼 간격 불변)
+       · 화면 사상: c <= t 면 접선 아래 평면 → y = yT + (t - c)
+                    c >  t 면 롤 곡면 → 호 길이 a = c - t, θ = a/R, y = yT - R·sinθ (θ <= θmax 까지만 보임)
+       · d=0 에서는 그림 전체가 보이는 호보다 안쪽(롤 속)이라 **한 픽셀도 안 보인다**.
+       · 최대 당김 D = 그림이 접선 아래로 완전히 펴지는 지점 + 그림 높이 5%.               */
   function tissue(opt) {
     var wrap = el("div"); wrap.id = "tissueWrap";
     var stack = el("div", "tstack");
     var img = new Image(); img.src = opt.idle || opt.img; img.className = "tissueImg";
     stack.appendChild(img);
-    /* 롤 아래(=늘어진 휴지) 부분만 담는 레이어 — 같은 이미지를 겹쳐놓고 클립한다 */
+    /* 늘어진 휴지(사진) — 종이와 같이 움직인다 */
     var layer = el("div", "tissueLayer");
     var img2 = new Image(); img2.src = opt.img; img2.className = "tissueImg";
     layer.appendChild(img2);
-    /* ★v0.12.3 그림은 **종이에 인쇄돼 종이와 같이 내려온다**.
-       patClip = 롤에서 종이가 빠져나오는 선 위쪽을 잘라내는 창(그 위로는 그림이 안 보인다),
-       pat     = 그림 자체. 당긴 만큼 translateY 로 같이 내려온다. */
-    var patClip = el("div", "tissuePatClip");
-    /* .tissuePat = **위치 기준(투명)**. 눈에 보이는 그림은 아래 canvas 가 그린다.
-       (곡면 투영이 필요해서 DOM 으로는 못 그린다 — 아래 drawArt 참고) */
-    var pat = el("div", "tissuePat");
-    pat.innerHTML = patternSVG();
-    patClip.appendChild(pat);
-    var artCv = document.createElement("canvas");
-    artCv.className = "tissueArt";
-    patClip.appendChild(artCv);
-    layer.appendChild(patClip);
-    var artImg = new Image();
-    artImg.onload = function () { apply(); };
-    /* Image 로 쓰려면 고유 크기가 있어야 한다(viewBox 만 있으면 naturalWidth=0) */
-    artImg.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(
-      patternSVG().replace("<svg ", '<svg width="330" height="330" '));   /* xmlns 는 patternSVG 가 이미 넣는다 */
     stack.appendChild(layer);
+    /* 인쇄된 그림 — 곡면 구간까지 그려야 하므로 canvas */
+    var artCv = document.createElement("canvas"); artCv.className = "tissueArt";
+    stack.appendChild(artCv);
     wrap.appendChild(stack);
-    var hint = el("div", "dragHint", "\u2195");
+    var hint = el("div", "dragHint", "↕");
     wrap.appendChild(hint);
 
-    var ROLL = 40, END = 92;    /* 이미지 세로 %: 롤 아래끝 / 휴지 끝 */
-    var EMERGE = 36;            /* 롤에서 종이가 빠져나오는 **접선** — 아래는 평면 */
-    var ROLL_R = 12;            /* 롤 반지름(이미지 세로 %) — 사진 실측(롤 지름 약 24%) */
-    var ARC_RAD = 0.6435;       /* 곡면으로 보여 주는 각도(=asin 0.6) → 접선 위 R*0.6 만큼 */
-    var ARC = 7.2;              /* 그 높이(이미지 세로 %) = ROLL_R * 0.6 */
-    var PEEK = 0.13;            /* 안 당긴 상태에서 롤 선 아래로 보이는 그림 높이 비율(단서) */
-    var PAT_TOP = 50;           /* 끝까지 당겼을 때 그림 top (이미지 세로 %) — 기존 디자인 그대로 */
-    var p = 0, startY = 0, startP = 0;
-    function apply() {
-      var Hs = stack.getBoundingClientRect().height || 0;
-      var Hp = pat.getBoundingClientRect().height || Hs * 0.22;
-      /* 그림 위치: 끝까지 당기면 PAT_TOP, 안 당기면 롤 선 위로 숨고 아래 PEEK 만큼만 보인다 */
-      var finalTop = PAT_TOP / 100 * Hs;
-      var initTop = EMERGE / 100 * Hs - (1 - PEEK) * Hp;
-      var dy = (initTop - finalTop) * (1 - p);
-      pat.style.transform = "translateY(" + dy.toFixed(1) + "px)";
-      var pcp = "inset(" + (EMERGE - ARC).toFixed(2) + "% 0 0 0)";
-      patClip.style.clipPath = pcp; patClip.style.webkitClipPath = pcp;
-      drawArt(Hs, finalTop + dy, Hp);
-      /* 종이는 최소한 그림이 보이는 데까지는 나와 있어야 한다 */
-      var minCut = EMERGE + (Hs ? ((PEEK * Hp) / Hs * 100) : 0) + 1;
-      var cut = Math.max(minCut, ROLL + (END - ROLL) * p);
-      var cp = "inset(0 0 " + (100 - cut).toFixed(2) + "% 0)";
-      layer.style.clipPath = cp; layer.style.webkitClipPath = cp;
-      /* idle 이미지가 있으면 그대로 두고(이미 안 풀린 롤), 없으면 롤 아래를 가린다 */
-      if (!opt.idle) {
-        var bcp = "inset(0 0 " + (100 - ROLL).toFixed(2) + "% 0)";
-        img.style.clipPath = bcp; img.style.webkitClipPath = bcp;
-      }
-      hint.style.display = p > 0.92 ? "none" : "block";
-    }
-    /* ★v0.12.3 롤 곡면 투영 —
-       접선(EMERGE) 아래는 1:1 평면, 위로 ARC% 구간은 원통에 감긴 종이라서
-       화면 y 가 올라갈수록 종이 좌표가 cos 만큼 압축된다(θ = asin((yt−y)/R)).
-       잉크도 θ 만큼 옅어져 곡면 음영처럼 보인다. 롤 자체는 사진이라 위쪽은 자연히 가려진다. */
-    function drawArt(Hs, patTop, Hp) {
-      if (!artImg.complete || !artImg.naturalWidth || !Hs) return;
-      var W = stack.getBoundingClientRect().width;
-      var dpr = Math.min(3, window.devicePixelRatio || 1);
-      if (artCv.width !== Math.round(W * dpr) || artCv.height !== Math.round(Hs * dpr)) {
-        artCv.width = Math.round(W * dpr); artCv.height = Math.round(Hs * dpr);
-      }
-      artCv.style.width = W + "px"; artCv.style.height = Hs + "px";
-      var g2 = artCv.getContext("2d");
-      g2.setTransform(dpr, 0, 0, dpr, 0, 0);
-      g2.clearRect(0, 0, W, Hs);
-      var pw = W * 0.32, x0 = W * 0.34;
-      var yt = EMERGE / 100 * Hs;                 /* 접선: 여기부터 아래는 평면 */
-      var R = ROLL_R / 100 * Hs;                  /* 롤 반지름(사진 실측 비율) */
-      var sH = artImg.naturalHeight, sW = artImg.naturalWidth;
-      /* 평면 구간 */
-      var f0 = Math.max(yt, patTop), f1 = patTop + Hp;
-      g2.globalAlpha = 0.75;
-      if (f1 > f0) {
-        var su = (f0 - patTop) / Hp * sH, sh = (f1 - f0) / Hp * sH;
-        g2.drawImage(artImg, 0, su, sW, sh, x0, f0, pw, f1 - f0);
-      }
-      /* 곡면 구간 — 한 줄씩 종이 좌표를 되짚어 그린다 */
-      var top = yt - R * Math.sin(ARC_RAD);
-      for (var y = Math.floor(top); y < yt; y++) {
-        var d = (yt - y) / R; if (d > 1) continue;
-        var th = Math.asin(d);
-        var u = (yt - patTop) - R * th;           /* 종이 좌표(그림 위에서부터) */
-        if (u < 0 || u > Hp) continue;
-        var sy = u / Hp * sH;
-        var step = Math.max(1, (sH / Hp) / Math.max(0.35, Math.cos(th)));
-        g2.globalAlpha = 0.75 * Math.max(0.45, Math.cos(th));
-        g2.drawImage(artImg, 0, sy, sW, step, x0, y, pw, 1.15);
-      }
-      g2.globalAlpha = 1;
-    }
+    var artImg = new Image();
+    artImg.onload = function () { apply(); };
+    artImg.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(
+      patternSVG().replace("<svg ", '<svg width="330" height="330" '));
 
+    /* 사진 실측(이미지 세로 %) */
+    var TAN = 36;        /* 접선 — 종이가 롤에서 떨어지는 선 */
+    var RPCT = 12;       /* 롤 반지름 */
+    var THMAX = 0.6435;  /* 보이는 곡면 각도 = asin(0.6) → 접선 위 R*0.6 */
+    var PEND = 92;       /* 사진 속 휴지 끝 */
+    var IDLE_END = 44;   /* 안 당긴 상태에서 보이는 짧은 꼬리 끝(idle 사진과 맞춤) */
+    var ART_W = 0.32;    /* 그림 폭 = 스택 폭의 32% */
+
+    var d = 0;                    /* 당김량(px) — 유일한 상태 */
+    function geom() {
+      var r = stack.getBoundingClientRect();
+      var Hs = r.height, W = r.width;
+      var R = RPCT / 100 * Hs, yT = TAN / 100 * Hs;
+      var pw = W * ART_W;
+      var sw = artImg.naturalWidth || 330, sh = artImg.naturalHeight || 330;
+      var Hp = pw * sh / sw;
+      var t0 = -(R * THMAX) - 0.02 * Hp;          /* 쉴 때 접선에 있는 종이 좌표(그림은 전부 롤 안) */
+      var D = Hp * 1.05 - t0;                     /* 최대 당김 */
+      var tail = (IDLE_END - TAN) / 100 * Hs - t0;  /* 그림 아래로 남는 종이 길이 */
+      return { Hs: Hs, W: W, R: R, yT: yT, pw: pw, Hp: Hp, t0: t0, D: D, tail: tail, sw: sw, sh: sh };
+    }
+    function apply() {
+      var g = geom();
+      if (!g.Hs) return;
+      if (d > g.D) d = g.D; if (d < 0) d = 0;
+      var t = g.t0 + d;
+      var endY = g.yT + t + g.tail;                /* 종이 끝(찢긴 자리) 화면 y */
+      /* 사진도 같은 양만큼 — 끝이 endY 에 오도록 */
+      img2.style.transform = "translateY(" + (endY - PEND / 100 * g.Hs).toFixed(1) + "px)";
+      var cut = Math.max(TAN, endY / g.Hs * 100);
+      /* ★가로도 **종이 폭**만 자른다 — 사진 전체를 움직이면 뒷배경(벽·선반)까지 밀려 층이 생긴다.
+         종이는 사진에서 가로 33~68% 구간. */
+      var cp = "inset(" + TAN.toFixed(2) + "% 34% " + (100 - cut).toFixed(2) + "% 34%)";
+      /* 접선에서 사진이 바뀌는 가로 이음선을 1.5% 그라데이션으로 흐린다 */
+      var mk = "linear-gradient(to bottom, rgba(0,0,0,0) " + TAN.toFixed(2) + "%, rgba(0,0,0,1) " + (TAN + 1.6).toFixed(2) + "%)";
+      layer.style.webkitMaskImage = mk; layer.style.maskImage = mk;
+      layer.style.clipPath = cp; layer.style.webkitClipPath = cp;
+      drawArt(g, t, endY);
+      hint.style.display = d > g.D * 0.985 ? "none" : "block";
+    }
+    /* 종이 위 그림을 경로(호 → 직선)에 사상해 그린다 */
+    function drawArt(g, t, endY) {
+      if (!artImg.complete || !artImg.naturalWidth) return;
+      var dpr = Math.min(3, window.devicePixelRatio || 1);
+      if (artCv.width !== Math.round(g.W * dpr) || artCv.height !== Math.round(g.Hs * dpr)) {
+        artCv.width = Math.round(g.W * dpr); artCv.height = Math.round(g.Hs * dpr);
+      }
+      artCv.style.width = g.W + "px"; artCv.style.height = g.Hs + "px";
+      var cx = artCv.getContext("2d");
+      cx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      cx.clearRect(0, 0, g.W, g.Hs);
+      var x0 = (g.W - g.pw) / 2;
+      var top = g.yT - g.R * Math.sin(THMAX);
+      var bot = Math.min(endY, g.Hs);
+      for (var y = Math.floor(top); y < bot; y++) {
+        var c, alpha = 0.75;
+        if (y >= g.yT) { c = t - (y - g.yT); }                       /* 평면 */
+        else {
+          var sn = (g.yT - y) / g.R; if (sn > 1) continue;
+          var th = Math.asin(sn);
+          if (th > THMAX) continue;
+          c = t + g.R * th;                                          /* 곡면(호 길이만큼 안쪽) */
+          alpha = 0.75 * Math.max(0.45, Math.cos(th));
+        }
+        if (c < 0 || c > g.Hp) continue;
+        var sy = (g.Hp - c) / g.Hp * g.sh;                           /* 그림 위쪽이 큰 c */
+        var step = Math.max(1, g.sh / g.Hp * 1.4);
+        cx.globalAlpha = alpha;
+        cx.drawImage(artImg, 0, Math.max(0, Math.min(g.sh - 1, sy)), g.sw, step, x0, y, g.pw, 1.15);
+      }
+      cx.globalAlpha = 1;
+    }
+    var startY = 0, startD = 0;
     G.drag(stack, {
-      start: function (q) { startY = q.y; startP = p; },
-      move: function (q) {
-        var h = Math.max(60, stack.getBoundingClientRect().height * (END - ROLL) / 100);
-        p = Math.max(0, Math.min(1, startP + (q.y - startY) / h));
-        apply();
-      },
-      end: function () { if (p > 0.9) { p = 1; apply(); if (opt.onFull) opt.onFull(); } }
+      start: function (q) { startY = q.y; startD = d; },
+      move: function (q) { d = startD + (q.y - startY); apply(); },     /* 1:1 */
+      end: function () {
+        var g = geom();
+        if (d > g.D * 0.98) { d = g.D; apply(); if (opt.onFull) opt.onFull(); }
+      }
     });
     setTimeout(apply, 20); setTimeout(apply, 200); setTimeout(apply, 600);
     window.addEventListener("resize", apply);
-    register({ answer: "휴지를 끝까지 풀어", force: function () { p = 1; apply(); if (opt.onFull) opt.onFull(); } });
-    wrap._setP = function (v) { p = Math.max(0, Math.min(1, v)); apply(); };   /* 검증용 */
-    wrap._getP = function () { return p; };
+    register({ answer: "휴지를 끝까지 풀어", force: function () { d = geom().D; apply(); if (opt.onFull) opt.onFull(); } });
+    wrap._setP = function (v) { d = geom().D * Math.max(0, Math.min(1, v)); apply(); };   /* 검증용 */
+    wrap._getP = function () { return d / geom().D; };
+    wrap._artTop = function () {                 /* 검증용: 그림 위끝의 화면 y(평면 기준) */
+      var g = geom(); return g.yT + (g.t0 + d) - g.Hp;
+    };
+    wrap._geom = function () { var g = geom(); return { D: g.D, Hp: g.Hp, yT: g.yT, R: g.R, arcTop: g.yT - g.R * Math.sin(THMAX) }; };
     return wrap;
   }
 
@@ -12861,6 +12866,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     var foot = el("div", "fullFoot");
     root.appendChild(top); root.appendChild(body); root.appendChild(foot);
     root.classList.add("show");
+    document.body.classList.add("fullOpen");   /* ★v0.13.1 상단바·인벤과 겹치지 않게 */
     o.build(body, foot);
     stack.push(o);
     return { body: body, foot: foot };
@@ -12869,6 +12875,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     stack.pop();
     var root = $("full");
     clear(root); root.classList.remove("show");
+    if (!stack.length) document.body.classList.remove("fullOpen");
   }
   /** ★디버그 전용 "바로 풀기" — ?debug=1 이 아니면 DOM에 아예 만들지 않는다 */
   function dbgSolveBtn(fn) {
