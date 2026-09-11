@@ -641,6 +641,9 @@ body.dbg .cvcell.hot.ifeBtn:active,body.dbg .cvcell.hot.ifeTile:active{box-shado
 .cvcell.done .cv.faceBox{color:var(--ok);text-shadow:0 0 2px rgba(0,0,0,.9)}
 .cvcell.done .cv.faceBox.light{color:#17683f;text-shadow:0 0 2px rgba(255,255,255,.95)}
 .cvcell.icon .cv{min-width:70%;min-height:70%;width:70%;height:70%}
+/* ★v0.16 아이콘 자물쇠도 앞면(faceBox)이 있으면 그 크기·자리를 그대로 쓴다
+   (min-width:70% 가 인라인 width 를 덮어써 다이얼 중심에서 어긋났다) */
+.cvcell.icon .cv.faceBox{min-width:0;min-height:0;max-width:none;max-height:none}
 .cvcell.extra .cv,.cvcell.ifeBack .cv{width:100%;height:100%;min-width:100%;min-height:100%}
 
 /* v0.4 수정2: 아이콘 칸 내부 요소는 칩을 정확히 채운다 */
@@ -838,7 +841,7 @@ body.dbg .cvcell.cabBtn:active{box-shadow:inset 0 0 0 3px rgba(255,255,255,.8)}
 
 </div>
 
-<script>window.__AUDIO = ["binoc.mp3","song1.mp3","song2.mp3","song3.mp3","song4.mp3","song5.mp3"]; window.__IMG = ["app_kakao.png","app_map.png","app_minigame.png","app_qr.png","archer.jpg","bin_L1.jpg","bin_L1_open_case.jpg","bin_L1_open_empty.jpg","bin_L2.jpg","bin_L2_open_cello.jpg","bin_L2_open_empty.jpg","bin_R1.jpg","bin_R1_open_card.jpg","bin_R1_open_empty.jpg","bin_R2.jpg","bin_R2_open_empty.jpg","bin_R2_open_key.jpg","blanket_zoom.jpg","case_open_empty.jpg","case_open_headset.jpg","ceiling_open_cardkey.jpg","ceiling_open_empty.jpg","cello_align.png","char_front.jpg","char_happy.jpg","char_hipL.jpg","char_hipR.jpg","char_hungry.jpg","crew_blanket.jpg","crew_tray.jpg","food_bread.png","food_cake.png","food_omu.png","food_salad.png","galley_cart.jpg","galley_drawer.jpg","galley_snack.jpg","galley_upper.jpg","galley_upper_empty.jpg","galley_upper_open.jpg","gamecard.jpg","headphones.jpg","headset_case.jpg","headset_worn.jpg","ic_blanket.png","ic_butter.jpg","ic_cardkey.jpg","ic_cardkey.png","ic_case.png","ic_cellophane.png","ic_dna.jpg","ic_drop.jpg","ic_dynamite.jpg","ic_fire.jpg","ic_gamecard.png","ic_goldkey.jpg","ic_goldkey.png","ic_headphones.jpg","ic_headphones.png","ic_ladder.png","ic_pamphlet.png","ic_passport.png","ic_peanut.png","ic_phone.png","ic_silverkey.jpg","ic_silverkey.png","ic_telescope.png","ic_ticket.png","ic_tile_beige.png","ic_tile_black.png","ic_tile_brown.png","ic_tile_dark.png","ife_ic_blanket.png","ife_ic_meal.png","ife_ic_tv.png","ife_off.jpg","ife_on.jpg","ife_photo1.jpg","ife_photo2.jpg","ife_photo3.jpg","ife_photo4.jpg","lav_cab1.jpg","lav_cab1_empty.jpg","lav_cab1_open.jpg","lav_cab2.jpg","lav_cab2_empty.jpg","lav_cab2_open.jpg","lav_cabtop.jpg","lav_cabtop_empty.jpg","lav_cabtop_open.jpg","lav_ceiling.jpg","lav_tissue.jpg","lav_tissue_idle.jpg","lav_tissue_roll.jpg","map_aisle.jpg","map_gate.jpg","map_seat.jpg","map_seat_tray.jpg","meal_tray.jpg","oway_plane.jpg","pamphlet_bg.jpg","pamphlet_body_bg.jpg","passport.jpg","shade_logo.png","tile_beige.jpg","tile_black.jpg","tile_brown.jpg","tile_dark.jpg","tissue_mask.png","travel1.jpg","travel2.jpg","travel3.jpg","travel4.jpg","window_open.jpg","window_shade.jpg","window_shade_plain.jpg"];</script>
+<script>window.__AUDIO = ["binoc.mp3","song1.mp3","song2.mp3","song3.mp3","song4.mp3","song5.mp3"]; window.__IMG = ["app_kakao.png","app_map.png","app_minigame.png","app_qr.png","archer.jpg","bin_L1.jpg","bin_L1_open_case.jpg","bin_L1_open_empty.jpg","bin_L2.jpg","bin_L2_open_cello.jpg","bin_L2_open_empty.jpg","bin_R1.jpg","bin_R1_open_card.jpg","bin_R1_open_empty.jpg","bin_R2.jpg","bin_R2_open_empty.jpg","bin_R2_open_key.jpg","blanket_zoom.jpg","case_open_empty.jpg","case_open_headset.jpg","ceiling_open_cardkey.jpg","ceiling_open_empty.jpg","cello_align.png","char_front.jpg","char_happy.jpg","char_hipL.jpg","char_hipR.jpg","char_hungry.jpg","crew_blanket.jpg","crew_tray.jpg","dialbox.jpg","dialbox_open.jpg","food_bread.png","food_cake.png","food_omu.png","food_salad.png","galley_cart.jpg","galley_drawer.jpg","galley_snack.jpg","galley_upper.jpg","galley_upper_empty.jpg","galley_upper_open.jpg","gamecard.jpg","headphones.jpg","headset_case.jpg","headset_worn.jpg","hint_phonecase.jpg","ic_blanket.png","ic_butter.jpg","ic_cardkey.jpg","ic_cardkey.png","ic_case.png","ic_cellophane.png","ic_dna.jpg","ic_drop.jpg","ic_dynamite.jpg","ic_fire.jpg","ic_gamecard.png","ic_goldkey.jpg","ic_goldkey.png","ic_headphones.jpg","ic_headphones.png","ic_ladder.png","ic_pamphlet.png","ic_passport.png","ic_peanut.png","ic_phone.png","ic_silverkey.jpg","ic_silverkey.png","ic_telescope.png","ic_ticket.png","ic_tile_beige.png","ic_tile_black.png","ic_tile_brown.png","ic_tile_dark.png","ife_ic_blanket.png","ife_ic_meal.png","ife_ic_tv.png","ife_off.jpg","ife_on.jpg","ife_photo1.jpg","ife_photo2.jpg","ife_photo3.jpg","ife_photo4.jpg","lav_cab1.jpg","lav_cab1_empty.jpg","lav_cab1_open.jpg","lav_cab2.jpg","lav_cab2_empty.jpg","lav_cab2_open.jpg","lav_cabtop.jpg","lav_cabtop_empty.jpg","lav_cabtop_open.jpg","lav_ceiling.jpg","lav_tissue.jpg","lav_tissue_idle.jpg","lav_tissue_roll.jpg","map_aisle.jpg","map_gate.jpg","map_seat.jpg","map_seat_tray.jpg","meal_tray.jpg","oway_plane.jpg","pamphlet_bg.jpg","pamphlet_body_bg.jpg","passport.jpg","shade_logo.png","tile_beige.jpg","tile_black.jpg","tile_brown.jpg","tile_dark.jpg","tissue_mask.png","travel1.jpg","travel2.jpg","travel3.jpg","travel4.jpg","window_open.jpg","window_shade.jpg","window_shade_plain.jpg"];</script>
 <script>
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -10948,7 +10951,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 (function () {
   "use strict";
 
-  var BUILD = "ODY-S1-20260911-2248";
+  var BUILD = "ODY-S1-20260911-2358";
   var LSKEY = "odyssey.s1.v1";
 
   var qs = new URLSearchParams(location.search);
@@ -11325,7 +11328,13 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
      ───────────────────────────────────────────────────────── */
   var TEMP = {
     p8Place: "갤리 카트 옆 작은 상자",          // Q1 #8 다이얼 상자 위치
-    p8Prize: "tileDark",                         // ★v0.13 임시(북쑥 확인 전): 검정판은 #26 전용이 됐고 #22 보상이 없어져 짙은갈색을 여기로
+    /* ★v0.16 #8 보상은 아이템이 아니라 "상자 안의 종이(힌트 그림)" 가 됐다 → 아이템 배정 없음.
+       짙은갈색 색상판 출처가 비어 완주가 막히는데, 지시받은 **#23(쌍안경)에 붙이면 순환**이 생긴다:
+         #25 간식칸 → 땅콩 → 다마고치(#24) → 춤 순서 → 하단 수납장 → 사다리 → 천장 → 카드키
+         → 서랍장(#14) → 쌍안경 → (#23 보상) 짙은갈색 → 다시 #25.
+       그래서 **#25 보다 앞에 있는 #22 네모네모로직**(현재 보상 없음)에 임시로 붙인다.
+       ★임시 — 북쑥 확인 전(QUESTIONS.md v0.16 항목). */
+    p22Prize: "tileDark",
     p10Prize: "cellophane",                      // #10 보상 = 셀로판(#17용) — 15:40 정정으로 원복
     p13Prize: "pamphlet",                        // Q4 #13 보상(팜플렛)
     p16Prize: "silverKey",                       // ★v0.14 확정: #16 짐칸R2 보상 = 은색 열쇠(카트 #9 에서 사용)
@@ -11454,7 +11463,8 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   var ANS = {
     p3: ["plane", "music", "tv", "music", "plane", "tv"],      // #3 IFE 아이콘 6회
     p5: "BOSE",                                                  // #5 헤드셋 케이스
-    p8: "3212",                                                  // #8 식기 개수(숟3 포2 젓1 칼2)
+    /* ★v0.16 사진(gen/65) 각인 순서가 왼→오 포크·나이프·젓가락·숟가락 이라 그 순서로 다시 적는다(개수 자체는 그대로). */
+    p8: "2213",                                                  // #8 식기 개수(포2 칼2 젓1 숟3)
     p9: ["vn", "sg", "jp", "id"],                              // #9 국기 순서
     p10: "うらやまし",                                            // #10 히라가나
     p12: "FIRE",                                                 // #12 알파벳
@@ -11519,6 +11529,25 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
        leaflet : 잘라 쓸 리플릿 영역
        body    : 본문 글자를 얹을 빈 자리(글자 크기는 이 폭·높이에 맞춰 자동)
        logo    : 상단 로고 — 셀로판 align mark 가 겹칠 자리 */
+  /* ★v0.16 #8 상자 안 종이에 그려진 그림 — 바탕 사진(hint_phonecase.jpg) 위에
+     게임이 SVG 로 ①폰 뒷면과 케이스 사이 틈을 가리키는 화살표 ②꼬리 쪽 QR 픽토그램을 그린다.
+     좌표는 전부 사진(1000x574) 기준 %. 글자는 넣지 않는다. */
+  /* ★v0.16 #8 상자 안 종이에 그려진 그림 — 바탕 사진(hint_phonecase.jpg) 위에
+     게임이 SVG 로 ①폰과 케이스 사이 틈으로 **들어가는** 화살표 ②꼬리 쪽 QR 픽토그램을 그린다.
+     화살촉이 틈으로 들어가 보이게, 케이스 쪽 영역을 같은 사진으로 한 번 더 덧그려 화살 앞부분을 가린다.
+     좌표는 전부 사진(1000x574) 기준 %. 글자는 넣지 않는다. */
+  /* ★v0.16 #8 상자 안 종이 그림 — 바탕 사진(hint_phonecase.jpg) 위에
+     ①폰 뒷면과 케이스 사이 틈을 가리키는 굵은 직선 화살표 ②꼬리 끝 QR 픽토그램. 글자 없음.
+     최초 도안(직선·굵기·QR 위치 관계) 그대로 두고 **전체를 왼쪽 6.5% · 아래 3.0% 평행이동**만 했다:
+       화살촉 끝 47.5/49.5 → **41.0/52.5** = 케이스 좌하단 안쪽 모서리와 폰 티타늄 면 사이의 어두운 틈
+       (사진 실측: y52% 행에서 가장 어두운 x 41.4%, y54% 42.6% — 그 틈 선 위).
+     좌표는 전부 사진(1000x574) 기준 %. */
+  var HINT_ART = {
+    img: "hint_phonecase.jpg", nw: 1000, nh: 574,
+    arrow: { tail: { x: 20.0, y: 82.0 }, tip: { x: 41.0, y: 52.5 }, w: 3.4, head: 9.0 },
+    qr: { x: 8.5, y: 75.0, size: 10.5 }
+  };
+
   var PAMPHLET_BG = {
     img: "pamphlet_bg.jpg", nw: 848, nh: 1264,
     leaflet: { x: 17, y: 19, w: 65, h: 62 },
@@ -11734,6 +11763,14 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         { x: 43.7, y: 39.58, w: 5.3, h: 16.94 },
         { x: 51.4, y: 39.58, w: 5.3, h: 16.94 },
         { x: 59.1, y: 39.58, w: 5.3, h: 16.94 }
+      ],
+      /* ★v0.16 다이얼 앞면(실물 중심) — tools/scan-faces.mjs v16 공통 세로 띠 302~354px.
+         이게 없으면 아이콘이 "칸"(홈 그림자까지 포함) 가운데에 놓여 다이얼과 어긋나 보인다. */
+      faces: [
+        { x: 36.60, y: 45.28, w: 4.10, h: 7.95 },
+        { x: 44.30, y: 45.28, w: 4.10, h: 7.95 },
+        { x: 52.00, y: 45.28, w: 4.10, h: 7.95 },
+        { x: 59.70, y: 45.28, w: 4.10, h: 7.95 }
       ]
     },
     p16: {
@@ -11825,23 +11862,39 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     },
     /* #8 식기 개수 다이얼 — 이미지 없음(자리표시 패널). 좌표는 패널 기준 % */
     p8: {
-      img: null, nw: 1000, nh: 420,
-      crop: { x: 0, y: 0, w: 100, h: 100 },
+      /* ★v0.16 닫힘 사진(gen/65 — 원통 다이얼 4개 + 포크·나이프·젓가락·숟가락 각인).
+         각인이 사진에 있으므로 게임이 식기 이모지를 얹지 않는다.
+         실측(1264x848): 다이얼 x 29.7/41.1/52.6/64.1 · y 45.4 · w 6.7 · h 16.5
+                         각인  x 31.1/43.0/54.0/65.1 · y 27.1~27.7 · w 3.5~4.3 · h 14.2~14.7
+         crop: 각인(위)과 다이얼(아래)이 다 보이고 좌우 대칭(중심 50.25%), 다이얼 폭 47px */
+      img: IMG + "dialbox.jpg", nw: 1264, nh: 848,
+      openImg: "dialbox_open.jpg",
+      /* 열림 사진 속 접힌 종이 — 탭하면 힌트 그림 팝업(아이템 아님, 상자에 그대로 남는다) */
+      paperCell: { x: 30.7, y: 58.3, w: 38.8, h: 23.3 },
+      crop: { x: 24.0, y: 22.0, w: 52.5, h: 46.0 },
       cells: [
-        { x: 9, y: 40, w: 17, h: 40 },
-        { x: 31, y: 40, w: 17, h: 40 },
-        { x: 53, y: 40, w: 17, h: 40 },
-        { x: 75, y: 40, w: 17, h: 40 }
+        { x: 29.70, y: 45.40, w: 6.70, h: 16.50 },
+        { x: 41.10, y: 45.40, w: 6.70, h: 16.50 },
+        { x: 52.60, y: 45.40, w: 6.70, h: 16.50 },
+        { x: 64.10, y: 45.40, w: 6.70, h: 16.50 }
       ],
-      /* ★v0.12.2 사진이 없는 자리표시 패널이라 앞면 = 칸 그대로. 배경 상자 없이 글자만. */
+      /* 앞면 = 원통 다이얼 가운데 평평한 띠(tools/scan-faces.mjs v16, 공통 430~462px) */
+      /* 앞면 = 원통 다이얼의 보이는 앞면(칸 높이의 가운데 55%). 가운데 평평한 띠(430~462px)만 잡으면
+         숫자가 너무 작아진다 — 실제 다이얼 면 전체를 쓰고 faceDy 로 시각 중심을 맞춘다. */
+      /* ★v0.16 앞면 = 사진에서 잰 **실물 원통 앞면**(tools/_dialcenter.mjs, 밝기 프로파일).
+         칸 중심과 다이얼 실물 중심이 원근 때문에 조금씩 다르다 — 1번 -0.30% / 2번 -0.15% / 3번 -0.02% / 4번 +0.15%.
+         앞면 좌우 경계 375~453 / 520~600 / 667~747 / 814~895px, 공통 폭 6.25%. */
       faces: [
-        { x: 9, y: 40, w: 17, h: 40 },
-        { x: 31, y: 40, w: 17, h: 40 },
-        { x: 53, y: 40, w: 17, h: 40 },
-        { x: 75, y: 40, w: 17, h: 40 }
+        { x: 29.62, y: 49.10, w: 6.25, h: 9.08 },
+        { x: 41.17, y: 49.10, w: 6.25, h: 9.08 },
+        { x: 52.80, y: 49.10, w: 6.25, h: 9.08 },
+        { x: 64.47, y: 49.10, w: 6.25, h: 9.08 }
       ],
-      labels: [{ x: 9, y: 12, w: 17, h: 22 }, { x: 31, y: 12, w: 17, h: 22 },
-               { x: 53, y: 12, w: 17, h: 22 }, { x: 75, y: 12, w: 17, h: 22 }]
+      narrow: true,     /* ★v0.16 칸이 가로로 좁다 → 납작한 숫자(좁은 글꼴 + scaleX 폴백) */
+      faceLight: true,
+      faceDy: 0.102,     /* 원통 다이얼 시각 중심 보정 — tools/scan-facecenter.mjs 실측 10.2% */
+      labels: [{ x: 31.1, y: 27.1, w: 4.3, h: 14.7 }, { x: 43.0, y: 27.4, w: 3.5, h: 14.2 },
+               { x: 54.0, y: 27.4, w: 4.0, h: 14.5 }, { x: 65.1, y: 27.7, w: 3.6, h: 14.2 }]
     }
   };
 
@@ -11916,7 +11969,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     IMG: IMG, TEMP: TEMP, ITEMS: ITEMS, MAPS: MAPS, ANS: ANS, PIN_HASH: PIN_HASH, P26_HASH: P26_HASH,
     FOOD: FOOD, FOOD_BG: FOOD_BG, FLAGS: FLAGS, UTENSIL: UTENSIL, IFE_ICONS: IFE_ICONS,
     KANA: KANA, SONGS: SONGS,
-    PAMPHLET: PAMPHLET_A, PAMPHLET_TARGETS: PAMPHLET_TARGETS, PAMPHLET_BG: PAMPHLET_BG, KAKAO_MSG: KAKAO_MSG, KAKAO_FROM: KAKAO_FROM
+    PAMPHLET: PAMPHLET_A, PAMPHLET_TARGETS: PAMPHLET_TARGETS, PAMPHLET_BG: PAMPHLET_BG, HINT_ART: HINT_ART, KAKAO_MSG: KAKAO_MSG, KAKAO_FROM: KAKAO_FROM
   };
 })();
 
@@ -12107,13 +12160,21 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     var adv = cx.measureText(txt).width;
     var d = cx.getImageData(0, 0, W, H).data;
     var x0 = 1e9, y0 = 1e9, x1 = -1, y1 = -1;
+    /* ★v0.16 잉크 **무게중심**(= 광학 중심)도 같이 잰다. "1" 처럼 획이 한쪽에 몰린 글자는
+       잉크 상자 한가운데를 맞추면 실제로는 오른쪽으로 치우쳐 보인다(세로 획이 중심에서 벗어난다). */
+    var mSum = 0, mX = 0;
     for (var y = 0; y < H; y++) for (var x = 0; x < W; x++) {
-      if (d[((y * W + x) << 2) + 3] > 12) { if (x < x0) x0 = x; if (y < y0) y0 = y; if (x > x1) x1 = x; if (y > y1) y1 = y; }
+      var al = d[((y * W + x) << 2) + 3];
+      if (al > 12) {
+        if (x < x0) x0 = x; if (y < y0) y0 = y; if (x > x1) x1 = x; if (y > y1) y1 = y;
+        mSum += al; mX += al * (x + 0.5);
+      }
     }
     var o;
-    if (x1 < 0) o = { L: 0, R: adv / S, A: px * 0.7, D: 0, adv: adv / S, fA: px * 0.8, fD: px * 0.2 };
+    if (x1 < 0) o = { L: 0, R: adv / S, A: px * 0.7, D: 0, adv: adv / S, fA: px * 0.8, fD: px * 0.2, C: adv / S / 2 };
     else o = { L: (ox - x0) / S, R: ((x1 + 1) - ox) / S, A: (oy - y0) / S, D: ((y1 + 1) - oy) / S,
-               adv: adv / S, fA: px * 0.8, fD: px * 0.2 };
+               adv: adv / S, fA: px * 0.8, fD: px * 0.2,
+               C: (mSum > 0 ? (mX / mSum - ox) / S : ((x1 + 1 + x0) / 2 - ox) / S) };
     _inkCacheAt[key] = o;
     return o;
   }
@@ -12141,10 +12202,18 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     /* ★글자 상자를 캔버스로 재려면 캔버스와 DOM 이 **같은 글꼴**을 골라야 한다.
        상속된 글꼴 목록은 엔진마다 폴백이 갈려 캔버스 측정과 실제 렌더가 어긋난다(WebKit 에서 1~2px).
        그래서 글자칸만 단일 글꼴로 고정한다. */
-    var fam = "sans-serif";
+    /* ★v0.16 좁은 칸(#8 식기 다이얼)은 납작한 숫자를 쓴다.
+       ①먼저 narrow 계열 글꼴을 시도하고(있으면 그대로 좁다)
+       ②그래도 넓으면 scaleX 로 눌러 "잉크 폭 <= 앞면 폭 60%" 를 반드시 지킨다(iOS 폴백). */
+    var narrow = !!v._narrow;
+    var fam = narrow ? '"Arial Narrow","Roboto Condensed","SF Compact Display","Helvetica Neue Condensed",sans-serif'
+                     : "sans-serif";
     var weight = cs.fontWeight || "400";
     var all = (glyphs && glyphs.length) ? glyphs : [txt];
-    var px = uniformSize(all, cellW, cellH, fam, weight);
+    /* narrow 는 높이 기준으로 최대한 키우고(가로는 scaleX 로 맞춘다) */
+    var px = uniformSize(all, narrow ? cellW * 4 : cellW, cellH, fam, weight);
+    /* narrow 는 높이 한계까지 꽉 차서 안티에일리어싱이 앞면 밖으로 0.5~1px 샌다 → 4% 여유 */
+    if (narrow) px *= 0.92;
     v.style.fontSize = px.toFixed(2) + "px";
     v.style.transform = "none";
 
@@ -12166,7 +12235,17 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       gl.appendChild(pb);
       v.appendChild(gl);
     }
-    gl.style.transform = "none";
+    gl.style.fontFamily = fam;
+    /* narrow: 이 글꼴에서 잰 잉크 폭이 앞면 폭의 60% 를 넘으면 그만큼 가로로 누른다 */
+    var sx = 1;
+    if (narrow) {
+      var k0 = inkAtPx(txt, px, fam, weight);
+      var inkW0 = k0.L + k0.R;
+      var wantW = cellW * TXT_W;
+      if (inkW0 > wantW && inkW0 > 0) sx = wantW / inkW0;
+      v._sx = sx;
+    }
+    gl.style.transform = sx === 1 ? "none" : ("scaleX(" + sx.toFixed(4) + ")");
     var probe = gl.querySelector("i.blProbe");
     var k = inkAtPx(txt, px, fam, weight);
     var pr = probe.getBoundingClientRect();          /* pr.top == 베이스라인, pr.left == advance 끝 */
@@ -12188,11 +12267,14 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       var tb = rg0.getBoundingClientRect();
       if (tb.width > 0) advStart = tb.left;
     } catch (e) {}
-    var inkCx = advStart + (k.R - k.L) / 2;
+    /* ★v0.16 좁은 칸(#8)은 **광학 중심**(잉크 무게중심)을 앞면 중심에 맞춘다.
+       그 외 자물쇠는 기존대로 잉크 상자 한가운데(검증 규칙이 그 기준). */
+    var inkCx = advStart + (narrow ? k.C : (k.R - k.L) / 2) * sx;
     var inkCy = pr.top + (k.D - k.A) / 2;
     var dx = (ref.left + ref.width / 2) - inkCx;
     var dy = (ref.top + ref.height / 2 + (v._dy || 0)) - inkCy;
-    gl.style.transform = "translate(" + dx.toFixed(2) + "px," + dy.toFixed(2) + "px)";
+    gl.style.transform = "translate(" + dx.toFixed(2) + "px," + dy.toFixed(2) + "px)" +
+      (sx === 1 ? "" : " scaleX(" + sx.toFixed(4) + ")");
   }
 
   /* ★v0.15.1 명판(#25 "CHOI. FIRST?") 전용 맞춤 —
@@ -12360,6 +12442,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
             cands.forEach(function (list) { list.forEach(function (g) { uni[g] = 1; }); });
             v._glyphs = Object.keys(uni);
           }
+          if (opt.narrow) { v._narrow = true; nd.classList.add("narrowNum"); }
           nd.appendChild(v); vnodes[i] = v; cellNodes[i] = nd;
           if (opt.pre) nd.classList.add("done");
         },
@@ -15151,32 +15234,44 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   };
 
   /* #8 다이얼 상자 (임시 위치: 갤리 작은 상자) */
+  /* ★v0.16 #8 갤리 작은 상자 — 닫힘 사진(65) 위 숫자 다이얼 4칸(각인은 사진에 있다).
+     풀리면 열림 사진(66) 이 뜨고, 안의 접힌 종이를 탭하면 힌트 그림 팝업.
+     종이는 아이템이 아니라서 인벤에 안 들어가고 상자에 그대로 남는다(다시 탭하면 또 볼 수 있다). */
   CU.dialbox = function (c) {
     c.title("작은 상자");
+    var L = DATA.LOCKS.p8;
+    var hasClosed = hasImg("dialbox.jpg");
     if (!G.solved("p8")) {
-      var L = DATA.LOCKS.p8;
-      var extras = L.labels.map(function (r, i) {
+      /* 사진이 없을 때만 식기 이모지 라벨을 임시로 얹는다(사진에는 각인돼 있다) */
+      var extras = hasClosed ? [] : L.labels.map(function (r, i) {
         return { x: r.x, y: r.y, w: r.w, h: r.h, cls: "lbl", label: DATA.UTENSIL[i].emoji };
       });
       c.stage.appendChild(W.imgLock({
-        id: "p8", img: null, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells, faces: L.faces, faceLight: L.faceLight, faceDy: L.faceDy,
+        id: "p8", img: hasClosed ? (DATA.IMG + "dialbox.jpg") : null, nw: L.nw, nh: L.nh,
+        crop: L.crop, cells: L.cells, faces: L.faces, faceLight: L.faceLight, faceDy: L.faceDy,
         pool: "0123456789".split(""), size: 10, answer: DATA.ANS.p8,
+        narrow: !!L.narrow,          /* ★v0.16 좁은 칸 → 납작한 숫자 */
         extras: extras,
-        onSolve: function () {
-          G.markSolved("p8");
-          prize(DATA.TEMP.p8Prize, "상자가 열렸다");
-          reopenCU();
-        }
+        onSolve: function () { G.markSolved("p8"); reopenCU(); }
       }));
-      c.cap("식기 그림 아래 숫자 4칸.\n(임시 배치 — 위치 미정)");
+      c.cap("식기 그림 아래 숫자 네 칸.");
       return;
     }
-    var d = el("div", null, "📦");
+    if (hasImg(L.openImg)) {
+      c.stage.appendChild(imgStage(DATA.IMG + L.openImg, [
+        { x: L.paperCell.x, y: L.paperCell.y, w: L.paperCell.w, h: L.paperCell.h,
+          t: "readPaper", cls: "hot", onTap: function () { ZOOM.hintPaper(); } }
+      ]));
+      c.cap("상자가 열렸다. 접힌 종이가 들어 있다.");
+      return;
+    }
+    var d = el("div", null, "\uD83D\uDCC4");
     d.style.cssText = "font-size:64px;text-align:center";
+    d.setAttribute("data-t", "readPaper");
+    d.onclick = function () { ZOOM.hintPaper(); };
     c.stage.appendChild(d);
-    c.cap("이미 열었다.");
+    c.cap("상자가 열렸다. 접힌 종이가 들어 있다.");
   };
-
   CU.tissue = function (c) {
     c.title("휴지롤");
     c.stage.appendChild(W.tissue({
@@ -15530,6 +15625,56 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   };
   /* ★v0.15 [7] 팜플렛 탭 → **팜플렛만** 뜬다. 셀로판은 인벤에서 고른 뒤
      팜플렛을 탭해야 나타난다(고르지 않고 탭하면 아무 일도 없다). */
+  /* ★v0.16 #8 종이에 그려진 그림 — 사진 위에 굵은 직선 화살표 + QR 픽토그램(글자 없음).
+     클립·곡선·원근 없이 최초 도안 그대로, 위치만 옮겨 화살촉이 폰과 케이스 사이 틈을 가리킨다. */
+  ZOOM.hintPaper = function () {
+    var A = DATA.HINT_ART;
+    var host = el("div");
+    host.setAttribute("data-t", "hintPaper");
+    host.style.cssText = "position:relative;width:100%;max-width:360px;margin:0 auto;line-height:0";
+    var im = new Image();
+    im.src = DATA.IMG + A.img;
+    im.style.cssText = "width:100%;height:auto;display:block;border-radius:8px";
+    host.appendChild(im);
+
+    var nw = A.nw, nh = A.nh;
+    var t = A.arrow.tail, p = A.arrow.tip;
+    var x1 = t.x / 100 * nw, y1 = t.y / 100 * nh, x2 = p.x / 100 * nw, y2 = p.y / 100 * nh;
+    var ux = x2 - x1, uy = y2 - y1, len = Math.sqrt(ux * ux + uy * uy) || 1;
+    ux /= len; uy /= len;
+    var px = -uy, py = ux;
+    var hl = A.arrow.head / 100 * nw;
+    var bx = x2 - ux * hl, by = y2 - uy * hl;
+    var hw = hl * 0.62;
+    var sw = A.arrow.w / 100 * nw;
+    var qs = A.qr.size / 100 * nw, qx = A.qr.x / 100 * nw, qy = A.qr.y / 100 * nh;
+    function q(v) { return v.toFixed(1); }
+
+    var shaft = '<line x1="' + q(x1) + '" y1="' + q(y1) + '" x2="' + q(bx) + '" y2="' + q(by) + '" stroke-linecap="round"/>';
+    var head = '<polygon points="' + q(x2) + ',' + q(y2) + ' ' +
+      q(bx + px * hw) + ',' + q(by + py * hw) + ' ' + q(bx - px * hw) + ',' + q(by - py * hw) + '"/>';
+    var svg = '<svg viewBox="0 0 ' + nw + ' ' + nh + '" width="100%" height="100%" ' +
+      'style="position:absolute;left:0;top:0;pointer-events:none" xmlns="http://www.w3.org/2000/svg">';
+    svg += '<g stroke="#12131a" fill="#12131a" stroke-width="' + q(sw * 2.05) + '" stroke-linejoin="round">' + shaft + head + '</g>';
+    svg += '<g stroke="#ffffff" fill="#ffffff" stroke-width="' + q(sw) + '" stroke-linejoin="round">' + shaft + head + '</g>';
+    svg += '<g transform="translate(' + q(qx) + ',' + q(qy) + ') scale(' + (qs / 100).toFixed(4) + ')">';
+    svg += '<rect x="-6" y="-6" width="112" height="112" rx="12" fill="#ffffff" stroke="#12131a" stroke-width="7"/>';
+    var mods = [[8, 8, 30, 30], [62, 8, 30, 30], [8, 62, 30, 30],
+                [16, 16, 14, 14], [70, 16, 14, 14], [16, 70, 14, 14],
+                [50, 50, 12, 12], [66, 50, 12, 12], [82, 50, 12, 12],
+                [50, 66, 12, 12], [82, 66, 12, 12], [50, 82, 12, 12], [66, 82, 12, 12], [82, 82, 12, 12]];
+    mods.forEach(function (m, i) {
+      var st = i < 3 ? ' fill="none" stroke="#12131a" stroke-width="8"' : ' fill="#12131a"';
+      svg += '<rect x="' + m[0] + '" y="' + m[1] + '" width="' + m[2] + '" height="' + m[3] + '"' + st + '/>';
+    });
+    svg += '</g></svg>';
+    var ov = el("div");
+    ov.style.cssText = "position:absolute;left:0;top:0;width:100%;height:100%";
+    ov.innerHTML = svg;
+    host.appendChild(ov);
+    openZoom({ id: "hintPaper", title: "종이", node: host, cap: "종이에 그림이 그려져 있다." });
+  };
+
   ZOOM.pamphlet = function (withCello) {
     if (!withCello) {
       function useCello() {
@@ -15814,10 +15959,12 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
           G.setFlag("archDone");
           GAMES.closeFull();
           GAMES.openNono(function () {
-            /* ★v0.13 #22 보상(색상판) 삭제 — 완성 이펙트만 보여 주고 완료 플래그만 남긴다 */
+            /* ★v0.16 #8 보상이 종이(힌트)로 바뀌며 짙은갈색 색상판 출처가 비었다.
+               #23(쌍안경)에 붙이면 #25→다마고치→#24→천장→#14→#23→#25 순환이 생겨서,
+               #25 보다 앞인 여기(#22)에 **임시로** 되돌려 붙인다(북쑥 확인 전). */
             G.setFlag("nonoDone");
             GAMES.closeFull();
-            G.toast("그림이 완성됐다.", 1800);
+            prize(DATA.TEMP.p22Prize, "그림이 완성됐다");
           }, function () { GAMES.closeFull(); });
         }, function () { GAMES.closeFull(); });
       });
