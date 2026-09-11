@@ -10906,7 +10906,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 (function () {
   "use strict";
 
-  var BUILD = "ODY-S1-20260911-1816";
+  var BUILD = "ODY-S1-20260911-1823";
   var LSKEY = "odyssey.s1.v1";
 
   var qs = new URLSearchParams(location.search);
@@ -11774,8 +11774,10 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   /* ★v0.14.1 #23 쌍안경 뷰 — gen/55f(1264x842). 기체 bbox 20.0/17.7/50.0/23.75,
      "oway" 글자 28.5~37.2 / 28.5~32.7. .cu-binoc 원형 마스크는 스테이지의 50%/52% 가 중심이고
      radial-gradient 가 반지름 70% 까지만 완전 투명하므로, 기체와 글자가 그 안에 들어오게 자른다.
-     crop 폭 55.5% → 화면의 "oway" 글자 폭이 55c(직전 버전)보다 크다(실측 비교). */
-  var BINOC = { img: "oway_plane.jpg", nw: 1264, nh: 842, crop: { x: 17.40, y: 0.95, w: 55.0, h: 55.1 } };
+     crop 폭 78% → 기체가 원 지름(402px)의 64% 만 차지하고 아래·주변에 큰 구름 봉우리가 함께 보인다.
+     기체 가로 중심(45.0%)을 마스크 가로 중심에 맞추고, 세로는 원본 위끝이 0 이라 기체가 원 중심보다
+     약간 위(크롭의 37.9%)에 놓인다 — 기체 전체가 완전 투명 원(반지름 70%) 안에 들어온다. */
+  var BINOC = { img: "oway_plane.jpg", nw: 1264, nh: 842, crop: { x: 6.0, y: 0, w: 78.0, h: 78.06 } };
 
   window.DATA = {
     LOCKS: LOCKS, IFE: IFE, TAMA: TAMA, TILES: TILES, BINOC: BINOC,
