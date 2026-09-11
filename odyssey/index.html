@@ -10948,7 +10948,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 (function () {
   "use strict";
 
-  var BUILD = "ODY-S1-20260911-2240";
+  var BUILD = "ODY-S1-20260911-2248";
   var LSKEY = "odyssey.s1.v1";
 
   var qs = new URLSearchParams(location.search);
@@ -15988,7 +15988,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         try {
           var hit = await caches.match("index.html");
           if (!hit) hit = await caches.match(new URL("index.html", location.href).href);
-          if (hit) { b.className = "banner ready"; b.textContent = "오프라인 준비 완료 ✓ — 이제 인터넷 꺼도 돼"; return; }
+          if (hit) { b.className = "banner ready"; b.textContent = "오프라인 준비 완료 ✓";   /* ★v0.15.6 조작 안내 부분 삭제 */ return; }
         } catch (e) {}
         await new Promise(function (r) { setTimeout(r, i < 20 ? 400 : 2000); });
       }
