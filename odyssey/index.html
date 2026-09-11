@@ -10906,7 +10906,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 (function () {
   "use strict";
 
-  var BUILD = "ODY-S1-20260911-1718";
+  var BUILD = "ODY-S1-20260911-1816";
   var LSKEY = "odyssey.s1.v1";
 
   var qs = new URLSearchParams(location.search);
@@ -11771,8 +11771,14 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     danceMs: 1000
   };
 
+  /* ★v0.14.1 #23 쌍안경 뷰 — gen/55f(1264x842). 기체 bbox 20.0/17.7/50.0/23.75,
+     "oway" 글자 28.5~37.2 / 28.5~32.7. .cu-binoc 원형 마스크는 스테이지의 50%/52% 가 중심이고
+     radial-gradient 가 반지름 70% 까지만 완전 투명하므로, 기체와 글자가 그 안에 들어오게 자른다.
+     crop 폭 55.5% → 화면의 "oway" 글자 폭이 55c(직전 버전)보다 크다(실측 비교). */
+  var BINOC = { img: "oway_plane.jpg", nw: 1264, nh: 842, crop: { x: 17.40, y: 0.95, w: 55.0, h: 55.1 } };
+
   window.DATA = {
-    LOCKS: LOCKS, IFE: IFE, TAMA: TAMA, TILES: TILES,
+    LOCKS: LOCKS, IFE: IFE, TAMA: TAMA, TILES: TILES, BINOC: BINOC,
     IMG: IMG, TEMP: TEMP, ITEMS: ITEMS, MAPS: MAPS, ANS: ANS, PIN_HASH: PIN_HASH, P26_HASH: P26_HASH,
     FOOD: FOOD, FOOD_BG: FOOD_BG, FLAGS: FLAGS, UTENSIL: UTENSIL, IFE_ICONS: IFE_ICONS,
     KANA: KANA, SONGS: SONGS,
@@ -14366,8 +14372,12 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       /* ★v0.6.3 쌍안경 뷰 — 싱가포르 방탈출의 .cu-binoc 마스크를 그대로 재사용.
          (안은 사진, 검은 원 테두리, 바깥은 어둡게)
          #23 에 보일 내용 이미지는 아직 미정 → 우선 22 창문 하늘(window_open.jpg) 위에 씌운다. */
-      /* ★v0.14 쌍안경으로 보이는 것 = 하늘의 비행기(55). 없으면 창밖 하늘로 */
-      var vw = imgStage(DATA.IMG + (hasImg("oway_plane.jpg") ? "oway_plane.jpg" : "window_open.jpg"), []);
+      /* ★v0.14.1 쌍안경으로 보이는 것 = 구름 위를 나는 기체(55f).
+         원형 마스크 한가운데에 기체와 "oway" 글자가 오게 DATA.BINOC.crop 으로 잘라 보여 준다.
+         사진이 없으면 예전처럼 창밖 하늘로. */
+      var B = DATA.BINOC, useB = hasImg(B.img);
+      var vw = imgStage(DATA.IMG + (useB ? B.img : "window_open.jpg"), [],
+        useB ? { crop: B.crop, nw: B.nw, nh: B.nh } : null);
       var vin = vw.querySelector(".cropInner");
       if (vin) vin.appendChild(el("div", "cu-binoc"));
       c.stage.appendChild(vw);
