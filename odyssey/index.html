@@ -101,19 +101,32 @@ body.dbg .spot.done .ring{animation:none;border-color:rgba(255,255,255,.14)}
   /* ★v0.9 position/z-index — 팝업(.sheet z:30)이 떠도 인벤은 그 위에 남아 그대로 보이고 눌린다.
      폰(34)·전체화면(40)·스토리(46)보다는 아래라 그쪽은 예전처럼 인벤을 덮는다. */
   position:relative;z-index:33;
-  flex:0 0 auto;display:flex;align-items:center;gap:10px;padding:10px 14px calc(var(--safeB) + 10px);
+  /* ★v0.11 칸 아래 이름표(약 12px) 자리만큼 아래 여백을 더 준다 */
+  flex:0 0 auto;display:flex;align-items:flex-start;gap:10px;padding:10px 14px calc(var(--safeB) + 8px);
   background:var(--n1);border-top:1px solid var(--line);
 }
 #invLabel{font-size:14px;color:var(--n6)}
-#inventory{flex:1;display:flex;gap:9px;overflow-x:auto;padding:2px 0 4px;-webkit-overflow-scrolling:touch}
+/* ★v0.11 가로 스크롤 상자라 padding box 밖은 잘린다 → 칸 밖 이름표 자리를 여기서 확보 */
+#inventory{flex:1;display:flex;gap:9px;overflow-x:auto;padding:2px 0 17px;-webkit-overflow-scrolling:touch}
 #inventory::-webkit-scrollbar{display:none}
+/* ★v0.11 인벤 아이템 = [아이콘 칸] + 그 **아래** 이름표.
+   예전엔 이름표가 아이콘 위에 흰 띠로 얹혀 아이콘 아래쪽을 가렸다. */
 .invItem{
-  position:relative;flex:0 0 auto;width:52px;height:52px;border-radius:var(--r);border:1px solid var(--line);background:var(--n2);
-  display:grid;place-items:center;font-size:23px;overflow:hidden;padding:0;
+  position:relative;flex:0 0 auto;width:52px;height:52px;border:0;background:transparent;
+  overflow:visible;padding:0;
 }
-.invItem img{width:100%;height:100%;object-fit:cover}
-.invItem .nm{position:absolute;left:0;right:0;bottom:0;font-size:8px;background:rgba(11,11,12,.72);color:var(--n8);text-align:center;padding:1px 0;letter-spacing:.2px}
-.invItem.sel{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.invItem .ico{
+  width:52px;height:52px;border-radius:var(--r);border:1px solid var(--line);background:var(--n2);
+  display:grid;place-items:center;font-size:23px;overflow:hidden;
+}
+.invItem .ico img{width:100%;height:100%;object-fit:cover}
+.invItem .nm{
+  position:absolute;left:50%;top:calc(100% + 3px);transform:translateX(-50%);
+  /* line-height 1.1 은 글자 상자보다 짧아 2px 샜다 → 1.35 */
+  color:#ffffff;font-weight:400;font-size:9.5px;line-height:1.35;letter-spacing:-.1px;
+  white-space:nowrap;text-align:center;background:transparent;padding:0;
+}
+.invItem.sel .ico{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
 .invEmpty{font-size:11px;color:var(--n6);padding:6px 2px}
 
 /* ───────── 시트(클로즈업/확대) ───────── */
@@ -142,9 +155,10 @@ body.dbg .spot.done .ring{animation:none;border-color:rgba(255,255,255,.14)}
 .slots{display:flex;gap:9px;justify-content:center;flex-wrap:wrap}
 .slot{
   width:48px;height:56px;border-radius:var(--r);border:1px solid var(--line2);background:var(--n2);
-  display:grid;place-items:center;font-size:23px;font-weight:600;padding:0;position:relative;color:var(--fg);
+  display:grid;place-items:center;font-size:23px;font-weight:400;padding:0;position:relative;color:var(--fg);
 }
 .slot.small{width:42px;height:50px;font-size:19px}
+/* ★v0.11 순환칸 글자는 칸 폭의 60% 이하 — 실제 크기는 widgets.fitSlotText 가 잰다 */
 .slot.on{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
 .slot img{width:68%;height:68%;object-fit:contain}
 .slot .cnum{position:absolute;top:3px;left:5px;font-size:9px;color:var(--n6);font-weight:400}
@@ -394,7 +408,7 @@ body.dbg #story,body.dbg .overlay{padding-bottom:calc(var(--safeB) + 56px)}
   #full,#story,#transit{background:rgba(11,11,12,.86)}
 }
 /* 순환식 입력칸 */
-.slot .v{display:block;font-weight:600;line-height:1}
+.slot .v{display:block;font-weight:400;line-height:1}
 .slot.cyc{cursor:pointer}
 .slot.cyc:active{border-color:var(--accent)}
 .cycTip{font-size:11px;color:var(--n6);letter-spacing:.2px}
@@ -434,9 +448,11 @@ input,textarea{-webkit-user-select:text;user-select:text;-webkit-touch-callout:d
 .cropInner.noimg{background:linear-gradient(160deg,#2a2a2f,#141416);border:1px solid var(--line2)}
 .cropImg{position:absolute;max-width:none;max-height:none;display:block}
 .cvcell{position:absolute;border:0;background:transparent;padding:0;display:flex;align-items:center;justify-content:center;border-radius:5px}
-.cvcell .cv{min-width:72%;min-height:64%;padding:1px 3px;border-radius:5px;background:rgba(6,6,8,.62);
-  color:#fff;font-weight:800;line-height:1;display:flex;align-items:center;justify-content:center;
-  box-shadow:0 1px 4px rgba(0,0,0,.4)}
+/* ★v0.11 글자칸 — 볼드 해제(400), 칩을 칸보다 확실히 작게 잡아 좌우 여백을 만든다.
+   글자 자체 크기는 fitText 가 "칸 폭의 60% 이하 · 좌우 여백 각 18% 이상" 으로 맞춘다. */
+.cvcell .cv{min-width:64%;min-height:58%;max-width:82%;max-height:80%;padding:1px 3px;border-radius:5px;
+  background:rgba(6,6,8,.62);color:#fff;font-weight:400;line-height:1;
+  display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,.4)}
 .cvcell.icon .cv{background:rgba(6,6,8,.34);min-width:78%;min-height:78%}
 .cvcell.icon .cv img,.cvcell.icon .cv .cvsvg{width:78%;height:78%;object-fit:contain}
 .cvcell.icon .cv .cvsvg svg{width:100%;height:100%;display:block}
@@ -485,7 +501,8 @@ body.dbg .cvcell.hot.ifeBtn:active,body.dbg .cvcell.hot.ifeTile:active{box-shado
 
 /* ═══ v0.4 ═══ */
 /* 값 칩: 글자 크기는 엔진이 measureText 로 맞춘다(인라인 style) */
-.cvcell .cv{min-width:80%;min-height:70%;padding:0;font-weight:800;letter-spacing:0}
+/* ★v0.11 볼드 해제(400) — 앞선 규칙을 덮어쓰던 자리 */
+.cvcell .cv{min-width:80%;min-height:70%;padding:0;font-weight:400;letter-spacing:0}
 .cvcell.icon .cv{background:rgba(6,6,8,.30);min-width:70%;min-height:70%}
 .cvcell.icon .cv img,.cvcell.icon .cv .cvsvg{width:100%;height:100%;object-fit:contain}
 .cvcell.icon .cv{font-size:0}
@@ -563,13 +580,13 @@ body.dbg.hints .cvcell.snackSlot{box-shadow:inset 0 0 0 2px rgba(255,255,255,.35
   box-shadow:0 1px 0 rgba(255,255,255,.25) !important}
 
 /* ★v0.6 인벤 아이콘: 슬롯 배경 흰색 + 얇은 연회색 테두리 (인벤 바 자체 톤은 모노 유지) */
-.invItem{background:#ffffff;border:1px solid #d8d8dc}
-.invItem img{width:100%;height:100%;object-fit:contain;background:#fff}
-.invItem .nm{background:rgba(255,255,255,.90);color:#3a3a41;font-weight:600}
+.invItem .ico{background:#ffffff;border:1px solid #d8d8dc}
+.invItem .ico img{width:100%;height:100%;object-fit:contain;background:#fff}
+
 .invItem.sel{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent)}
 .invItem:active{background:#f1f1f3}
 
-.invItem .nm{font-size:7.5px;letter-spacing:-.2px}
+
 
 /* ★v0.6.3 쌍안경 뷰 (#23) — 싱가포르 방탈출 .cu-binoc 그대로:
    안은 사진, 검은 원 테두리, 바깥은 어둡게 */
@@ -10816,7 +10833,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 (function () {
   "use strict";
 
-  var BUILD = "ODY-S1-20260911-0858";
+  var BUILD = "ODY-S1-20260911-1004";
   var LSKEY = "odyssey.s1.v1";
 
   var qs = new URLSearchParams(location.search);
@@ -11453,24 +11470,30 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   /* #3/#7/#9/#10 IFE — ★v0.3b: 조작을 전부 "화면 안"에서. 스크린이 뷰 가로의 93% 를 차지하도록 크롭 */
   var IFE = {
     nw: 1100, nh: 738,
-    /* ★v0.10 재산출 — 패널(스크린 26.9~71.6% + 버튼줄 39.5~61.3%, 세로 19.5~74.1%)의
-       가로 중심 49.25% 에 크롭 중심을 정확히 맞춘다(좌우 여백 동일).
-       배율 기준 = "가장 작은 탭 대상이 44×44 CSS px 이 되는 최소 배율"
-       → 402×738 에서 스테이지 370×526, 크롭 폭 48.5% 일 때 dispW 762.9 / dispH 511.8,
-         버튼 6.0×8.6% = 45.8×44.0px, 뒤로가기 10.7×8.6% = 81.6×44.0px (둘 다 44 이상, 여기가 한계).
-       세로는 크롭을 키워도 배율이 안 변하므로(폭 기준 맞춤) 72% 로 넉넉히 잡아 위아래 배경을 남긴다. */
-    crop: { x: 25.0, y: 10.8, w: 48.5, h: 72 },
+    /* ★v0.11 확대 축소 재산출 (북쑥 09:01 — 44px 기준 폐기, "버튼 작아져도 되니 확대 줄여라")
+       패널 = 스크린(가로 26.9~71.6%) + 버튼줄(39.5~61.3%), 세로 19.5~74.1%
+              → 가로 폭 44.7% · 가로 중심 49.25% · 세로 중심 46.8%
+       기준: **패널 폭 = 스테이지 폭의 60%** → 크롭 폭 = 44.7 / 0.60 = 74.5%
+             (패널%/크롭% 는 뷰포트와 무관한 비율이라 어느 화면에서도 60.0% 가 나온다)
+       세로는 크롭 중심을 패널 중심(46.8%)에 맞춘 채 원본 위아래 한계까지 넓혀 93.6%
+             (46.8 - 46.8 = 0 ~ 93.6). 위아래 배경이 각각 dispH 의 19.5% 남는다. */
+    crop: { x: 12.0, y: 0, w: 74.5, h: 93.6 },
     screen: { x: 26.9, y: 19.5, w: 44.7, h: 42.8 },
     /* ★v0.4: 큰 원 → 작은 점. 지름 = 스크린 폭의 3%, 간격 균일, 스크린 세로 중앙 아래쪽 */
     dots: { y: 45.0, size: 1.34, sizeY: 2.0, x0: 40.3, gap: 3.31 },
     /* ★v0.10 탭 영역을 버튼줄과 같은 높이(8.6%)로 키웠다 — 원래 6.2% 는 어떤 배율에서도
        44px 을 못 넘겨(그러려면 패널이 화면 밖으로 나간다) 여기만 히트 영역을 넓혔다.
        (그린 아이콘 크기는 그대로, 눌리는 범위만 커진다) */
-    back: { x: 27.6, y: 19.8, w: 10.7, h: 8.6 },
+    /* ★v0.11 보이는 아이콘은 작아지되 **히트 영역은 44px 이상** 유지(아이콘보다 넓게).
+       새 배율에서 1% ≈ dispW 4.97px(가로) / dispH 3.33px(세로) → 세로 14.3% = 402폭 47.6px / 375폭 44.2px */
+    back: { x: 27.6, y: 16.95, w: 10.7, h: 14.3 },
+    /* 히트 영역만 넓혔다(그려진 아이콘 크기는 사진 그대로).
+       가로는 버튼 중심 간격이 8.0%(≈39.7px)뿐이라 44px 로 키우면 서로 겹친다 → 7.8%(38.7px)가 한계.
+       세로는 14.3% — 402폭에서 47.6px, 375폭에서도 44.2px 로 44 이상. */
     buttons: [
-      { id: "plane", x: 39.5, y: 65.5, w: 6.0, h: 8.6 },
-      { id: "tv", x: 47.5, y: 65.5, w: 6.0, h: 8.6 },
-      { id: "music", x: 55.3, y: 65.5, w: 6.0, h: 8.6 }
+      { id: "plane", x: 38.6, y: 62.65, w: 7.8, h: 14.3 },
+      { id: "tv", x: 46.6, y: 62.65, w: 7.8, h: 14.3 },
+      { id: "music", x: 54.4, y: 62.65, w: 7.8, h: 14.3 }
     ],
     tiles: [
       { id: "meal", x: 29.7, y: 27.4, w: 12.8, h: 27, icon: "🍱", label: "기내식" },
@@ -11610,31 +11633,55 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     _mc.font = "800 " + px + "px " + fam;
     return _mc.measureText(txt).width;
   }
-  function fitText(v, cw, ch) {
+  /* ★v0.11 글자 크기 상한 — "칸"(cell) 기준
+       · 글자 bbox 폭  <= 칸 폭 × 0.60      (좌우 여백 각 >= 18%)
+       · 글자 bbox 높이 <= 칸 높이 × 0.76    (상하 여백 각 >= 12%) */
+  var TXT_W = 0.60, TXT_H = 0.76;
+  function fitText(v, cw, ch, cellW, cellH, cellNode) {
     var txt = (v.textContent || "").trim();
     if (!txt) return;
+    cellW = cellW || cw; cellH = cellH || ch;
     var cs = getComputedStyle(v);
     var fam = cs.fontFamily || "sans-serif";
     var ls = parseFloat(cs.letterSpacing) || 0;      /* letter-spacing 도 폭에 포함 */
-    var px = Math.max(9, ch * 0.62);
-    var maxW = cw * 0.80;
-    for (var i = 0; i < 40 && px > 7; i++) {
-      if (measureW(txt, px, fam) + ls * txt.length <= maxW) break;
-      px -= 0.5;
-    }
+    var maxW = Math.min(cw * 0.80, cellW * TXT_W);
+    var maxH = Math.min(ch * 0.86, cellH * TXT_H);
+    /* ★v0.11 반복해서 깎지 않고 바로 계산한다.
+       글자 폭은 font-size 에 비례하고(letter-spacing 만 비례하지 않는다) 높이도 비례하므로
+       한 번 재서 필요한 크기를 곧장 구한다. 예전 방식(0.5px씩 40회)은 큰 칸에서 목표까지 못 내려갔다. */
+    var kW = measureW(txt, 100, fam) / 100;                  /* 100px 일 때 폭 → 비례상수 */
+    var pxW = kW > 0 ? (maxW - ls * txt.length) / kW : 999;
+    /* 글자 상자(Range)는 글꼴 ascent+descent 때문에 font-size 보다 1.1~1.2배 높다 →
+       세로 여백 12% 를 지키려면 그만큼 미리 나눠 준다. */
+    var px = Math.max(7, Math.min(pxW, maxH / 1.2));
     v.style.fontSize = px.toFixed(1) + "px";
     /* ★v0.10 실제 렌더 결과로 다시 확인 — 칩이 칸 폭에 맞춰 줄어든 경우(flex-shrink)엔
        위 계산이 낡은 폭을 쓰게 되어 글자가 칩 밖으로 1~2px 삐져나온다. 눈으로 보이는
        결과 기준으로 한 번 더 줄인다(글자를 자르거나 말줄임하지 않는다). */
     if (v.firstChild && v.firstChild.nodeType === 3 && v.childNodes.length === 1) {
       try {
-        for (var g = 0; g < 14 && px > 7; g++) {
+        /* ★v0.11 실제 렌더 결과(Range)를 **칸 기준**으로 재서
+           "폭 <= 60% · 좌우 여백 각 >= 18% · 상하 여백 각 >= 12%" 가 될 때까지 줄인다.
+           글꼴마다 ascent/descent 가 달라 계산만으로는 위아래가 살짝 치우친다. */
+        for (var g = 0; g < 60 && px > 7; g++) {
           var kr = v.getBoundingClientRect();
           if (!kr.width) break;
           var rg = document.createRange(); rg.selectNodeContents(v);
           var b = rg.getBoundingClientRect();
           if (!b.width) break;
-          if (b.width <= kr.width - 0.6 && b.height <= kr.height + 0.6) break;
+          var okChip = b.width <= kr.width + 0.6 && b.height <= kr.height + 0.6;
+          var okCell;
+          var cr = cellNode ? cellNode.getBoundingClientRect() : null;
+          if (cr && cr.width > 0) {
+            okCell = b.width <= cr.width * TXT_W &&
+              (b.left - cr.left) >= cr.width * 0.185 &&
+              (cr.right - b.right) >= cr.width * 0.185 &&
+              (b.top - cr.top) >= cr.height * 0.125 &&
+              (cr.bottom - b.bottom) >= cr.height * 0.125;
+          } else {
+            okCell = b.width <= cellW * TXT_W + 0.2 && b.height <= cellH * TXT_H + 0.2;
+          }
+          if (okChip && okCell) break;
           px -= 0.5;
           v.style.fontSize = px.toFixed(1) + "px";
         }
@@ -11689,9 +11736,10 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         n.style.height = (o.h / 100 * dispH) + "px";
         var v = n.querySelector(".cv");
         if (v && !v._noFit) {
-          /* 칩 자체 상자 기준으로 글자 크기를 맞춘다(아이콘 칸은 칩이 70%라 더 작게) */
+          /* ★v0.11 칩 상자 + **칸(cell)** 크기를 같이 넘겨 "칸 폭의 60% 이하" 를 지킨다 */
           var vr = v.getBoundingClientRect();
-          fitText(v, vr.width || o.w / 100 * dispW, vr.height || o.h / 100 * dispH);
+          var cellW = o.w / 100 * dispW, cellH = o.h / 100 * dispH;
+          fitText(v, vr.width || cellW, vr.height || cellH, cellW, cellH, n);
         }
         if (o.onFit) o.onFit(n, { dispW: dispW, dispH: dispH, ox: ox, oy: oy });
       });
@@ -13555,10 +13603,13 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       var it = DATA.ITEMS[id] || { name: id, emoji: "❔" };
       var b = el("button", "invItem" + (S.sel === id ? " sel" : ""));
       b.setAttribute("data-t", "inv_" + id);
-      if (it.img) { var im = new Image(); im.src = it.img; b.appendChild(im); }
-      else if (it.frag) { var f = el("div", null, it.frag[1]); f.style.cssText = "font-size:22px;color:var(--accent);font-weight:700"; b.appendChild(f); }
-      else b.appendChild(el("div", null, it.emoji || "❔"));
-      b.appendChild(el("div", "nm", it.name.length > 7 ? it.name.slice(0, 7) : it.name));
+      /* ★v0.11 아이콘은 .ico 안에서 칸을 꽉 쓰고, 이름표는 칸 **밖 아래**에 둔다(아이콘을 가리지 않는다) */
+      var ico = el("div", "ico");
+      if (it.img) { var im = new Image(); im.src = it.img; ico.appendChild(im); }
+      else if (it.frag) { var f = el("div", null, it.frag[1]); f.style.cssText = "font-size:22px;color:var(--accent);font-weight:700"; ico.appendChild(f); }
+      else ico.appendChild(el("div", null, it.emoji || "❔"));
+      b.appendChild(ico);
+      b.appendChild(el("div", "nm", it.name));   /* 말줄임 없음 — 이름 전체를 보여준다 */
       G.tapper(b, {
         tap: function () { selectItem(id); },
         dbl: function () { inspect(id); },
@@ -13566,6 +13617,25 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       });
       box.appendChild(b);
     });
+    fitInvLabels();
+  }
+  /* ★v0.11 이름표가 이웃 이름표와 겹치지 않게 — 칸 52px + 간격 9px = 중심 간 61px 이므로
+     라벨 폭이 58px 를 넘으면 8px 까지 글씨를 줄인다(자르거나 말줄임하지 않는다). */
+  function fitInvLabels() {
+    var MAXW = 58;
+    var list = document.querySelectorAll("#inventory .invItem .nm");
+    for (var i = 0; i < list.length; i++) {
+      var n = list[i];
+      n.style.fontSize = "";
+      var px = 9.5;
+      n.style.fontSize = px + "px";
+      for (var g = 0; g < 12 && px > 8; g++) {
+        if (n.getBoundingClientRect().width <= MAXW) break;
+        px -= 0.25;
+        n.style.fontSize = px.toFixed(2) + "px";
+      }
+    }
+    if (G.syncInvH) G.syncInvH();
   }
   function selectItem(id) {
     var it = DATA.ITEMS[id];
@@ -14716,9 +14786,31 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   function sw() {
     var b = $("offlineBanner");
     if (!("serviceWorker" in navigator)) { b.className = "banner err"; b.textContent = "이 브라우저는 오프라인 저장을 못 해"; return; }
-    navigator.serviceWorker.register("sw.js", { scope: "./" }).catch(function (e) {
-      b.className = "banner err"; b.textContent = "오프라인 준비 실패 — " + (e && e.message || e);
+    /* ★v0.11 새 빌드가 곧바로 뜨게 — 링크를 다시 열면 그 자리에서 최신 빌드.
+       sw.js 는 cache-first 라 새 SW 가 설치돼도 이미 그려진 페이지는 옛 HTML 그대로다.
+       ① 로드할 때마다 registration.update() 로 새 sw.js 를 확인하고
+       ② 새 SW 가 제어권을 가져가면(controllerchange) **딱 한 번** 새로고침한다.
+       진행 상태는 localStorage 라 새로고침해도 그대로 남는다.
+       루프 방지: 직전 자동 새로고침이 10초 안이면 다시 하지 않는다. */
+    var hadController = !!navigator.serviceWorker.controller;
+    var refreshing = false;
+    navigator.serviceWorker.addEventListener("controllerchange", function () {
+      if (!hadController || refreshing) return;   /* 첫 설치(제어자 없음)에는 새로고침하지 않는다 */
+      refreshing = true;
+      var last = 0;
+      try { last = +sessionStorage.getItem("swReloadAt") || 0; } catch (e) {}
+      if (Date.now() - last < 10000) return;
+      try { sessionStorage.setItem("swReloadAt", String(Date.now())); } catch (e) {}
+      location.reload();
     });
+    navigator.serviceWorker.register("sw.js", { scope: "./", updateViaCache: "none" })
+      .then(function (reg) {
+        try { reg.update(); } catch (e) {}
+        window.addEventListener("pageshow", function () { try { reg.update(); } catch (e) {} });
+      })
+      .catch(function (e) {
+        b.className = "banner err"; b.textContent = "오프라인 준비 실패 — " + (e && e.message || e);
+      });
     (async function poll() {
       for (var i = 0; i < 90; i++) {
         try {
