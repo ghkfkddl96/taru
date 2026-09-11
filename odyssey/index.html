@@ -506,6 +506,11 @@ body.dbg.hints .cvcell.hot.ifeBtn,body.dbg.hints .cvcell.hot.ifeTile{box-shadow:
 body.dbg .cvcell.hot.ifeBtn:active,body.dbg .cvcell.hot.ifeTile:active{box-shadow:inset 0 0 0 3px rgba(255,255,255,.9)}
 .ifeScreenOv{position:absolute;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#000}
 .ifeScreenOv img{max-width:100%;max-height:100%;object-fit:contain}
+/* ★v0.14 #27 명판 각인 — 판 위에 새긴 글자처럼 */
+.cvcell.namePlate{pointer-events:none}
+.cvcell.namePlate.onDark .cv{color:#d9d9de !important;text-shadow:0 1px 2px rgba(0,0,0,.65) !important}
+.cvcell.namePlate .cv{background:transparent !important;box-shadow:none !important;
+  color:#2b2b30;font-weight:700;letter-spacing:1px;text-shadow:0 1px 0 rgba(255,255,255,.5)}
 .cvcell.extra.lbl{pointer-events:none}
 .cvcell.extra.lbl .cv{background:transparent;box-shadow:none;font-size:20px !important}
 
@@ -515,6 +520,11 @@ body.dbg .cvcell.hot.ifeBtn:active,body.dbg .cvcell.hot.ifeTile:active{box-shado
   background:rgba(6,6,8,.28);border-radius:8px}
 .cvcell.ifeTile .ti{font-size:min(6vw,26px);line-height:1}
 .cvcell.ifeTile .tl{font-size:min(3.1vw,13px);font-weight:700;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.7)}
+/* ★v0.14 IFE 메뉴 아이콘(gen/54) — 파스텔 타일 위 흰 선화, 글자 라벨 없음 */
+.cvcell.ifeTile.hasIcon .tileIn{background:transparent}
+.cvcell.ifeTile.hasIcon:active .tileIn{background:rgba(6,6,8,.22)}
+.cvcell.ifeTile .tiImg{width:62%;height:auto;display:block;
+  filter:drop-shadow(0 1px 2px rgba(0,0,0,.55)) drop-shadow(0 0 1px rgba(0,0,0,.35))}
 .cvcell.ifeTile:active .tileIn{background:rgba(6,6,8,.5)}
 .cvcell.ifeBack{border-radius:6px}
 .cvcell.ifeBack .cv{background:rgba(6,6,8,.6);min-width:100%;min-height:100%;font-size:15px !important}
@@ -786,7 +796,7 @@ body.dbg .cvcell.cabBtn:active{box-shadow:inset 0 0 0 3px rgba(255,255,255,.8)}
 
 </div>
 
-<script>window.__AUDIO = ["song1.mp3","song2.mp3","song3.mp3","song4.mp3","song5.mp3"]; window.__IMG = ["app_kakao.png","app_map.png","app_minigame.png","app_qr.png","archer.jpg","bin_L1.jpg","bin_L1_open_case.jpg","bin_L1_open_empty.jpg","bin_L2.jpg","bin_R1.jpg","bin_R1_open_card.jpg","bin_R1_open_empty.jpg","bin_R2.jpg","blanket_zoom.jpg","case_open_empty.jpg","case_open_headset.jpg","ceiling_open_cardkey.jpg","ceiling_open_empty.jpg","char_front.jpg","char_happy.jpg","char_hipL.jpg","char_hipR.jpg","char_hungry.jpg","crew_blanket.jpg","crew_tray.jpg","food_bread.png","food_cake.png","food_omu.png","food_salad.png","galley_cart.jpg","galley_drawer.jpg","galley_snack.jpg","galley_upper.jpg","galley_upper_empty.jpg","galley_upper_open.jpg","gamecard.jpg","headphones.jpg","headset_case.jpg","headset_worn.jpg","ic_blanket.png","ic_butter.jpg","ic_cardkey.jpg","ic_cardkey.png","ic_case.png","ic_cellophane.png","ic_dna.jpg","ic_drop.jpg","ic_dynamite.jpg","ic_fire.jpg","ic_gamecard.png","ic_goldkey.jpg","ic_goldkey.png","ic_headphones.jpg","ic_headphones.png","ic_ladder.png","ic_pamphlet.png","ic_passport.png","ic_peanut.png","ic_phone.png","ic_silverkey.jpg","ic_silverkey.png","ic_telescope.png","ic_ticket.png","ic_tile_beige.png","ic_tile_black.png","ic_tile_brown.png","ic_tile_dark.png","ife_off.jpg","ife_on.jpg","ife_photo1.jpg","ife_photo2.jpg","ife_photo3.jpg","ife_photo4.jpg","lav_cab1.jpg","lav_cab1_empty.jpg","lav_cab1_open.jpg","lav_cabtop.jpg","lav_cabtop_empty.jpg","lav_cabtop_open.jpg","lav_ceiling.jpg","lav_tissue.jpg","lav_tissue_idle.jpg","lav_tissue_roll.jpg","map_aisle.jpg","map_seat.jpg","map_seat_tray.jpg","meal_tray.jpg","passport.jpg","shade_logo.png","tile_beige.jpg","tile_black.jpg","tile_brown.jpg","tile_dark.jpg","tissue_mask.png","travel1.jpg","travel2.jpg","travel3.jpg","travel4.jpg","window_open.jpg","window_shade.jpg","window_shade_plain.jpg"];</script>
+<script>window.__AUDIO = ["binoc.mp3","song1.mp3","song2.mp3","song3.mp3","song4.mp3","song5.mp3"]; window.__IMG = ["app_kakao.png","app_map.png","app_minigame.png","app_qr.png","archer.jpg","bin_L1.jpg","bin_L1_open_case.jpg","bin_L1_open_empty.jpg","bin_L2.jpg","bin_R1.jpg","bin_R1_open_card.jpg","bin_R1_open_empty.jpg","bin_R2.jpg","bin_R2_open_empty.jpg","bin_R2_open_key.jpg","blanket_zoom.jpg","case_open_empty.jpg","case_open_headset.jpg","ceiling_open_cardkey.jpg","ceiling_open_empty.jpg","char_front.jpg","char_happy.jpg","char_hipL.jpg","char_hipR.jpg","char_hungry.jpg","crew_blanket.jpg","crew_tray.jpg","food_bread.png","food_cake.png","food_omu.png","food_salad.png","galley_cart.jpg","galley_drawer.jpg","galley_snack.jpg","galley_upper.jpg","galley_upper_empty.jpg","galley_upper_open.jpg","gamecard.jpg","headphones.jpg","headset_case.jpg","headset_worn.jpg","ic_blanket.png","ic_butter.jpg","ic_cardkey.jpg","ic_cardkey.png","ic_case.png","ic_cellophane.png","ic_dna.jpg","ic_drop.jpg","ic_dynamite.jpg","ic_fire.jpg","ic_gamecard.png","ic_goldkey.jpg","ic_goldkey.png","ic_headphones.jpg","ic_headphones.png","ic_ladder.png","ic_pamphlet.png","ic_passport.png","ic_peanut.png","ic_phone.png","ic_silverkey.jpg","ic_silverkey.png","ic_telescope.png","ic_ticket.png","ic_tile_beige.png","ic_tile_black.png","ic_tile_brown.png","ic_tile_dark.png","ife_ic_blanket.png","ife_ic_meal.png","ife_ic_tv.png","ife_off.jpg","ife_on.jpg","ife_photo1.jpg","ife_photo2.jpg","ife_photo3.jpg","ife_photo4.jpg","lav_cab1.jpg","lav_cab1_empty.jpg","lav_cab1_open.jpg","lav_cab2.jpg","lav_cab2_empty.jpg","lav_cab2_open.jpg","lav_cabtop.jpg","lav_cabtop_empty.jpg","lav_cabtop_open.jpg","lav_ceiling.jpg","lav_tissue.jpg","lav_tissue_idle.jpg","lav_tissue_roll.jpg","map_aisle.jpg","map_gate.jpg","map_seat.jpg","map_seat_tray.jpg","meal_tray.jpg","oway_plane.jpg","passport.jpg","shade_logo.png","tile_beige.jpg","tile_black.jpg","tile_brown.jpg","tile_dark.jpg","tissue_mask.png","travel1.jpg","travel2.jpg","travel3.jpg","travel4.jpg","window_open.jpg","window_shade.jpg","window_shade_plain.jpg"];</script>
 <script>
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -10896,7 +10906,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 (function () {
   "use strict";
 
-  var BUILD = "ODY-S1-20260911-1548";
+  var BUILD = "ODY-S1-20260911-1718";
   var LSKEY = "odyssey.s1.v1";
 
   var qs = new URLSearchParams(location.search);
@@ -11222,7 +11232,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     p8Prize: "tileDark",                         // ★v0.13 임시(북쑥 확인 전): 검정판은 #26 전용이 됐고 #22 보상이 없어져 짙은갈색을 여기로
     p10Prize: "cellophane",                      // #10 보상 = 셀로판(#17용) — 15:40 정정으로 원복
     p13Prize: "pamphlet",                        // Q4 #13 보상(팜플렛)
-    p16Prize: "silverKey",                       // Q5 #16 보상(은색 열쇠)
+    p16Prize: "silverKey",                       // ★v0.14 확정: #16 짐칸R2 보상 = 은색 열쇠(카트 #9 에서 사용)
     p9Prize: "goldKey",                          // Q6 #9 카트 보상(금색 열쇠)
     p14Prize: "telescope",                       // ★15:54 확정: #14 서랍장 보상 = 쌍안경
     p18Answer: "https://m.site.naver.com/1DmdB", // ★실물 명함 QR 해독값(2026-09-10, jsQR)
@@ -11234,7 +11244,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     songOrder: ["fire", "blood", "dna", "butter", "dynamite"],
     p23From: "화장실 수납장1",                   // Q13 #23 쌍안경 출처
     p24PeanutFrom: "갤리 간식 수납칸(#25 색상판 자물쇠)",  // ★15:54: 잠금 생김
-    cab2Prize: "tileBrown",                      // ★임시(북쑥 확인 전): 화장실 상단 수납장2 = 갈색 색상판(문제 미정)
+    p27Prize: "tileBrown",                       // ★v0.14 확정: #27 화장실 상단 수납장2 = 갈색 색상판
     p24DanceLock: "화장실 하단 수납장(수납장1)",  // Q17 춤 순서(◀▶ 5회) 입력 위치
     ladderFrom: "화장실 하단 수납장(수납장1)",    // Q19 사다리 출처 = 춤 순서 자물쇠 보상
     p24Dance: ["L", "R", "R", "L", "R"],       // Q18 춤(골반 씰룩) 순서
@@ -11285,9 +11295,12 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
      맵
      ───────────────────────────────────────────────────────── */
   var MAPS = {
+    /* ★v0.14 게이트 배경 사진(53) — 직원(곰) 자리가 탑승권 제출 핫스팟 */
     gate: {
-      name: "탑승 게이트", type: "comp", left: null, right: null,
-      objs: [{ id: "gate", x: 26, y: 22, w: 48, h: 52, label: "게이트", emoji: "🚪", cu: "gate" }]
+      name: "탑승 게이트", type: "img", img: IMG + "map_gate.jpg",
+      left: null, right: null,
+      /* 스캐너(50.5/54.1/10.6/7.9)는 직원 상자 안에 들어가므로 맵에는 한 개만 — 클로즈업에서 둘 다 탭 가능 */
+      spots: [{ id: "s_staff", x: 36.6, y: 34.7, w: 28.3, h: 27.3, label: "직원", cu: "gate" }]
     },
     seat: {
       name: "내 자리", type: "img", img: IMG + "map_seat.jpg", imgIf: [["mealTray", IMG + "map_seat_tray.jpg"]],
@@ -11349,6 +11362,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     p13: [1, 4, 7, 8, 9, 6, 3],                                  // #13 3x3 패턴
     p15: ["omu", "bread", "cake", "salad"],                    // #15 빨·초·파·노
     p16: "858",                                                  // #16 카톡 숫자
+    p27: "HAWAIIAN",                                              // ★v0.14 #27 화장실 상단 수납장2(알파벳 8칸)
     p19: "soeasytoyou",                                          // #19 미니게임 앱 비번
     p25: ["black", "brown", "dark", "beige"],                    // ★v0.5 #25 색상판 순서(왼→오)
     p11: TEMP.gmapPass                                           // #11 구글맵(임시)
@@ -11418,6 +11432,43 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
      cells: 실제 다이얼/칸 자리 (탭 영역 + 값 표시 위치)
      ───────────────────────────────────────────────────────── */
   var LOCKS = {
+    /* ★v0.14 #27 화장실 상단 수납장2 — 문 사진(gen/56) 위 정사각 홈 8칸(알파벳) + 아래 명판.
+       사진이 오기 전에는 img:null 자리표시 패널로 돌아간다(좌표는 패널 기준 %).
+       사진이 오면 img/nw/nh/crop/cells/faces 를 실측값으로 바꾸면 된다. */
+    p27: {
+      img: IMG + "lav_cab2.jpg", nw: 1264, nh: 848,
+      /* ★v0.14 실측(gen/56b_v2, 1264x848) — 홈 안쪽 어두운 사각 8개
+         x 320-369 / 399-450 / 481-533 / 564-617 / 647-701 / 731-784 / 814-865 / 895-944
+         y 397-466 (중심 간격 82.1px) · 립 포함 탭칸 75x86px
+         비행기 양각 37.3/16.2/24.8/21.0 · "language" 30.1/63.1/38.8/10.6 (사진 양각 — 오버레이 없음)
+         crop: 비행기~language 가 다 보이면서 홈 한 칸이 38px 이상 되게 */
+      crop: { x: 21.8, y: 11.2, w: 56.7, h: 67.5 },
+      cells: [
+        { x: 24.29, y: 45.87, w: 5.93, h: 10.14 },
+        { x: 30.62, y: 45.87, w: 5.93, h: 10.14 },
+        { x: 37.14, y: 45.87, w: 5.93, h: 10.14 },
+        { x: 43.75, y: 45.87, w: 5.93, h: 10.14 },
+        { x: 50.36, y: 45.87, w: 5.93, h: 10.14 },
+        { x: 56.96, y: 45.87, w: 5.93, h: 10.14 },
+        { x: 63.45, y: 45.87, w: 5.93, h: 10.14 },
+        { x: 69.78, y: 45.87, w: 5.93, h: 10.14 }
+      ],
+      /* 앞면 = 홈 안쪽 바닥(어두움 → 흰 글자). 홈 중심 실측 기준 공통 40x50px */
+      faces: [
+        { x: 25.67, y: 47.64, w: 3.16, h: 5.90 },
+        { x: 32.00, y: 47.64, w: 3.16, h: 5.90 },
+        { x: 38.53, y: 47.64, w: 3.16, h: 5.90 },
+        { x: 45.13, y: 47.64, w: 3.16, h: 5.90 },
+        { x: 51.74, y: 47.64, w: 3.16, h: 5.90 },
+        { x: 58.35, y: 47.64, w: 3.16, h: 5.90 },
+        { x: 64.83, y: 47.64, w: 3.16, h: 5.90 },
+        { x: 71.16, y: 47.64, w: 3.16, h: 5.90 }
+      ],
+      openImg: "lav_cab2_open.jpg",
+      emptyImg: "lav_cab2_empty.jpg",
+      /* ★v0.14 갈색판 실측 38.6/48.4/18.7/28.0 (탭 여유 포함) */
+      prizeCell: { x: 38.6, y: 48.4, w: 18.7, h: 28.0 }
+    },
     /* ★v0.13 #26 화장실 상단 수납장1 — 사진(50) 속 숫자 다이얼 6칸.
        정답은 P26_HASH 로만 비교한다(평문 없음). 좌표는 전부 원본(1264×848) 기준 %.
        crop: 다이얼 6개 중심(632.25px = 50.02%)·격자 중심(633px)·베젤 홈(439~827px, 중심 633px)이
@@ -11555,6 +11606,11 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     },
     p16: {
       img: IMG + "bin_R2.jpg", nw: 1000, nh: 667,
+      /* ★v0.14 풀린 뒤 — 열림(은열쇠)·빈 사진. 도착 전에는 예전처럼 풀리자마자 보상 */
+      openImg: "bin_R2_open_key.jpg",
+      emptyImg: "bin_R2_open_empty.jpg",
+      /* ★v0.14 실측: 열쇠 43.9/67.8/12.3/7.7 → 탭 영역은 사방 여유(402px 화면에서 >=44px) */
+      prizeCell: { x: 41.9, y: 62.0, w: 16.3, h: 19.3 },
       /* ★v0.12.3 원통 다이얼은 위쪽 하이라이트 때문에 기하 중심에 글자를 두면 위로 쏠려 보인다.
          하이라이트 아래(=정면)의 가운데로 내린다 — tools/scan-facecenter.mjs 실측 8.3% (3칸 동일) */
       faceDy: 0.083,
@@ -11686,9 +11742,10 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       { id: "music", x: 54.4, y: 62.65, w: 7.8, h: 14.3 }
     ],
     tiles: [
-      { id: "meal", x: 29.7, y: 27.4, w: 12.8, h: 27, icon: "🍱", label: "기내식" },
-      { id: "tv", x: 44.0, y: 27.4, w: 12.7, h: 27, icon: "📺", label: "TV" },
-      { id: "blanket", x: 58.0, y: 27.4, w: 12.8, h: 27, icon: "🧣", label: "담요" }
+      /* ★v0.14 gen/54 선화 아이콘으로 교체 · 글자 라벨 제거(img 없으면 이모지+라벨로 복귀) */
+      { id: "meal", x: 29.7, y: 27.4, w: 12.8, h: 27, icon: "🍱", label: "기내식", img: "ife_ic_meal.png" },
+      { id: "tv", x: 44.0, y: 27.4, w: 12.7, h: 27, icon: "📺", label: "TV", img: "ife_ic_tv.png" },
+      { id: "blanket", x: 58.0, y: 27.4, w: 12.8, h: 27, icon: "🧣", label: "담요", img: "ife_ic_blanket.png" }
     ],
     /* ★슬라이드는 파일 경로만 바꾸면 되게 분리.
        mode "letterbox" = 지금(IFE 스크린 영역 안에 사진을 레터박스로)
@@ -14035,7 +14092,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     var f = CU[id];
     if (!f) { G.toast("아직 준비 중"); return; }
     cuId = id;
-    stopSlides();
+    stopSlides(); binocStop();
     W.unregister();
     var sheet = $("closeup");
     $("cuTitle").textContent = "";
@@ -14050,7 +14107,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     render();
   }
   function closeCU() {
-    stopSlides();
+    stopSlides(); binocStop();
     cuId = null; W.unregister();
     $("closeup").classList.remove("show");
     clear($("cuStage")); clear($("cuPanel"));
@@ -14241,14 +14298,25 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   /* #2 게이트 */
   CU.gate = function (c) {
     c.title("탑승 게이트");
-    /* ★v0.10 버튼 대신 리더기(자리표시자 이모지) 자체를 탭 — 탑승권을 고른 뒤 눌러야 통과 */
-    var box = el("button");
-    box.setAttribute("data-t", "gateReader");
-    box.style.cssText = "text-align:center;font-size:56px;background:transparent;border:0;padding:0;color:inherit;display:block;margin:0 auto";
-    box.textContent = "🛫";
-    c.stage.appendChild(box);
+    /* ★v0.14 사진 속 직원을 직접 탭해 탑승권을 낸다(이모지 제거) */
+    var box, scan = null;
+    if (hasImg("map_gate.jpg")) {
+      /* 실측 bbox — 직원 36.6/34.7/28.3/27.3 · 스캐너 50.5/54.1/10.6/7.9 */
+      var st = imgStage(DATA.IMG + "map_gate.jpg", [
+        { x: 36.6, y: 34.7, w: 28.3, h: 27.3, t: "gateReader", cls: "hot" },
+        { x: 50.5, y: 54.1, w: 10.6, h: 7.9, t: "gateScan", cls: "hot" }]);
+      c.stage.appendChild(st);
+      box = st.querySelector('[data-t="gateReader"]');
+      scan = st.querySelector('[data-t="gateScan"]');
+    } else {
+      box = el("button");
+      box.setAttribute("data-t", "gateReader");
+      box.style.cssText = "text-align:center;font-size:56px;background:transparent;border:0;padding:0;color:inherit;display:block;margin:0 auto";
+      box.textContent = "\uD83D\uDEEB";
+      c.stage.appendChild(box);
+    }
     c.cap("게이트 앞. 직원이 탑승권을 기다리고 있다.");
-    box.onclick = function () {
+    function give() {
       var sel = S.sel;
       if (sel !== "ticket") {
         if (sel) G.sfxBad();
@@ -14261,8 +14329,35 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         S.map = "seat"; G.setFlag("boarded"); G.save(); render();
         story(["✈️", "자리에 앉았다.\n창가 좌석, 옆자리는 비어 있다.\n\n…이제 진짜 출발이다."], null);
       });
-    };
+    }
+    box.onclick = give;
+    if (scan) scan.onclick = give;
   };
+
+  /* ★v0.14 쌍안경(#23) 배경음 — 뷰를 열면 바로 재생, 끝나면 지체 없이 처음부터(루프),
+     뷰를 닫으면 정지. 곡 제목은 어디에도 노출하지 않는다(#21 스포일러 규칙과 동일). */
+  var binocAu = null;
+  function binocPlay() {
+    if (!Array.isArray(window.__AUDIO) || window.__AUDIO.indexOf("binoc.mp3") < 0) return;
+    if (!binocAu) {
+      binocAu = new Audio(DATA.IMG.replace("img/", "") + "audio/binoc.mp3");
+      binocAu.loop = true;                       /* 끝나면 즉시 처음부터 */
+      binocAu.preload = "auto";
+    }
+    try { binocAu.currentTime = 0; } catch (e) {}
+    var pr = null;
+    try { pr = binocAu.play(); } catch (e) {}
+    if (pr && pr.catch) pr.catch(function () {});
+  }
+  window.__binocState = function () {                 /* 검증용 */
+    if (!binocAu) return { none: true };
+    return { src: String(binocAu.src).split("/").pop(), paused: binocAu.paused, loop: binocAu.loop,
+             t: +binocAu.currentTime.toFixed(2), dur: +(binocAu.duration || 0).toFixed(2) };
+  };
+  function binocStop() {
+    if (!binocAu) return;
+    try { binocAu.pause(); binocAu.currentTime = 0; } catch (e) {}
+  }
 
   /* #12 창문 + #23 쌍안경 */
   CU.window = function (c) {
@@ -14271,15 +14366,13 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       /* ★v0.6.3 쌍안경 뷰 — 싱가포르 방탈출의 .cu-binoc 마스크를 그대로 재사용.
          (안은 사진, 검은 원 테두리, 바깥은 어둡게)
          #23 에 보일 내용 이미지는 아직 미정 → 우선 22 창문 하늘(window_open.jpg) 위에 씌운다. */
-      var vw = imgStage(DATA.IMG + "window_open.jpg", []);
+      /* ★v0.14 쌍안경으로 보이는 것 = 하늘의 비행기(55). 없으면 창밖 하늘로 */
+      var vw = imgStage(DATA.IMG + (hasImg("oway_plane.jpg") ? "oway_plane.jpg" : "window_open.jpg"), []);
       var vin = vw.querySelector(".cropInner");
       if (vin) vin.appendChild(el("div", "cu-binoc"));
       c.stage.appendChild(vw);
-      c.cap("쌍안경으로 창밖을 봤다.");
-      var t = el("div");
-      t.style.cssText = "text-align:center;font-size:13px;color:var(--n8);line-height:1.7";
-      t.innerHTML = "저 멀리 구름 사이로 <b>무언가</b>가 보인다…<br><span style='color:#ffffff;opacity:.75;font-size:11px'>(#23 — 보이는 내용 미정, 자리표시자)</span>";
-      c.panel.appendChild(t);
+      c.cap("어디서 들어본 노래네!");          /* ★v0.14 북쑥 지정 문구 */
+      binocPlay();
       S.sel = null; renderInv();
       G.setFlag("p23seen");
       return;
@@ -14374,8 +14467,16 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
           x: t.x, y: t.y, w: t.w, h: t.h, t: "tile_" + t.id, cls: "ifeTile",
           build: function (n) {
             var box = el("div", "tileIn");
-            box.appendChild(el("div", "ti", t.icon));
-            box.appendChild(el("div", "tl", t.label));
+            if (t.img && hasImg(t.img)) {
+              /* ★v0.14 gen/54 선화 아이콘 한 개만 — 글자 라벨 없음 */
+              var im = el("img", "tiImg");
+              im.src = DATA.IMG + t.img; im.alt = t.label;
+              box.appendChild(im);
+              n.classList.add("hasIcon");
+            } else {
+              box.appendChild(el("div", "ti", t.icon));
+              box.appendChild(el("div", "tl", t.label));
+            }
             n.appendChild(box);
           },
           onTap: function () { t.id === "meal" ? tileMeal() : t.id === "tv" ? (view = "tv", drawOn()) : tileBlanket(); }
@@ -14555,11 +14656,23 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         pool: "0123456789".split(""), size: 10, answer: DATA.ANS.p16,
         onSolve: function () {
           G.markSolved("p16");
-          prize(DATA.TEMP.p16Prize, "짐칸이 열렸다");
+          /* 열림 사진이 있으면 사진 속 열쇠를 직접 탭해 꺼낸다(#24·#26 과 같은 흐름) */
+          if (!(hasImg(DATA.LOCKS.p16.openImg) && hasImg(DATA.LOCKS.p16.emptyImg))) {
+            prize(DATA.TEMP.p16Prize, "짐칸이 열렸다");
+          }
           reopenCU();
         }
       }));
       c.cap("말풍선 로고 아래 숫자 3칸.");
+      return;
+    }
+    /* ★v0.14 열림 사진(59)·빈 사진(60) 이 오면 열쇠를 직접 탭해 꺼낸다 */
+    var L2 = DATA.LOCKS.p16;
+    if (hasImg(L2.openImg) && hasImg(L2.emptyImg)) {
+      var gotK = G.has("silverKey") || G.flag("tookSilver");
+      c.stage.appendChild(imgStage(DATA.IMG + (gotK ? L2.emptyImg : L2.openImg),
+        gotK ? [] : [pick(L2.prizeCell, "takeSilverKey", "silverKey", "tookSilver")]));
+      c.cap(gotK ? "비어 있다." : "짐칸이 열렸다. 안에 은색 열쇠가 있다.");
       return;
     }
     c.stage.appendChild(imgStage(DATA.IMG + "bin_R2.jpg", []));
@@ -14837,18 +14950,44 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     c.cap(got2 ? "비어 있다." : "문이 열렸다. 안에 접이식 사다리가 있다.");
   };
 
+  /* ★v0.14 #27 화장실 상단 수납장2 — 문 위 정사각 홈 8칸(알파벳) + 아래 명판 "language".
+     풀리면 열린 사진 → 갈색판 직접 탭 → 빈 사진. */
+  /* ★v0.14 #27 화장실 상단 수납장2 — 문 사진(gen/56b) 위 정사각 홈 8칸(알파벳).
+     "language" 는 사진에 양각으로 들어 있어 게임이 글자를 얹지 않는다.
+     ★문 사진이 아직 없으면(56b 미도착) 자물쇠를 달지 않고 예전처럼 그냥 열린다. */
   CU.cab2 = function (c) {
-    c.title("수납장 2");
-    /* ★v0.10 사진이 아직 없어 이모지 자체가 탭 대상 */
-    var done = G.has("tileBrown") || G.flag("tookBrown");
-    var d = el(done ? "div" : "button", null, "🗄️");
-    d.style.cssText = "font-size:54px;text-align:center;background:transparent;border:0;padding:0;color:inherit;display:block;margin:0 auto";
-    if (!done) {
-      d.setAttribute("data-t", "openCab2");
-      d.onclick = function () { G.setFlag("tookBrown"); prize(DATA.TEMP.cab2Prize, "수납장을 열었다"); reopenCU(); };
+    c.title("상단 수납장 2");
+    var L = DATA.LOCKS.p27;
+    var hasDoor = hasImg("lav_cab2.jpg");
+    var ready = hasImg(L.openImg) && hasImg(L.emptyImg);
+
+    if (hasDoor && !G.solved("p27")) {
+      c.stage.appendChild(W.imgLock({
+        id: "p27", img: DATA.IMG + "lav_cab2.jpg", nw: L.nw, nh: L.nh,
+        crop: L.crop, cells: L.cells, faces: L.faces, faceLight: L.faceLight, faceDy: L.faceDy,
+        pool: "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(""), size: 12, answer: DATA.ANS.p27,
+        onSolve: function () { G.markSolved("p27"); reopenCU(); }
+      }));
+      c.cap("정사각형 홈이 여덟 칸. 아래 명판에 글자가 새겨져 있다.");
+      return;
     }
-    c.stage.appendChild(d);
-    c.cap(done ? "비어 있다." : "잠겨 있지 않다.");
+
+    var got = G.has("tileBrown") || G.flag("tookBrown");
+    if (!ready) {
+      var d = el("div", null, "\uD83D\uDDC4\uFE0F"); d.style.cssText = "font-size:54px;text-align:center";
+      c.stage.appendChild(d);
+      if (!got) {
+        var bt = el("button", "fbtn", "갈색 판을 꺼낸다");
+        bt.setAttribute("data-t", "openCab2");
+        bt.onclick = function () { G.setFlag("tookBrown"); prize(DATA.TEMP.p27Prize, ""); reopenCU(); };
+        c.panel.appendChild(bt);
+      }
+      c.cap(got ? "비어 있다." : "문이 열렸다. 안에 갈색 나무 판이 있다.");
+      return;
+    }
+    c.stage.appendChild(imgStage(DATA.IMG + (got ? L.emptyImg : L.openImg),
+      got ? [] : [pick(L.prizeCell, "takeTileBrown", "tileBrown", "tookBrown")]));
+    c.cap(got ? "비어 있다." : "문이 열렸다. 안에 갈색 나무 판이 있다.");
   };
 
   /* ★v0.5 #25 갤리 간식 수납칸 — 정사각 홈 4개에 색상판을 순서대로 끼운다.
