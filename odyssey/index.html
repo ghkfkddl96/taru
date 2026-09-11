@@ -244,6 +244,9 @@ input:focus{outline:none;border-color:var(--accent)}
 #pamText .pamRule{height:1px;margin:0 0 .72em;background:linear-gradient(to right,
   rgba(60,80,110,.55) 0%, rgba(60,80,110,.30) 62%, rgba(60,80,110,0) 100%)}
 #pamDeco{position:absolute;width:34px;height:10px;pointer-events:none}
+/* ★v0.15.3 셀로판 정렬 마크 — 리플릿 로고를 흑백 외곽선으로 딴 이미지 */
+#cello img.alignMark{position:absolute;pointer-events:none;opacity:.85;
+  image-rendering:auto;display:block}
 #pamDeco .ln{position:absolute;right:7px;top:4px;width:24px;height:1px;background:rgba(60,80,110,.42);display:block}
 #pamDeco .dt{position:absolute;right:0;top:2px;width:4px;height:4px;border-radius:50%;
   background:rgba(120,160,190,.65);display:block}
@@ -835,7 +838,7 @@ body.dbg .cvcell.cabBtn:active{box-shadow:inset 0 0 0 3px rgba(255,255,255,.8)}
 
 </div>
 
-<script>window.__AUDIO = ["binoc.mp3","song1.mp3","song2.mp3","song3.mp3","song4.mp3","song5.mp3"]; window.__IMG = ["app_kakao.png","app_map.png","app_minigame.png","app_qr.png","archer.jpg","bin_L1.jpg","bin_L1_open_case.jpg","bin_L1_open_empty.jpg","bin_L2.jpg","bin_L2_open_cello.jpg","bin_L2_open_empty.jpg","bin_R1.jpg","bin_R1_open_card.jpg","bin_R1_open_empty.jpg","bin_R2.jpg","bin_R2_open_empty.jpg","bin_R2_open_key.jpg","blanket_zoom.jpg","case_open_empty.jpg","case_open_headset.jpg","ceiling_open_cardkey.jpg","ceiling_open_empty.jpg","char_front.jpg","char_happy.jpg","char_hipL.jpg","char_hipR.jpg","char_hungry.jpg","crew_blanket.jpg","crew_tray.jpg","food_bread.png","food_cake.png","food_omu.png","food_salad.png","galley_cart.jpg","galley_drawer.jpg","galley_snack.jpg","galley_upper.jpg","galley_upper_empty.jpg","galley_upper_open.jpg","gamecard.jpg","headphones.jpg","headset_case.jpg","headset_worn.jpg","ic_blanket.png","ic_butter.jpg","ic_cardkey.jpg","ic_cardkey.png","ic_case.png","ic_cellophane.png","ic_dna.jpg","ic_drop.jpg","ic_dynamite.jpg","ic_fire.jpg","ic_gamecard.png","ic_goldkey.jpg","ic_goldkey.png","ic_headphones.jpg","ic_headphones.png","ic_ladder.png","ic_pamphlet.png","ic_passport.png","ic_peanut.png","ic_phone.png","ic_silverkey.jpg","ic_silverkey.png","ic_telescope.png","ic_ticket.png","ic_tile_beige.png","ic_tile_black.png","ic_tile_brown.png","ic_tile_dark.png","ife_ic_blanket.png","ife_ic_meal.png","ife_ic_tv.png","ife_off.jpg","ife_on.jpg","ife_photo1.jpg","ife_photo2.jpg","ife_photo3.jpg","ife_photo4.jpg","lav_cab1.jpg","lav_cab1_empty.jpg","lav_cab1_open.jpg","lav_cab2.jpg","lav_cab2_empty.jpg","lav_cab2_open.jpg","lav_cabtop.jpg","lav_cabtop_empty.jpg","lav_cabtop_open.jpg","lav_ceiling.jpg","lav_tissue.jpg","lav_tissue_idle.jpg","lav_tissue_roll.jpg","map_aisle.jpg","map_gate.jpg","map_seat.jpg","map_seat_tray.jpg","meal_tray.jpg","oway_plane.jpg","pamphlet_bg.jpg","pamphlet_body_bg.jpg","passport.jpg","shade_logo.png","tile_beige.jpg","tile_black.jpg","tile_brown.jpg","tile_dark.jpg","tissue_mask.png","travel1.jpg","travel2.jpg","travel3.jpg","travel4.jpg","window_open.jpg","window_shade.jpg","window_shade_plain.jpg"];</script>
+<script>window.__AUDIO = ["binoc.mp3","song1.mp3","song2.mp3","song3.mp3","song4.mp3","song5.mp3"]; window.__IMG = ["app_kakao.png","app_map.png","app_minigame.png","app_qr.png","archer.jpg","bin_L1.jpg","bin_L1_open_case.jpg","bin_L1_open_empty.jpg","bin_L2.jpg","bin_L2_open_cello.jpg","bin_L2_open_empty.jpg","bin_R1.jpg","bin_R1_open_card.jpg","bin_R1_open_empty.jpg","bin_R2.jpg","bin_R2_open_empty.jpg","bin_R2_open_key.jpg","blanket_zoom.jpg","case_open_empty.jpg","case_open_headset.jpg","ceiling_open_cardkey.jpg","ceiling_open_empty.jpg","cello_align.png","char_front.jpg","char_happy.jpg","char_hipL.jpg","char_hipR.jpg","char_hungry.jpg","crew_blanket.jpg","crew_tray.jpg","food_bread.png","food_cake.png","food_omu.png","food_salad.png","galley_cart.jpg","galley_drawer.jpg","galley_snack.jpg","galley_upper.jpg","galley_upper_empty.jpg","galley_upper_open.jpg","gamecard.jpg","headphones.jpg","headset_case.jpg","headset_worn.jpg","ic_blanket.png","ic_butter.jpg","ic_cardkey.jpg","ic_cardkey.png","ic_case.png","ic_cellophane.png","ic_dna.jpg","ic_drop.jpg","ic_dynamite.jpg","ic_fire.jpg","ic_gamecard.png","ic_goldkey.jpg","ic_goldkey.png","ic_headphones.jpg","ic_headphones.png","ic_ladder.png","ic_pamphlet.png","ic_passport.png","ic_peanut.png","ic_phone.png","ic_silverkey.jpg","ic_silverkey.png","ic_telescope.png","ic_ticket.png","ic_tile_beige.png","ic_tile_black.png","ic_tile_brown.png","ic_tile_dark.png","ife_ic_blanket.png","ife_ic_meal.png","ife_ic_tv.png","ife_off.jpg","ife_on.jpg","ife_photo1.jpg","ife_photo2.jpg","ife_photo3.jpg","ife_photo4.jpg","lav_cab1.jpg","lav_cab1_empty.jpg","lav_cab1_open.jpg","lav_cab2.jpg","lav_cab2_empty.jpg","lav_cab2_open.jpg","lav_cabtop.jpg","lav_cabtop_empty.jpg","lav_cabtop_open.jpg","lav_ceiling.jpg","lav_tissue.jpg","lav_tissue_idle.jpg","lav_tissue_roll.jpg","map_aisle.jpg","map_gate.jpg","map_seat.jpg","map_seat_tray.jpg","meal_tray.jpg","oway_plane.jpg","pamphlet_bg.jpg","pamphlet_body_bg.jpg","passport.jpg","shade_logo.png","tile_beige.jpg","tile_black.jpg","tile_brown.jpg","tile_dark.jpg","tissue_mask.png","travel1.jpg","travel2.jpg","travel3.jpg","travel4.jpg","window_open.jpg","window_shade.jpg","window_shade_plain.jpg"];</script>
 <script>
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -10945,7 +10948,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 (function () {
   "use strict";
 
-  var BUILD = "ODY-S1-20260911-2124";
+  var BUILD = "ODY-S1-20260911-2136";
   var LSKEY = "odyssey.s1.v1";
 
   var qs = new URLSearchParams(location.search);
@@ -13019,9 +13022,14 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       paper.appendChild(bgl);
     }
 
+    /* ★v0.15.3 실제 출력물처럼 좌우 안쪽 여백 — 본문 영역 폭의 9.5%씩(리드·본문 같은 여백),
+       위쪽은 헤더 밴드 아래 한 행쯤 띄운다. 아래는 10% 이상 남긴다. */
+    var PADX = BODY.w * 0.095, PADY = BODY.h * 0.065, SLACK = BODY.h * 0.10;
+    var INNER = { x: BODY.x + PADX, y: BODY.y + PADY, w: BODY.w - PADX * 2, h: BODY.h - PADY - SLACK };
+
     /* 텍스트: 글자마다 span → 실제 좌표를 재서 셀로판 원 위치를 잡는다(P17 문서 (b)안) */
     var tx = el("div"); tx.id = "pamText";
-    tx.style.cssText = "left:" + BODY.x.toFixed(1) + "px;top:" + BODY.y.toFixed(1) + "px;width:" + BODY.w.toFixed(1) + "px;" +
+    tx.style.cssText = "left:" + INNER.x.toFixed(1) + "px;top:" + INNER.y.toFixed(1) + "px;width:" + INNER.w.toFixed(1) + "px;" +
       "font-size:11.5px;line-height:1.6;white-space:normal;word-break:break-all";
     var spanMap = {};
     /* ★v0.15.2 타이포 위계 — 첫 단락은 리드 문장(조금 크고 진하게), 나머지는 본문 톤.
@@ -13040,7 +13048,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     /* 우하단 장식 — 글자 없이 얇은 선 + 점 */
     if (useBg) {
       var dec = el("div"); dec.id = "pamDeco";
-      dec.style.cssText = "left:" + (BODY.x + BODY.w - 34).toFixed(1) + "px;top:" + (BODY.y + BODY.h - 10).toFixed(1) + "px";
+      dec.style.cssText = "left:" + (BODY.x + BODY.w - PADX - 34).toFixed(1) + "px;top:" + (BODY.y + BODY.h - PADY - 10).toFixed(1) + "px";
       dec.innerHTML = '<i class="ln"></i><i class="dt"></i>';
       paper.appendChild(dec);
     }
@@ -13049,8 +13057,9 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     function fitBody() {
       var fs = 11.5;
       tx.style.fontSize = fs + "px";
-      /* 리드 단락이 조금 크므로 전체가 본문 상자 안에 들어올 때까지 같이 줄인다 */
-      for (var k = 0; k < 40 && (tx.scrollHeight > BODY.h + 0.5 || tx.scrollWidth > BODY.w + 0.5); k++) {
+      /* 리드 단락이 조금 크므로 전체가 본문 안쪽 상자에 들어올 때까지 같이 줄인다
+         (안쪽 상자 = 본문 영역에서 좌우 9.5% · 위 6.5% · 아래 10% 를 뺀 자리) */
+      for (var k = 0; k < 40 && (tx.scrollHeight > INNER.h + 0.5 || tx.scrollWidth > INNER.w + 0.5); k++) {
         fs -= 0.25;
         if (fs < 5) break;
         tx.style.fontSize = fs + "px";
@@ -13058,16 +13067,19 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       return fs;
     }
     var bodyFs = fitBody();
+    /* ★v0.15.3 붙기 전에는 scrollHeight 가 0 이라 줄어들지 않는다 → 붙은 뒤 다시 맞춘다 */
+    function refit() { bodyFs = fitBody(); }
 
     /* ★v0.15.2 셀로판 없이 팜플렛만 볼 때 — 같은 리플릿 디자인 그대로, 셀로판만 없다.
        (예전에는 이때만 밋밋한 베이지 카드가 떠서 디자인이 따로 놀았다) */
     if (opt.noCello) {
+      setTimeout(refit, 30); setTimeout(refit, 180);
       if (opt.t) host.setAttribute("data-t", opt.t);
       host.style.cursor = "default";
       if (opt.onTap) host.onclick = function () { opt.onTap(); };
       window.__pamState = function () {
         return { useBg: useBg, W: W, H: H, bodyFs: bodyFs, noCello: true,
-                 overflow: { h: tx.scrollHeight - BODY.h, w: tx.scrollWidth - BODY.w }, holes: [] };
+                 overflow: { h: tx.scrollHeight - INNER.h, w: tx.scrollWidth - INNER.w }, holes: [] };
       };
       return host;
     }
@@ -13092,14 +13104,29 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       s += '<rect width="' + W + '" height="' + H + '" rx="8" fill="#6b6c74" opacity=".22" mask="url(#hm)"/>';
       s += '<rect width="' + W + '" height="' + H + '" rx="8" fill="none" stroke="#3a3a41" stroke-width="1.2" opacity=".85"/>';
       holes.forEach(function (h) { s += '<circle cx="' + h.x.toFixed(1) + '" cy="' + h.y.toFixed(1) + '" r="8.5" fill="none" stroke="#2a2a2f" stroke-width="1.4"/>'; });
-      /* align mark: 팜플렛(사진) 로고와 **같은 자리·같은 크기** 의 윤곽선 */
-      s += '<g transform="translate(' + LOGO_X.toFixed(1) + ',' + LOGO_Y.toFixed(1) + ') scale(' +
-        (LOGO_W / 40).toFixed(4) + ',' + (LOGO_H / 40).toFixed(4) + ')">' +
-        '<rect x="1" y="1" width="38" height="38" rx="6" fill="none" stroke="#2a2a2f" stroke-width="2" stroke-dasharray="4 3"/>' +
-        '<circle cx="20" cy="20" r="9" fill="none" stroke="#2a2a2f" stroke-width="1.6"/></g>';
+      /* align mark 는 SVG 밖에 이미지로 얹는다(아래) */
       s += "</svg>";
       cello.innerHTML = s;
+      /* ★v0.15.3 정렬 마크 = 리플릿 로고를 흑백 외곽선으로 딴 것.
+         팜플렛 사진 로고와 **같은 자리·같은 크기** 라서, 겹치면 정확히 포개진다.
+         (마크 이미지는 로고 둘레로 22% 여유를 두고 잘랐으므로 그만큼 넓혀 놓는다) */
+      var mk = cello.querySelector("img.alignMark");
+      if (!mk && useBg && Array.isArray(window.__IMG) && window.__IMG.indexOf("cello_align.png") >= 0) {
+        mk = document.createElement("img");
+        mk.className = "alignMark";
+        mk.src = DATA.IMG + "cello_align.png";
+        mk.alt = "";
+        cello.appendChild(mk);
+      }
+      if (mk) {
+        var MG = 0.22;
+        mk.style.left = (LOGO_X - LOGO_W * MG).toFixed(2) + "px";
+        mk.style.top = (LOGO_Y - LOGO_H * MG).toFixed(2) + "px";
+        mk.style.width = (LOGO_W * (1 + MG * 2)).toFixed(2) + "px";
+        mk.style.height = (LOGO_H * (1 + MG * 2)).toFixed(2) + "px";
+      }
       cello._holes = holes;
+      cello._logo = { x: LOGO_X, y: LOGO_Y, w: LOGO_W, h: LOGO_H };
     }
 
     var ox = 92, oy = 66;   /* 처음엔 어긋난 상태 */
@@ -13131,15 +13158,27 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       setTimeout(function () { opt.onSnap && opt.onSnap(); }, 700);
     }
 
-    setTimeout(function () { build(); }, 30);
+    setTimeout(function () { refit(); build(); }, 30);
+    setTimeout(function () { refit(); build(); }, 180);
 
     /* ★v0.15 검증용 — 정렬된 상태에서 표적 글자 중심과 구멍 중심의 거리(px) */
     window.__pamState = function () {
       var sr = stage.getBoundingClientRect();
       return {
         useBg: useBg, W: W, H: H, bodyFs: bodyFs,
-        overflow: { h: tx.scrollHeight - BODY.h, w: tx.scrollWidth - BODY.w },
+        pad: { x: +PADX.toFixed(2), y: +PADY.toFixed(2), slack: +SLACK.toFixed(2), xPct: +(PADX / BODY.w * 100).toFixed(2), slackPct: +(SLACK / BODY.h * 100).toFixed(2) },
+        overflow: { h: tx.scrollHeight - INNER.h, w: tx.scrollWidth - INNER.w },
         off: { x: ox, y: oy }, snapped: snapped,
+        logo: cello._logo || null,
+        mark: (function () {
+          var m2 = cello.querySelector("img.alignMark"); if (!m2) return null;
+          var sr2 = stage.getBoundingClientRect(), r2 = m2.getBoundingClientRect();
+          var lg = cello._logo || { x: 0, y: 0, w: 0, h: 0 };
+          /* 마크 중심(스테이지 좌표) vs 사진 로고 중심 */
+          return { cx: +(r2.left - sr2.left + r2.width / 2).toFixed(2), cy: +(r2.top - sr2.top + r2.height / 2).toFixed(2),
+                   lcx: +(lg.x + lg.w / 2).toFixed(2), lcy: +(lg.y + lg.h / 2).toFixed(2),
+                   w: +r2.width.toFixed(2), h: +r2.height.toFixed(2) };
+        })(),
         holes: (cello._holes || []).map(function (h, hi) {
           /* 구멍과 표적은 같은 순서로 만들어진다 — 글자가 같아도(장·장) 인덱스로 짝짓는다 */
           var t = DATA.PAMPHLET_TARGETS[hi];
@@ -15512,7 +15551,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         node.onclick = useCello;
       }
       openZoom({ id: "pamphlet", title: "팜플렛", node: node,
-        cap: G.has("cellophane") ? "그냥 안내문 같다. (셀로판을 골라 팜플렛을 탭해 보자)" : "그냥 안내문 같다." });
+        cap: "그냥 안내문 같다." });   /* ★v0.15.3 조작 설명 문구 제거(북쑥 원칙) */
       return;
     }
     var pam = W.pamphlet({
