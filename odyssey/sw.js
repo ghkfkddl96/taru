@@ -1,5 +1,5 @@
 /* 오디세이 × 발리 — 오프라인 서비스워커 (자동 생성) */
-const CACHE = "odyssey-ODY-S1-20260911-1823";
+const CACHE = "odyssey-ODY-S1-20260911-2034";
 const PRECACHE = [
  "./",
  "./index.html",
@@ -14,6 +14,8 @@ const PRECACHE = [
  "./img/bin_L1_open_case.jpg",
  "./img/bin_L1_open_empty.jpg",
  "./img/bin_L2.jpg",
+ "./img/bin_L2_open_cello.jpg",
+ "./img/bin_L2_open_empty.jpg",
  "./img/bin_R1.jpg",
  "./img/bin_R1_open_card.jpg",
  "./img/bin_R1_open_empty.jpg",
@@ -102,6 +104,7 @@ const PRECACHE = [
  "./img/map_seat_tray.jpg",
  "./img/meal_tray.jpg",
  "./img/oway_plane.jpg",
+ "./img/pamphlet_bg.jpg",
  "./img/passport.jpg",
  "./img/shade_logo.png",
  "./img/tile_beige.jpg",
@@ -154,6 +157,33 @@ self.addEventListener("fetch", (e) => {
   e.respondWith((async () => {
     const cache = await caches.open(CACHE);
     const hit = await cache.match(req, { ignoreSearch: true });
+    /* ★v0.15 Range 요청(오디오·비디오)은 206 으로 잘라서 돌려준다.
+       캐시에서 200 전체를 주면 iOS Safari 가 미디어를 못 이어 재생한다(노래 2번째부터 멈춤). */
+    const range = req.headers.get("range");
+    if (hit && range) {
+      const m = /bytes=(d*)-(d*)/.exec(range);
+      if (m) {
+        const buf = await hit.arrayBuffer();
+        const total = buf.byteLength;
+        let start = m[1] === "" ? null : parseInt(m[1], 10);
+        let end = m[2] === "" ? null : parseInt(m[2], 10);
+        if (start === null) { start = Math.max(0, total - (end || 0)); end = total - 1; }
+        if (end === null || end >= total) end = total - 1;
+        if (start > end || start >= total) {
+          return new Response(null, { status: 416, headers: { "Content-Range": "bytes */" + total } });
+        }
+        const body = buf.slice(start, end + 1);
+        return new Response(body, {
+          status: 206, statusText: "Partial Content",
+          headers: {
+            "Content-Type": hit.headers.get("content-type") || "application/octet-stream",
+            "Content-Length": String(body.byteLength),
+            "Content-Range": "bytes " + start + "-" + end + "/" + total,
+            "Accept-Ranges": "bytes"
+          }
+        });
+      }
+    }
     if (hit) return hit;
     try {
       const res = await fetch(req);

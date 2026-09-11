@@ -229,6 +229,9 @@ input:focus{outline:none;border-color:var(--accent)}
 #pamText{position:absolute;white-space:pre;font-weight:500;color:#3a3630}
 #pamText .ch{display:inline-block;text-align:center}
 #pamText .ch.hi{background:#2b2b2b;border-radius:2px;color:#faf7f0;font-weight:800}
+/* ★v0.15 [10] 팜플렛 배경이 사진일 때 — 종이 질감·테두리는 사진이 갖고 있다 */
+#pamPaper.photo{background-color:transparent;box-shadow:0 6px 18px rgba(0,0,0,.45);border:0}
+#pamPaper.photo #pamText{color:#2f2b26;text-shadow:0 0 2px rgba(255,255,255,.55)}
 #cello{position:absolute;left:0;top:0;cursor:grab;touch-action:none}
 #cello.snapped{cursor:default}
 
@@ -527,7 +530,17 @@ body.dbg .cvcell.hot.ifeBtn:active,body.dbg .cvcell.hot.ifeTile:active{box-shado
   filter:drop-shadow(0 1px 2px rgba(0,0,0,.55)) drop-shadow(0 0 1px rgba(0,0,0,.35))}
 .cvcell.ifeTile:active .tileIn{background:rgba(6,6,8,.5)}
 .cvcell.ifeBack{border-radius:6px}
-.cvcell.ifeBack .cv{background:rgba(6,6,8,.6);min-width:100%;min-height:100%;font-size:15px !important}
+/* ★v0.15 [3] IFE 뒤로가기 — 아이콘이 칸 크기에 비례해 줄어든다(고정 15px 폰트 때문에 튀어나왔다).
+   탭 판정은 투명 ::after 로 최소 44x44px 확보(보이는 크기와 무관). */
+.cvcell.ifeBack .cv{background:rgba(6,6,8,.6);min-width:0;min-height:0;
+  width:calc(100% - 2px);height:calc(100% - 2px);font-size:0 !important;padding:12%;box-shadow:none}
+  /* 그림자 제거(칸 밖 2.75px 번짐) + 둥근 모서리 안티에일리어싱이 칸을 넘지 않게 사방 1px 안쪽 */
+.cvcell.ifeBack .cv .ifeBackSvg{width:100%;height:100%;display:block}
+.cvcell.ifeBack{position:absolute}
+.cvcell.ifeBack::after{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  min-width:44px;min-height:44px;width:100%;height:100%}
+/* ★v0.15 [6] 바닥 같은 '빈 자리' 탭 영역 — 플레이 모드에선 아무 표시도 없다(링은 디버그에서만) */
+.spot.floorSpot{background:transparent}
 .ifeDotsBar{position:absolute;left:0;right:0;bottom:4%;display:flex;gap:5px;justify-content:center;pointer-events:none}
 .ifeDotsBar i{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.35);display:block}
 .ifeDotsBar i.on{background:#fff}
@@ -796,7 +809,7 @@ body.dbg .cvcell.cabBtn:active{box-shadow:inset 0 0 0 3px rgba(255,255,255,.8)}
 
 </div>
 
-<script>window.__AUDIO = ["binoc.mp3","song1.mp3","song2.mp3","song3.mp3","song4.mp3","song5.mp3"]; window.__IMG = ["app_kakao.png","app_map.png","app_minigame.png","app_qr.png","archer.jpg","bin_L1.jpg","bin_L1_open_case.jpg","bin_L1_open_empty.jpg","bin_L2.jpg","bin_R1.jpg","bin_R1_open_card.jpg","bin_R1_open_empty.jpg","bin_R2.jpg","bin_R2_open_empty.jpg","bin_R2_open_key.jpg","blanket_zoom.jpg","case_open_empty.jpg","case_open_headset.jpg","ceiling_open_cardkey.jpg","ceiling_open_empty.jpg","char_front.jpg","char_happy.jpg","char_hipL.jpg","char_hipR.jpg","char_hungry.jpg","crew_blanket.jpg","crew_tray.jpg","food_bread.png","food_cake.png","food_omu.png","food_salad.png","galley_cart.jpg","galley_drawer.jpg","galley_snack.jpg","galley_upper.jpg","galley_upper_empty.jpg","galley_upper_open.jpg","gamecard.jpg","headphones.jpg","headset_case.jpg","headset_worn.jpg","ic_blanket.png","ic_butter.jpg","ic_cardkey.jpg","ic_cardkey.png","ic_case.png","ic_cellophane.png","ic_dna.jpg","ic_drop.jpg","ic_dynamite.jpg","ic_fire.jpg","ic_gamecard.png","ic_goldkey.jpg","ic_goldkey.png","ic_headphones.jpg","ic_headphones.png","ic_ladder.png","ic_pamphlet.png","ic_passport.png","ic_peanut.png","ic_phone.png","ic_silverkey.jpg","ic_silverkey.png","ic_telescope.png","ic_ticket.png","ic_tile_beige.png","ic_tile_black.png","ic_tile_brown.png","ic_tile_dark.png","ife_ic_blanket.png","ife_ic_meal.png","ife_ic_tv.png","ife_off.jpg","ife_on.jpg","ife_photo1.jpg","ife_photo2.jpg","ife_photo3.jpg","ife_photo4.jpg","lav_cab1.jpg","lav_cab1_empty.jpg","lav_cab1_open.jpg","lav_cab2.jpg","lav_cab2_empty.jpg","lav_cab2_open.jpg","lav_cabtop.jpg","lav_cabtop_empty.jpg","lav_cabtop_open.jpg","lav_ceiling.jpg","lav_tissue.jpg","lav_tissue_idle.jpg","lav_tissue_roll.jpg","map_aisle.jpg","map_gate.jpg","map_seat.jpg","map_seat_tray.jpg","meal_tray.jpg","oway_plane.jpg","passport.jpg","shade_logo.png","tile_beige.jpg","tile_black.jpg","tile_brown.jpg","tile_dark.jpg","tissue_mask.png","travel1.jpg","travel2.jpg","travel3.jpg","travel4.jpg","window_open.jpg","window_shade.jpg","window_shade_plain.jpg"];</script>
+<script>window.__AUDIO = ["binoc.mp3","song1.mp3","song2.mp3","song3.mp3","song4.mp3","song5.mp3"]; window.__IMG = ["app_kakao.png","app_map.png","app_minigame.png","app_qr.png","archer.jpg","bin_L1.jpg","bin_L1_open_case.jpg","bin_L1_open_empty.jpg","bin_L2.jpg","bin_L2_open_cello.jpg","bin_L2_open_empty.jpg","bin_R1.jpg","bin_R1_open_card.jpg","bin_R1_open_empty.jpg","bin_R2.jpg","bin_R2_open_empty.jpg","bin_R2_open_key.jpg","blanket_zoom.jpg","case_open_empty.jpg","case_open_headset.jpg","ceiling_open_cardkey.jpg","ceiling_open_empty.jpg","char_front.jpg","char_happy.jpg","char_hipL.jpg","char_hipR.jpg","char_hungry.jpg","crew_blanket.jpg","crew_tray.jpg","food_bread.png","food_cake.png","food_omu.png","food_salad.png","galley_cart.jpg","galley_drawer.jpg","galley_snack.jpg","galley_upper.jpg","galley_upper_empty.jpg","galley_upper_open.jpg","gamecard.jpg","headphones.jpg","headset_case.jpg","headset_worn.jpg","ic_blanket.png","ic_butter.jpg","ic_cardkey.jpg","ic_cardkey.png","ic_case.png","ic_cellophane.png","ic_dna.jpg","ic_drop.jpg","ic_dynamite.jpg","ic_fire.jpg","ic_gamecard.png","ic_goldkey.jpg","ic_goldkey.png","ic_headphones.jpg","ic_headphones.png","ic_ladder.png","ic_pamphlet.png","ic_passport.png","ic_peanut.png","ic_phone.png","ic_silverkey.jpg","ic_silverkey.png","ic_telescope.png","ic_ticket.png","ic_tile_beige.png","ic_tile_black.png","ic_tile_brown.png","ic_tile_dark.png","ife_ic_blanket.png","ife_ic_meal.png","ife_ic_tv.png","ife_off.jpg","ife_on.jpg","ife_photo1.jpg","ife_photo2.jpg","ife_photo3.jpg","ife_photo4.jpg","lav_cab1.jpg","lav_cab1_empty.jpg","lav_cab1_open.jpg","lav_cab2.jpg","lav_cab2_empty.jpg","lav_cab2_open.jpg","lav_cabtop.jpg","lav_cabtop_empty.jpg","lav_cabtop_open.jpg","lav_ceiling.jpg","lav_tissue.jpg","lav_tissue_idle.jpg","lav_tissue_roll.jpg","map_aisle.jpg","map_gate.jpg","map_seat.jpg","map_seat_tray.jpg","meal_tray.jpg","oway_plane.jpg","pamphlet_bg.jpg","passport.jpg","shade_logo.png","tile_beige.jpg","tile_black.jpg","tile_brown.jpg","tile_dark.jpg","tissue_mask.png","travel1.jpg","travel2.jpg","travel3.jpg","travel4.jpg","window_open.jpg","window_shade.jpg","window_shade_plain.jpg"];</script>
 <script>
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -10906,7 +10919,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 (function () {
   "use strict";
 
-  var BUILD = "ODY-S1-20260911-1823";
+  var BUILD = "ODY-S1-20260911-2034";
   var LSKEY = "odyssey.s1.v1";
 
   var qs = new URLSearchParams(location.search);
@@ -10991,6 +11004,56 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     if (actx && actx.state === "suspended") { try { actx.resume(); } catch (e) {} }
     return actx;
   }
+
+  /* ★v0.15 [1] iOS 자동재생 정책 대응 — "사용자 제스처 안에서 play() 를 한 번 거친 요소"만
+     그 뒤로 스크립트가 재생할 수 있다. 그래서 노래는 **엘리먼트 하나**를 돌려 쓰고,
+     첫 탭에서 무음으로 한 번 재생해 그 엘리먼트를 풀어 둔다.
+     (곡마다 new Audio() 를 만들면 2번째 곡부터 제스처 밖이라 iOS 가 막는다 — 실제 증상) */
+  var SILENT_WAV = "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA=";
+  var shared = null, unlocked = false;
+  function sharedAudio() {
+    if (!shared) {
+      shared = new Audio();
+      shared.preload = "auto";
+      shared.setAttribute("playsinline", "");
+      shared.setAttribute("webkit-playsinline", "");
+    }
+    return shared;
+  }
+  function unlockAudio() {
+    var a = audio();
+    if (a && a.state === "suspended") { try { a.resume(); } catch (e) {} }
+    if (unlocked) return;
+    var au = sharedAudio();
+    try {
+      /* 0.05초 무음 wav — src 가 없는 요소는 iOS 에서 언락이 안 된다 */
+      if (!au.src) au.src = SILENT_WAV;
+      au.muted = true;
+      var p = au.play();
+      if (p && p.then) p.then(function () { try { au.pause(); au.muted = false; } catch (e) {} }, function () { try { au.muted = false; } catch (e) {} });
+      else { try { au.pause(); au.muted = false; } catch (e) {} }
+    } catch (e) { try { au.muted = false; } catch (e2) {} }
+    unlocked = true;
+  }
+  function audioUnlocked() { return unlocked; }
+  /* 첫 사용자 입력에서 한 번만 */
+  ["pointerdown", "touchend", "mousedown", "keydown"].forEach(function (ev) {
+    document.addEventListener(ev, unlockAudio, { capture: true, once: false, passive: true });
+  });
+
+  /* ★v0.15 [5] iOS 더블탭 확대 완전 차단 —
+     touch-action:manipulation 만으로는 Safari 가 여전히 확대하는 경우가 있어
+     ①dblclick 기본동작 ②제스처(핀치·더블탭) 이벤트 ③300ms 안의 두 번째 touchend 를 막는다. */
+  document.addEventListener("dblclick", function (e) { e.preventDefault(); }, { passive: false });
+  ["gesturestart", "gesturechange", "gestureend"].forEach(function (ev) {
+    document.addEventListener(ev, function (e) { e.preventDefault(); }, { passive: false });
+  });
+  var lastTouchEnd = 0;
+  document.addEventListener("touchend", function (e) {
+    var now = Date.now();
+    if (now - lastTouchEnd <= 300 && e.cancelable) e.preventDefault();
+    lastTouchEnd = now;
+  }, { passive: false });
   function beep(freq, dur, type, vol) {
     var a = audio(); if (!a) return;
     try {
@@ -11099,6 +11162,8 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
      ★v0.4: PointerEvent 가 있으면 **포인터 경로 하나만** 쓴다.
      (기존엔 touch + mouse 를 둘 다 걸어서, iOS 에서 touchend 뒤 합성 mouseup 이 또 들어와
       한 번 탭에 값이 두 번 바뀌는 버그가 있었다.) */
+  /* ★v0.15 [4] 탭 판정 — dbl 을 쓰는 곳(헤드셋 더블탭 재생)만 310ms 지연,
+     그 밖(사진 속 물건 습득 등)은 pointerup 에서 **즉시** 발화한다. */
   function tapper(node, o) {
     var lastTap = 0, timer = null, moved = false, sx = 0, sy = 0, longFired = false, active = false;
     function start(x, y) {
@@ -11119,7 +11184,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       lastTap = now;
       if (o.tap) {
         if (o.dbl) setTimeout(function () { if (lastTap && Date.now() - lastTap >= 300) { lastTap = 0; o.tap(); } }, 310);
-        else o.tap();
+        else { lastTap = 0; o.tap(); }        /* 즉시 — 더블탭 대기 없음 */
       }
     }
     if (window.PointerEvent) {
@@ -11134,12 +11199,13 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       /* 합성 click 이 상위로 새는 것 방지 */
       node.addEventListener("click", function (e) { e.stopPropagation(); });
     } else {
-      node.addEventListener("touchstart", function (e) { var t = e.touches[0]; start(t.clientX, t.clientY); }, { passive: true });
+      var usedTouch = false;
+      node.addEventListener("touchstart", function (e) { usedTouch = true; var t = e.touches[0]; start(t.clientX, t.clientY); }, { passive: true });
       node.addEventListener("touchmove", function (e) { var t = e.touches[0]; move(t.clientX, t.clientY); }, { passive: true });
       node.addEventListener("touchend", function (e) { e.stopPropagation(); end(); });
-      node.addEventListener("mousedown", function (e) { start(e.clientX, e.clientY); });
-      node.addEventListener("mousemove", function (e) { move(e.clientX, e.clientY); });
-      node.addEventListener("mouseup", function (e) { e.stopPropagation(); end(); });
+      node.addEventListener("mousedown", function (e) { if (usedTouch) return; start(e.clientX, e.clientY); });
+      node.addEventListener("mousemove", function (e) { if (usedTouch) return; move(e.clientX, e.clientY); });
+      node.addEventListener("mouseup", function (e) { if (usedTouch) { usedTouch = false; return; } e.stopPropagation(); end(); });
     }
   }
 
@@ -11211,7 +11277,8 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     solved: solved, markSolved: markSolved,
     $: $, el: el, clear: clear, on: on, toast: toast,
     beep: beep, sfxOk: sfxOk, sfxBad: sfxBad, sfxTap: sfxTap, buzz: buzz, audio: audio, syncInvH: syncInvH,
-    sha256: sha256, drag: drag, tapper: tapper
+    sha256: sha256, drag: drag, tapper: tapper,
+    sharedAudio: sharedAudio, unlockAudio: unlockAudio, audioUnlocked: audioUnlocked
   };
 })();
 
@@ -11338,7 +11405,10 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         { id: "tissue", x: 5, y: 40, w: 30, h: 34, label: "휴지롤", img: IMG + "lav_tissue.jpg", cu: "tissue" },
         { id: "cab1", x: 40, y: 34, w: 26, h: 20, label: "수납장 1", emoji: "🗄️", cu: "cab1" },
         { id: "cab2", x: 70, y: 34, w: 26, h: 20, label: "수납장 2", emoji: "🗄️", cu: "cab2" },
-        { id: "cab3", x: 40, y: 60, w: 26, h: 20, label: "수납장 3", emoji: "🗄️", cu: "cab3" }
+        { id: "cab3", x: 40, y: 60, w: 26, h: 20, label: "수납장 3", emoji: "🗄️", cu: "cab3" },
+        /* ★v0.15 [6] 사다리를 놓는 자리 — 사다리를 고른 채 바닥을 탭하면 설치된다.
+           kind:"floor" 는 카드·이모지 없이 투명한 탭 영역만 그린다. */
+        { id: "lavFloor", x: 24, y: 74, w: 52, h: 22, label: "바닥", kind: "floor", use: "ladder" }
       ]
     }
   };
@@ -11415,6 +11485,18 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     "무거운 짐은 천천히 올려 주시고, 비상시 사용하는 구명장비는 좌석 하단에 있습니다."
   ];
   /* 표적 글자 (행, 열) — 0-based, P17_PAMPHLET.md 2절 표 그대로 */
+  /* ★v0.15 [10] 팜플렛 배경 사진(gen/63, 848x1264) — 트레이 테이블 위 리플릿.
+     팝업에는 리플릿만 잘라 세로로 꽉 채운다. 좌표는 전부 원본 사진 기준 %.
+       leaflet : 잘라 쓸 리플릿 영역
+       body    : 본문 글자를 얹을 빈 자리(글자 크기는 이 폭·높이에 맞춰 자동)
+       logo    : 상단 로고 — 셀로판 align mark 가 겹칠 자리 */
+  var PAMPHLET_BG = {
+    img: "pamphlet_bg.jpg", nw: 848, nh: 1264,
+    leaflet: { x: 17, y: 19, w: 65, h: 62 },
+    body: { x: 21.8, y: 29.3, w: 57.8, h: 46.3 },
+    logo: { x: 46.0, y: 21.4, w: 7.1, h: 3.2 }
+  };
+
   var PAMPHLET_TARGETS = [
     { r: 0, c: 15, ch: "화" }, { r: 1, c: 21, ch: "장" }, { r: 2, c: 33, ch: "실" },
     { r: 3, c: 7, ch: "천" }, { r: 3, c: 30, ch: "장" }
@@ -11431,6 +11513,22 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
      crop: 자물쇠가 화면 가로의 1/2 이상 차지하도록 확대해 보여줄 영역
      cells: 실제 다이얼/칸 자리 (탭 영역 + 값 표시 위치)
      ───────────────────────────────────────────────────────── */
+  /* ★v0.15 [4] 사진 속 물건 탭 좌표 — 전부 "열린 사진 ↔ 빈 사진" 픽셀 차이로 실측했다
+     (tools/measure-prizes.mjs). 값은 원본 이미지 기준 %, 탭 영역은 물건 bbox 에
+     사방 여유를 더해 402px 화면에서 가로·세로 모두 44px 이상이 되게 잡았다.
+     이전에는 눈대중 좌표라 물건과 어긋나 탭이 안 먹었다(예: L1 케이스 27~51% vs 실제 28.8~74.7%). */
+  var PRIZE = {
+    caseL1:     { x: 26.80, y: 45.69, w: 49.90, h: 30.97 },   /* 헤드셋 케이스 (실물 28.80/47.69/45.90/26.97) */
+    cardR1:     { x: 34.30, y: 58.61, w: 31.70, h: 16.31 },   /* 게임카드     (실물 36.30/60.66/27.70/12.22) */
+    keyR2:      { x: 40.80, y: 60.94, w: 17.40, h: 16.34 },   /* 은색 열쇠     (실물 42.80/66.72/13.40/4.78) */
+    phones:     { x: 17.81, y: 13.89, w: 73.00, h: 78.11 },   /* 헤드폰        (실물 19.81/15.89/69.00/74.11) */
+    cardKey:    { x: 32.40, y: 36.60, w: 35.20, h: 25.01 },   /* 천장 카드키   (실물 34.40/38.60/31.20/21.01) */
+    ladder:     { x: 34.08, y: 43.93, w: 11.44, h: 45.32 },   /* 사다리        (실물 36.08/45.93/7.44/41.32) */
+    tileBlack:  { x: 33.68, y: 64.00, w: 30.82, h: 17.58 },   /* 검정 색상판   (실물 35.68/66.00/26.82/13.58) */
+    tileBrown:  { x: 34.00, y: 46.17, w: 28.29, h: 32.81 },   /* 갈색 색상판   (실물 36.00/48.17/24.29/28.81) */
+    cellophane: { x: 31.20, y: 57.10, w: 38.80, h: 21.40 }    /* 셀로판  (실물 33.20/60.70/34.80/14.20) */
+  };
+
   var LOCKS = {
     /* ★v0.14 #27 화장실 상단 수납장2 — 문 사진(gen/56) 위 정사각 홈 8칸(알파벳) + 아래 명판.
        사진이 오기 전에는 img:null 자리표시 패널로 돌아간다(좌표는 패널 기준 %).
@@ -11467,7 +11565,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       openImg: "lav_cab2_open.jpg",
       emptyImg: "lav_cab2_empty.jpg",
       /* ★v0.14 갈색판 실측 38.6/48.4/18.7/28.0 (탭 여유 포함) */
-      prizeCell: { x: 38.6, y: 48.4, w: 18.7, h: 28.0 }
+      prizeCell: PRIZE.tileBrown
     },
     /* ★v0.13 #26 화장실 상단 수납장1 — 사진(50) 속 숫자 다이얼 6칸.
        정답은 P26_HASH 로만 비교한다(평문 없음). 좌표는 전부 원본(1264×848) 기준 %.
@@ -11507,7 +11605,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       openImg: "lav_cabtop_open.jpg",
       emptyImg: "lav_cabtop_empty.jpg",
       /* 검정판 실측 x35.9 y66.3 w26.4 h13.1 → 세로 탭 높이 44px 확보용으로 상하 패딩 */
-      prizeCell: { x: 35.9, y: 62.85, w: 26.4, h: 20.0 }
+      prizeCell: PRIZE.tileBlack
     },
     /* ★v0.11.1 #24 화장실 하단 수납장 — 사진(47) 위에 ◀ ▶ 버튼과 표시등 5개가 실물로 찍혀 있다.
        기존 W.arrowLock 의 누르기·표시등 로직을 그대로 사진 오버레이로 옮긴다.
@@ -11534,7 +11632,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       openImg: "lav_cab1_open.jpg",
       emptyImg: "lav_cab1_empty.jpg",
       /* 사다리 실측 x36.00 y45.81 w7.59 h40.50 → 탭 편의상 좌우 4%·상하 3% 패딩 */
-      prizeCell: { x: 32.0, y: 42.81, w: 15.59, h: 46.5 }
+      prizeCell: PRIZE.ladder
     },
     /* ★v0.9 #13 갤리 상단 수납함 — 풀린 뒤 "문 열린 사진 + 팜플렛 직접 탭" 흐름용 자리.
        사진 2장이 아직 없어서(gen/44·45 작업 중) 파일이 들어오기 전에는 코드가 자동으로
@@ -11572,6 +11670,11 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       ]
     },
     p10: {
+      /* ★v0.15 [9] 열린 사진(gen/61 셀로판)·빈 사진(gen/62) 이 오면 R2 와 같은 흐름으로
+         사진 속 셀로판을 탭해 꺼낸다. 도착 전에는 예전처럼 풀리자마자 보상. */
+      openImg: "bin_L2_open_cello.jpg",
+      emptyImg: "bin_L2_open_empty.jpg",
+      prizeCell: PRIZE.cellophane,
       img: IMG + "bin_L2.jpg", nw: 1000, nh: 667,
       crop: { x: 33, y: 32, w: 34, h: 28 },
       cells: [
@@ -11610,7 +11713,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       openImg: "bin_R2_open_key.jpg",
       emptyImg: "bin_R2_open_empty.jpg",
       /* ★v0.14 실측: 열쇠 43.9/67.8/12.3/7.7 → 탭 영역은 사방 여유(402px 화면에서 >=44px) */
-      prizeCell: { x: 41.9, y: 62.0, w: 16.3, h: 19.3 },
+      prizeCell: PRIZE.keyR2,
       /* ★v0.12.3 원통 다이얼은 위쪽 하이라이트 때문에 기하 중심에 글자를 두면 위로 쏠려 보인다.
          하이라이트 아래(=정면)의 가운데로 내린다 — tools/scan-facecenter.mjs 실측 8.3% (3칸 동일) */
       faceDy: 0.083,
@@ -11780,11 +11883,11 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   var BINOC = { img: "oway_plane.jpg", nw: 1264, nh: 842, crop: { x: 6.0, y: 0, w: 78.0, h: 78.06 } };
 
   window.DATA = {
-    LOCKS: LOCKS, IFE: IFE, TAMA: TAMA, TILES: TILES, BINOC: BINOC,
+    LOCKS: LOCKS, IFE: IFE, TAMA: TAMA, TILES: TILES, BINOC: BINOC, PRIZE: PRIZE,
     IMG: IMG, TEMP: TEMP, ITEMS: ITEMS, MAPS: MAPS, ANS: ANS, PIN_HASH: PIN_HASH, P26_HASH: P26_HASH,
     FOOD: FOOD, FOOD_BG: FOOD_BG, FLAGS: FLAGS, UTENSIL: UTENSIL, IFE_ICONS: IFE_ICONS,
     KANA: KANA, SONGS: SONGS,
-    PAMPHLET: PAMPHLET_A, PAMPHLET_TARGETS: PAMPHLET_TARGETS, KAKAO_MSG: KAKAO_MSG, KAKAO_FROM: KAKAO_FROM
+    PAMPHLET: PAMPHLET_A, PAMPHLET_TARGETS: PAMPHLET_TARGETS, PAMPHLET_BG: PAMPHLET_BG, KAKAO_MSG: KAKAO_MSG, KAKAO_FROM: KAKAO_FROM
   };
 })();
 
@@ -12139,6 +12242,8 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 
   /* ════════════════ 0-c. 이미지 위 인라인 자물쇠 (★v0.3) ════════════════
      별도 입력줄 없이, 클로즈업 이미지의 실제 다이얼 자리를 탭해서 값을 순환시킨다.  */
+  var DASH = String.fromCharCode(0x2013);   /* ★v0.15 순환 입력칸 초기 표시 */
+
   function imgLock(opt) {
     /* opt: {id, img, crop, cells:[{x,y,w,h}], answer, pool, size, kind:"text"|"icon",
              cands:[{id,label,emoji,svg,img}], extras:[{x,y,w,h,t,onTap,cls}], onSolve} */
@@ -12164,13 +12269,13 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         cands.push(list);
         idx.push(-1);
       } else if (isHash) {
-        /* 정답을 모르므로 후보는 풀 그대로(숫자 0~9). 초기 표시 = 0 */
+        /* 정답을 모르므로 후보는 풀 그대로(숫자 0~9) */
         cands.push(pool.slice(0, size));
-        idx.push(0);
+        idx.push(-1);          /* ★v0.15 초기 표시 = 대시 · 첫 탭에 구간 첫 글자 */
       } else {
-        /* ★v0.10 문자형은 풀 순서 그대로의 연속 구간, 초기 표시 = 구간 첫 글자 */
+        /* ★v0.10 문자형은 풀 순서 그대로의 연속 구간 */
         cands.push(orderedWindow(pool, ansArr[i], size, (opt.id || "lock") + "#" + i + "#" + ansArr[i]));
-        idx.push(0);
+        idx.push(-1);          /* ★v0.15 초기 표시 = 대시 · 첫 탭에 구간 첫 글자 */
       }
     }
 
@@ -12190,6 +12295,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
           /* ★v0.12 이 자물쇠의 후보 글자 전부 — 칸마다 크기가 달라지지 않게 한 번에 정한다 */
           if (!isIcon) {
             var uni = {};
+            uni[DASH] = 1;                 /* ★v0.15 초기 표시 대시도 앞면 규칙(폭60%/높이70%) 안에 들어가게 */
             cands.forEach(function (list) { list.forEach(function (g) { uni[g] = 1; }); });
             v._glyphs = Object.keys(uni);
           }
@@ -12217,7 +12323,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         var v = vnodes[i]; if (!v) continue;
         var val = idx[i] < 0 ? null : cands[i][idx[i]];
         if (cellNodes[i]) cellNodes[i].setAttribute("data-v", val === null ? "-" : val);
-        if (val === null) { clear(v); v.textContent = "\u2013"; v._noFit = false; continue; }
+        if (val === null) { clear(v); v.textContent = DASH; v._noFit = false; continue; }
         if (isIcon) {
           var c = opt.cands.filter(function (x) { return x.id === val; })[0];
           clear(v);
@@ -12257,6 +12363,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       setTimeout(function () { opt.onSolve && opt.onSolve(); }, 460);
     }
     if (!opt.pre) register({
+      isIcon: isIcon,
       /* ★해시 모드는 디버그에도 정답을 내놓지 않는다(#4 와 동일) */
       answer: isHash ? "(비공개 · 해시로만 비교)" : (isIcon
         ? ansArr.map(function (a) { var c = opt.cands.filter(function (x) { return x.id === a; })[0]; return c ? c.label : a; }).join(" ")
@@ -12791,29 +12898,62 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 
   /* ════════════════ 7. 팜플렛 × 셀로판 드래그 정렬 (#17) ════════════════ */
   function pamphlet(opt) {
-    var W = 340, H = 300;
+    /* ★v0.15 [10] 배경 사진(gen/63)이 있으면 리플릿만 잘라 세로로 꽉 채우고,
+       본문 빈 자리에 기존 문구를 얹는다. 없으면 예전 종이 그리기로 돌아간다.
+       셀로판 구멍은 **렌더된 글자 span 의 실제 중심**에서 뽑으므로 글자 배치가 바뀌어도 항상 맞는다. */
+    var BG = DATA.PAMPHLET_BG;
+    var useBg = !!(BG && Array.isArray(window.__IMG) && window.__IMG.indexOf(BG.img) >= 0);
+    var W, H, LOGO_X, LOGO_Y, LOGO_W, LOGO_H, BODY;
+    if (useBg) {
+      /* 잘라 쓸 리플릿의 화면 크기 — 팝업 높이(<=52vh)에 맞춰 세로 기준으로 잡는다 */
+      var lw = BG.leaflet.w / 100 * BG.nw, lh = BG.leaflet.h / 100 * BG.nh;   /* 원본 픽셀 */
+      H = 360; W = Math.round(H * lw / lh);
+      var sx = W / lw, sy = H / lh;                                           /* 원본 px -> 화면 px */
+      var LX = BG.leaflet.x / 100 * BG.nw, LY = BG.leaflet.y / 100 * BG.nh;
+      var toX = function (px) { return (px / 100 * BG.nw - LX) * sx; };
+      var toY = function (py) { return (py / 100 * BG.nh - LY) * sy; };
+      LOGO_X = toX(BG.logo.x); LOGO_Y = toY(BG.logo.y);
+      LOGO_W = BG.logo.w / 100 * BG.nw * sx; LOGO_H = BG.logo.h / 100 * BG.nh * sy;
+      BODY = { x: toX(BG.body.x), y: toY(BG.body.y),
+               w: BG.body.w / 100 * BG.nw * sx, h: BG.body.h / 100 * BG.nh * sy };
+    } else {
+      W = 340; H = 300;
+      LOGO_X = 16; LOGO_Y = 12; LOGO_W = 40; LOGO_H = 40;
+      BODY = { x: 14, y: LOGO_Y + LOGO_H + 10, w: W - 28, h: H - (LOGO_Y + LOGO_H + 10) - 10 };
+    }
     var host = el("div");
     host.style.cssText = "display:flex;align-items:center;justify-content:center;height:100%;width:100%";
     var stage = el("div"); stage.id = "pamStage";
     stage.style.width = W + "px"; stage.style.height = H + "px";
     var paper = el("div"); paper.id = "pamPaper";
+    if (useBg) {
+      /* background-size/position 으로 crop — 리플릿 영역이 정확히 paper 를 채운다 */
+      paper.classList.add("photo");
+      paper.style.backgroundImage = "url('" + DATA.IMG + BG.img + "')";
+      paper.style.backgroundSize = (BG.nw * (W / (BG.leaflet.w / 100 * BG.nw))) + "px " +
+        (BG.nh * (H / (BG.leaflet.h / 100 * BG.nh))) + "px";
+      paper.style.backgroundPosition = (-(BG.leaflet.x / 100) * (BG.nw * (W / (BG.leaflet.w / 100 * BG.nw)))) + "px " +
+        (-(BG.leaflet.y / 100) * (BG.nh * (H / (BG.leaflet.h / 100 * BG.nh)))) + "px";
+      paper.style.backgroundRepeat = "no-repeat";
+    }
     stage.appendChild(paper);
     host.appendChild(stage);
 
-    /* 로고(대한항공 닮은꼴 오리지널) */
-    var LOGO_X = 16, LOGO_Y = 12, LOGO_R = 20;
-    var logo = el("div", "plogo");
-    logo.style.cssText = "left:" + LOGO_X + "px;top:" + LOGO_Y + "px;width:" + (LOGO_R * 2) + "px;height:" + (LOGO_R * 2) + "px";
-    logo.innerHTML = '<svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="18" fill="none" stroke="#3a3630" stroke-width="2.2"/>' +
-      '<path d="M20 6 C27 12 30 18 28 26 C24 22 16 22 12 26 C10 18 13 12 20 6 z" fill="#6f6a60" opacity=".9"/></svg>';
-    paper.appendChild(logo);
-    var brand = el("div", null, "MARU AIR  ·  기내 안내");
-    brand.style.cssText = "position:absolute;left:" + (LOGO_X + LOGO_R * 2 + 8) + "px;top:" + (LOGO_Y + 12) + "px;font-size:11px;color:#7d776c;letter-spacing:1.2px";
-    paper.appendChild(brand);
+    if (!useBg) {
+      /* 로고(대한항공 닮은꼴 오리지널) — 사진이 없을 때만 그린다 */
+      var logo = el("div", "plogo");
+      logo.style.cssText = "left:" + LOGO_X + "px;top:" + LOGO_Y + "px;width:" + LOGO_W + "px;height:" + LOGO_H + "px";
+      logo.innerHTML = '<svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="18" fill="none" stroke="#3a3630" stroke-width="2.2"/>' +
+        '<path d="M20 6 C27 12 30 18 28 26 C24 22 16 22 12 26 C10 18 13 12 20 6 z" fill="#6f6a60" opacity=".9"/></svg>';
+      paper.appendChild(logo);
+      var brand = el("div", null, "MARU AIR  ·  기내 안내");
+      brand.style.cssText = "position:absolute;left:" + (LOGO_X + LOGO_W + 8) + "px;top:" + (LOGO_Y + 12) + "px;font-size:11px;color:#7d776c;letter-spacing:1.2px";
+      paper.appendChild(brand);
+    }
 
     /* 텍스트: 글자마다 span → 실제 좌표를 재서 셀로판 원 위치를 잡는다(P17 문서 (b)안) */
     var tx = el("div"); tx.id = "pamText";
-    tx.style.cssText = "left:14px;top:" + (LOGO_Y + LOGO_R * 2 + 10) + "px;width:" + (W - 28) + "px;" +
+    tx.style.cssText = "left:" + BODY.x.toFixed(1) + "px;top:" + BODY.y.toFixed(1) + "px;width:" + BODY.w.toFixed(1) + "px;" +
       "font-size:11.5px;line-height:1.62;white-space:normal;word-break:break-all";
     var spanMap = {};
     DATA.PAMPHLET.forEach(function (line, r) {
@@ -12827,6 +12967,19 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       tx.appendChild(p);
     });
     paper.appendChild(tx);
+
+    /* ★v0.15 본문이 빈 자리를 넘지 않게 글자 크기를 줄여 맞춘다(넘침 0) */
+    function fitBody() {
+      var fs = 11.5;
+      tx.style.fontSize = fs + "px";
+      for (var k = 0; k < 40 && (tx.scrollHeight > BODY.h + 0.5 || tx.scrollWidth > BODY.w + 0.5); k++) {
+        fs -= 0.25;
+        if (fs < 5) break;
+        tx.style.fontSize = fs + "px";
+      }
+      return fs;
+    }
+    var bodyFs = fitBody();
 
     /* 셀로판 */
     var cello = el("div"); cello.id = "cello";
@@ -12848,10 +13001,11 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       s += '<rect width="' + W + '" height="' + H + '" rx="8" fill="#6b6c74" opacity=".22" mask="url(#hm)"/>';
       s += '<rect width="' + W + '" height="' + H + '" rx="8" fill="none" stroke="#3a3a41" stroke-width="1.2" opacity=".85"/>';
       holes.forEach(function (h) { s += '<circle cx="' + h.x.toFixed(1) + '" cy="' + h.y.toFixed(1) + '" r="8.5" fill="none" stroke="#2a2a2f" stroke-width="1.4"/>'; });
-      /* align mark: 팜플렛 로고와 같은 자리에 윤곽선만 */
-      s += '<g transform="translate(' + LOGO_X + ',' + LOGO_Y + ') scale(' + (LOGO_R * 2 / 40) + ')">' +
-        '<circle cx="20" cy="20" r="18" fill="none" stroke="#2a2a2f" stroke-width="1.8" stroke-dasharray="4 3"/>' +
-        '<path d="M20 6 C27 12 30 18 28 26 C24 22 16 22 12 26 C10 18 13 12 20 6 z" fill="none" stroke="#2a2a2f" stroke-width="1.4"/></g>';
+      /* align mark: 팜플렛(사진) 로고와 **같은 자리·같은 크기** 의 윤곽선 */
+      s += '<g transform="translate(' + LOGO_X.toFixed(1) + ',' + LOGO_Y.toFixed(1) + ') scale(' +
+        (LOGO_W / 40).toFixed(4) + ',' + (LOGO_H / 40).toFixed(4) + ')">' +
+        '<rect x="1" y="1" width="38" height="38" rx="6" fill="none" stroke="#2a2a2f" stroke-width="2" stroke-dasharray="4 3"/>' +
+        '<circle cx="20" cy="20" r="9" fill="none" stroke="#2a2a2f" stroke-width="1.6"/></g>';
       s += "</svg>";
       cello.innerHTML = s;
       cello._holes = holes;
@@ -12887,6 +13041,27 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     }
 
     setTimeout(function () { build(); }, 30);
+
+    /* ★v0.15 검증용 — 정렬된 상태에서 표적 글자 중심과 구멍 중심의 거리(px) */
+    window.__pamState = function () {
+      var sr = stage.getBoundingClientRect();
+      return {
+        useBg: useBg, W: W, H: H, bodyFs: bodyFs,
+        overflow: { h: tx.scrollHeight - BODY.h, w: tx.scrollWidth - BODY.w },
+        off: { x: ox, y: oy }, snapped: snapped,
+        holes: (cello._holes || []).map(function (h, hi) {
+          /* 구멍과 표적은 같은 순서로 만들어진다 — 글자가 같아도(장·장) 인덱스로 짝짓는다 */
+          var t = DATA.PAMPHLET_TARGETS[hi];
+          var sp = t ? spanMap[t.r + "," + t.c] : null;
+          var r = sp ? sp.getBoundingClientRect() : null;
+          var cx = r ? (r.left - sr.left + r.width / 2) : null;
+          var cy = r ? (r.top - sr.top + r.height / 2) : null;
+          return { ch: h.ch, hole: [+h.x.toFixed(1), +h.y.toFixed(1)],
+                   glyph: r ? [+cx.toFixed(1), +cy.toFixed(1)] : null,
+                   d: r ? +Math.hypot(cx - h.x - ox, cy - h.y - oy).toFixed(2) : null };
+        })
+      };
+    };
     register({ answer: "셀로판을 로고에 맞춰(정렬 마크)", force: doSnap });
     host._snap = doSnap;
     return host;
@@ -14203,6 +14378,13 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     var b = el("button", "spot");
     b.style.cssText = "left:" + o.x + "%;top:" + o.y + "%;width:" + o.w + "%;height:" + o.h + "%";
     b.setAttribute("data-t", o.id);
+    /* ★v0.15 [6] 바닥처럼 "물건이 없는 자리" 는 카드·이모지 없이 투명 탭 영역만 */
+    if (o.kind === "floor") {
+      b.classList.add("floorSpot");
+      b.appendChild(el("div", "ring"));
+      b.onclick = function () { G.sfxTap(); onSpot(o); };
+      return b;
+    }
     var card = el("div", "compObj");
     card.style.cssText = "position:absolute;inset:0";
     if (o.img) { var im = new Image(); im.src = o.img; card.appendChild(im); }
@@ -14214,6 +14396,19 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     return b;
   }
   function onSpot(sp) {
+    /* ★v0.15 [6] 아이템을 "쓰는 자리" — 사다리를 고른 채 화장실 바닥을 탭하면 설치 */
+    if (sp.use) {
+      if (sp.use === "ladder") {
+        if (G.flag("ladderPlaced")) { G.toast("사다리는 이미 놓여 있다.", 1500); return; }
+        if (S.sel !== "ladder") { G.toast(S.sel ? "여기에 쓸 물건이 아니다." : "바닥이다. 뭔가 딛고 올라서야 할 것 같다.", 1800); return; }
+        G.take("ladder"); S.sel = null; renderInv();
+        G.setFlag("ladderPlaced"); G.sfxOk(); G.save();
+        G.toast("사다리를 놓았다.", 1900);
+        render();
+        return;
+      }
+      return;
+    }
     var cu = sp.cu;
     (sp.cuIf || []).forEach(function (p) { if (G.flag(p[0])) cu = p[1]; });
     openCU(cu);
@@ -14617,7 +14812,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     }
     var got = G.has("headsetCase") || G.flag("tookCase");
     c.stage.appendChild(imgStage(got ? DATA.IMG + "bin_L1_open_empty.jpg" : DATA.IMG + "bin_L1_open_case.jpg",
-      got ? [] : [pick({ x: 27, y: 50, w: 24, h: 28 }, "takeCase", "headsetCase", "tookCase")]));
+      got ? [] : [pick(DATA.PRIZE.caseL1, "takeCase", "headsetCase", "tookCase")]));
     c.cap(got ? "비어 있다." : "짐칸 안에 케이스가 들어 있다.");
   };
 
@@ -14630,11 +14825,20 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         pool: DATA.KANA, size: 12, answer: DATA.ANS.p10,
         onSolve: function () {
           G.markSolved("p10");
-          prize(DATA.TEMP.p10Prize, "짐칸이 열렸다");
+          /* ★v0.15 [9] 열림 사진이 있으면 사진 속 셀로판을 직접 탭해 꺼낸다 */
+          if (!(hasImg(L.openImg) && hasImg(L.emptyImg))) prize(DATA.TEMP.p10Prize, "짐칸이 열렸다");
           reopenCU();
         }
       }));
       c.cap("히라가나 5칸 자물쇠.");
+      return;
+    }
+    var L2 = DATA.LOCKS.p10;
+    if (hasImg(L2.openImg) && hasImg(L2.emptyImg)) {
+      var gotC = G.has("cellophane") || G.flag("tookCello");
+      c.stage.appendChild(imgStage(DATA.IMG + (gotC ? L2.emptyImg : L2.openImg),
+        gotC ? [] : [pick(L2.prizeCell, "takeCellophane", "cellophane", "tookCello")]));
+      c.cap(gotC ? "비어 있다." : "짐칸이 열렸다. 안에 얇은 셀로판이 있다.");
       return;
     }
     c.stage.appendChild(imgStage(DATA.IMG + "bin_L2.jpg", []));
@@ -14655,7 +14859,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     }
     var got = G.has("gamecard") || G.flag("tookCard");
     c.stage.appendChild(imgStage(got ? DATA.IMG + "bin_R1_open_empty.jpg" : DATA.IMG + "bin_R1_open_card.jpg",
-      got ? [] : [pick({ x: 26, y: 63, w: 26, h: 20 }, "takeGamecard", "gamecard", "tookCard")]));
+      got ? [] : [pick(DATA.PRIZE.cardR1, "takeGamecard", "gamecard", "tookCard")]));
     c.cap(got ? "비어 있다." : "웬 쿠폰 같은 카드가 있다.");
   };
 
@@ -14855,16 +15059,11 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   };
 
   CU.ceiling = function (c) {
-    c.title("천장 열쇠문");
-    /* ★v0.4: 사다리를 설치해야 손이 닿는다 */
-    if (!G.flag("ladderSet")) {
-      c.stage.appendChild(imgStage(DATA.IMG + "lav_ceiling.jpg", [
-        useAt({ x: 25, y: 74, w: 50, h: 24 }, "setLadder", ["ladder"], "천장이 너무 높다. 손이 안 닿는다.", function () {
-          G.take("ladder"); G.setFlag("ladderSet"); G.sfxOk();
-          G.toast("사다리를 놓았다", 1600);
-          reopenCU();
-        })
-      ]));
+    c.title("천장");
+    /* ★v0.15 [6] 사다리는 화장실 **바닥**에 놓는다(맵에서). 여기 "사다리 자리" 핫스팟은 없앴다.
+       놓기 전에는 관찰 문구만 보여 주고 아무것도 누를 수 없다. */
+    if (!G.flag("ladderPlaced")) {
+      c.stage.appendChild(imgStage(DATA.IMG + "lav_ceiling.jpg", []));
       c.cap("천장이 너무 높다. 손이 안 닿는다.");
       return;
     }
@@ -14874,14 +15073,13 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
           G.take("goldKey"); G.markSolved("ceiling"); G.sfxOk(); reopenCU();
         })
       ]));
-      c.cap("주유구처럼 생긴 둥근 사각형 문. 열쇠 구멍이 있다.");
+      c.cap("사다리를 딛고 올라섰다. 열쇠 구멍이 보인다.");
       return;
     }
     var got = G.has("cardKey") || G.flag("tookCardKey");
     c.stage.appendChild(imgStage(got ? DATA.IMG + "ceiling_open_empty.jpg" : DATA.IMG + "ceiling_open_cardkey.jpg",
-      got ? [] : [pick({ x: 43, y: 41, w: 26, h: 22 }, "takeCardKey", "cardKey", "tookCardKey")]));
-    c.panel.appendChild(el("div", "ladderTag", "사다리가 놓여 있다."));   /* ★v0.10.1 이모지 제거 + 관찰 서술 */
-    c.cap(got ? "비어 있다." : "안에 흰 카드가 들어 있다.");
+      got ? [] : [pick(DATA.PRIZE.cardKey, "takeCardKey", "cardKey", "tookCardKey")]));
+    c.cap(got ? "비어 있다." : "천장 문이 열렸다. 안에 흰 카드가 들어 있다.");
   };
 
   /* ★v0.4 화장실 수납장 배치
@@ -15162,10 +15360,13 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       var got = G.has("headphones") || G.flag("tookPhones");
       /* ★v0.10 버튼 대신 사진 속 헤드폰을 직접 탭 */
       var node = imgStage(got ? DATA.IMG + "case_open_empty.jpg" : DATA.IMG + "case_open_headset.jpg",
-        got ? [] : [{ x: 33, y: 24, w: 42, h: 54, t: "takePhones", onTap: function () {
-          G.setFlag("tookPhones"); prize("headphones", "");
-          closeZoom(); setTimeout(function () { ZOOM.case(); }, 100);
-        } }]);
+        got ? [] : [{ x: DATA.PRIZE.phones.x, y: DATA.PRIZE.phones.y, w: DATA.PRIZE.phones.w, h: DATA.PRIZE.phones.h,
+          t: "takePhones", onTap: function () {
+            G.setFlag("tookPhones"); prize("headphones", "");
+            /* ★v0.15 [8] 케이스는 헤드폰을 꺼내면 소모된다 — 인벤에는 헤드폰만 남는다 */
+            G.take("headsetCase");
+            closeZoom(); renderInv();
+          } }]);
       openZoom({ id: "case", title: "헤드셋 케이스", node: node,
         cap: got ? "비어 있다." : "안에 헤드폰이 들어 있다." });
       return;
@@ -15192,12 +15393,21 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     node.appendChild(t);
     openZoom({ id: "gamecard", title: "GAME CARD", node: node, cap: "미니게임 앱 계정 카드." });
   };
-  ZOOM.pamphlet = function () {
-    if (!G.has("cellophane")) {
+  /* ★v0.15 [7] 팜플렛 탭 → **팜플렛만** 뜬다. 셀로판은 인벤에서 고른 뒤
+     팜플렛을 탭해야 나타난다(고르지 않고 탭하면 아무 일도 없다). */
+  ZOOM.pamphlet = function (withCello) {
+    if (!withCello) {
       var node = el("div");
+      node.setAttribute("data-t", "pamPaperPlain");
       node.style.cssText = "background:#faf7f0;color:#3a3630;border-radius:6px;padding:12px;font-size:11px;line-height:1.6;max-width:340px";
       node.innerHTML = "<b style='color:#7d776c;letter-spacing:1.2px'>MARU AIR · 기내 안내</b><br><br>" + DATA.PAMPHLET.join("<br>");
-      openZoom({ id: "pamphlet", title: "팜플렛", node: node, cap: "그냥 안내문 같다." });
+      node.onclick = function () {
+        if (S.sel !== "cellophane") return;              /* 고르지 않았으면 아무 일 없음 */
+        S.sel = null; renderInv();
+        closeZoom(); setTimeout(function () { ZOOM.pamphlet(true); }, 120);
+      };
+      openZoom({ id: "pamphlet", title: "팜플렛", node: node,
+        cap: G.has("cellophane") ? "그냥 안내문 같다. (셀로판을 골라 팜플렛을 탭해 보자)" : "그냥 안내문 같다." });
       return;
     }
     var pam = W.pamphlet({
@@ -15224,26 +15434,36 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   var TONE_STEP = 1400;        /* 음원 없을 때 곡당 ms */
   var songRun = 0;             /* 재생 세션 번호 — 새로 시작하면 이전 세션은 스스로 멈춘다 */
   var songTimers = [];
-  var songNodes = {};          /* url -> {au, gain, dead}  (MediaElementSource 는 요소당 1번만) */
 
+  /* ★v0.15 [1] iOS 자동재생 정책 — 곡마다 new Audio() 를 만들면 2번째 곡부터
+     "사용자 제스처 밖에서 새 요소 play()" 가 되어 Safari 가 막는다(실제 증상: 1번만 재생).
+     → **엘리먼트 하나(G.sharedAudio)** 를 만들어 src 만 갈아끼운다. 첫 곡을 제스처 안에서
+     재생하는 순간 그 엘리먼트가 풀리고, 이후 src 교체 재생은 제스처 없이도 된다.
+     MediaElementSource 도 요소당 한 번만 만들 수 있어 같이 재사용한다. */
+  var songRec = null;          /* {au, gain, dead} — 노래 전용 공용 엘리먼트 */
   function songChain(url) {
-    if (songNodes[url]) return songNodes[url];
-    var au = new Audio(url);
-    au.preload = "auto";
-    var rec = { au: au, gain: null, dead: false };
-    au.addEventListener("error", function () { rec.dead = true; });
-    var a = G.audio && G.audio();
-    if (a && a.createMediaElementSource) {
-      try {
-        var src = a.createMediaElementSource(au);
-        var g = a.createGain();
-        g.gain.value = 0.0001;
-        src.connect(g); g.connect(a.destination);
-        rec.gain = g;
-      } catch (e) { rec.gain = null; }
+    if (!songRec) {
+      var au = G.sharedAudio();
+      var rec = { au: au, gain: null, dead: false, url: null };
+      au.addEventListener("error", function () { rec.dead = true; });
+      var a = G.audio && G.audio();
+      if (a && a.createMediaElementSource) {
+        try {
+          var srcN = a.createMediaElementSource(au);
+          var g = a.createGain();
+          g.gain.value = 0.0001;
+          srcN.connect(g); g.connect(a.destination);
+          rec.gain = g;
+        } catch (e) { rec.gain = null; }
+      }
+      songRec = rec;
     }
-    songNodes[url] = rec;
-    return rec;
+    if (songRec.url !== url) {
+      songRec.dead = false;
+      songRec.url = url;
+      try { songRec.au.src = url; songRec.au.load(); } catch (e) { songRec.dead = true; }
+    }
+    return songRec;
   }
   /* GainNode 가 있으면 그걸로, 없으면 element.volume 으로 같은 모양의 페이드 */
   function fadeTo(rec, to, sec) {
@@ -15271,11 +15491,10 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     songRun++;
     songTimers.forEach(function (t) { if (t && t.iv) clearInterval(t.iv); else clearTimeout(t); });
     songTimers = [];
-    Object.keys(songNodes).forEach(function (u) {
-      var r = songNodes[u];
-      try { r.au.pause(); r.au.currentTime = 0; } catch (e) {}
-      if (r.gain) { try { r.gain.gain.cancelScheduledValues(0); r.gain.gain.value = 0.0001; } catch (e) {} }
-    });
+    if (songRec) {
+      try { songRec.au.pause(); songRec.au.currentTime = 0; } catch (e) {}
+      if (songRec.gain) { try { songRec.gain.gain.cancelScheduledValues(0); songRec.gain.gain.value = 0.0001; } catch (e) {} }
+    }
   }
   function later(fn, ms) { var t = setTimeout(fn, ms); songTimers.push(t); return t; }
   /* 검증용 훅 — 지금 재생 상태(게인/재생위치)를 그대로 보여준다 */
@@ -15288,11 +15507,10 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       track: h ? h.textContent : "",              /* "3/5" — 화면에 실제로 보이는 것 */
       now: d ? d.textContent : "",                /* 곡 제목은 debug 에서만 존재 */
       ended: !!(e && e.style.display === "block"),
-      nodes: Object.keys(songNodes).map(function (u) {
-        var r = songNodes[u];
-        return { url: u, gain: r.gain ? +r.gain.gain.value.toFixed(3) : null,
-                 t: +(r.au.currentTime || 0).toFixed(2), paused: !!r.au.paused, dead: r.dead };
-      })
+      unlocked: !!(G.audioUnlocked && G.audioUnlocked()),
+      nodes: songRec ? [{ url: String(songRec.url || ""), gain: songRec.gain ? +songRec.gain.gain.value.toFixed(3) : null,
+                          t: +(songRec.au.currentTime || 0).toFixed(2), dur: +(songRec.au.duration || 0).toFixed(2),
+                          paused: !!songRec.au.paused, dead: songRec.dead }] : []
     };
   };
 
@@ -15402,27 +15620,37 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     var file = "song" + n + ".mp3";
     var have = Array.isArray(window.__AUDIO) && window.__AUDIO.indexOf(file) >= 0;
     var fired = false;
+    function fallback() { cur.tone = true; cur.rec = null; cur.t0 = Date.now(); tone(id); later(function () { finish(null); }, TONE_STEP); }
     function finish(rec) { if (fired) return; fired = true; if (rec) { try { rec.au.pause(); } catch (e) {} } done(); }
-    if (!have) { cur.tone = true; cur.rec = null; cur.t0 = Date.now(); tone(id); later(function () { finish(null); }, TONE_STEP); return; }
+    if (!have) { fallback(); return; }
 
-    var rec = songChain("audio/" + file);
-    if (rec.dead) { cur.tone = true; cur.rec = null; cur.t0 = Date.now(); tone(id); later(function () { finish(null); }, TONE_STEP); return; }
+    var rec = songChain("audio/" + file);      /* ★같은 엘리먼트에 src 만 교체 */
     var au = rec.au;
+    if (rec.gain) { try { au.volume = 1; } catch (e) {} } else { try { au.volume = 0; } catch (e) {} }
     try { au.currentTime = 0; } catch (e) {}
-    if (!rec.gain) { try { au.volume = 0; } catch (e) {} }
 
+    var started = false;
     function go() {
+      if (started) return; started = true;
       var dur = (au.duration && isFinite(au.duration) && au.duration > 0.2) ? au.duration : 10;
       cur.tone = false; cur.rec = rec; cur.dur = dur; cur.t0 = Date.now();
       fadeTo(rec, 1, FADE);                                                              /* 페이드인 1초 */
       later(function () { fadeTo(rec, 0.0001, FADE); }, Math.max(0, (dur - FADE) * 1000)); /* 끝나기 1초 전 페이드아웃 */
-      later(function () { finish(rec); }, dur * 1000 + 80);
-      au.addEventListener("ended", function () { finish(rec); }, { once: true });
+      later(function () { finish(rec); }, dur * 1000 + 300);                              /* 보험(ended 가 안 오면) */
     }
-    var p;
-    try { p = au.play(); } catch (e) { p = null; }
-    if (p && p.catch) p.catch(function () { rec.dead = true; cur.tone = true; cur.rec = null; cur.t0 = Date.now(); tone(id); later(function () { finish(null); }, TONE_STEP); });
-    if (au.readyState >= 1) go(); else au.addEventListener("loadedmetadata", go, { once: true });
+    au.addEventListener("ended", function () { finish(rec); }, { once: true });
+
+    function tryPlay() {
+      var p;
+      try { p = au.play(); } catch (e) { p = null; }
+      if (p && p.catch) p.catch(function () { rec.dead = true; if (!fired) fallback(); });
+    }
+    if (au.readyState >= 1) { tryPlay(); go(); }
+    else {
+      au.addEventListener("loadedmetadata", function () { tryPlay(); go(); }, { once: true });
+      /* 메타데이터가 안 오면(캐시·Range 문제) 신호음으로 대체 */
+      later(function () { if (!started && !fired) { rec.dead = true; fallback(); } }, 4000);
+    }
   }
 
   function tone(id) {
