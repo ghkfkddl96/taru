@@ -1,5 +1,5 @@
 /* 비행기에서 내리고 싶다. — 오프라인 서비스워커 (자동 생성) */
-const CACHE = "odyssey-ODY-S1-20260911-2358";
+const CACHE = "odyssey-ODY-S1-20260912-0014";
 const PRECACHE = [
  "./",
  "./index.html",

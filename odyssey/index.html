@@ -10951,7 +10951,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 (function () {
   "use strict";
 
-  var BUILD = "ODY-S1-20260911-2358";
+  var BUILD = "ODY-S1-20260912-0014";
   var LSKEY = "odyssey.s1.v1";
 
   var qs = new URLSearchParams(location.search);
@@ -11538,14 +11538,14 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
      좌표는 전부 사진(1000x574) 기준 %. 글자는 넣지 않는다. */
   /* ★v0.16 #8 상자 안 종이 그림 — 바탕 사진(hint_phonecase.jpg) 위에
      ①폰 뒷면과 케이스 사이 틈을 가리키는 굵은 직선 화살표 ②꼬리 끝 QR 픽토그램. 글자 없음.
-     최초 도안(직선·굵기·QR 위치 관계) 그대로 두고 **전체를 왼쪽 6.5% · 아래 3.0% 평행이동**만 했다:
+     ★v0.16.1 길이·굵기·QR 을 **70% 로 축소**하고, 촉 끝을 **케이스 밖으로 드러난 폰 뒷면(티타늄)** 위로 옮겼다(41.0/52.5 → 32.5/57.0):
        화살촉 끝 47.5/49.5 → **41.0/52.5** = 케이스 좌하단 안쪽 모서리와 폰 티타늄 면 사이의 어두운 틈
        (사진 실측: y52% 행에서 가장 어두운 x 41.4%, y54% 42.6% — 그 틈 선 위).
      좌표는 전부 사진(1000x574) 기준 %. */
   var HINT_ART = {
     img: "hint_phonecase.jpg", nw: 1000, nh: 574,
-    arrow: { tail: { x: 20.0, y: 82.0 }, tip: { x: 41.0, y: 52.5 }, w: 3.4, head: 9.0 },
-    qr: { x: 8.5, y: 75.0, size: 10.5 }
+    arrow: { tail: { x: 18.41, y: 73.96 }, tip: { x: 32.50, y: 57.00 }, w: 2.38, head: 6.30 },
+    qr: { x: 13.75, y: 68.75, size: 7.35 }
   };
 
   var PAMPHLET_BG = {
