@@ -10845,7 +10845,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 (function () {
   "use strict";
 
-  var BUILD = "ODY-S1-20260911-1016";
+  var BUILD = "ODY-S1-20260911-1157";
   var LSKEY = "odyssey.s1.v1";
 
   var qs = new URLSearchParams(location.search);
@@ -11672,60 +11672,170 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     _mc.font = "800 " + px + "px " + fam;
     return _mc.measureText(txt).width;
   }
-  /* ★v0.11 글자 크기 상한 — "칸"(cell) 기준
-       · 글자 bbox 폭  <= 칸 폭 × 0.60      (좌우 여백 각 >= 18%)
-       · 글자 bbox 높이 <= 칸 높이 × 0.76    (상하 여백 각 >= 12%) */
+  /* ══════════ ★v0.12 글자 맞춤 — "잉크"를 칸 한가운데에 ══════════
+     예전엔 글자의 **advance box**(글꼴이 잡아 주는 폭)를 칸 가운데에 뒀다.
+     그런데 글자마다 좌우 side bearing 이 달라서(C 는 왼쪽이 비고 H 는 꽉 차는 식)
+     실제 보이는 먹(잉크)은 칸 중심에서 밀려 보인다. 세로도 ascent/descent 가 비대칭이라 같다.
+     → canvas measureText 의 actualBoundingBox* 로 **잉크 상자**를 직접 재서
+       (a) 자물쇠 전체가 **같은 글자 크기**를 쓰고(칸마다 커졌다 작아졌다 하지 않게)
+       (b) 글자마다 translate 로 잉크 중심을 칸 중심에 맞춘다.
+     크기 기준(칸 기준): 잉크 폭 <= 60% · 잉크 높이 <= 76% → 좌우 여백 20% · 상하 12% 가 저절로 나온다. */
   var TXT_W = 0.60, TXT_H = 0.76;
-  function fitText(v, cw, ch, cellW, cellH, cellNode) {
-    var txt = (v.textContent || "").trim();
+  var _mcv = null;
+  function _mctx() {
+    if (!_mcv) _mcv = document.createElement("canvas");
+    return _mcv.getContext("2d");
+  }
+  /* 100px 기준으로 한 번만 재서 비례로 쓴다(글자·글꼴당 캐시) */
+  var _inkCache = {};
+  function inkAt100(txt, fam, weight) {
+    var key = weight + "|" + fam + "|" + txt;
+    if (_inkCache[key]) return _inkCache[key];
+    var cx = _mctx();
+    cx.font = weight + " 100px " + fam;
+    var m = cx.measureText(txt);
+    var L = m.actualBoundingBoxLeft || 0, Rr = m.actualBoundingBoxRight || 0;
+    var A = m.actualBoundingBoxAscent || 0, D = m.actualBoundingBoxDescent || 0;
+    var fA = (typeof m.fontBoundingBoxAscent === "number") ? m.fontBoundingBoxAscent : 80;
+    var fD = (typeof m.fontBoundingBoxDescent === "number") ? m.fontBoundingBoxDescent : 20;
+    var o = { L: L, R: Rr, A: A, D: D, fA: fA, fD: fD, adv: m.width,
+              w: L + Rr, h: A + D };
+    _inkCache[key] = o;
+    return o;
+  }
+  /* 이 자물쇠의 모든 후보 글자가 들어가는 최대 글자 크기(px) */
+  function uniformSize(glyphs, cellW, cellH, fam, weight) {
+    var px = 1e9;
+    for (var i = 0; i < glyphs.length; i++) {
+      var g = glyphs[i];
+      if (!g || !g.trim()) continue;
+      var k = inkAtPx(g, 100, fam, weight);          /* 100px 기준으로 비례 계산 */
+      var kw = k.L + k.R, kh = k.A + k.D;
+      if (kw > 0) px = Math.min(px, cellW * TXT_W / (kw / 100));
+      if (kh > 0) px = Math.min(px, cellH * TXT_H / (kh / 100));
+      if (k.adv > 0) px = Math.min(px, cellW * 0.92 / (k.adv / 100));
+    }
+    if (!isFinite(px)) px = Math.max(9, cellH * 0.5);
+    px = Math.max(7, px);
+    /* ★100px 비례로 고른 크기를 **그 크기에서 다시 재서** 확인한다(힌팅 때문에 비례가 정확하지 않다) */
+    for (var t = 0; t < 8; t++) {
+      var over = 0;
+      for (var q = 0; q < glyphs.length; q++) {
+        var g2 = glyphs[q]; if (!g2 || !g2.trim()) continue;
+        var kk = inkAtPx(g2, px, fam, weight);
+        over = Math.max(over, (kk.L + kk.R) / (cellW * TXT_W), (kk.A + kk.D) / (cellH * TXT_H));
+      }
+      if (over <= 1.001 || px <= 7) break;
+      px = Math.max(7, px / over * 0.995);
+    }
+    return px;
+  }
+  /* ★실제 글자 크기에서 직접 잰다 — 힌팅 때문에 100px 값을 비례로 줄이면 1~2px 어긋난다 */
+  var _inkCacheAt = {}, _scv = null;
+  /* ★잉크 상자는 **직접 그려서 픽셀로** 잰다.
+     WebKit 의 measureText 는 actualBoundingBoxLeft 를 0 으로, Right 를 advance 로 돌려줘서
+     (= 잉크 상자가 아니라 advance 상자) 좌우 side bearing 보정이 통째로 먹히지 않는다.
+     캔버스에 한 글자 찍어 알파 채널로 bbox 를 재면 엔진·글꼴과 무관하게 정확하다. */
+  function inkAtPx(txt, px, fam, weight) {
+    var key = weight + "|" + fam + "|" + px.toFixed(2) + "|" + txt;
+    if (_inkCacheAt[key]) return _inkCacheAt[key];
+    if (!_scv) _scv = document.createElement("canvas");
+    var pad = Math.ceil(px * 0.8);
+    var W = Math.ceil(px * 2.4) + pad * 2, H = Math.ceil(px * 2.6) + pad * 2;
+    _scv.width = W; _scv.height = H;
+    var cx = _scv.getContext("2d", { willReadFrequently: true });
+    cx.clearRect(0, 0, W, H);
+    cx.font = weight + " " + px + "px " + fam;
+    cx.textBaseline = "alphabetic";
+    cx.textAlign = "left";
+    cx.fillStyle = "#ffffff";
+    var ox = pad, oy = Math.round(px * 1.6) + pad;
+    cx.fillText(txt, ox, oy);
+    var adv = cx.measureText(txt).width;
+    var d = cx.getImageData(0, 0, W, H).data;
+    var x0 = 1e9, y0 = 1e9, x1 = -1, y1 = -1;
+    for (var y = 0; y < H; y++) for (var x = 0; x < W; x++) {
+      if (d[((y * W + x) << 2) + 3] > 12) { if (x < x0) x0 = x; if (y < y0) y0 = y; if (x > x1) x1 = x; if (y > y1) y1 = y; }
+    }
+    var o;
+    if (x1 < 0) o = { L: 0, R: adv, A: px * 0.7, D: 0, adv: adv, fA: px * 0.8, fD: px * 0.2 };
+    else o = { L: ox - x0, R: (x1 + 1) - ox, A: oy - y0, D: (y1 + 1) - oy, adv: adv, fA: px * 0.8, fD: px * 0.2 };
+    _inkCacheAt[key] = o;
+    return o;
+  }
+  /* 글자 하나의 잉크 중심을 칸 중심에 맞추는 translate */
+  function inkOffset(txt, px, fam, weight) {
+    var k = inkAtPx(txt, px, fam, weight);
+    var adv = k.adv, L = k.L, Rr = k.R, A = k.A, D = k.D;
+    var fA = k.fA, fD = k.fD;
+    var dx = adv / 2 - (Rr - L) / 2;                 /* advance 중심 → 잉크 중심 */
+    var half = (px - (fA + fD)) / 2;                  /* line-height:1 기준 half-leading */
+    var baseTop = half + fA;                          /* 줄상자 위에서 베이스라인까지 */
+    var inkCy = baseTop + (D - A) / 2;                /* 줄상자 위에서 잉크 중심까지 */
+    var dy = px / 2 - inkCy;
+    return { dx: dx, dy: dy };
+  }
+  /* v: 글자 칩(.cv 또는 .v)  ·  cellW/cellH: 칸 크기  ·  glyphs: 이 자물쇠의 후보 전부
+     ★베이스라인은 글꼴 메트릭(fontBoundingBox*) 대신 **DOM 에서 직접** 잰다.
+       높이 0 짜리 inline-block 을 글자 뒤에 두면 그 상자의 위 모서리가 곧 베이스라인이다.
+       (히라가나처럼 줄상자 계산이 글꼴 메트릭과 어긋나는 글꼴에서도 정확하다) */
+  function fitText(v, cw, ch, cellW, cellH, cellNode, glyphs) {
+    var txt = (v.textContent || "").replace(/​/g, "").trim();
     if (!txt) return;
     cellW = cellW || cw; cellH = cellH || ch;
     var cs = getComputedStyle(v);
-    var fam = cs.fontFamily || "sans-serif";
-    var ls = parseFloat(cs.letterSpacing) || 0;      /* letter-spacing 도 폭에 포함 */
-    var maxW = Math.min(cw * 0.80, cellW * TXT_W);
-    var maxH = Math.min(ch * 0.86, cellH * TXT_H);
-    /* ★v0.11 반복해서 깎지 않고 바로 계산한다.
-       글자 폭은 font-size 에 비례하고(letter-spacing 만 비례하지 않는다) 높이도 비례하므로
-       한 번 재서 필요한 크기를 곧장 구한다. 예전 방식(0.5px씩 40회)은 큰 칸에서 목표까지 못 내려갔다. */
-    var kW = measureW(txt, 100, fam) / 100;                  /* 100px 일 때 폭 → 비례상수 */
-    var pxW = kW > 0 ? (maxW - ls * txt.length) / kW : 999;
-    /* 글자 상자(Range)는 글꼴 ascent+descent 때문에 font-size 보다 1.1~1.2배 높다 →
-       세로 여백 12% 를 지키려면 그만큼 미리 나눠 준다. */
-    var px = Math.max(7, Math.min(pxW, maxH / 1.2));
-    v.style.fontSize = px.toFixed(1) + "px";
-    /* ★v0.10 실제 렌더 결과로 다시 확인 — 칩이 칸 폭에 맞춰 줄어든 경우(flex-shrink)엔
-       위 계산이 낡은 폭을 쓰게 되어 글자가 칩 밖으로 1~2px 삐져나온다. 눈으로 보이는
-       결과 기준으로 한 번 더 줄인다(글자를 자르거나 말줄임하지 않는다). */
-    if (v.firstChild && v.firstChild.nodeType === 3 && v.childNodes.length === 1) {
-      try {
-        /* ★v0.11 실제 렌더 결과(Range)를 **칸 기준**으로 재서
-           "폭 <= 60% · 좌우 여백 각 >= 18% · 상하 여백 각 >= 12%" 가 될 때까지 줄인다.
-           글꼴마다 ascent/descent 가 달라 계산만으로는 위아래가 살짝 치우친다. */
-        for (var g = 0; g < 60 && px > 7; g++) {
-          var kr = v.getBoundingClientRect();
-          if (!kr.width) break;
-          var rg = document.createRange(); rg.selectNodeContents(v);
-          var b = rg.getBoundingClientRect();
-          if (!b.width) break;
-          var okChip = b.width <= kr.width + 0.6 && b.height <= kr.height + 0.6;
-          var okCell;
-          var cr = cellNode ? cellNode.getBoundingClientRect() : null;
-          if (cr && cr.width > 0) {
-            okCell = b.width <= cr.width * TXT_W &&
-              (b.left - cr.left) >= cr.width * 0.185 &&
-              (cr.right - b.right) >= cr.width * 0.185 &&
-              (b.top - cr.top) >= cr.height * 0.125 &&
-              (cr.bottom - b.bottom) >= cr.height * 0.125;
-          } else {
-            okCell = b.width <= cellW * TXT_W + 0.2 && b.height <= cellH * TXT_H + 0.2;
-          }
-          if (okChip && okCell) break;
-          px -= 0.5;
-          v.style.fontSize = px.toFixed(1) + "px";
-        }
-      } catch (e) {}
+    /* ★글자 상자를 캔버스로 재려면 캔버스와 DOM 이 **같은 글꼴**을 골라야 한다.
+       상속된 글꼴 목록은 엔진마다 폴백이 갈려 캔버스 측정과 실제 렌더가 어긋난다(WebKit 에서 1~2px).
+       그래서 글자칸만 단일 글꼴로 고정한다. */
+    var fam = "sans-serif";
+    var weight = cs.fontWeight || "400";
+    var all = (glyphs && glyphs.length) ? glyphs : [txt];
+    var px = uniformSize(all, cellW, cellH, fam, weight);
+    v.style.fontSize = px.toFixed(2) + "px";
+    v.style.transform = "none";
+
+    /* .cv 는 flex 라 그 안에 바로 넣은 probe 는 baseline 에 붙지 않는다 →
+       글자를 inline span 으로 한 번 감싸고 그 안에 probe 를 둔다. */
+    var gl = v.querySelector("span.gl");
+    if (!gl || gl.getAttribute("data-g") !== txt) {
+      v.textContent = "";
+      gl = document.createElement("span");
+      gl.className = "gl";
+      /* line-height:1 이면 줄상자가 글자 상자보다 짧아 "세로 넘침" 으로 잡힌다 → normal 로.
+         세로 위치는 어차피 베이스라인 probe 로 정확히 맞추므로 줄상자 높이는 상관없다. */
+      gl.style.cssText = "font-family:sans-serif";
+      gl.setAttribute("data-g", txt);
+      gl.appendChild(document.createTextNode(txt));
+      var pb = document.createElement("i");
+      pb.className = "blProbe";
+      pb.style.cssText = "display:inline-block;width:0;height:0;overflow:hidden;vertical-align:baseline";
+      gl.appendChild(pb);
+      v.appendChild(gl);
     }
+    gl.style.transform = "none";
+    var probe = gl.querySelector("i.blProbe");
+    var k = inkAtPx(txt, px, fam, weight);
+    var pr = probe.getBoundingClientRect();          /* pr.top == 베이스라인, pr.left == advance 끝 */
+    var ref = cellNode ? cellNode.getBoundingClientRect() : v.getBoundingClientRect();
+    if (!pr.width && !pr.top) {
+      var o = inkOffset(txt, px, fam, weight);
+      gl.style.transform = "translate(" + o.dx.toFixed(2) + "px," + o.dy.toFixed(2) + "px)";
+      return;
+    }
+    /* advance 시작 x 는 캔버스 width 대신 **DOM 의 글자 상자**에서 직접 잰다
+       (엔진마다 measureText 폭과 실제 배치가 미세하게 다르다) */
+    var advStart = pr.left - k.adv;
+    try {
+      var rg0 = document.createRange();
+      rg0.selectNodeContents(gl.firstChild);
+      var tb = rg0.getBoundingClientRect();
+      if (tb.width > 0) advStart = tb.left;
+    } catch (e) {}
+    var inkCx = advStart + (k.R - k.L) / 2;
+    var inkCy = pr.top + (k.D - k.A) / 2;
+    var dx = (ref.left + ref.width / 2) - inkCx;
+    var dy = (ref.top + ref.height / 2) - inkCy;
+    gl.style.transform = "translate(" + dx.toFixed(2) + "px," + dy.toFixed(2) + "px)";
   }
 
   function cropView(src, crop, overlays, opts) {
@@ -11778,7 +11888,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
           /* ★v0.11 칩 상자 + **칸(cell)** 크기를 같이 넘겨 "칸 폭의 60% 이하" 를 지킨다 */
           var vr = v.getBoundingClientRect();
           var cellW = o.w / 100 * dispW, cellH = o.h / 100 * dispH;
-          fitText(v, vr.width || cellW, vr.height || cellH, cellW, cellH, n);
+          fitText(v, vr.width || cellW, vr.height || cellH, cellW, cellH, n, v._glyphs);
         }
         if (o.onFit) o.onFit(n, { dispW: dispW, dispH: dispH, ox: ox, oy: oy });
       });
@@ -11831,6 +11941,12 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         cls: isIcon ? "icon" : "",
         build: function (nd) {
           var v = el("div", "cv");
+          /* ★v0.12 이 자물쇠의 후보 글자 전부 — 칸마다 크기가 달라지지 않게 한 번에 정한다 */
+          if (!isIcon) {
+            var uni = {};
+            cands.forEach(function (list) { list.forEach(function (g) { uni[g] = 1; }); });
+            v._glyphs = Object.keys(uni);
+          }
           nd.appendChild(v); vnodes[i] = v; cellNodes[i] = nd;
           if (opt.pre) nd.classList.add("done");
         },
