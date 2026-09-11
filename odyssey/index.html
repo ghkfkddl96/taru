@@ -197,7 +197,8 @@ input:focus{outline:none;border-color:var(--accent)}
 #shadeWrap img{height:100%;width:auto;max-width:100%;object-fit:contain;border-radius:var(--r)}
 #shadeWrap .shadeImg{position:absolute;inset:0;height:100%;width:100%;object-fit:contain}
 /* 가리개에 인쇄된 코드 — 디제틱(그림 일부)이라 로고와 같은 붉은색 유지 */
-#shadeCode{position:absolute;left:50%;transform:translateX(-50%);font-size:clamp(13px,4.4vw,21px);letter-spacing:2px;color:#b03a3a;font-weight:700;white-space:nowrap}
+#shadeWrap .shadeCodeClip{position:absolute;inset:0;pointer-events:none}
+#shadeCode{position:absolute;left:50%;transform:translate(-50%,0);will-change:transform;font-size:clamp(13px,4.4vw,21px);letter-spacing:2px;color:#b03a3a;font-weight:700;white-space:nowrap}
 /* ★v0.10 line-height 1.25 는 글자 상자보다 짧아 글자 상자가 2px 샐져나갔다 → 1.45 */
 #shadeCode .dg{display:inline-block;min-width:16px;padding:0 2px;margin:0 1px;border:1.5px solid #b03a3a;border-radius:3px;font-size:.86em;line-height:1.45;text-align:center;background:rgba(255,255,255,.35)}
 .dragHint{position:absolute;left:50%;transform:translateX(-50%);bottom:6px;font-size:11px;color:var(--n8);background:rgba(11,11,12,.62);padding:3px 10px;border-radius:6px;animation:blink 1.8s ease-in-out infinite}
@@ -517,7 +518,11 @@ body.dbg .cvcell.hot.ifeBtn:active,body.dbg .cvcell.hot.ifeTile:active{box-shado
 #tissueWrap .tissueImg{height:100%;width:auto;max-width:100%;object-fit:contain;display:block}
 #tissueWrap .tissueLayer{position:absolute;inset:0}
 #tissueWrap .tissueLayer .tissueImg{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
-#tissueWrap .tissuePat{position:absolute;left:34%;top:50%;width:32%;opacity:.75}
+/* ★v0.12.3 그림은 종이에 인쇄된 것 — patClip 이 롤 선 위쪽을 잘라내고, pat 이 종이와 함께 내려온다 */
+#tissueWrap .tissuePatClip{position:absolute;inset:0;pointer-events:none}
+/* .tissuePat 은 위치 기준만(투명). 보이는 그림은 .tissueArt 캔버스가 곡면 투영해 그린다 */
+#tissueWrap .tissuePat{position:absolute;left:34%;top:50%;width:32%;opacity:0;will-change:transform}
+#tissueWrap .tissueArt{position:absolute;left:0;top:0;pointer-events:none}
 #tissueWrap .tissuePat svg{width:100%;height:auto;display:block}
 
 /* ◀▶ 화살표 자물쇠 */
@@ -10858,7 +10863,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 (function () {
   "use strict";
 
-  var BUILD = "ODY-S1-20260911-1307";
+  var BUILD = "ODY-S1-20260911-1335";
   var LSKEY = "odyssey.s1.v1";
 
   var qs = new URLSearchParams(location.search);
@@ -11390,6 +11395,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
              주기 49px, 다이얼 실폭 29.5px)에 맞춘 탭 영역이고, 글자는 faces(앞면)에 놓인다. */
     p26: {
       img: IMG + "lav_cabtop.jpg", nw: 1264, nh: 848,
+      faceDy: 0.062,          /* ★v0.12.3 원통 다이얼 시각 중심 보정(실측 6칸 중 5칸 6.2%) */
       crop: { x: 32.48, y: 13.92, w: 35.13, h: 71.70 },
       cells: [
         { x: 38.53, y: 60.44, w: 3.60, h: 12.50 },
@@ -11515,6 +11521,9 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     },
     p16: {
       img: IMG + "bin_R2.jpg", nw: 1000, nh: 667,
+      /* ★v0.12.3 원통 다이얼은 위쪽 하이라이트 때문에 기하 중심에 글자를 두면 위로 쏠려 보인다.
+         하이라이트 아래(=정면)의 가운데로 내린다 — tools/scan-facecenter.mjs 실측 8.3% (3칸 동일) */
+      faceDy: 0.083,
       crop: { x: 34, y: 19, w: 32, h: 58 },
       cells: [
         { x: 40.7, y: 58.17, w: 4.8, h: 13.49 },
@@ -11951,7 +11960,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     var inkCx = advStart + (k.R - k.L) / 2;
     var inkCy = pr.top + (k.D - k.A) / 2;
     var dx = (ref.left + ref.width / 2) - inkCx;
-    var dy = (ref.top + ref.height / 2) - inkCy;
+    var dy = (ref.top + ref.height / 2 + (v._dy || 0)) - inkCy;
     gl.style.transform = "translate(" + dx.toFixed(2) + "px," + dy.toFixed(2) + "px)";
   }
 
@@ -12012,6 +12021,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
             v.style.left = ((o.face.x - o.x) / 100 * dispW) + "px";
             v.style.top = ((o.face.y - o.y) / 100 * dispH) + "px";
             v.style.width = boxW + "px"; v.style.height = boxH + "px";
+            v._dy = (o.faceDy || 0) * boxH;     /* 원통 다이얼 시각 중심 보정 */
           }
           var vr = v.getBoundingClientRect();
           fitText(v, vr.width || boxW, vr.height || boxH, boxW, boxH, n, v._glyphs);
@@ -12074,6 +12084,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         /* ★v0.12.1 탭 영역은 칸 전체, 글자칩은 다이얼 앞면에만 */
         face: opt.faces && opt.faces[i] ? opt.faces[i] : null,
         faceLight: !!opt.faceLight,
+        faceDy: opt.faceDy || 0,
         cls: isIcon ? "icon" : "",
         build: function (nd) {
           var v = el("div", "cv");
@@ -12468,10 +12479,13 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     var layer = el("div", "shadeLayer");
     var sh = new Image(); sh.src = opt.shadeImg; sh.className = "shadeImg";
     layer.appendChild(sh);
+    /* ★v0.12.3 코드는 가리개 천에 인쇄돼 천과 같이 내려온다(하우징 선에서 아래쪽부터 드러남) */
+    var codeClip = el("div", "shadeCodeClip");
     var code = el("div"); code.id = "shadeCode";
     code.innerHTML = '<span style="letter-spacing:1px">OO</span>&nbsp;' +
       '<b class="dg">1</b><b class="dg">2</b><span style="letter-spacing:1px">OO</span><b class="dg">4</b><b class="dg">3</b>';
-    layer.appendChild(code);
+    codeClip.appendChild(code);
+    layer.appendChild(codeClip);
     stack.appendChild(layer);
     var hint = el("div", "dragHint", "\u2195");
     stack.appendChild(hint);
@@ -12479,13 +12493,25 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 
     /* 유리 영역: 이미지 세로 19% ~ 70% */
     var TOP = 19, BOT = 70;
+    var EMERGE = 19;            /* 하우징 하단선 — 가리개(와 인쇄된 코드)가 여기부터 나온다 */
+    var PEEK = 0.13;            /* 안 내린 상태에서 하우징 아래로 보이는 코드 높이 비율(단서) */
+    var CODE_TOP = 44;          /* 끝까지 내렸을 때 코드 top (이미지 세로 %) — 기존 디자인 그대로 */
     var p = opt.closed ? 1 : 0;
     function apply() {
-      var cut = TOP + (BOT - TOP) * p;
+      var Hs = stack.getBoundingClientRect().height || 0;
+      code.style.top = CODE_TOP + "%";
+      var Hc = code.getBoundingClientRect().height || Hs * 0.06;
+      var finalTop = CODE_TOP / 100 * Hs;
+      var initTop = EMERGE / 100 * Hs - (1 - PEEK) * Hc;
+      var dy = (initTop - finalTop) * (1 - p);
+      code.style.transform = "translate(-50%," + dy.toFixed(1) + "px)";
+      var ccp = "inset(" + EMERGE.toFixed(2) + "% 0 0 0)";
+      codeClip.style.clipPath = ccp; codeClip.style.webkitClipPath = ccp;
+      var minCut = EMERGE + (Hs ? ((PEEK * Hc) / Hs * 100) : 0) + 1;
+      var cut = Math.max(minCut, TOP + (BOT - TOP) * p);
       var cp = "inset(0 0 " + (100 - cut).toFixed(2) + "% 0)";
       layer.style.clipPath = cp;
       layer.style.webkitClipPath = cp;
-      code.style.top = "44%";
       hint.style.display = p > 0.985 ? "none" : "block";
     }
     var startY = 0, startP = 0;
@@ -12502,8 +12528,12 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       }
     });
     apply();
+    setTimeout(apply, 30); setTimeout(apply, 250); setTimeout(apply, 700);
+    window.addEventListener("resize", apply);
     if (opt.closed && opt.onClosed) setTimeout(opt.onClosed, 0);
     register({ answer: "가리개를 끝까지 내려", force: function () { p = 1; apply(); if (opt.onClosed) opt.onClosed(); } });
+    wrap._setP = function (v) { p = Math.max(0, Math.min(1, v)); apply(); };   /* 검증용 */
+    wrap._getP = function () { return p; };
     return wrap;
   }
 
@@ -12519,18 +12549,51 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     var layer = el("div", "tissueLayer");
     var img2 = new Image(); img2.src = opt.img; img2.className = "tissueImg";
     layer.appendChild(img2);
+    /* ★v0.12.3 그림은 **종이에 인쇄돼 종이와 같이 내려온다**.
+       patClip = 롤에서 종이가 빠져나오는 선 위쪽을 잘라내는 창(그 위로는 그림이 안 보인다),
+       pat     = 그림 자체. 당긴 만큼 translateY 로 같이 내려온다. */
+    var patClip = el("div", "tissuePatClip");
+    /* .tissuePat = **위치 기준(투명)**. 눈에 보이는 그림은 아래 canvas 가 그린다.
+       (곡면 투영이 필요해서 DOM 으로는 못 그린다 — 아래 drawArt 참고) */
     var pat = el("div", "tissuePat");
     pat.innerHTML = patternSVG();
-    layer.appendChild(pat);
+    patClip.appendChild(pat);
+    var artCv = document.createElement("canvas");
+    artCv.className = "tissueArt";
+    patClip.appendChild(artCv);
+    layer.appendChild(patClip);
+    var artImg = new Image();
+    artImg.onload = function () { apply(); };
+    /* Image 로 쓰려면 고유 크기가 있어야 한다(viewBox 만 있으면 naturalWidth=0) */
+    artImg.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(
+      patternSVG().replace("<svg ", '<svg width="330" height="330" '));   /* xmlns 는 patternSVG 가 이미 넣는다 */
     stack.appendChild(layer);
     wrap.appendChild(stack);
     var hint = el("div", "dragHint", "\u2195");
     wrap.appendChild(hint);
 
     var ROLL = 40, END = 92;    /* 이미지 세로 %: 롤 아래끝 / 휴지 끝 */
+    var EMERGE = 36;            /* 롤에서 종이가 빠져나오는 **접선** — 아래는 평면 */
+    var ROLL_R = 12;            /* 롤 반지름(이미지 세로 %) — 사진 실측(롤 지름 약 24%) */
+    var ARC_RAD = 0.6435;       /* 곡면으로 보여 주는 각도(=asin 0.6) → 접선 위 R*0.6 만큼 */
+    var ARC = 7.2;              /* 그 높이(이미지 세로 %) = ROLL_R * 0.6 */
+    var PEEK = 0.13;            /* 안 당긴 상태에서 롤 선 아래로 보이는 그림 높이 비율(단서) */
+    var PAT_TOP = 50;           /* 끝까지 당겼을 때 그림 top (이미지 세로 %) — 기존 디자인 그대로 */
     var p = 0, startY = 0, startP = 0;
     function apply() {
-      var cut = ROLL + (END - ROLL) * p;
+      var Hs = stack.getBoundingClientRect().height || 0;
+      var Hp = pat.getBoundingClientRect().height || Hs * 0.22;
+      /* 그림 위치: 끝까지 당기면 PAT_TOP, 안 당기면 롤 선 위로 숨고 아래 PEEK 만큼만 보인다 */
+      var finalTop = PAT_TOP / 100 * Hs;
+      var initTop = EMERGE / 100 * Hs - (1 - PEEK) * Hp;
+      var dy = (initTop - finalTop) * (1 - p);
+      pat.style.transform = "translateY(" + dy.toFixed(1) + "px)";
+      var pcp = "inset(" + (EMERGE - ARC).toFixed(2) + "% 0 0 0)";
+      patClip.style.clipPath = pcp; patClip.style.webkitClipPath = pcp;
+      drawArt(Hs, finalTop + dy, Hp);
+      /* 종이는 최소한 그림이 보이는 데까지는 나와 있어야 한다 */
+      var minCut = EMERGE + (Hs ? ((PEEK * Hp) / Hs * 100) : 0) + 1;
+      var cut = Math.max(minCut, ROLL + (END - ROLL) * p);
       var cp = "inset(0 0 " + (100 - cut).toFixed(2) + "% 0)";
       layer.style.clipPath = cp; layer.style.webkitClipPath = cp;
       /* idle 이미지가 있으면 그대로 두고(이미 안 풀린 롤), 없으면 롤 아래를 가린다 */
@@ -12540,6 +12603,47 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       }
       hint.style.display = p > 0.92 ? "none" : "block";
     }
+    /* ★v0.12.3 롤 곡면 투영 —
+       접선(EMERGE) 아래는 1:1 평면, 위로 ARC% 구간은 원통에 감긴 종이라서
+       화면 y 가 올라갈수록 종이 좌표가 cos 만큼 압축된다(θ = asin((yt−y)/R)).
+       잉크도 θ 만큼 옅어져 곡면 음영처럼 보인다. 롤 자체는 사진이라 위쪽은 자연히 가려진다. */
+    function drawArt(Hs, patTop, Hp) {
+      if (!artImg.complete || !artImg.naturalWidth || !Hs) return;
+      var W = stack.getBoundingClientRect().width;
+      var dpr = Math.min(3, window.devicePixelRatio || 1);
+      if (artCv.width !== Math.round(W * dpr) || artCv.height !== Math.round(Hs * dpr)) {
+        artCv.width = Math.round(W * dpr); artCv.height = Math.round(Hs * dpr);
+      }
+      artCv.style.width = W + "px"; artCv.style.height = Hs + "px";
+      var g2 = artCv.getContext("2d");
+      g2.setTransform(dpr, 0, 0, dpr, 0, 0);
+      g2.clearRect(0, 0, W, Hs);
+      var pw = W * 0.32, x0 = W * 0.34;
+      var yt = EMERGE / 100 * Hs;                 /* 접선: 여기부터 아래는 평면 */
+      var R = ROLL_R / 100 * Hs;                  /* 롤 반지름(사진 실측 비율) */
+      var sH = artImg.naturalHeight, sW = artImg.naturalWidth;
+      /* 평면 구간 */
+      var f0 = Math.max(yt, patTop), f1 = patTop + Hp;
+      g2.globalAlpha = 0.75;
+      if (f1 > f0) {
+        var su = (f0 - patTop) / Hp * sH, sh = (f1 - f0) / Hp * sH;
+        g2.drawImage(artImg, 0, su, sW, sh, x0, f0, pw, f1 - f0);
+      }
+      /* 곡면 구간 — 한 줄씩 종이 좌표를 되짚어 그린다 */
+      var top = yt - R * Math.sin(ARC_RAD);
+      for (var y = Math.floor(top); y < yt; y++) {
+        var d = (yt - y) / R; if (d > 1) continue;
+        var th = Math.asin(d);
+        var u = (yt - patTop) - R * th;           /* 종이 좌표(그림 위에서부터) */
+        if (u < 0 || u > Hp) continue;
+        var sy = u / Hp * sH;
+        var step = Math.max(1, (sH / Hp) / Math.max(0.35, Math.cos(th)));
+        g2.globalAlpha = 0.75 * Math.max(0.45, Math.cos(th));
+        g2.drawImage(artImg, 0, sy, sW, step, x0, y, pw, 1.15);
+      }
+      g2.globalAlpha = 1;
+    }
+
     G.drag(stack, {
       start: function (q) { startY = q.y; startP = p; },
       move: function (q) {
@@ -12549,8 +12653,11 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       },
       end: function () { if (p > 0.9) { p = 1; apply(); if (opt.onFull) opt.onFull(); } }
     });
-    setTimeout(apply, 20); setTimeout(apply, 200);
+    setTimeout(apply, 20); setTimeout(apply, 200); setTimeout(apply, 600);
+    window.addEventListener("resize", apply);
     register({ answer: "휴지를 끝까지 풀어", force: function () { p = 1; apply(); if (opt.onFull) opt.onFull(); } });
+    wrap._setP = function (v) { p = Math.max(0, Math.min(1, v)); apply(); };   /* 검증용 */
+    wrap._getP = function () { return p; };
     return wrap;
   }
 
@@ -12559,7 +12666,10 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     var pts = [[1, 0, 0], [2, 1, 0], [3, 2, 0], [4, 0, 1], [5, 1, 1], [6, 2, 1], [7, 0, 2], [8, 1, 2], [9, 2, 2]];
     var seq = [1, 4, 7, 8, 9, 6, 3];
     var X = function (c) { return 34 + c * 46; }, Y = function (r) { return 30 + r * 46; };
-    var s = '<svg viewBox="0 0 160 150" xmlns="http://www.w3.org/2000/svg">';
+    /* ★v0.12.3 viewBox 를 그림(점·화살표)에 딱 맞춘다 — 위아래 빈 여백이 있으면
+       롤 곡면 구간과 "살짝 보이는 아래끝"에 아무것도 안 나와서 단서가 안 된다.
+       내용 범위: x 29~131, y 25~127 → 여백 4 씩. */
+    var s = '<svg viewBox="25 21 110 110" xmlns="http://www.w3.org/2000/svg">';
     s += '<defs><marker id="ar" markerWidth="7" markerHeight="7" refX="5" refY="3.2" orient="auto">' +
       '<path d="M0,0 L6,3.2 L0,6.4 z" fill="#5c6470"/></marker></defs>';
     pts.forEach(function (p) { s += '<circle cx="' + X(p[1]) + '" cy="' + Y(p[2]) + '" r="5" fill="none" stroke="#9aa3ae" stroke-width="1.6"/>'; });
@@ -14226,7 +14336,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     if (!G.solved("p12")) {
       var L = DATA.LOCKS.p12;
       c.stage.appendChild(W.imgLock({
-        id: "p12", img: L.img, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells, faces: L.faces, faceLight: L.faceLight,
+        id: "p12", img: L.img, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells, faces: L.faces, faceLight: L.faceLight, faceDy: L.faceDy,
         pool: "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(""), size: 12, answer: DATA.ANS.p12,
         onSolve: function () { G.markSolved("p12"); reopenCU(); }
       }));
@@ -14244,7 +14354,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     if (!G.solved("p10")) {
       var L = DATA.LOCKS.p10;
       c.stage.appendChild(W.imgLock({
-        id: "p10", img: L.img, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells, faces: L.faces, faceLight: L.faceLight,
+        id: "p10", img: L.img, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells, faces: L.faces, faceLight: L.faceLight, faceDy: L.faceDy,
         pool: DATA.KANA, size: 12, answer: DATA.ANS.p10,
         onSolve: function () {
           G.markSolved("p10");
@@ -14264,7 +14374,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     if (!G.solved("p15")) {
       var L = DATA.LOCKS.p15;
       c.stage.appendChild(W.imgLock({
-        id: "p15", img: L.img, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells, faces: L.faces, faceLight: L.faceLight,
+        id: "p15", img: L.img, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells, faces: L.faces, faceLight: L.faceLight, faceDy: L.faceDy,
         kind: "icon", cands: DATA.FOOD, answer: DATA.ANS.p15,
         onSolve: function () { G.markSolved("p15"); reopenCU(); }
       }));
@@ -14282,7 +14392,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     if (!G.solved("p16")) {
       var L = DATA.LOCKS.p16;
       c.stage.appendChild(W.imgLock({
-        id: "p16", img: L.img, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells, faces: L.faces, faceLight: L.faceLight,
+        id: "p16", img: L.img, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells, faces: L.faces, faceLight: L.faceLight, faceDy: L.faceDy,
         pool: "0123456789".split(""), size: 10, answer: DATA.ANS.p16,
         onSolve: function () {
           G.markSolved("p16");
@@ -14313,7 +14423,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       }
     }
     c.stage.appendChild(W.imgLock({
-      id: "p9", img: L.img, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells, faces: L.faces, faceLight: L.faceLight,
+      id: "p9", img: L.img, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells, faces: L.faces, faceLight: L.faceLight, faceDy: L.faceDy,
       kind: "icon", cands: DATA.FLAGS, answer: DATA.ANS.p9, pre: G.flag("cartFlags"),
       extras: [{
         x: L.keyhole.x, y: L.keyhole.y, w: L.keyhole.w, h: L.keyhole.h, t: "cartKey",
@@ -14432,7 +14542,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         return { x: r.x, y: r.y, w: r.w, h: r.h, cls: "lbl", label: DATA.UTENSIL[i].emoji };
       });
       c.stage.appendChild(W.imgLock({
-        id: "p8", img: null, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells, faces: L.faces, faceLight: L.faceLight,
+        id: "p8", img: null, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells, faces: L.faces, faceLight: L.faceLight, faceDy: L.faceDy,
         pool: "0123456789".split(""), size: 10, answer: DATA.ANS.p8,
         extras: extras,
         onSolve: function () {
@@ -14698,7 +14808,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         return;
       }
       c.stage.appendChild(W.imgLock({
-        id: "p26", img: L.img, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells, faces: L.faces, faceLight: L.faceLight,
+        id: "p26", img: L.img, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells, faces: L.faces, faceLight: L.faceLight, faceDy: L.faceDy,
         pool: "0123456789".split(""), size: 10, hash: DATA.P26_HASH,
         onSolve: function () { G.markSolved("p26"); reopenCU(); }
       }));
@@ -14752,7 +14862,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     }
     var L = DATA.LOCKS.p5;
     var node = W.imgLock({
-      id: "p5", img: L.img, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells, faces: L.faces, faceLight: L.faceLight,
+      id: "p5", img: L.img, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells, faces: L.faces, faceLight: L.faceLight, faceDy: L.faceDy,
       pool: "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(""), size: 12, answer: DATA.ANS.p5,
       onSolve: function () { G.markSolved("p5"); closeZoom(); setTimeout(function () { ZOOM.case(); }, 120); }
     });
