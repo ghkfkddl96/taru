@@ -645,9 +645,16 @@ body.dbg .cvcell.hot.ifeBtn:active,body.dbg .cvcell.hot.ifeTile:active{box-shado
 body.dbg.hints .cvcell.snackSlot{box-shadow:inset 0 0 0 2px rgba(255,255,255,.35)}
 .gmHint{font-size:12px;color:var(--n6);border:1px dashed var(--line2);border-radius:8px;padding:8px 14px}
 
-/* ★v0.5 수정: 명판은 새 박스를 얹지 않고 이미지 명판 자리에 각인 텍스트만 */
+/* ★v0.5 수정: 명판은 새 박스를 얹지 않고 이미지 명판 자리에 각인 텍스트만
+   ★v0.15.1 원복 — 한 줄(nowrap) · 칸 전체를 flex 로 채워 한가운데 · 줄바꿈/클리핑 없음.
+   (v0.12~v0.15 의 글자칸 규칙이 얹히면서 두 줄로 접히고 위로 6px 밀려 나갔다) */
 .cvcell.snackPlate .cv{background:transparent !important;border:0 !important;box-shadow:none !important;
-  color:#222222;font-weight:800;letter-spacing:1px;text-shadow:0 1px 0 rgba(255,255,255,.45)}
+  color:#222222;font-weight:800;letter-spacing:1px;text-shadow:0 1px 0 rgba(255,255,255,.45);
+  width:100%;height:100%;min-width:0;min-height:0;max-width:none;max-height:none;
+  display:flex;align-items:center;justify-content:center;white-space:nowrap;overflow:visible;
+  line-height:1;padding:0}
+.cvcell.snackPlate .cv span.pl{display:inline-block;white-space:nowrap;line-height:normal}
+  /* line-height:1 이면 줄상자가 글자보다 짧아 '세로 넘침'으로 잡힌다 → normal */
 /* 힌트 막대: 짙은 회색 계단, 금속 위에서 또렷하게 */
 .cvcell.snackBar .cv{background:rgba(58,58,58,.90) !important;border-radius:2px;
   box-shadow:0 1px 0 rgba(255,255,255,.25) !important}
@@ -10919,7 +10926,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 (function () {
   "use strict";
 
-  var BUILD = "ODY-S1-20260911-2034";
+  var BUILD = "ODY-S1-20260911-2056";
   var LSKEY = "odyssey.s1.v1";
 
   var qs = new URLSearchParams(location.search);
@@ -12166,6 +12173,38 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     gl.style.transform = "translate(" + dx.toFixed(2) + "px," + dy.toFixed(2) + "px)";
   }
 
+  /* ★v0.15.1 명판(#25 "CHOI. FIRST?") 전용 맞춤 —
+     다이얼 글자칸 규칙(fitText: 한 글자 기준·잉크 폭 56%·베이스라인 translate)을 그대로 쓰면
+     긴 문장이 줄바꿈되고 위로 밀려 나간다(v0.15 에서 실제로 그렇게 됐다).
+     명판은 v0.5 기준 그대로 — **한 줄**, 글자 폭이 명판 폭의 ratio(기본 78%), 명판 한가운데.
+     글꼴·굵기·자간은 CSS 값(앱 기본 글꼴 + 800 + 자간 1px)을 그대로 쓴다. */
+  function fitPlate(v, cellW, cellH, ratio) {
+    var txt = (v.textContent || "").trim();
+    if (!txt || !cellW || !cellH) return;
+    ratio = ratio || 0.78;
+    v.style.whiteSpace = "nowrap";
+    v.style.transform = "none";
+    var sp = v.querySelector("span.pl");
+    if (!sp || sp.getAttribute("data-g") !== txt) {
+      v.textContent = "";
+      sp = document.createElement("span");
+      sp.className = "pl";
+      sp.setAttribute("data-g", txt);
+      sp.appendChild(document.createTextNode(txt));
+      v.appendChild(sp);
+    }
+    var want = cellW * ratio, maxH = cellH * 0.46;
+    var lo = 5, hi = Math.max(6, cellH), best = lo;
+    for (var i = 0; i < 18; i++) {
+      var mid = (lo + hi) / 2;
+      sp.style.fontSize = mid.toFixed(3) + "px";
+      var r = sp.getBoundingClientRect();
+      if (r.width <= want && r.height <= maxH) { best = mid; lo = mid; } else hi = mid;
+    }
+    sp.style.fontSize = best.toFixed(2) + "px";
+    return best;
+  }
+
   function cropView(src, crop, overlays, opts) {
     var wrap = el("div", "cropView");
     var inner = el("div", "cropInner");
@@ -13092,6 +13131,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   }
 
   window.W = {
+    fitPlate: fitPlate,
     cropView: cropView, imgLock: imgLock, arrowLock: arrowLock, fitText: fitText, cycleLock: cycleLock, keypadLock: keypadLock, rotateLock: rotateLock, seqLock: seqLock,
     patternLock: patternLock, shade: shade, tissue: tissue, pamphlet: pamphlet, slides: slides,
     currentLock: function () { return current; }, unregister: unregister
@@ -15225,7 +15265,13 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     /* 명판 텍스트 */
     overlays.push({
       x: L.plate.x, y: L.plate.y, w: L.plate.w, h: L.plate.h, cls: "snackPlate",
-      build: function (n) { var v = el("div", "cv", L.plateText); n.appendChild(v); }
+      /* ★v0.15.1 명판은 글자칸 규칙(fitText)을 타지 않는다 — v0.5 처럼 한 줄·명판 폭 78%·한가운데 */
+      build: function (n) { var v = el("div", "cv", L.plateText); v._noFit = true; n.appendChild(v); },
+      onFit: function (n) {
+        var v = n.querySelector(".cv"); if (!v) return;
+        var r = n.getBoundingClientRect();
+        if (r.width && r.height) W.fitPlate(v, r.width, r.height, 0.78);
+      }
     });
     /* 힌트 막대 (왼쪽이 가장 높다) */
     L.bars.forEach(function (b2, i) {
