@@ -10816,7 +10816,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 (function () {
   "use strict";
 
-  var BUILD = "ODY-S1-20260911-0855";
+  var BUILD = "ODY-S1-20260911-0858";
   var LSKEY = "odyssey.s1.v1";
 
   var qs = new URLSearchParams(location.search);
@@ -13948,7 +13948,9 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       kind: "icon", cands: DATA.FLAGS, answer: DATA.ANS.p9, pre: G.flag("cartFlags"),
       extras: [{
         x: L.keyhole.x, y: L.keyhole.y, w: L.keyhole.w, h: L.keyhole.h, t: "cartKey",
-        label: G.flag("cartKeyed") ? "✓" : "🔑",
+        /* ★v0.10.2 사진 위 라벨은 "여기 누르세요" 표시라 플레이 모드에서 제거.
+           꽂힌 상태는 캡션(관찰 서술)으로만 알린다. 디버그에서는 그대로 보인다. */
+        label: G.DEBUG ? (G.flag("cartKeyed") ? "✓" : "🔑") : "",
         onTap: function () {
           if (G.flag("cartKeyed")) return;
           var sel = S.sel;                       /* ★v0.10 인벤에서 고른 뒤 여기를 탭 */
@@ -13968,7 +13970,9 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     info.appendChild(el("div", "chip", (G.flag("cartFlags") ? "✅" : "⬜") + " 국기 4칸"));
     info.appendChild(el("div", "chip", (G.flag("cartKeyed") ? "✅" : "⬜") + " 열쇠 구멍"));
     c.panel.appendChild(info);
-    c.cap("국기 4칸과 열쇠 구멍. 둘 다 맞아야 열린다.");
+    c.cap(G.flag("cartKeyed")
+      ? "열쇠가 꽂혀 있다. 국기 4칸이 남았다."
+      : "국기 4칸과 열쇠 구멍. 둘 다 맞아야 열린다.");
   };
 
   /* ★v0.9 #13 갤리 상단 수납함 — 2층 팝업 구조.
