@@ -547,6 +547,8 @@ body.dbg .cvcell.hot.ifeBtn:active,body.dbg .cvcell.hot.ifeTile:active{box-shado
 /* v0.4 수정: 글자 칩은 칸 전체를 채운다(라인박스가 칩 밖으로 삐져나오지 않게).
    아이콘 칩은 칸의 70% 정중앙(북쑥 지시). */
 .cvcell .cv{min-width:100%;min-height:100%;width:100%;height:100%;overflow:hidden}
+/* ★v0.12.1 앞면 칩 — 칸이 아니라 다이얼 앞면 사각형에 맞춰 인라인 좌표로 놓인다 */
+.cvcell .cv.faceBox{position:absolute;min-width:0;min-height:0;max-width:none;max-height:none}
 .cvcell.icon .cv{min-width:70%;min-height:70%;width:70%;height:70%}
 .cvcell.extra .cv,.cvcell.ifeBack .cv{width:100%;height:100%;min-width:100%;min-height:100%}
 
@@ -735,7 +737,7 @@ body.dbg .cvcell.cabBtn:active{box-shadow:inset 0 0 0 3px rgba(255,255,255,.8)}
 
 </div>
 
-<script>window.__AUDIO = ["song1.mp3","song2.mp3","song3.mp3","song4.mp3","song5.mp3"]; window.__IMG = ["app_kakao.png","app_map.png","app_minigame.png","app_qr.png","archer.jpg","bin_L1.jpg","bin_L1_open_case.jpg","bin_L1_open_empty.jpg","bin_L2.jpg","bin_R1.jpg","bin_R1_open_card.jpg","bin_R1_open_empty.jpg","bin_R2.jpg","blanket_zoom.jpg","case_open_empty.jpg","case_open_headset.jpg","ceiling_open_cardkey.jpg","ceiling_open_empty.jpg","char_front.jpg","char_happy.jpg","char_hipL.jpg","char_hipR.jpg","char_hungry.jpg","crew_blanket.jpg","crew_tray.jpg","food_bread.png","food_cake.png","food_omu.png","food_salad.png","galley_cart.jpg","galley_drawer.jpg","galley_snack.jpg","galley_upper.jpg","galley_upper_empty.jpg","galley_upper_open.jpg","gamecard.jpg","headphones.jpg","headset_case.jpg","headset_worn.jpg","ic_blanket.png","ic_butter.jpg","ic_cardkey.jpg","ic_cardkey.png","ic_case.png","ic_cellophane.png","ic_dna.jpg","ic_drop.jpg","ic_dynamite.jpg","ic_fire.jpg","ic_gamecard.png","ic_goldkey.jpg","ic_goldkey.png","ic_headphones.jpg","ic_headphones.png","ic_ladder.png","ic_pamphlet.png","ic_passport.png","ic_peanut.png","ic_phone.png","ic_silverkey.jpg","ic_silverkey.png","ic_telescope.png","ic_ticket.png","ic_tile_beige.png","ic_tile_black.png","ic_tile_brown.png","ic_tile_dark.png","ife_off.jpg","ife_on.jpg","ife_photo1.jpg","ife_photo2.jpg","ife_photo3.jpg","ife_photo4.jpg","lav_cab1.jpg","lav_cab1_empty.jpg","lav_cab1_open.jpg","lav_ceiling.jpg","lav_tissue.jpg","lav_tissue_idle.jpg","map_aisle.jpg","map_seat.jpg","map_seat_tray.jpg","meal_tray.jpg","passport.jpg","tile_beige.jpg","tile_black.jpg","tile_brown.jpg","tile_dark.jpg","travel1.jpg","travel2.jpg","travel3.jpg","travel4.jpg","window_open.jpg","window_shade.jpg"];</script>
+<script>window.__AUDIO = ["song1.mp3","song2.mp3","song3.mp3","song4.mp3","song5.mp3"]; window.__IMG = ["app_kakao.png","app_map.png","app_minigame.png","app_qr.png","archer.jpg","bin_L1.jpg","bin_L1_open_case.jpg","bin_L1_open_empty.jpg","bin_L2.jpg","bin_R1.jpg","bin_R1_open_card.jpg","bin_R1_open_empty.jpg","bin_R2.jpg","blanket_zoom.jpg","case_open_empty.jpg","case_open_headset.jpg","ceiling_open_cardkey.jpg","ceiling_open_empty.jpg","char_front.jpg","char_happy.jpg","char_hipL.jpg","char_hipR.jpg","char_hungry.jpg","crew_blanket.jpg","crew_tray.jpg","food_bread.png","food_cake.png","food_omu.png","food_salad.png","galley_cart.jpg","galley_drawer.jpg","galley_snack.jpg","galley_upper.jpg","galley_upper_empty.jpg","galley_upper_open.jpg","gamecard.jpg","headphones.jpg","headset_case.jpg","headset_worn.jpg","ic_blanket.png","ic_butter.jpg","ic_cardkey.jpg","ic_cardkey.png","ic_case.png","ic_cellophane.png","ic_dna.jpg","ic_drop.jpg","ic_dynamite.jpg","ic_fire.jpg","ic_gamecard.png","ic_goldkey.jpg","ic_goldkey.png","ic_headphones.jpg","ic_headphones.png","ic_ladder.png","ic_pamphlet.png","ic_passport.png","ic_peanut.png","ic_phone.png","ic_silverkey.jpg","ic_silverkey.png","ic_telescope.png","ic_ticket.png","ic_tile_beige.png","ic_tile_black.png","ic_tile_brown.png","ic_tile_dark.png","ife_off.jpg","ife_on.jpg","ife_photo1.jpg","ife_photo2.jpg","ife_photo3.jpg","ife_photo4.jpg","lav_cab1.jpg","lav_cab1_empty.jpg","lav_cab1_open.jpg","lav_cabtop.jpg","lav_cabtop_empty.jpg","lav_cabtop_open.jpg","lav_ceiling.jpg","lav_tissue.jpg","lav_tissue_idle.jpg","map_aisle.jpg","map_seat.jpg","map_seat_tray.jpg","meal_tray.jpg","passport.jpg","tile_beige.jpg","tile_black.jpg","tile_brown.jpg","tile_dark.jpg","travel1.jpg","travel2.jpg","travel3.jpg","travel4.jpg","window_open.jpg","window_shade.jpg"];</script>
 <script>
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -10845,7 +10847,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 (function () {
   "use strict";
 
-  var BUILD = "ODY-S1-20260911-1157";
+  var BUILD = "ODY-S1-20260911-1229";
   var LSKEY = "odyssey.s1.v1";
 
   var qs = new URLSearchParams(location.search);
@@ -11411,6 +11413,15 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         { x: 44.6, y: 43.78, w: 3.9, h: 11.09 },
         { x: 51, y: 43.78, w: 3.9, h: 11.09 },
         { x: 57.4, y: 43.78, w: 3.9, h: 11.09 }
+      ],
+      /* ★v0.12.1 앞면(face) = 글자가 인쇄되는 평평한 정면. 칸(cells)=탭 영역은 홈 그림자까지
+         포함하므로 글자를 칸 한가운데 두면 그림자 위에 얹힌다. 값은 tools/scan-faces.mjs 픽셀 산출.
+         (guide: shots/v121/guide_<id>.png — 빨강=앞면, 초록=칸) */
+      faces: [
+        { x: 38.4, y: 44.83, w: 2.9, h: 7.5 },
+        { x: 45.2, y: 44.83, w: 2.9, h: 7.5 },
+        { x: 51.1, y: 45.43, w: 2.9, h: 7.5 },
+        { x: 57.9, y: 45.73, w: 2.9, h: 7.5 }
       ]
     },
     p10: {
@@ -11422,6 +11433,16 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         { x: 48.3, y: 39.13, w: 3.4, h: 13.64 },
         { x: 53.1, y: 39.13, w: 3.4, h: 13.64 },
         { x: 57.9, y: 39.13, w: 3.4, h: 13.64 }
+      ],
+      /* ★v0.12.1 앞면(face) = 글자가 인쇄되는 평평한 정면. 칸(cells)=탭 영역은 홈 그림자까지
+         포함하므로 글자를 칸 한가운데 두면 그림자 위에 얹힌다. 값은 tools/scan-faces.mjs 픽셀 산출.
+         (guide: shots/v121/guide_<id>.png — 빨강=앞면, 초록=칸) */
+      faces: [
+        { x: 39, y: 42.73, w: 2.7, h: 6.45 },
+        { x: 43.8, y: 42.13, w: 2.7, h: 6.45 },
+        { x: 48.7, y: 42.73, w: 2.7, h: 6.45 },
+        { x: 53.5, y: 42.43, w: 2.7, h: 6.45 },
+        { x: 58.3, y: 42.58, w: 2.7, h: 6.45 }
       ]
     },
     p15: {
@@ -11441,6 +11462,14 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         { x: 40.7, y: 58.17, w: 4.8, h: 13.49 },
         { x: 47.6, y: 58.17, w: 4.8, h: 13.49 },
         { x: 54.5, y: 58.17, w: 4.8, h: 13.49 }
+      ],
+      /* ★v0.12.1 앞면(face) = 글자가 인쇄되는 평평한 정면. 칸(cells)=탭 영역은 홈 그림자까지
+         포함하므로 글자를 칸 한가운데 두면 그림자 위에 얹힌다. 값은 tools/scan-faces.mjs 픽셀 산출.
+         (guide: shots/v121/guide_<id>.png — 빨강=앞면, 초록=칸) */
+      faces: [
+        { x: 41.5, y: 61.47, w: 2.9, h: 8.1 },
+        { x: 48.5, y: 61.47, w: 2.9, h: 8.1 },
+        { x: 55.5, y: 61.47, w: 2.9, h: 8.1 }
       ]
     },
     /* ★v0.4: 케이스 전체가 보이게(v0.2 수준) 되돌림 */
@@ -11452,6 +11481,15 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         { x: 41.11, y: 43.38, w: 7.89, h: 11.92 },
         { x: 50.67, y: 43.38, w: 7.89, h: 11.92 },
         { x: 60.22, y: 43.38, w: 7.89, h: 11.92 }
+      ],
+      /* ★v0.12.1 앞면(face) = 글자가 인쇄되는 평평한 정면. 칸(cells)=탭 영역은 홈 그림자까지
+         포함하므로 글자를 칸 한가운데 두면 그림자 위에 얹힌다. 값은 tools/scan-faces.mjs 픽셀 산출.
+         (guide: shots/v121/guide_<id>.png — 빨강=앞면, 초록=칸) */
+      faces: [
+        { x: 32.44, y: 45.53, w: 6.89, h: 9.77 },
+        { x: 42.11, y: 45.53, w: 6.89, h: 9.77 },
+        { x: 51.67, y: 45.53, w: 6.89, h: 9.77 },
+        { x: 61.22, y: 45.53, w: 6.89, h: 9.77 }
       ]
     },
     p9: {
@@ -11680,7 +11718,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
        (a) 자물쇠 전체가 **같은 글자 크기**를 쓰고(칸마다 커졌다 작아졌다 하지 않게)
        (b) 글자마다 translate 로 잉크 중심을 칸 중심에 맞춘다.
      크기 기준(칸 기준): 잉크 폭 <= 60% · 잉크 높이 <= 76% → 좌우 여백 20% · 상하 12% 가 저절로 나온다. */
-  var TXT_W = 0.60, TXT_H = 0.76;
+  var TXT_W = 0.60, TXT_H = 0.70;   /* ★v0.12.1 앞면 기준: 잉크 폭<=60% 높이<=70% */
   var _mcv = null;
   function _mctx() {
     if (!_mcv) _mcv = document.createElement("canvas");
@@ -11740,16 +11778,20 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     var key = weight + "|" + fam + "|" + px.toFixed(2) + "|" + txt;
     if (_inkCacheAt[key]) return _inkCacheAt[key];
     if (!_scv) _scv = document.createElement("canvas");
-    var pad = Math.ceil(px * 0.8);
-    var W = Math.ceil(px * 2.4) + pad * 2, H = Math.ceil(px * 2.6) + pad * 2;
+    /* ★v0.12.1 4배 확대해서 재고 4로 나눈다 — 1x 캔버스는 잉크 상자가 정수로 끊겨
+       (특히 글자가 작아진 뒤) 세로 중심이 1~2px 씩 밀렸다. 실기 DPR(2~3)과도 더 가깝다. */
+    var S = 4;
+    var pxS = px * S;
+    var pad = Math.ceil(pxS * 0.8);
+    var W = Math.ceil(pxS * 2.4) + pad * 2, H = Math.ceil(pxS * 2.6) + pad * 2;
     _scv.width = W; _scv.height = H;
     var cx = _scv.getContext("2d", { willReadFrequently: true });
     cx.clearRect(0, 0, W, H);
-    cx.font = weight + " " + px + "px " + fam;
+    cx.font = weight + " " + pxS + "px " + fam;
     cx.textBaseline = "alphabetic";
     cx.textAlign = "left";
     cx.fillStyle = "#ffffff";
-    var ox = pad, oy = Math.round(px * 1.6) + pad;
+    var ox = pad, oy = Math.round(pxS * 1.6) + pad;
     cx.fillText(txt, ox, oy);
     var adv = cx.measureText(txt).width;
     var d = cx.getImageData(0, 0, W, H).data;
@@ -11758,8 +11800,9 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       if (d[((y * W + x) << 2) + 3] > 12) { if (x < x0) x0 = x; if (y < y0) y0 = y; if (x > x1) x1 = x; if (y > y1) y1 = y; }
     }
     var o;
-    if (x1 < 0) o = { L: 0, R: adv, A: px * 0.7, D: 0, adv: adv, fA: px * 0.8, fD: px * 0.2 };
-    else o = { L: ox - x0, R: (x1 + 1) - ox, A: oy - y0, D: (y1 + 1) - oy, adv: adv, fA: px * 0.8, fD: px * 0.2 };
+    if (x1 < 0) o = { L: 0, R: adv / S, A: px * 0.7, D: 0, adv: adv / S, fA: px * 0.8, fD: px * 0.2 };
+    else o = { L: (ox - x0) / S, R: ((x1 + 1) - ox) / S, A: (oy - y0) / S, D: ((y1 + 1) - oy) / S,
+               adv: adv / S, fA: px * 0.8, fD: px * 0.2 };
     _inkCacheAt[key] = o;
     return o;
   }
@@ -11816,7 +11859,10 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     var probe = gl.querySelector("i.blProbe");
     var k = inkAtPx(txt, px, fam, weight);
     var pr = probe.getBoundingClientRect();          /* pr.top == 베이스라인, pr.left == advance 끝 */
-    var ref = cellNode ? cellNode.getBoundingClientRect() : v.getBoundingClientRect();
+    /* ★v0.12.1 기준 상자 = **글자칩(.cv)** — faceBox 면 다이얼 앞면, 아니면 칸 전체.
+       (v0.12 는 칸 노드를 기준으로 삼아, 앞면이 칸 가운데가 아닌 자물쇠에서 글자가 그림자 위로 밀렸다) */
+    var ref = v.getBoundingClientRect();
+    if ((!ref.width || !ref.height) && cellNode) ref = cellNode.getBoundingClientRect();
     if (!pr.width && !pr.top) {
       var o = inkOffset(txt, px, fam, weight);
       gl.style.transform = "translate(" + o.dx.toFixed(2) + "px," + o.dy.toFixed(2) + "px)";
@@ -11885,10 +11931,18 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         n.style.height = (o.h / 100 * dispH) + "px";
         var v = n.querySelector(".cv");
         if (v && !v._noFit) {
-          /* ★v0.11 칩 상자 + **칸(cell)** 크기를 같이 넘겨 "칸 폭의 60% 이하" 를 지킨다 */
+          /* ★v0.12.1 글자칩(.cv)은 **다이얼 앞면**에 놓는다(칸=탭 영역은 홈 그림자까지 포함).
+             face 가 없으면 예전대로 칸 전체. */
+          var boxW = o.w / 100 * dispW, boxH = o.h / 100 * dispH;
+          if (o.face) {
+            v.classList.add("faceBox");
+            boxW = o.face.w / 100 * dispW; boxH = o.face.h / 100 * dispH;
+            v.style.left = ((o.face.x - o.x) / 100 * dispW) + "px";
+            v.style.top = ((o.face.y - o.y) / 100 * dispH) + "px";
+            v.style.width = boxW + "px"; v.style.height = boxH + "px";
+          }
           var vr = v.getBoundingClientRect();
-          var cellW = o.w / 100 * dispW, cellH = o.h / 100 * dispH;
-          fitText(v, vr.width || cellW, vr.height || cellH, cellW, cellH, n, v._glyphs);
+          fitText(v, vr.width || boxW, vr.height || boxH, boxW, boxH, n, v._glyphs);
         }
         if (o.onFit) o.onFit(n, { dispW: dispW, dispH: dispH, ox: ox, oy: oy });
       });
@@ -11938,6 +11992,8 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     var overlays = opt.cells.map(function (c, i) {
       return {
         x: c.x, y: c.y, w: c.w, h: c.h, t: "slot" + i,
+        /* ★v0.12.1 탭 영역은 칸 전체, 글자칩은 다이얼 앞면에만 */
+        face: opt.faces && opt.faces[i] ? opt.faces[i] : null,
         cls: isIcon ? "icon" : "",
         build: function (nd) {
           var v = el("div", "cv");
@@ -14082,7 +14138,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     if (!G.solved("p12")) {
       var L = DATA.LOCKS.p12;
       c.stage.appendChild(W.imgLock({
-        id: "p12", img: L.img, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells,
+        id: "p12", img: L.img, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells, faces: L.faces,
         pool: "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(""), size: 12, answer: DATA.ANS.p12,
         onSolve: function () { G.markSolved("p12"); reopenCU(); }
       }));
@@ -14100,7 +14156,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     if (!G.solved("p10")) {
       var L = DATA.LOCKS.p10;
       c.stage.appendChild(W.imgLock({
-        id: "p10", img: L.img, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells,
+        id: "p10", img: L.img, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells, faces: L.faces,
         pool: DATA.KANA, size: 12, answer: DATA.ANS.p10,
         onSolve: function () {
           G.markSolved("p10");
@@ -14120,7 +14176,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     if (!G.solved("p15")) {
       var L = DATA.LOCKS.p15;
       c.stage.appendChild(W.imgLock({
-        id: "p15", img: L.img, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells,
+        id: "p15", img: L.img, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells, faces: L.faces,
         kind: "icon", cands: DATA.FOOD, answer: DATA.ANS.p15,
         onSolve: function () { G.markSolved("p15"); reopenCU(); }
       }));
@@ -14138,7 +14194,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     if (!G.solved("p16")) {
       var L = DATA.LOCKS.p16;
       c.stage.appendChild(W.imgLock({
-        id: "p16", img: L.img, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells,
+        id: "p16", img: L.img, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells, faces: L.faces,
         pool: "0123456789".split(""), size: 10, answer: DATA.ANS.p16,
         onSolve: function () {
           G.markSolved("p16");
@@ -14169,7 +14225,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       }
     }
     c.stage.appendChild(W.imgLock({
-      id: "p9", img: L.img, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells,
+      id: "p9", img: L.img, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells, faces: L.faces,
       kind: "icon", cands: DATA.FLAGS, answer: DATA.ANS.p9, pre: G.flag("cartFlags"),
       extras: [{
         x: L.keyhole.x, y: L.keyhole.y, w: L.keyhole.w, h: L.keyhole.h, t: "cartKey",
@@ -14288,7 +14344,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         return { x: r.x, y: r.y, w: r.w, h: r.h, cls: "lbl", label: DATA.UTENSIL[i].emoji };
       });
       c.stage.appendChild(W.imgLock({
-        id: "p8", img: null, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells,
+        id: "p8", img: null, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells, faces: L.faces,
         pool: "0123456789".split(""), size: 10, answer: DATA.ANS.p8,
         extras: extras,
         onSolve: function () {
@@ -14580,7 +14636,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     }
     var L = DATA.LOCKS.p5;
     var node = W.imgLock({
-      id: "p5", img: L.img, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells,
+      id: "p5", img: L.img, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells, faces: L.faces,
       pool: "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(""), size: 12, answer: DATA.ANS.p5,
       onSolve: function () { G.markSolved("p5"); closeZoom(); setTimeout(function () { ZOOM.case(); }, 120); }
     });
