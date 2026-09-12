@@ -1,5 +1,5 @@
 /* 비행기에서 내리고 싶다. — 오프라인 서비스워커 (자동 생성) */
-const CACHE = "odyssey-ODY-S1-20260912-1742";
+const CACHE = "odyssey-ODY-S1-20260912-1816";
 const PRECACHE = [
  "./",
  "./index.html",
@@ -23,6 +23,8 @@ const PRECACHE = [
  "./img/bin_R2_open_empty.jpg",
  "./img/bin_R2_open_key.jpg",
  "./img/blanket_zoom.jpg",
+ "./img/book_empty.jpg",
+ "./img/book_tile.jpg",
  "./img/case_open_empty.jpg",
  "./img/case_open_headset.jpg",
  "./img/ceiling_open_cardkey.jpg",
