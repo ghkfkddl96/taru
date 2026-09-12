@@ -203,8 +203,12 @@ input:focus{outline:none;border-color:var(--accent)}
 #shadeWrap .shadeInk{position:absolute;inset:0;pointer-events:none;will-change:transform}
 #shadeWrap .shadeLogo{position:absolute;object-fit:contain}
 #shadeCode{position:absolute;left:50%;transform:translate(-50%,0);will-change:transform;font-size:clamp(13px,4.4vw,21px);letter-spacing:2px;color:#b03a3a;font-weight:700;white-space:nowrap}
-/* ★v0.10 line-height 1.25 는 글자 상자보다 짧아 글자 상자가 2px 샐져나갔다 → 1.45 */
-#shadeCode .dg{display:inline-block;min-width:16px;padding:0 2px;margin:0 1px;border:1.5px solid #b03a3a;border-radius:3px;font-size:.86em;line-height:1.45;text-align:center;background:rgba(255,255,255,.35)}
+/* ★v0.17.3 [지시7] 빈 칸도 숫자 칸도 **같은 원** — 지름·선 굵기·색·간격이 완전히 같다.
+   (예전 .dg 네모 테두리는 폐지. 숫자는 원 안에 잉크 무게중심으로 놓인다 — widgets.js centerDigits) */
+#shadeCode .cir{position:relative;display:inline-block;width:.86em;height:.86em;box-sizing:border-box;
+  border:.09em solid #b03a3a;border-radius:50%;margin:0 1px;vertical-align:middle;background:rgba(255,255,255,.35)}
+#shadeCode .cir.gap{margin-left:.34em}
+#shadeCode .cir .gl{position:absolute;left:0;top:0;font-size:.56em;line-height:1;font-weight:700;white-space:nowrap;letter-spacing:0}
 .dragHint{position:absolute;left:50%;transform:translateX(-50%);bottom:6px;font-size:11px;color:var(--n8);background:rgba(11,11,12,.62);padding:3px 10px;border-radius:6px;animation:blink 1.8s ease-in-out infinite}
 @keyframes blink{0%,100%{opacity:.3}50%{opacity:1}}
 
@@ -280,6 +284,12 @@ body.dbg .ifeHot:active{box-shadow:0 0 0 2px rgba(255,255,255,.95)}
 #island{position:absolute;top:8px;left:50%;transform:translateX(-50%);width:78px;height:22px;border-radius:13px;background:#000;z-index:6}
 #homebar{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);width:104px;height:4px;border-radius:3px;background:var(--n6);z-index:6}
 #phoneScreen{position:absolute;inset:0;display:flex;flex-direction:column;overflow:hidden;background:linear-gradient(170deg,#26262a 0%,#141416 60%,#0d0d0f 100%)}
+/* ★v0.17.3 [지시5] 잠금화면·홈 배경사진 — 세로 기준 cover(좌우가 잘린다).
+   사진 위 흰 글자(큰 시계·앱 이름)가 밝은 석상에 묻히지 않게 위·아래만 은은한 스크림. */
+#phoneScreen.wall{background-size:cover;background-position:center center;background-repeat:no-repeat}
+#phoneScreen.wall::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(180deg,rgba(0,0,0,.50) 0%,rgba(0,0,0,.34) 14%,rgba(0,0,0,.27) 32%,rgba(0,0,0,.18) 62%,rgba(0,0,0,.50) 100%)}
+#phoneScreen.wall > *{position:relative;z-index:1}
 .pStatus{display:flex;justify-content:space-between;padding:11px 18px 0;font-size:10px;font-weight:600;color:var(--n8)}
 .pBody{flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden}
 .pApps{display:grid;grid-template-columns:repeat(4,1fr);gap:16px 4px;padding:28px 12px 0}
@@ -413,6 +423,15 @@ body.dbg .ifeHot:active{box-shadow:0 0 0 2px rgba(255,255,255,.95)}
 #gmap{position:relative;width:100%;height:100%;background:#e9e9ec;border-radius:var(--r);overflow:hidden}
 #gmap .sea{position:absolute;inset:0;background:#dcdce0}
 #gmap .land{position:absolute;background:#c6c6cb;border-radius:40%}
+/* ★v0.17.3 [지시3] GPS 끊김 화면 — 지도는 회색·흐릿하게, 그 위에 알림 창 하나 */
+#gmap.dead{filter:grayscale(1) brightness(.82) blur(1.2px)}
+.gmapDead{flex:1;position:relative;min-height:0;display:flex;align-items:center;justify-content:center;padding:10px}
+.gmapDead #gmap{position:absolute;inset:0;width:auto;height:auto;border-radius:0}
+.gpsBox{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:10px;
+  background:rgba(16,16,19,.86);border:1px solid rgba(255,255,255,.14);border-radius:14px;
+  padding:18px 20px;box-shadow:0 8px 24px rgba(0,0,0,.45)}
+.gpsIco{width:62px;height:62px}
+.gpsMsg{font-size:13px;font-weight:700;color:#e8e9ee;letter-spacing:.2px}
 #planeIco,#typhoonIco{position:absolute;font-size:26px;transition:left .1s linear, top .1s linear}
 #typhoonIco{font-size:30px;animation:spin 2.4s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -858,7 +877,7 @@ body.dbg .cvcell.cabBtn:active{box-shadow:inset 0 0 0 3px rgba(255,255,255,.8)}
 
 </div>
 
-<script>window.__AUDIO = ["ad_bgm.mp3","binoc.mp3","bow_shot.mp3","main_bgm.mp3","song1.mp3","song2.mp3","song3.mp3","song4.mp3","song5.mp3","sudoku_bgm.mp3"]; window.__IMG = ["app_kakao.png","app_map.png","app_minigame.png","app_qr.png","archer.jpg","archer.png","archery_field.jpg","bin_L1.jpg","bin_L1_open_case.jpg","bin_L1_open_empty.jpg","bin_L2.jpg","bin_L2_open_cello.jpg","bin_L2_open_empty.jpg","bin_R1.jpg","bin_R1_open_card.jpg","bin_R1_open_empty.jpg","bin_R2.jpg","bin_R2_open_empty.jpg","bin_R2_open_key.jpg","blanket_zoom.jpg","book_empty.jpg","book_tile.jpg","case_open_empty.jpg","case_open_headset.jpg","ceiling_open_cardkey.jpg","ceiling_open_empty.jpg","cello_align.png","char_front.jpg","char_happy.jpg","char_hipL.jpg","char_hipR.jpg","char_hungry.jpg","crew_blanket.jpg","crew_tray.jpg","dialbox.jpg","dialbox_open.jpg","food_bread.png","food_cake.png","food_omu.png","food_salad.png","galley_cart.jpg","galley_drawer.jpg","galley_snack.jpg","galley_upper.jpg","galley_upper_empty.jpg","galley_upper_open.jpg","gamecard.jpg","headphones.jpg","headset_case.jpg","headset_worn.jpg","hint_phonecase.jpg","ic_blanket.png","ic_butter.jpg","ic_butter.png","ic_cardkey.jpg","ic_cardkey.png","ic_case.png","ic_cellophane.png","ic_dna.jpg","ic_dna.png","ic_drop.jpg","ic_drop.png","ic_dynamite.jpg","ic_dynamite.png","ic_fire.jpg","ic_fire.png","ic_gamecard.png","ic_goldkey.jpg","ic_goldkey.png","ic_headphones.jpg","ic_headphones.png","ic_ladder.png","ic_pamphlet.png","ic_passport.png","ic_peanut.png","ic_phone.png","ic_silverkey.jpg","ic_silverkey.png","ic_telescope.png","ic_ticket.png","ic_tile_beige.png","ic_tile_black.png","ic_tile_brown.png","ic_tile_dark.png","ife_ic_blanket.png","ife_ic_meal.png","ife_ic_tv.png","ife_off.jpg","ife_on.jpg","ife_photo1.jpg","ife_photo2.jpg","ife_photo3.jpg","ife_photo4.jpg","lav_cab1.jpg","lav_cab1_empty.jpg","lav_cab1_open.jpg","lav_cab2.jpg","lav_cab2_empty.jpg","lav_cab2_open.jpg","lav_cabtop.jpg","lav_cabtop_empty.jpg","lav_cabtop_open.jpg","lav_ceiling.jpg","lav_tissue.jpg","lav_tissue_idle.jpg","lav_tissue_roll.jpg","map_aisle.jpg","map_gate.jpg","map_seat.jpg","map_seat_tray.jpg","meal_tray.jpg","oway_plane.jpg","pamphlet_bg.jpg","pamphlet_body_bg.jpg","passport.jpg","shade_logo.png","tile_beige.jpg","tile_black.jpg","tile_brown.jpg","tile_dark.jpg","tissue_mask.png","travel1.jpg","travel2.jpg","travel3.jpg","travel4.jpg","window_open.jpg","window_shade.jpg","window_shade_plain.jpg"];</script>
+<script>window.__AUDIO = ["ad_bgm.mp3","binoc.mp3","bow_shot.mp3","main_bgm.mp3","song1.mp3","song2.mp3","song3.mp3","song4.mp3","song5.mp3","sudoku_bgm.mp3"]; window.__IMG = ["app_kakao.png","app_map.png","app_minigame.png","app_qr.png","archer.jpg","archer.png","archery_field.jpg","bin_L1.jpg","bin_L1_open_case.jpg","bin_L1_open_empty.jpg","bin_L2.jpg","bin_L2_open_cello.jpg","bin_L2_open_empty.jpg","bin_R1.jpg","bin_R1_open_card.jpg","bin_R1_open_empty.jpg","bin_R2.jpg","bin_R2_open_empty.jpg","bin_R2_open_key.jpg","blanket_zoom.jpg","book_empty.jpg","book_tile.jpg","case_open_empty.jpg","case_open_headset.jpg","ceiling_open_cardkey.jpg","ceiling_open_empty.jpg","cello_align.png","char_front.jpg","char_happy.jpg","char_hipL.jpg","char_hipR.jpg","char_hungry.jpg","crew_blanket.jpg","crew_tray.jpg","dialbox.jpg","dialbox_open.jpg","food_bread.png","food_cake.png","food_omu.png","food_salad.png","galley_cart.jpg","galley_drawer.jpg","galley_snack.jpg","galley_upper.jpg","galley_upper_empty.jpg","galley_upper_open.jpg","gamecard.jpg","headphones.jpg","headset_case.jpg","headset_worn.jpg","hint_phonecase.jpg","ic_blanket.png","ic_butter.jpg","ic_butter.png","ic_cardkey.jpg","ic_cardkey.png","ic_case.png","ic_cellophane.png","ic_dna.jpg","ic_dna.png","ic_drop.jpg","ic_drop.png","ic_dynamite.jpg","ic_dynamite.png","ic_fire.jpg","ic_fire.png","ic_gamecard.png","ic_goldkey.jpg","ic_goldkey.png","ic_headphones.jpg","ic_headphones.png","ic_ladder.png","ic_pamphlet.png","ic_passport.png","ic_peanut.png","ic_phone.png","ic_silverkey.jpg","ic_silverkey.png","ic_telescope.png","ic_ticket.png","ic_tile_beige.png","ic_tile_black.png","ic_tile_brown.png","ic_tile_dark.png","ife_ic_blanket.png","ife_ic_meal.png","ife_ic_tv.png","ife_off.jpg","ife_on.jpg","ife_photo1.jpg","ife_photo2.jpg","ife_photo3.jpg","ife_photo4.jpg","lav_cab1.jpg","lav_cab1_empty.jpg","lav_cab1_open.jpg","lav_cab2.jpg","lav_cab2_empty.jpg","lav_cab2_open.jpg","lav_cabtop.jpg","lav_cabtop_empty.jpg","lav_cabtop_open.jpg","lav_ceiling.jpg","lav_tissue.jpg","lav_tissue_idle.jpg","lav_tissue_roll.jpg","map_aisle.jpg","map_gate.jpg","map_seat.jpg","map_seat_tray.jpg","meal_tray.jpg","oway_plane.jpg","pamphlet_bg.jpg","pamphlet_body_bg.jpg","passport.jpg","phone_wall.jpg","shade_logo.png","tile_beige.jpg","tile_black.jpg","tile_brown.jpg","tile_dark.jpg","tissue_mask.png","travel1.jpg","travel2.jpg","travel3.jpg","travel4.jpg","window_open.jpg","window_shade.jpg","window_shade_plain.jpg"];</script>
 <script>
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -10968,12 +10987,72 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 (function () {
   "use strict";
 
-  var BUILD = "ODY-S1-20260912-2252";
+  var BUILD = "ODY-S1-20260913-0001";
   var LSKEY = "odyssey.s1.v1";
 
   var qs = new URLSearchParams(location.search);
   var DEBUG = qs.get("debug") === "1";
   var HINTS = qs.get("hint") !== "off";
+
+  /* ═══════════ ★v0.17.3 새로고침 감지 ═══════════
+     "이번 페이지 로드가 **사용자가 누른 새로고침**인가" 를 한 곳에서 판정해 둔다.
+     (나중에 붙일 "새로고침으로 푸는 퍼즐" 의 기반 — 지금은 상태만 기록하고 게임 동작은 그대로다)
+
+     판정은 두 가지를 OR 로 본다:
+       ① performance 의 내비게이션 타입 == "reload"
+          (PerformanceNavigationTiming. 없으면 옛 performance.navigation 으로 폴백)
+       ② 같은 탭 세션에서 이 문서가 **이미 한 번 로드된 적이 있다**(sessionStorage 마커)
+          — iOS 사파리에서 홈화면 PWA·복원 등으로 ①이 "navigate" 로 오는 경우를 받쳐 준다.
+          단 뒤로가기/앞으로가기(back_forward)는 새로고침이 아니므로 뺀다.
+
+     ★ 게임이 **스스로 일으킨 재로드는 제외**한다:
+       · 서비스워커 업데이트 자동 새로고침(main.js sw() 의 controllerchange)
+       · ☰ "처음부터" · 디버그 초기화
+       재로드 **직전에** markAutoNav() 로 세션에 표시를 남기고, 다음 로드에서 그 표시를 보고 뺀다.
+
+     검증 훅: window.__reloadState()                                                      */
+  var RK_SEEN = "odyssey.nav.seen";     /* 이 탭 세션에서 문서를 한 번이라도 로드했다 */
+  var RK_AUTO = "odyssey.nav.auto";     /* 다음 로드는 게임이 일으킨 것이다(사용자 새로고침 아님) */
+  var RK_CNT = "odyssey.nav.reloads";   /* 이 탭 세션의 사용자 새로고침 횟수 */
+  var RELOAD = { isReload: false, navType: "", auto: false, firstLoad: true, count: 0, at: 0 };
+  var reloadSubs = [];
+  function ssGet(k) { try { return sessionStorage.getItem(k); } catch (e) { return null; } }
+  function ssSet(k, v) { try { sessionStorage.setItem(k, v); } catch (e) {} }
+  function ssDel(k) { try { sessionStorage.removeItem(k); } catch (e) {} }
+  /** 지금부터 일어날 재로드는 "게임이 일으킨 것" 으로 표시한다 — reload 직전에 부른다 */
+  function markAutoNav() { ssSet(RK_AUTO, "1"); }
+  (function detectNav() {
+    var t = "";
+    try {
+      var e = performance.getEntriesByType && performance.getEntriesByType("navigation")[0];
+      if (e && e.type) t = String(e.type);
+      else if (performance.navigation) t = ["navigate", "reload", "back_forward", "prerender"][performance.navigation.type] || "";
+    } catch (err) {}
+    var seen = ssGet(RK_SEEN) === "1";
+    var auto = ssGet(RK_AUTO) === "1";
+    ssDel(RK_AUTO);
+    ssSet(RK_SEEN, "1");
+    var cnt = +(ssGet(RK_CNT) || 0) || 0;
+    RELOAD.navType = t;
+    RELOAD.firstLoad = !seen;
+    RELOAD.auto = auto;
+    RELOAD.isReload = !auto && (t === "reload" || (seen && t !== "back_forward"));
+    if (RELOAD.isReload) { cnt++; ssSet(RK_CNT, String(cnt)); }
+    RELOAD.count = cnt;
+    RELOAD.at = Date.now();
+  })();
+  /** 이번 로드가 사용자 새로고침이면 즉시 fn(RELOAD) — 아니면 등록만 해 둔다 */
+  function onReload(fn) {
+    if (typeof fn !== "function") return;
+    reloadSubs.push(fn);
+    if (RELOAD.isReload) { try { fn(RELOAD); } catch (e) {} }
+  }
+  window.__reloadState = function () {
+    return {
+      isReload: RELOAD.isReload, navType: RELOAD.navType, auto: RELOAD.auto,
+      firstLoad: RELOAD.firstLoad, count: RELOAD.count, at: RELOAD.at, subs: reloadSubs.length
+    };
+  };
 
   /* ───────── 상태 ───────── */
   var S = {
@@ -11543,6 +11622,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 
   window.G = {
     BUILD: BUILD, DEBUG: DEBUG, HINTS: HINTS, S: S,
+    RELOAD: RELOAD, onReload: onReload, markAutoNav: markAutoNav,   /* ★v0.17.3 새로고침 감지 */
     syncOverlay: syncOverlay, hashSeed: hashSeed, lcg: lcg,
     save: save, load: load, wipe: wipe,
     flag: flag, setFlag: setFlag, has: has, give: give, take: take,
@@ -11662,9 +11742,14 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       name: "복도", type: "img", img: IMG + "map_aisle.jpg", left: "seat", right: "galley",
       spots: [
         { id: "s_L1", x: 2, y: 25, w: 25, h: 17, label: "왼쪽 짐칸 1", cu: "binL1" },
-        { id: "s_L2", x: 26, y: 40, w: 15, h: 10, label: "왼쪽 짐칸 2", cu: "binL2" },
+        /* ★v0.17.3 [지시9] 짐칸2 탭 영역을 짐칸1(25×17) 수준으로 키웠다 — 화면 중앙 쪽으로 넓히고
+           위로는 복도 중앙 천장까지 침범(북쑥 승인). 지킨 것:
+             · L2(27.5~49.5) 와 R2(50.5~72.5) 사이 1% 간격 — 서로 겹침 0
+             · L1(2~27)·R1(73~98) 과 겹침 0 · 좌우 화살표(≈2~12.4% / 87.6~98%) 와 겹침 0
+             · s_book(28.4~40.3 / y61.8~74.0) 과 y 대역이 달라 겹침 0 */
+        { id: "s_L2", x: 27.5, y: 34, w: 22, h: 16, label: "왼쪽 짐칸 2", cu: "binL2" },
         { id: "s_R1", x: 73, y: 25, w: 25, h: 17, label: "오른쪽 짐칸 1", cu: "binR1" },
-        { id: "s_R2", x: 59, y: 40, w: 15, h: 10, label: "오른쪽 짐칸 2", cu: "binR2" },
+        { id: "s_R2", x: 50.5, y: 34, w: 22, h: 16, label: "오른쪽 짐칸 2", cu: "binR2" },
         /* ★v0.16.4 왼쪽 열 승객이 펼쳐 든 책 — 갈색 색상판 획득처(#27 에서 옮김).
            map_aisle.jpg(670×1200) 밝은 픽셀 실측: x 209~250 / y 748~795.
            ★#scene 은 background-size:cover 라 **뷰포트마다 세로로 잘리는 범위가 다르다** →
@@ -11879,6 +11964,10 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       ],
       openImg: "lav_cab2_open.jpg",
       emptyImg: "lav_cab2_empty.jpg",
+      /* ★v0.17.3 [지시3] #27 보상 = 종이 카드(그림 힌트, 인벤에 안 들어감).
+         lav_cab2_empty.jpg(1264×847) 수납장 안쪽 = x 320~850 / y 110~690 →
+         뒷벽에 기대 놓인 카드 자리(원본 % 기준) */
+      cardCell: { x: 35.5, y: 43.0, w: 27.0, h: 27.0 },
       /* ★v0.14 갈색판 실측 38.6/48.4/18.7/28.0 (탭 여유 포함) */
       prizeCell: PRIZE.tileBrown
     },
@@ -13113,9 +13202,47 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     var ink = el("div", "shadeInk");
     var logo = new Image(); logo.src = opt.logoImg; logo.className = "shadeLogo";
     ink.appendChild(logo);
+    /* ★v0.17.3 [지시7] 숫자 테두리를 네모 → **빈 칸과 똑같은 원**으로.
+       8칸 전부 같은 .cir(지름·선 굵기·색·간격 동일)이고, 숫자만 그 안에 들어간다.
+       숫자는 잉크 무게중심(광학 중심)을 원 중심에 맞춰 "1" 이 치우쳐 보이지 않게 한다. */
     var code = el("div"); code.id = "shadeCode";
-    code.innerHTML = '<span style="letter-spacing:1px">OO</span>&nbsp;' +
-      '<b class="dg">1</b><b class="dg">2</b><span style="letter-spacing:1px">OO</span><b class="dg">4</b><b class="dg">3</b>';
+    var CODE_SEQ = [null, null, "1", "2", null, null, "4", "3"];
+    var codeGl = [];
+    CODE_SEQ.forEach(function (ch, i) {
+      var c0 = el("span", "cir" + (i === 2 ? " gap" : ""));
+      if (ch) {
+        var gl = el("span", "gl");
+        gl.setAttribute("data-g", ch);
+        gl.style.cssText = "font-family:sans-serif";
+        gl.appendChild(document.createTextNode(ch));
+        var pb = el("i", "blProbe");
+        pb.style.cssText = "display:inline-block;width:0;height:0;overflow:hidden;vertical-align:baseline";
+        gl.appendChild(pb);
+        c0.appendChild(gl);
+        codeGl.push({ cir: c0, gl: gl, ch: ch });
+      }
+      code.appendChild(c0);
+    });
+    /** 숫자 잉크의 광학 중심을 원 한가운데로 */
+    function centerDigits() {
+      codeGl.forEach(function (q) {
+        var cs = getComputedStyle(q.gl);
+        var px = parseFloat(cs.fontSize) || 10;
+        var weight = cs.fontWeight || "700";
+        var k = inkAtPx(q.ch, px, "sans-serif", weight);
+        q.gl.style.transform = "none";
+        var probe = q.gl.querySelector("i.blProbe");
+        var pr = probe.getBoundingClientRect();
+        var rc = q.cir.getBoundingClientRect();
+        if (!rc.width || !pr.width && !pr.top) return;
+        var advStart = pr.left - k.adv;
+        var inkCx = advStart + k.C;                       /* 잉크 무게중심 */
+        var inkCy = pr.top + (k.D - k.A) / 2;
+        var dx = (rc.left + rc.width / 2) - inkCx;
+        var dy = (rc.top + rc.height / 2) - inkCy;
+        q.gl.style.transform = "translate(" + dx.toFixed(2) + "px," + dy.toFixed(2) + "px)";
+      });
+    }
     ink.appendChild(code);
     /* ★clip 은 **변형되지 않는** 래퍼에 걸어야 화면상 하우징 선에서 잘린다
        (ink 자체에 걸면 clip 도 같이 움직여 하나도 안 잘린다) */
@@ -13155,6 +13282,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       var icp = "inset(" + TOP.toFixed(2) + "% 0 0 0)";
       inkClip.style.clipPath = icp; inkClip.style.webkitClipPath = icp;
       hint.style.display = d > g.D * 0.985 ? "none" : "block";
+      centerDigits();
     }
     var startY = 0, startD = 0;
     G.drag(stack, {
@@ -13172,6 +13300,40 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     window.addEventListener("resize", apply);
     if (opt.closed && opt.onClosed) setTimeout(opt.onClosed, 0);
     register({ answer: "가리개를 끝까지 내려", force: function () { d = geom().D; apply(); if (opt.onClosed) opt.onClosed(); } });
+    /* ★v0.17.3 [지시7] 검증 훅 — 원 지름·선 굵기·색이 8칸 모두 같은지, 숫자가 원 밖으로 나가는지 */
+    window.__shadeCode = function () {
+      centerDigits();
+      var out = [];
+      Array.prototype.forEach.call(code.querySelectorAll(".cir"), function (n) {
+        var r = n.getBoundingClientRect(), cs = getComputedStyle(n);
+        var bw = parseFloat(cs.borderTopWidth) || 0;
+        var o = { w: +r.width.toFixed(2), h: +r.height.toFixed(2), bw: +bw.toFixed(2),
+                  color: cs.borderTopColor,
+                  ml: +parseFloat(cs.marginLeft).toFixed(2), mr: +parseFloat(cs.marginRight).toFixed(2),
+                  digit: null, outPx: 0 };
+        var gl = n.querySelector(".gl");
+        if (gl) {
+          var g = getComputedStyle(gl), px = parseFloat(g.fontSize);
+          var k = inkAtPx(gl.getAttribute("data-g"), px, "sans-serif", g.fontWeight || "700");
+          var pr = gl.querySelector("i.blProbe").getBoundingClientRect();
+          var advStart = pr.left - k.adv;
+          var bx = { l: advStart - k.L, r: advStart + k.R, t: pr.top - k.A, b: pr.top + k.D };
+          var cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+          var innerR = Math.min(r.width, r.height) / 2 - bw;
+          var maxd = 0;
+          [[bx.l, bx.t], [bx.r, bx.t], [bx.l, bx.b], [bx.r, bx.b]].forEach(function (p) {
+            maxd = Math.max(maxd, Math.sqrt((p[0] - cx) * (p[0] - cx) + (p[1] - cy) * (p[1] - cy)));
+          });
+          o.digit = gl.getAttribute("data-g");
+          o.ink = { w: +(bx.r - bx.l).toFixed(2), h: +(bx.b - bx.t).toFixed(2),
+                    dx: +(((bx.l + bx.r) / 2) - cx).toFixed(2), dy: +(((bx.t + bx.b) / 2) - cy).toFixed(2) };
+          o.innerR = +innerR.toFixed(2); o.maxR = +maxd.toFixed(2);
+          o.outPx = +Math.max(0, maxd - innerR).toFixed(2);
+        }
+        out.push(o);
+      });
+      return out;
+    };
     wrap._setP = function (v) { d = geom().D * Math.max(0, Math.min(1, v)); apply(); };   /* 검증용 */
     wrap._getP = function () { return d / geom().D; };
     wrap._geom = function () { var g = geom(); return { D: g.D, top: TOP / 100 * g.Hs, bot: BOT / 100 * g.Hs }; };
@@ -14318,7 +14480,16 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   }
   function go(v) { view = v; render(); }
 
-  function screen() { return clear($("phoneScreen")); }
+  /* ★v0.17.3 [지시5] 폰 배경화면 — 잠금화면·홈 화면에서만 사진을 깐다(앱 화면은 기존 배경 유지) */
+  var WALL = "phone_wall.jpg";
+  function hasWall() { return Array.isArray(window.__IMG) && window.__IMG.indexOf(WALL) >= 0; }
+  function screen(wall) {
+    var sc = clear($("phoneScreen"));
+    var on = !!wall && hasWall();
+    sc.className = on ? "wall" : "";
+    sc.style.backgroundImage = on ? ("url('" + DATA.IMG + WALL + "')") : "";
+    return sc;
+  }
 
   /* ★v0.4: 실제 현재 시각(HH:MM), 분마다 갱신 */
   function nowHM() {
@@ -14351,7 +14522,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 
   /* ═══════════ 잠금화면 (#4) ═══════════ */
   function viewLock() {
-    var sc = screen();
+    var sc = screen(true);
     sc.appendChild(statusbar());
     var body = el("div", "pBody");
     var box = el("div", "pLock");
@@ -14426,7 +14597,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   }
 
   function viewHome() {
-    var sc = screen();
+    var sc = screen(true);
     sc.appendChild(statusbar());
     var body = el("div", "pBody");
     var apps = el("div", "pApps");
@@ -14719,17 +14890,52 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   }
 
   /* ═══════════ 구글맵 (#11 · 1차 결말) ═══════════ */
+  /* ★v0.17.3 [지시3] GPS 픽토그램 + 빨간 사선 — 위치가 안 잡힌다는 표시 */
+  var GPS_LOST_SVG =
+    '<svg viewBox="0 0 72 72" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">' +
+    '<g fill="none" stroke="#cfd2da" stroke-width="4.4" stroke-linecap="round" stroke-linejoin="round">' +
+    '<path d="M36 64 C36 64 55 44.5 55 30.5 A19 19 0 0 0 17 30.5 C17 44.5 36 64 36 64 Z"/>' +
+    '<circle cx="36" cy="30" r="6.6"/></g>' +
+    '<g stroke-linecap="round"><line x1="12" y1="60" x2="60" y2="12" stroke="#1a1b21" stroke-width="10"/>' +
+    '<line x1="12" y1="60" x2="60" y2="12" stroke="#d8453b" stroke-width="5.4"/></g></svg>';
+
+  /** 신호가 끊긴 지도 배경(회색·흐릿) — 조작 대상 없음 */
+  function deadMapBg() {
+    var g = el("div"); g.id = "gmap"; g.className = "dead";
+    g.innerHTML = '<div class="sea"></div>';
+    var l1 = el("div", "land"); l1.style.cssText = "left:-14%;top:-6%;width:60%;height:34%;background:#c6c6cb";
+    var l2 = el("div", "land"); l2.style.cssText = "right:-18%;bottom:-8%;width:70%;height:36%;background:#c6c6cb";
+    g.appendChild(l1); g.appendChild(l2);
+    return g;
+  }
+
   function viewGmap() {
     var sc = screen();
     sc.appendChild(statusbar());
     var body = el("div", "pBody");
     body.appendChild(header("구글맵", function () { go("home"); }));
 
+    /* ★v0.17.3 [지시3] 복구 전에는 GPS 가 끊겨 있다 — 비밀번호 칸도 뜨지 않는다 */
+    if (!G.flag("gmapOpen") && !G.flag("gpsRestored")) {
+      var dead = el("div", "gmapDead");
+      dead.setAttribute("data-t", "gpsLost");
+      dead.appendChild(deadMapBg());
+      var gbox = el("div", "gpsBox");
+      var gico = el("div", "gpsIco"); gico.innerHTML = GPS_LOST_SVG;
+      gbox.appendChild(gico);
+      gbox.appendChild(el("div", "gpsMsg", "GPS 연결 끊김"));
+      dead.appendChild(gbox);
+      body.appendChild(dead);
+      sc.appendChild(body);
+      if (!G.flag("gpsSeen")) G.setFlag("gpsSeen");
+      return;
+    }
+
     if (!G.flag("gmapOpen")) {
       var box = el("div");
       box.style.cssText = "flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:14px";
       box.appendChild(el("div", null, "🔒"));
-      box.appendChild(el("div", null, "잠긴 앱 — 4자리 비밀번호"));
+      box.appendChild(el("div", null, "잠긴 앱"));   /* ★v0.17.3 [지시8] 자물쇠 스펙 라벨 삭제 */
       /* ★v0.5: 조각 아이템이 색상판으로 대체돼 힌트 출처가 빠짐 → 게임 내 힌트는 "준비 중"
          (정답은 ?debug=1 의 '정답' 표시로만 확인) */
       var frags = el("div", "gmHint", "힌트 준비 중");
@@ -15181,13 +15387,16 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       shadeImg: DATA.IMG + "window_shade_plain.jpg",   /* ★v0.13.3 로고 지운 가리개 */
       logoImg: DATA.IMG + "shade_logo.png",            /* 로고는 별도 레이어로 같이 내려온다 */
       closed: G.flag("shadeDown"),
+      /* ★v0.17.3 [지시6] 가리개를 내렸을 때 나오던 설명(토스트 1개 + 캡션 1개)을 전부 삭제한다 —
+         무엇을 보라고 짚어 주면 추론하는 재미가 사라진다(북쑥 지시).
+         가리개에 인쇄된 로고·숫자줄 자체(디제틱)는 그대로 둔다. */
       onClosed: function () {
-        if (!G.flag("shadeDown")) { G.setFlag("shadeDown"); G.toast("가리개 무늬에 뭔가 적혀 있다"); }
-        c.cap("로고 아래에 이상한 줄이 있다.\nOO 1 2 OO 4 3 …");
+        if (!G.flag("shadeDown")) G.setFlag("shadeDown");
+        c.cap("창문.");
       }
     });
     c.stage.appendChild(node);
-    c.cap(G.flag("shadeDown") ? "로고 아래에 이상한 줄이 있다.\nOO 1 2 OO 4 3 …" : "가리개가 창문 위쪽에 걷혀 있다.");
+    c.cap("창문.");
 
   };
 
@@ -15240,7 +15449,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         }
       }
       paint();
-      c.cap("화면 아래 버튼 3개.");                 /* ★v0.16.3 [지시5] "순서가 있을 것 같다" 삭제 */
+      c.cap("꺼진 화면.");                        /* ★v0.17.3 [지시8] "버튼 3개" 자물쇠 스펙 삭제 */
       W.unregister();
       window.__lock = {
         answer: order.map(function (o) { return DATA.IFE_ICONS[o]; }).join(""),
@@ -15290,40 +15499,84 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       var i = 0, im = null, dotEls = [];
       var ov = [];
       if (F.slides.mode === "full") {
-        /* 사진이 IFE 화면에 떠 있는 합성본 — 같은 IFE 프레임으로 보여주고 이미지만 교체 */
+        /* 사진이 IFE 화면에 떠 있는 합성본 — 같은 IFE 프레임으로 보여주고 이미지만 교체.
+           ★v0.17.3 [지시4] 깜빡임 제거 —
+             (전) 2초마다 host 를 통째로 비우고 cropView 를 새로 만들었다. 새 <img> 가 뜨는
+                  동안 IFE 프레임까지 같이 사라져 전환마다 한두 프레임 빈 화면이 보였다.
+             (후) 프레임은 **한 번만** 그리고, 사진 4장을 미리 받아 decode() 까지 끝낸 뒤
+                  같은 자리에 겹쳐 둔 <img> 두 장의 opacity 만 맞바꾼다(이중 버퍼).
+                  → 전환 프레임에 빈 화면·흰 플래시가 0. */
         var host = el("div", "imgLockHost");
-        var cur = 0;
-        function draw() {
-          clear(host);
-          var back = {
-            x: F.back.x, y: F.back.y, w: F.back.w, h: F.back.h, t: "ifeBack", cls: "ifeBack",
-            build: function (n2) { var cv = el("div", "cv"); cv._noFit = true; cv.innerHTML = BACK_SVG; n2.appendChild(cv); },
-            onTap: function () { view = "menu"; drawOn(); }
-          };
-          var swipe = {
-            x: F.screen.x, y: F.screen.y, w: F.screen.w, h: F.screen.h, cls: "ifeSwipe", t: "slideNext",
-            build: function (n2) {
-              var dw = el("div", "ifeDotsBar");
-              for (var k = 0; k < files.length; k++) { var dd = el("i"); if (k === cur) dd.className = "on"; dw.appendChild(dd); }
-              n2.appendChild(dw);
-              /* ★v0.10 스와이프 폐지 — 저절로 넘어간다 */
-            }
-          };
-          host.appendChild(W.cropView(files[cur], F.crop, [swipe, back], { nw: F.nw, nh: F.nh }));
-        }
-        function go(k) {
-          cur = (k + files.length) % files.length;
-          if (cur === files.length - 1) G.setFlag("sawSlides");
-          draw();
-        }
+        var cur = 0, dotEls = [];
+        var back = {
+          x: F.back.x, y: F.back.y, w: F.back.w, h: F.back.h, t: "ifeBack", cls: "ifeBack",
+          build: function (n2) { var cv = el("div", "cv"); cv._noFit = true; cv.innerHTML = BACK_SVG; n2.appendChild(cv); },
+          onTap: function () { view = "menu"; drawOn(); }
+        };
+        var swipe = {
+          x: F.screen.x, y: F.screen.y, w: F.screen.w, h: F.screen.h, cls: "ifeSwipe", t: "slideNext",
+          build: function (n2) {
+            var dw = el("div", "ifeDotsBar");
+            for (var k = 0; k < files.length; k++) { var dd = el("i"); if (k === 0) dd.className = "on"; dotEls.push(dd); dw.appendChild(dd); }
+            n2.appendChild(dw);
+            /* ★v0.10 스와이프 폐지 — 저절로 넘어간다 */
+          },
+          onFit: function () { syncGeo(); }
+        };
+        var cv0 = W.cropView(files[0], F.crop, [swipe, back], { nw: F.nw, nh: F.nh });
+        host.appendChild(cv0);
         c.stage.appendChild(host);
-        draw();
+        /* 두 번째 레이어 — cropView 가 크기를 잡아 주는 첫 번째 이미지의 기하를 그대로 따라간다 */
+        var imgA = cv0.querySelector(".cropImg");
+        var imgB = new Image();
+        imgB.className = "cropImg";
+        imgB.style.opacity = "0";
+        if (imgA && imgA.parentNode) imgA.parentNode.insertBefore(imgB, imgA.nextSibling);
+        var layers = [imgA, imgB], front = 0;
+        function syncGeo() {
+          if (!imgA || !imgB) return;
+          imgB.style.width = imgA.style.width; imgB.style.height = imgA.style.height;
+          imgB.style.left = imgA.style.left; imgB.style.top = imgA.style.top;
+        }
+        /* 4장 전부 미리 받아 decode 까지 끝낸다 — 그 전에는 넘기지 않는다 */
+        var preloaded = false;
+        Promise.all(files.map(function (f) {
+          var im = new Image(); im.src = f;
+          return im.decode ? im.decode().catch(function () {}) : new Promise(function (r) { im.onload = im.onerror = r; });
+        })).then(function () { preloaded = true; });
+        function go(k) {
+          var next = (k + files.length) % files.length;
+          if (next === cur) return;
+          var bk = layers[1 - front], fr = layers[front];
+          syncGeo();
+          function flip() {
+            syncGeo();
+            bk.style.opacity = "1"; fr.style.opacity = "0";
+            front = 1 - front; cur = next;
+            dotEls.forEach(function (d, q) { d.className = q === cur ? "on" : ""; });
+            if (cur === files.length - 1) G.setFlag("sawSlides");
+          }
+          if (bk.getAttribute("src") === files[next]) { flip(); return; }
+          bk.setAttribute("src", files[next]);
+          if (bk.decode) bk.decode().then(flip, flip); else flip();
+        }
         stopSlides();
         slideTimer = setInterval(function () {
           if (!$("closeup").classList.contains("show")) { stopSlides(); return; }
+          if (!preloaded) return;                    /* 아직 다 못 받았으면 이번 차례는 건너뛴다 */
           go(cur + 1);
         }, 2000);
         c.cap("우리가 갔던 곳들이다.");
+        window.__slideState = function () {          /* 검증용 */
+          return {
+            cur: cur, front: front, preloaded: preloaded,
+            layers: layers.map(function (im) {
+              var r = im.getBoundingClientRect();
+              return { src: (im.getAttribute("src") || "").split("/").pop(), op: +(getComputedStyle(im).opacity),
+                       complete: !!im.complete, nw: im.naturalWidth, w: +r.width.toFixed(1), h: +r.height.toFixed(1) };
+            })
+          };
+        };
         return;
       }
       ov.push({
@@ -15393,7 +15646,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         pool: "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(""), size: 12, answer: DATA.ANS.p12,
         onSolve: function () { G.markSolved("p12"); reopenCU(); }
       }));
-      c.cap("알파벳 4칸 자물쇠.");
+      c.cap("짐칸.");                             /* ★v0.17.3 [지시8] 자물쇠 스펙 라벨 삭제 */
       return;
     }
     var got = G.has("headsetCase") || G.flag("tookCase");
@@ -15416,7 +15669,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
           reopenCU();
         }
       }));
-      c.cap("히라가나 5칸 자물쇠.");
+      c.cap("짐칸.");                             /* ★v0.17.3 [지시8] 자물쇠 스펙 라벨 삭제 */
       return;
     }
     var L2 = DATA.LOCKS.p10;
@@ -15440,7 +15693,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         kind: "icon", cands: DATA.FOOD, answer: DATA.ANS.p15,
         onSolve: function () { G.markSolved("p15"); reopenCU(); }
       }));
-      c.cap("칸마다 색이 다르다.");                 /* ★v0.16.3 [지시5] "색에 맞는 음식은?" 삭제 */
+      c.cap("짐칸.");                             /* ★v0.17.3 [지시10] 관찰 유도 문구까지 삭제 */
       return;
     }
     var got = G.has("gamecard") || G.flag("tookCard");
@@ -15465,7 +15718,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
           reopenCU();
         }
       }));
-      c.cap("말풍선 로고 아래 숫자 3칸.");
+      c.cap("짐칸.");                             /* ★v0.17.3 [지시8] 자물쇠 스펙 라벨 삭제 */
       return;
     }
     /* ★v0.14 열림 사진(59)·빈 사진(60) 이 오면 열쇠를 직접 탭해 꺼낸다 */
@@ -15562,7 +15815,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       });
       openZoom({
         id: "p13lock", title: "패턴 자물쇠", node: node,
-        cap: already ? "이미 그은 패턴이다." : "점 9개를 이어 그려봐."
+        cap: already ? "이미 그은 패턴이다." : ""   /* ★v0.17.3 [지시13] 조작 유도 문구 삭제 */
       });
       sizePatternLock();
       setTimeout(sizePatternLock, 60);
@@ -15627,7 +15880,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         extras: extras,
         onSolve: function () { G.markSolved("p8"); reopenCU(); }
       }));
-      c.cap("식기 그림 아래 숫자 네 칸.");
+      c.cap("상자.");                             /* ★v0.17.3 [지시8] 자물쇠 스펙 라벨 삭제 */
       return;
     }
     if (hasImg(L.openImg)) {
@@ -15650,9 +15903,10 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     c.stage.appendChild(W.tissue({
       idle: DATA.IMG + "lav_tissue_roll.jpg",   /* ★v0.13.2 자락 없는 롤 — 늘어진 종이는 위젯이 그린다 */
       img: DATA.IMG + "lav_tissue.jpg",
-      onFull: function () { if (!G.flag("tissueOpen")) { G.setFlag("tissueOpen"); G.toast("휴지에 그림이 그려져 있다"); } }
+      /* ★v0.17.3 [지시14] 다 내렸을 때 뜨던 완료 토스트 삭제 — 플래그만 세운다 */
+      onFull: function () { if (!G.flag("tissueOpen")) G.setFlag("tissueOpen"); }
     }));
-    c.cap("휴지걸이에 휴지가 걸려 있다.");
+    c.cap("휴지.");                                /* ★v0.17.3 [지시14] 관찰 유도 문구 삭제 */
   };
 
   CU.ceiling = function (c) {
@@ -15696,7 +15950,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
           answer: DATA.TEMP.p24Dance,
           onSolve: function () { G.markSolved("p24"); prize("ladder", "수납장이 열렸다"); reopenCU(); }
         }));
-        c.cap("버튼 두 개와 표시등 다섯 개.");
+        c.cap("하단 수납장.");                       /* ★v0.17.3 [지시8] 자물쇠 스펙 라벨 삭제 */
         return;
       }
       /* ★v0.11.1 사진 위에서 바로 누른다 — 버튼은 사진 그대로, 표시등만 켜진다.
@@ -15735,7 +15989,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       ov.push({ x: L.btnR.x, y: L.btnR.y, w: L.btnR.w, h: L.btnR.h, t: "cabR", cls: "cabBtn", onTap: function () { press("R"); } });
       c.stage.appendChild(W.cropView(L.img, L.crop, ov, { nw: L.nw, nh: L.nh }));
       paintLamps();
-      c.cap("버튼 두 개와 표시등 다섯 개.");
+      c.cap("하단 수납장.");                       /* ★v0.17.3 [지시8] 자물쇠 스펙 라벨 삭제 */
       W.unregister();
       window.__lock = {
         answer: ans.join(" "),
@@ -15792,18 +16046,28 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         pool: "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(""), size: 12, answer: DATA.ANS.p27,
         onSolve: function () { G.markSolved("p27"); reopenCU(); }
       }));
-      c.cap("정사각형 홈이 여덟 칸. 아래 명판에 글자가 새겨져 있다.");
+      c.cap("상단 수납장.");                       /* ★v0.17.3 [지시8] 자물쇠 스펙 라벨 삭제 */
       return;
     }
 
+    /* ★v0.17.3 [지시3] #27 보상 = 안에 놓인 **종이 카드**(그림 힌트 · 인벤에 안 들어간다 — #8 종이와 같은 방식).
+       빈 수납장 사진은 그대로 두고 카드만 엔진 오버레이로 얹는다(사진 재생성 없음). */
     if (!hasImg(L.emptyImg)) {
-      var d = el("div", null, "\uD83D\uDDC4\uFE0F"); d.style.cssText = "font-size:54px;text-align:center";
+      var d = el("button", null, "📇");
+      d.style.cssText = "font-size:54px;text-align:center;background:transparent;border:0;padding:0;color:inherit;display:block;margin:0 auto";
+      d.setAttribute("data-t", "gpsCard");
+      d.onclick = function () { ZOOM.gpsHint(); };
       c.stage.appendChild(d);
-      c.cap("비어 있다.");
+      c.cap("안에 종이 카드가 있다.");
       return;
     }
-    c.stage.appendChild(imgStage(DATA.IMG + L.emptyImg, []));
-    c.cap("비어 있다.");
+    var cc = L.cardCell;
+    c.stage.appendChild(imgStage(DATA.IMG + L.emptyImg, [
+      { x: cc.x, y: cc.y, w: cc.w, h: cc.h, t: "gpsCard", cls: "hot gpsCardSpot",
+        build: function (n) { n.innerHTML = GPS_CARD_MINI; },
+        onTap: function () { ZOOM.gpsHint(); } }
+    ]));
+    c.cap("안에 종이 카드가 있다.");
   };
 
   /* ★v0.5 #25 갤리 간식 수납칸 — 정사각 홈 4개에 색상판을 순서대로 끼운다.
@@ -15861,7 +16125,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     paint();
     /* ★v0.9 색상판 선택 칩 제거 — 가방(인벤)에서 직접 골라 홈에 끼우는 흐름만 남긴다.
        (팝업이 떠도 인벤이 보이고 눌리게 바뀌었으므로 칩은 중복이다) */
-    c.cap("정사각형 홈이 네 개 있다.");
+    c.cap("간식 수납칸.");                       /* ★v0.17.3 [지시8] 자물쇠 스펙 라벨 삭제 */
 
     function itemOf(tile) {
       var k = { black: "tileBlack", brown: "tileBrown", dark: "tileDark", beige: "tileBeige" };
@@ -15934,7 +16198,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         pool: "0123456789".split(""), size: 10, hash: DATA.P26_HASH,
         onSolve: function () { G.markSolved("p26"); reopenCU(); }
       }));
-      c.cap("숫자 여섯 칸. 위에 작은 격자 무늬가 새겨져 있다.");
+      c.cap("상단 수납장.");                       /* ★v0.17.3 [지시8] 자물쇠 스펙 라벨 삭제 */
       return;
     }
 
@@ -16035,6 +16299,62 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     if (im.complete) fit(); else im.onload = fit;
     setTimeout(fit, 40); setTimeout(fit, 220);
   };
+  /* ═══ ★v0.17.3 [지시3] #27 종이 카드에 그려진 그림 — 글자는 "GPS" 하나뿐 ═══
+     ① 위치 핀 + 빨간 사선(신호 끊김) → ② 아래로 화살표 → ③ 새로고침 ↻ 버튼을 손가락이 누른다.
+     전부 엔진 SVG 픽토그램(플랫·굵은 선). 인벤에 안 들어가고 팝업으로만 본다. */
+  var INK = "#23242b", RED = "#d4453c", PAPER = "#f2ecdf";
+  function gpsArt(w, h) {
+    /* 기준 도안 320×430 을 그대로 쓰고 크기는 viewBox 로 맞춘다 */
+    var s = '<svg viewBox="0 0 320 430" width="' + w + '"' + (h ? ' height="' + h + '"' : '') + ' xmlns="http://www.w3.org/2000/svg">';
+    s += '<rect x="2" y="2" width="316" height="426" rx="14" fill="' + PAPER + '" stroke="#cdc3ad" stroke-width="3"/>';
+    /* ① 핀 + 사선 */
+    s += '<g fill="none" stroke="' + INK + '" stroke-width="11" stroke-linecap="round" stroke-linejoin="round">';
+    s += '<path d="M160 152 C160 152 202 108 202 76 A42 42 0 0 0 118 76 C118 108 160 152 160 152 Z"/>';
+    s += '<circle cx="160" cy="74" r="15"/></g>';
+    s += '<line x1="112" y1="150" x2="208" y2="40" stroke="' + RED + '" stroke-width="13" stroke-linecap="round"/>';
+    s += '<text x="160" y="192" text-anchor="middle" font-family="sans-serif" font-size="30" font-weight="700" fill="' + INK + '">GPS</text>';
+    /* ② 화살표 */
+    s += '<g stroke="' + INK + '" fill="' + INK + '" stroke-width="10" stroke-linecap="round" stroke-linejoin="round">';
+    s += '<line x1="160" y1="210" x2="160" y2="252"/>';
+    s += '<polygon points="160,272 144,244 176,244"/></g>';
+    /* ③ 새로고침 버튼 + 누르는 손가락 */
+    s += '<rect x="96" y="288" width="76" height="76" rx="20" fill="none" stroke="' + INK + '" stroke-width="8"/>';
+    s += '<g fill="none" stroke="' + INK + '" stroke-width="8" stroke-linecap="round">';
+    s += '<path d="M156 326 A22 22 0 1 1 149 309"/></g>';
+    s += '<polygon points="156,300 158,322 137,313" fill="' + INK + '"/>';
+    /* 손가락 — 검지 하나를 세운 손 모양(플랫) */
+    s += '<g transform="translate(150,318) rotate(24)">';
+    s += '<path d="M18 6 a11 11 0 0 1 22 0 v46 h-22 z" fill="' + PAPER + '" stroke="' + INK + '" stroke-width="8" stroke-linejoin="round"/>';
+    s += '<path d="M8 50 h42 a14 14 0 0 1 14 14 v22 a14 14 0 0 1 -14 14 h-42 a14 14 0 0 1 -14 -14 v-22 a14 14 0 0 1 14 -14 z" fill="' + PAPER + '" stroke="' + INK + '" stroke-width="8" stroke-linejoin="round"/>';
+    s += '</g>';
+    s += '</svg>';
+    return s;
+  }
+  /* 수납장 사진 위에 놓이는 작은 카드(한 장) — 탭하면 위 그림이 크게 뜬다 */
+  var GPS_CARD_MINI =
+    '<svg viewBox="0 0 120 96" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">' +
+    '<g transform="rotate(-3 60 48)">' +
+    '<rect x="10" y="8" width="100" height="80" rx="6" fill="' + PAPER + '" stroke="#b9ae97" stroke-width="2.4"/>' +
+    '<g fill="none" stroke="' + INK + '" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">' +
+    '<path d="M44 44 C44 44 57 31 57 21 A13 13 0 0 0 31 21 C31 31 44 44 44 44 Z"/>' +
+    '<circle cx="44" cy="20" r="4.6"/></g>' +
+    '<line x1="31" y1="43" x2="58" y2="12" stroke="' + RED + '" stroke-width="4.4" stroke-linecap="round"/>' +
+    '<rect x="66" y="20" width="30" height="30" rx="8" fill="none" stroke="' + INK + '" stroke-width="4"/>' +
+    '<path d="M89 36 A10 10 0 1 1 86 28" fill="none" stroke="' + INK + '" stroke-width="4" stroke-linecap="round"/>' +
+    '<polygon points="90,22 91,32 82,27" fill="' + INK + '"/>' +
+    '<line x1="30" y1="62" x2="90" y2="62" stroke="#b9ae97" stroke-width="3.2" stroke-linecap="round"/>' +
+    '<line x1="38" y1="72" x2="82" y2="72" stroke="#b9ae97" stroke-width="3.2" stroke-linecap="round"/>' +
+    '</g></svg>';
+  ZOOM.gpsHint = function () {
+    var host = el("div");
+    host.setAttribute("data-t", "gpsHintArt");
+    host.style.cssText = "position:relative;width:100%;max-width:300px;margin:0 auto;line-height:0";
+    host.innerHTML = gpsArt("100%", null);
+    var svg = host.querySelector("svg");
+    if (svg) { svg.style.width = "100%"; svg.style.height = "auto"; svg.style.display = "block"; }
+    openZoom({ id: "gpsHint", title: "종이 카드", node: host, cap: "카드에 그림이 그려져 있다." });
+  };
+
   /* ★v0.15 [7] 팜플렛 탭 → **팜플렛만** 뜬다. 셀로판은 인벤에서 고른 뒤
      팜플렛을 탭해야 나타난다(고르지 않고 탭하면 아무 일도 없다). */
   /* ★v0.16 #8 종이에 그려진 그림 — 사진 위에 굵은 직선 화살표 + QR 픽토그램(글자 없음).
@@ -16498,7 +16818,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 
     var rst = el("button", null, "초기화");
     rst.setAttribute("data-t", "dbgReset");
-    rst.onclick = function () { G.wipe(); location.href = location.pathname + location.search; };
+    rst.onclick = function () { G.wipe(); G.markAutoNav(); location.href = location.pathname + location.search; };
     bar.appendChild(rst);
   }
 
@@ -16516,6 +16836,18 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     render();
   }
 
+  /* ★v0.17.3 새로고침·재접속 — 저장이 있으면 인트로를 건너뛰고 **곧장 저장된 장면**으로 돌아온다.
+     · 맵·인벤·플래그는 G.load() 가 이미 되돌려 놓았다. 팝업(클로즈업·확대·폰·미니게임)은 복원하지
+       않는다 — 무엇이 열려 있었든 언제나 맵 화면으로 돌아온다(단순하게).
+     · 오디오: 제스처 없이 소리를 내는 건 iOS 가 막는다. 여기서는 "메인을 틀고 싶다" 상태만 켜 두고
+       (bgmCur="main"), 실제 재생은 **첫 탭**의 firstGesture → bgmUnlock/bgmKick 이 이어받는다. */
+  function resumeGame() {
+    $("intro").style.display = "none";
+    G.audio();
+    G.BGM.start();
+    render();
+  }
+
   function bind() {
     $("navL").onclick = function () { goMap("L"); };
     $("navR").onclick = function () { goMap("R"); };
@@ -16525,7 +16857,8 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     $("btnStart").onclick = function () { startGame(true); };
     $("btnResume").onclick = function () { startGame(false); };
     $("btnMenu").onclick = function () {
-      if (confirm("처음부터 다시 시작할까?")) { G.wipe(); location.href = location.pathname + location.search; }
+      /* ★v0.17.3 여기서 일어나는 재로드는 "사용자 새로고침" 이 아니다 — 감지에서 빼 둔다 */
+      if (confirm("처음부터 다시 시작할까?")) { G.wipe(); G.markAutoNav(); location.href = location.pathname + location.search; }
     };
   }
 
@@ -16548,6 +16881,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       try { last = +sessionStorage.getItem("swReloadAt") || 0; } catch (e) {}
       if (Date.now() - last < 10000) return;
       try { sessionStorage.setItem("swReloadAt", String(Date.now())); } catch (e) {}
+      G.markAutoNav();   /* ★v0.17.3 이 자동 새로고침은 "사용자 새로고침" 감지에서 뺀다 */
       location.reload();
     });
     navigator.serviceWorker.register("sw.js", { scope: "./", updateViaCache: "none" })
@@ -16585,7 +16919,15 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     buildDebug();
     sw();
     var had = G.load();
-    if (had && S.started) $("btnResume").hidden = false;
+    /* ★v0.17.3 [지시3] GPS 복구 — "GPS 연결 끊김" 화면을 본 뒤의 **사용자 새로고침** 한 번이면
+       위치가 다시 잡힌다. 서비스워커 자동 새로고침·☰처음부터는 G.markAutoNav() 로 빠져 있다. */
+    G.onReload(function () {
+      if (G.flag("gpsSeen") && !G.flag("gpsRestored")) G.setFlag("gpsRestored");
+    });
+    /* ★v0.17.3 저장이 있으면 인트로 없이 곧장 이어 한다(새로고침 = 즉시 복귀).
+       저장이 없거나 맵을 못 찾는 비정상 저장이면 예전처럼 인트로(이어하기 버튼)를 보여 준다. */
+    if (had && S.started && DATA.MAPS[S.map]) resumeGame();
+    else if (had && S.started) $("btnResume").hidden = false;
   });
 })();
 
