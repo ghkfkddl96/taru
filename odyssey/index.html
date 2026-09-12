@@ -10968,7 +10968,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 (function () {
   "use strict";
 
-  var BUILD = "ODY-S1-20260912-2116";
+  var BUILD = "ODY-S1-20260912-2237";
   var LSKEY = "odyssey.s1.v1";
 
   var qs = new URLSearchParams(location.search);
@@ -11569,13 +11569,8 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
      ───────────────────────────────────────────────────────── */
   var TEMP = {
     p8Place: "갤리 카트 옆 작은 상자",          // Q1 #8 다이얼 상자 위치
-    /* ★v0.16 #8 보상은 아이템이 아니라 "상자 안의 종이(힌트 그림)" 가 됐다 → 아이템 배정 없음.
-       짙은갈색 색상판 출처가 비어 완주가 막히는데, 지시받은 **#23(쌍안경)에 붙이면 순환**이 생긴다:
-         #25 간식칸 → 땅콩 → 다마고치(#24) → 춤 순서 → 하단 수납장 → 사다리 → 천장 → 카드키
-         → 서랍장(#14) → 쌍안경 → (#23 보상) 짙은갈색 → 다시 #25.
-       그래서 **#25 보다 앞에 있는 #22 네모네모로직**(현재 보상 없음)에 임시로 붙인다.
-       ★임시 — 북쑥 확인 전(QUESTIONS.md v0.16 항목). */
-    p22Prize: "tileDark",
+    /* ★v0.17.1 확정(북쑥): 짙은갈색 색상판 출처 = **#25 간식칸 1번 홈에 처음부터 끼워져 있음**(P25_INIT).
+       → #22 네모네모로직 보상(p22Prize)은 폐지하고 다시 "보상 없는 순수 관찰형 퍼즐"로 원복(Q67 종결). */
     p10Prize: "cellophane",                      // #10 보상 = 셀로판(#17용) — 15:40 정정으로 원복
     p13Prize: "pamphlet",                        // Q4 #13 보상(팜플렛)
     p16Prize: "silverKey",                       // ★v0.14 확정: #16 짐칸R2 보상 = 은색 열쇠(카트 #9 에서 사용)
@@ -11730,6 +11725,10 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     p25: ["black", "brown", "dark", "beige"],                    // ★v0.5 #25 색상판 순서(왼→오)
     p11: TEMP.gmapPass                                           // #11 구글맵(임시)
   };
+
+  /* ★v0.17.1 #25 간식칸 초기 배치 — 짙은갈색판이 **1번(맨 왼쪽) 홈**에 처음부터 끼워져 있다.
+     정답(ANS.p25)은 그대로라 짙은갈색의 제자리는 3번 홈 → 플레이어가 빼서 옮겨 끼워야 한다. */
+  var P25_INIT = ["dark", null, null, null];
 
   /* ─────────────────────────────────────────────────────────
      아이콘 세트
@@ -12244,7 +12243,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 
   window.DATA = {
     LOCKS: LOCKS, IFE: IFE, TAMA: TAMA, TILES: TILES, BINOC: BINOC, BOOK: BOOK, PRIZE: PRIZE, GAMECARD: GAMECARD,
-    IMG: IMG, TEMP: TEMP, ITEMS: ITEMS, MAPS: MAPS, ANS: ANS, PIN_HASH: PIN_HASH, P26_HASH: P26_HASH,
+    IMG: IMG, TEMP: TEMP, ITEMS: ITEMS, MAPS: MAPS, ANS: ANS, P25_INIT: P25_INIT, PIN_HASH: PIN_HASH, P26_HASH: P26_HASH,
     FOOD: FOOD, FOOD_BG: FOOD_BG, FLAGS: FLAGS, UTENSIL: UTENSIL, IFE_ICONS: IFE_ICONS,
     KANA: KANA, SONGS: SONGS,
     PAMPHLET: PAMPHLET_A, PAMPHLET_TARGETS: PAMPHLET_TARGETS, PAMPHLET_BG: PAMPHLET_BG, HINT_ART: HINT_ART, KAKAO_MSG: KAKAO_MSG, KAKAO_FROM: KAKAO_FROM
@@ -14149,7 +14148,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     var mode = 1;                 /* 1=채우기, 2=✕ */
     var done = false;
     openFull({
-      title: "네모네모로직", right: "",
+      title: "네모네모로직", right: "", bgm: "sudoku",   /* ★v0.17.1 스도쿠와 같은 곡을 쓴다 */
       build: function (body, foot) {
         var rowH = [], colH = [];
         for (var r = 0; r < N; r++) rowH.push(runs(NONO[r]));
@@ -14885,6 +14884,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   }
 
   var zoomId = null;
+  var pamCello = false;   /* ★v0.17.1 팜플렛 줌이 "셀로판 겹침" 상태인지 — 인벤 더블탭 분기에 쓴다 */
   function openZoom(o) {
     zoomId = o.id || null;
     var z = $("zoom");
@@ -14898,7 +14898,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     /* ★v0.9.1 2층일 때 아래 클로즈업의 글자(제목·캡션·패널·×)가 비쳐 겹치는 걸 막는다 */
     syncSheetCls();
   }
-  function closeZoom() { if (zoomId === "songs") stopSongs(); zoomId = null; $("zoom").classList.remove("show"); clear($("zoomStage")); clear($("zoomPanel")); syncSheetCls(); }
+  function closeZoom() { if (zoomId === "songs") stopSongs(); zoomId = null; pamCello = false; $("zoom").classList.remove("show"); clear($("zoomStage")); clear($("zoomPanel")); syncSheetCls(); }
 
   /* ═══════════ 보상 ═══════════ */
   function prize(itemId, msg) {
@@ -15022,7 +15022,14 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       G.tapper(b, {
         key: "inv_" + id,
         tap: function () { invPrevSel = S.sel; selectItem(id); },
-        dbl: function () { S.sel = invPrevSel; G.save(); renderInv(); inspect(id); },
+        dbl: function () {
+          S.sel = invPrevSel; G.save(); renderInv();
+          /* ★v0.17.1 팜플렛 팝업이 **겹치기 전 상태로** 열려 있을 때 셀로판을 더블탭하면
+             필름 확대(ZOOM.cellophane) 대신 곧바로 겹침 화면으로 간다.
+             기존 "셀로판 고르고 → 팜플렛 탭" 경로(useCello)는 그대로 두고 추가 경로만 붙인 것. */
+          if (id === "cellophane" && zoomId === "pamphlet" && !pamCello) { overlayCello(); return; }
+          inspect(id);
+        },
         long: function () { inspect(id); }
       });
       box.appendChild(b);
@@ -15817,7 +15824,9 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       return;
     }
     var L = DATA.LOCKS.p25;
-    var slots = (G.S.misc.p25 && G.S.misc.p25.length === 4) ? G.S.misc.p25.slice() : [null, null, null, null];
+    /* ★v0.17.1 초기 배치 = 짙은갈색판이 1번 홈에 끼워진 상태(DATA.P25_INIT).
+       한 번이라도 건드리면 G.S.misc.p25 에 저장돼 그 상태가 유지된다. */
+    var slots = (G.S.misc.p25 && G.S.misc.p25.length === 4) ? G.S.misc.p25.slice() : DATA.P25_INIT.slice();
     var vnodes = [];
 
     var overlays = [];
@@ -16079,11 +16088,11 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   };
 
   ZOOM.pamphlet = function (withCello) {
+    pamCello = !!withCello;                              /* ★v0.17.1 지금 열린 팜플렛이 겹침 상태인가 */
     if (!withCello) {
       function useCello() {
         if (S.sel !== "cellophane") return;              /* 고르지 않았으면 아무 일 없음 */
-        S.sel = null; renderInv();
-        closeZoom(); setTimeout(function () { ZOOM.pamphlet(true); }, 120);
+        overlayCello();
       }
       var node;
       if (hasImg(DATA.PAMPHLET_BG.img)) {
@@ -16113,6 +16122,13 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     });
     openZoom({ id: "pamphlet", title: "팜플렛 + 셀로판", node: pam, cap: "셀로판과 팜플렛이 겹쳐 있다." });
   };
+
+  /* ★v0.17.1 "팜플렛 위에 셀로판을 올린다" 공통 처리 — 선택 해제 → 팝업 닫고 120ms 뒤 겹침 화면.
+     두 경로가 같은 코드를 쓴다: ①셀로판 고르고 팜플렛 탭(useCello) ②팜플렛 열린 채 셀로판 더블탭 */
+  function overlayCello() {
+    S.sel = null; renderInv();
+    closeZoom(); setTimeout(function () { ZOOM.pamphlet(true); }, 120);
+  }
 
   /* ★v0.16.2 셀로판 확대 = #17 에서 팜플렛 위에 올라가는 **그 필름 자체**(아이콘 아님).
      구멍 좌표는 팜플렛 위젯을 안 보이게 붙여 같은 방식으로 실측한다. */
@@ -16372,12 +16388,10 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
           G.setFlag("archDone");
           GAMES.closeFull();
           GAMES.openNono(function () {
-            /* ★v0.16 #8 보상이 종이(힌트)로 바뀌며 짙은갈색 색상판 출처가 비었다.
-               #23(쌍안경)에 붙이면 #25→다마고치→#24→천장→#14→#23→#25 순환이 생겨서,
-               #25 보다 앞인 여기(#22)에 **임시로** 되돌려 붙인다(북쑥 확인 전). */
+            /* ★v0.17.1 보상 없음 — 완성 그림(사번)이 #26 힌트인 순수 관찰형 퍼즐로 원복.
+               짙은갈색 색상판은 #25 간식칸 1번 홈에 처음부터 끼워져 있다(DATA.P25_INIT). */
             G.setFlag("nonoDone");
             GAMES.closeFull();
-            prize(DATA.TEMP.p22Prize, "그림이 완성됐다");
           }, function () { GAMES.closeFull(); });
         }, function () { GAMES.closeFull(); });
       });
