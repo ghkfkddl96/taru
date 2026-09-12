@@ -335,6 +335,9 @@ body.dbg .ifeHot:active{box-shadow:0 0 0 2px rgba(255,255,255,.95)}
 .sc.fixed.peer{background:#dfe8f2}
 .sc.sel{background:#cfe8ff}
 .sc.fixed.sel{background:#cddceb}
+/* ★v0.16.3 [지시8] 중복 충돌 칸 — 방금 넣은 숫자와 부딪힌 기존 숫자(단서 포함) 둘 다 빨강 */
+.sc.dup,.sc.fixed.dup{color:#c62f2a;background:#ffe6e4}
+.sc.dup.sel,.sc.fixed.dup.sel{background:#ffd4d0}
 .sc.br{border-right:2px solid var(--n6)}
 .sc.bb{border-bottom:2px solid var(--n6)}
 #sudPad{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;width:min(96vw,420px);margin-top:12px}
@@ -739,7 +742,11 @@ body.zoomOpen #closeup .sheetPanel,
 body.zoomOpen #closeup .sheetClose{visibility:hidden}
 
 /* ★v0.10 IFE 뒤로가기 아이콘(U턴 화살표) — 칸 안에서 정사각으로 꽉 차게 */
-.cvcell.ifeBack .cv{display:flex;align-items:center;justify-content:center;padding:0}
+/* ★v0.16.3 위쪽 `.cvcell.extra .cv,.cvcell.ifeBack .cv{width:100%…}` 가 뒤에 있어서
+   541행의 "사방 1px 안쪽"이 무효였다. 칸이 작아진 지금(지시6) 둥근 모서리 안티에일리어싱이
+   칸 밖 0.5px 로 새어 나가 glyph 게이트에 걸리므로, **가장 뒤 규칙**에서 사방 1.5px 안쪽으로 잡는다. */
+.cvcell.ifeBack .cv{display:flex;align-items:center;justify-content:center;padding:0;
+  width:calc(100% - 3px);height:calc(100% - 3px);min-width:0;min-height:0;max-width:none;max-height:none}
 .ifeBackSvg{width:auto;height:64%;aspect-ratio:1;display:block}
 
 /* ★v0.11.1 #24 수납장 표시등 — 사진 속 램프 자리에 불만 켠다(테두리·힌트 없음).
@@ -10951,7 +10958,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 (function () {
   "use strict";
 
-  var BUILD = "ODY-S1-20260912-1111";
+  var BUILD = "ODY-S1-20260912-1742";
   var LSKEY = "odyssey.s1.v1";
 
   var qs = new URLSearchParams(location.search);
@@ -11080,11 +11087,25 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   ["gesturestart", "gesturechange", "gestureend"].forEach(function (ev) {
     document.addEventListener(ev, function (e) { e.preventDefault(); }, { passive: false });
   });
-  var lastTouchEnd = 0;
+  /* ★v0.16.3 [지시3] "다른 자리 연속 탭이 씹히던" 버그 —
+     v0.15 [5] 에서 이 가드가 **자리·대상을 안 보고** 300ms 안의 두 번째 touchend 를 무조건 막고 있었다.
+     touchend 를 preventDefault 하면 그 탭의 합성 click 이 죽는데, 이 게임의 조작 대부분이
+     onclick(맵 핫스팟·IFE 버튼·폰 키패드·닫기 버튼…)이라 두 번째 탭이 통째로 사라졌다.
+     v0.2.1 에 적혀 있던 두 조건을 되살린다 — ①같은 자리(±40px)일 때만 ②버튼·입력·링크는 제외.
+     (확대 자체는 touch-action:manipulation + maximum-scale=1 이 이미 막는다) */
+  var TAP_NEAR = 40, TAP_GAP = 300;
+  var lastTouchEnd = 0, lastTX = -99999, lastTY = -99999;
+  function repeatSafe(t) {   /* 같은 자리를 연타하는 게 정상인 조작 요소 */
+    try { return !!(t && t.closest && t.closest('button,a,input,textarea,select,label,[role="button"]')); }
+    catch (e) { return false; }
+  }
   document.addEventListener("touchend", function (e) {
+    var c = (e.changedTouches && e.changedTouches[0]) || null;
+    var x = c ? c.clientX : -99999, y = c ? c.clientY : -99999;
     var now = Date.now();
-    if (now - lastTouchEnd <= 300 && e.cancelable) e.preventDefault();
-    lastTouchEnd = now;
+    var same = Math.abs(x - lastTX) <= TAP_NEAR && Math.abs(y - lastTY) <= TAP_NEAR;
+    if (now - lastTouchEnd <= TAP_GAP && same && !repeatSafe(e.target) && e.cancelable) e.preventDefault();
+    lastTouchEnd = now; lastTX = x; lastTY = y;
   }, { passive: false });
   function beep(freq, dur, type, vol) {
     var a = audio(); if (!a) return;
@@ -11194,10 +11215,16 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
      ★v0.4: PointerEvent 가 있으면 **포인터 경로 하나만** 쓴다.
      (기존엔 touch + mouse 를 둘 다 걸어서, iOS 에서 touchend 뒤 합성 mouseup 이 또 들어와
       한 번 탭에 값이 두 번 바뀌는 버그가 있었다.) */
-  /* ★v0.15 [4] 탭 판정 — dbl 을 쓰는 곳(헤드셋 더블탭 재생)만 310ms 지연,
-     그 밖(사진 속 물건 습득 등)은 pointerup 에서 **즉시** 발화한다. */
+  /* ★v0.15 [4] 탭 판정 — dbl 을 쓰는 곳만 310ms 지연, 그 밖은 pointerup 에서 즉시 발화.
+     ★v0.16.3 [지시2] 그 310ms 지연이 **인벤 아이템**(유일한 dbl 사용처)에 걸려 있어서
+     "누르고 한참 뒤에 소리·선택 표시가 난다" 는 체감을 만들었다(실측 321ms).
+     → tap 은 언제나 pointerup 에서 즉시 발화하고, 두 번째 탭이 320ms 안에 들어오면 그때 dbl 을 부른다.
+     tap 이 노드를 다시 그리는 곳(인벤)은 클로저가 날아가므로 o.key 를 주면 더블탭 시각을 공유한다. */
+  var TAPMEM = {};
   function tapper(node, o) {
     var lastTap = 0, timer = null, moved = false, sx = 0, sy = 0, longFired = false, active = false;
+    function getLast() { return o.key ? (TAPMEM[o.key] || 0) : lastTap; }
+    function setLast(v) { if (o.key) TAPMEM[o.key] = v; else lastTap = v; }
     function start(x, y) {
       sx = x; sy = y; moved = false; longFired = false; active = true;
       if (o.long) { clearTimeout(timer); timer = setTimeout(function () { longFired = true; o.long(); }, 480); }
@@ -11212,12 +11239,9 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       clearTimeout(timer);
       if (moved || longFired) return;
       var now = Date.now();
-      if (o.dbl && now - lastTap < 320) { lastTap = 0; o.dbl(); return; }
-      lastTap = now;
-      if (o.tap) {
-        if (o.dbl) setTimeout(function () { if (lastTap && Date.now() - lastTap >= 300) { lastTap = 0; o.tap(); } }, 310);
-        else { lastTap = 0; o.tap(); }        /* 즉시 — 더블탭 대기 없음 */
-      }
+      if (o.dbl && now - getLast() < 320) { setLast(0); o.dbl(); return; }
+      setLast(o.dbl ? now : 0);
+      if (o.tap) o.tap();                     /* ★즉시 — 더블탭 대기 없음 */
     }
     if (window.PointerEvent) {
       node.addEventListener("pointerdown", function (e) {
@@ -11378,14 +11402,15 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     headsetCase: { name: "헤드셋 케이스", img: IMG + "ic_case.png", zoom: "case" },
     headphones: { name: "헤드폰", img: IMG + "ic_headphones.png", zoom: "headphones" },
     gamecard: { name: "게임카드", img: IMG + "ic_gamecard.png", zoom: "gamecard" },
-    silverKey: { name: "은색 열쇠", img: IMG + "ic_silverkey.png", zoomText: "은색 열쇠.\n어딘가의 열쇠 구멍에 맞을 것 같다." },
-    goldKey: { name: "금색 열쇠", img: IMG + "ic_goldkey.png", zoomText: "금색 열쇠.\n둥근 사각형 문에 맞을 것 같다." },
-    cardKey: { name: "카드키", img: IMG + "ic_cardkey.png", zoomText: "흰 플라스틱 카드키.\n카드 슬롯에 넣는 물건." },
+    /* ★v0.16.3 [지시1] 아이템 확대 캡션은 **관찰 서술만** — 용도 암시·힌트 문장 삭제(셀로판 전례) */
+    silverKey: { name: "은색 열쇠", img: IMG + "ic_silverkey.png", zoomText: "은색 열쇠." },
+    goldKey: { name: "금색 열쇠", img: IMG + "ic_goldkey.png", zoomText: "금색 열쇠." },
+    cardKey: { name: "카드키", img: IMG + "ic_cardkey.png", zoomText: "흰 플라스틱 카드키." },
     pamphlet: { name: "팜플렛", img: IMG + "ic_pamphlet.png", zoom: "pamphlet" },
     cellophane: { name: "셀로판", img: IMG + "ic_cellophane.png", zoom: "cellophane", zoomText: "투명한 셀로판지." },
-    telescope: { name: "쌍안경", img: IMG + "ic_telescope.png", zoomText: "작은 쌍안경.\n창문에 대고 보면 될 것 같다." },
-    peanut: { name: "땅콩", img: IMG + "ic_peanut.png", zoomText: "기내에서 주는 땅콩 한 봉지.\n누가 배고파하던데…" },
-    ladder: { name: "사다리", img: IMG + "ic_ladder.png", zoomText: "접이식 사다리.\n높은 데 올라갈 때 쓴다." },
+    telescope: { name: "쌍안경", img: IMG + "ic_telescope.png", zoomText: "작은 쌍안경." },
+    peanut: { name: "땅콩", img: IMG + "ic_peanut.png", zoomText: "기내에서 주는 땅콩 한 봉지." },
+    ladder: { name: "사다리", img: IMG + "ic_ladder.png", zoomText: "접이식 사다리." },
     tileBlack: { name: "검정판", img: IMG + "ic_tile_black.png", tile: "black", zoomText: "검정색 나무 판." },
     tileBrown: { name: "갈색판", img: IMG + "ic_tile_brown.png", tile: "brown", zoomText: "갈색 나무 판." },
     tileDark: { name: "짙은갈색판", img: IMG + "ic_tile_dark.png", tile: "dark", zoomText: "짙은 갈색 나무 판." },
@@ -11413,7 +11438,8 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       spots: [
         { id: "s_window", x: 7, y: 23, w: 34, h: 42, label: "창문", cu: "window" },
         { id: "s_ife", x: 43, y: 33, w: 42, h: 28, label: "화면", cu: "ife" },
-        { id: "s_tray", x: 14, y: 69, w: 76, h: 23, label: "테이블", cu: "tray", cuIf: [["mealTray", "tray"]] }
+        /* ★v0.16.3 [지시4] 기내식을 받기 전에는 이 자리가 맵에 아예 나오지 않는다(탭·반짝임 없음) */
+        { id: "s_tray", x: 14, y: 69, w: 76, h: 23, label: "테이블", cu: "tray", showIf: "mealTray" }
       ]
     },
     aisle: {
@@ -11917,7 +11943,12 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
        (그린 아이콘 크기는 그대로, 눌리는 범위만 커진다) */
     /* ★v0.11 보이는 아이콘은 작아지되 **히트 영역은 44px 이상** 유지(아이콘보다 넓게).
        새 배율에서 1% ≈ dispW 4.97px(가로) / dispH 3.33px(세로) → 세로 14.3% = 402폭 47.6px / 375폭 44.2px */
-    back: { x: 27.6, y: 16.95, w: 10.7, h: 14.3 },
+    /* ★v0.16.3 [지시6] TV 슬라이드 뒤로가기가 스크린 **위쪽 밖**으로 8.5px 튀어나오던 것 수정.
+       원인: v0.10~v0.11 에서 탭 44px 을 채우려고 칸 높이를 6.2%→14.3% 로 키우면서
+       칸 위끝이 y16.95% 가 됐는데 스크린 위끝은 y19.5% 다(= 2.55% ≈ 8.5px 초과).
+       v0.15 [3] 은 칸 **안의 아이콘 크기**만 고쳤고, 게이트도 "사진(cropInner) 안"만 봐서 안 걸렸다.
+       → 칸을 스크린 좌상단 안쪽으로 넣고(위 여유 1.5% · 왼 1.4%), 탭 44×44 는 투명 ::after 가 맡는다. */
+    back: { x: 28.3, y: 21.0, w: 9.2, h: 9.8 },
     /* 히트 영역만 넓혔다(그려진 아이콘 크기는 사진 그대로).
        가로는 버튼 중심 간격이 8.0%(≈39.7px)뿐이라 44px 로 키우면 서로 겹친다 → 7.8%(38.7px)가 한계.
        세로는 14.3% — 402폭에서 47.6px, 375폭에서도 44.2px 로 44 이상. */
@@ -11940,6 +11971,17 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       mode: "full",   /* ★v0.4: gen 34 합성본 도착 → IFE 프레임 그대로, 이미지만 교체 */
       files: [IMG + "ife_photo1.jpg", IMG + "ife_photo2.jpg", IMG + "ife_photo3.jpg", IMG + "ife_photo4.jpg"]
     }
+  };
+
+  /* ★v0.16.3 [지시7] 게임카드 사진(gamecard.jpg 900×567) 오른쪽 흰 라운드 상자 2개 —
+     흰 픽셀 스캔 실측(테두리 안쪽 흰 면): 위 391,149~701,268 · 아래 391,298~701,415.
+     원본 이미지 % 로 적어 두면 팝업 크기가 달라져도 그대로 따라간다. */
+  var GAMECARD = {
+    boxes: [
+      { x: 43.44, y: 26.28, w: 34.56, h: 21.16 },   /* 위 — ID */
+      { x: 43.44, y: 52.56, w: 34.56, h: 20.81 }    /* 아래 — password */
+    ],
+    pad: 0.86      /* 글자 폭 = 상자 폭의 86% (양쪽 여백 7% 씩 — 기준 6% 이상) */
   };
 
   /* ★v0.3b #24 다마고치 (뼈대) — 이미지는 자리표시자, 나중에 gen 35~39 로 교체 */
@@ -11965,7 +12007,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   var BINOC = { img: "oway_plane.jpg", nw: 1264, nh: 842, crop: { x: 6.0, y: 0, w: 78.0, h: 78.06 } };
 
   window.DATA = {
-    LOCKS: LOCKS, IFE: IFE, TAMA: TAMA, TILES: TILES, BINOC: BINOC, PRIZE: PRIZE,
+    LOCKS: LOCKS, IFE: IFE, TAMA: TAMA, TILES: TILES, BINOC: BINOC, PRIZE: PRIZE, GAMECARD: GAMECARD,
     IMG: IMG, TEMP: TEMP, ITEMS: ITEMS, MAPS: MAPS, ANS: ANS, PIN_HASH: PIN_HASH, P26_HASH: P26_HASH,
     FOOD: FOOD, FOOD_BG: FOOD_BG, FLAGS: FLAGS, UTENSIL: UTENSIL, IFE_ICONS: IFE_ICONS,
     KANA: KANA, SONGS: SONGS,
@@ -13617,8 +13659,31 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
             setTimeout(function () { onWin(); }, 500);
           }
         }
+        /* ★v0.16.3 [지시8] 충돌(중복) 칸 찾기 — "정답과 다르다" 가 아니라
+           같은 가로줄·세로줄·3×3 박스 안에 **같은 숫자가 둘 이상**이면 그 칸들을 전부 빨강.
+           단서 칸도 포함하고, 값이 바뀌면 매번 다시 계산해서 해소되면 빨강이 사라진다. */
+        function conflicts() {
+          var bad = {};
+          function scan(list) {
+            var seen = {};
+            list.forEach(function (i) {
+              var v = cur[i]; if (!v) return;
+              if (seen[v] === undefined) seen[v] = i;
+              else { bad[i] = 1; bad[seen[v]] = 1; }
+            });
+          }
+          for (var r = 0; r < 9; r++) { var row = []; for (var c = 0; c < 9; c++) row.push(r * 9 + c); scan(row); }
+          for (var c2 = 0; c2 < 9; c2++) { var col = []; for (var r2 = 0; r2 < 9; r2++) col.push(r2 * 9 + c2); scan(col); }
+          for (var b = 0; b < 9; b++) {
+            var box = [], br = ((b / 3) | 0) * 3, bc = (b % 3) * 3;
+            for (var y = 0; y < 3; y++) for (var x = 0; x < 3; x++) box.push((br + y) * 9 + bc + x);
+            scan(box);
+          }
+          return bad;
+        }
         function paint() {
           var sr = sel >= 0 ? (sel / 9) | 0 : -1, scg = sel >= 0 ? sel % 9 : -1;
+          var bad = conflicts();
           for (var i = 0; i < 81; i++) {
             var r = (i / 9) | 0, c = i % 9;
             var cls = "sc";
@@ -13627,10 +13692,16 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
             else if (sel >= 0 && (r === sr || c === scg)) cls += " peer";
             if (c === 2 || c === 5) cls += " br";
             if (r === 2 || r === 5) cls += " bb";
+            if (bad[i]) cls += " dup";
             cells[i].className = cls;
             cells[i].textContent = cur[i] ? String(cur[i]) : "";
           }
         }
+        window.__sudokuDups = function () {
+          var bad = conflicts(), out = [];
+          for (var i = 0; i < 81; i++) if (bad[i]) out.push(i);
+          return out;
+        };
         paint();
         window.__sudokuFill = function () {
           cur = s.solution.slice(); G.S.misc.sud = cur.slice(); G.save(); paint();
@@ -13645,19 +13716,16 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     openFull({
       title: "", right: "",
       build: function (body, foot) {
-        var box = el("div"); box.id = "adBox";
+        /* ★v0.16.3 [지시9] 보상 문구·골드 버튼 폐지 — "곧 광고가 나옵니다" 만 띄우고 3초 뒤 자동 시작 */
+        var box = el("div"); box.id = "adBox"; box.setAttribute("data-t", "adWait");
         box.appendChild(el("div", "adTag", "AD"));
-        box.appendChild(el("div", null, "🎁 광고를 보면 보상을 받을 수 있어요"));
-        var cnt = el("div"); cnt.id = "adCount"; cnt.textContent = "5";
+        box.appendChild(el("div", null, "곧 광고가 나옵니다"));
+        var cnt = el("div"); cnt.id = "adCount"; cnt.textContent = "3";
         box.appendChild(cnt);
+        body.appendChild(box);
         var fired = false, t = null;
         function goOnce() { if (fired) return; fired = true; if (t) clearInterval(t); onGo(); }
-        var b = el("button", "btn gold", "광고 보고 보상 받기 ▶");
-        b.setAttribute("data-t", "adGo");
-        b.onclick = goOnce;
-        box.appendChild(b);
-        body.appendChild(box);
-        var n = 5;
+        var n = 3;
         t = setInterval(function () {
           n--; cnt.textContent = String(Math.max(0, n));
           if (n <= 0) { clearInterval(t); goOnce(); }
@@ -13675,7 +13743,8 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       build: function (body, foot) {
         var stage = el("div"); stage.id = "arch"; stage.setAttribute("data-t", "archery");
         body.appendChild(stage);
-        var msg = el("div"); msg.id = "archMsg"; msg.textContent = "노래가 나온 순서대로 쏴!";
+        /* ★v0.16.3 [지시10] "노래가 나온 순서대로 쏴!" 문구 삭제(북쑥). ↕ 드래그 온보딩은 그대로 */
+        var msg = el("div"); msg.id = "archMsg"; msg.textContent = "";
         stage.appendChild(msg);
 
         /* 과녁: 화면에 아이콘이 붙은 5개 (배치는 섞되 고정 seed) */
@@ -14601,7 +14670,12 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       bg.style.background = "";
       bg.style.backgroundImage = "url('" + mapImg(m) + "')";
       bg.style.backgroundSize = "cover";
-      (m.spots || []).forEach(function (sp) { objs.appendChild(spotNode(sp)); });
+      /* ★v0.16.3 [지시4] 사진 맵 핫스팟도 조건부로 — showIf 플래그가 없으면 아예 그리지 않는다
+         (합성 맵 objs 는 예전부터 같은 규칙. 탭 영역·반짝임까지 통째로 없어진다) */
+      (m.spots || []).forEach(function (sp) {
+        if (sp.showIf && !G.flag(sp.showIf)) return;
+        objs.appendChild(spotNode(sp));
+      });
     } else {
       bg.style.backgroundImage = "";
       bg.style.background = "radial-gradient(120% 70% at 50% 0%, #26262a 0%, #16161a 58%, #0b0b0c 100%)";
@@ -14673,6 +14747,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   }
 
   /* ═══════════ 인벤 ═══════════ */
+  var invPrevSel = null;      /* ★v0.16.3 더블탭이 첫 탭의 선택 변화를 되돌릴 때 쓰는 직전 선택 */
   function renderInv() {
     var box = clear($("inventory"));
     if (!S.inv.length) { box.appendChild(el("div", "invEmpty", "비어 있음")); return; }
@@ -14687,9 +14762,12 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       else ico.appendChild(el("div", null, it.emoji || "❔"));
       b.appendChild(ico);
       b.appendChild(el("div", "nm", it.name));   /* 말줄임 없음 — 이름 전체를 보여준다 */
+      /* ★v0.16.3 [지시2] tap 은 즉시(소리·선택 표시), 더블탭은 첫 탭이 바꾼 선택을 **직전 값으로 되돌리고** 확대.
+         key·invPrevSel 이 모듈 변수인 이유 = tap 이 renderInv 로 이 버튼을 다시 만들어서 클로저가 날아간다. */
       G.tapper(b, {
-        tap: function () { selectItem(id); },
-        dbl: function () { inspect(id); },
+        key: "inv_" + id,
+        tap: function () { invPrevSel = S.sel; selectItem(id); },
+        dbl: function () { S.sel = invPrevSel; G.save(); renderInv(); inspect(id); },
         long: function () { inspect(id); }
       });
       box.appendChild(b);
@@ -14898,7 +14976,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         }
       }
       paint();
-      c.cap("화면 아래 버튼 3개. 순서가 있을 것 같다.");
+      c.cap("화면 아래 버튼 3개.");                 /* ★v0.16.3 [지시5] "순서가 있을 것 같다" 삭제 */
       W.unregister();
       window.__lock = {
         answer: order.map(function (o) { return DATA.IFE_ICONS[o]; }).join(""),
@@ -15033,18 +15111,12 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     }
   };
 
+  /* ★v0.16.3 [지시4] 기내식을 받기 전에는 테이블 자리가 맵에 아예 없다(data.js s_tray.showIf).
+     그래서 "아직 아무것도 없다" 같은 빈 분기도 없앴다. */
   CU.tray = function (c) {
-    if (!G.flag("mealTray")) {
-      c.title("테이블");
-      var d = el("div", null, "🍽️");
-      d.style.cssText = "font-size:56px;text-align:center";
-      c.stage.appendChild(d);
-      c.cap("접이식 테이블. 아직 아무것도 없다.");
-      return;
-    }
     c.title("기내식 트레이");
     c.stage.appendChild(imgStage(DATA.IMG + "meal_tray.jpg", []));
-    c.cap("그릇 색과 음식, 그리고 식기 개수…\n뭔가 세어 볼 만하다.");
+    c.cap("기내식 트레이.");                       /* ★v0.16.3 [지시5] 유도 문구 삭제 */
   };
 
   /* 복도 짐칸 */
@@ -15104,7 +15176,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         kind: "icon", cands: DATA.FOOD, answer: DATA.ANS.p15,
         onSolve: function () { G.markSolved("p15"); reopenCU(); }
       }));
-      c.cap("칸마다 색이 다르다. 색에 맞는 음식은?");
+      c.cap("칸마다 색이 다르다.");                 /* ★v0.16.3 [지시5] "색에 맞는 음식은?" 삭제 */
       return;
     }
     var got = G.has("gamecard") || G.flag("tookCard");
@@ -15239,9 +15311,8 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         build: function (n) { if (!G.DEBUG) return; var v = el("div", "cv", "패널"); v._noFit = true; n.appendChild(v); },
         onTap: openPatternZoom
       }]));
-      c.cap(G.solved("p13")
-        ? "이미 열었다. (패널을 누르면 그은 선을 다시 볼 수 있다)"
-        : "검정 터치패널이 보인다. 눌러봐.");
+      /* ★v0.16.3 [지시5] 조작 지시("눌러봐" · "패널을 누르면 …") 삭제 — 관찰 서술만 */
+      c.cap(G.solved("p13") ? "이미 열었다." : "검정 터치패널이 보인다.");
       return;
     }
 
@@ -15650,16 +15721,44 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 
   /* ★v0.7 — 헤드셋 더블탭 = 착용 뒷모습 화면에서 5곡 연속 재생. 언제나 첫 곡부터. */
   ZOOM.headphones = function () { playSongs(); };
+  /* ★v0.16.3 [지시7] ID·비번을 카드 왼쪽 그림 위가 아니라 **오른쪽 흰 상자 2개 안**에 넣는다.
+     상자 좌표 = gamecard.jpg 픽셀 실측(DATA.GAMECARD.boxes). 글자는 상자 안 가운데 정렬,
+     크기는 상자 폭의 88%(양쪽 여백 6%)에 맞춰 자동 축소하고 두 줄을 같은 크기로 통일.
+     흰 배경이라 text-shadow 는 뺐다. */
   ZOOM.gamecard = function () {
     var node = el("div");
     node.style.cssText = "position:relative;width:100%;max-width:330px";
-    var im = new Image(); im.src = DATA.IMG + "gamecard.jpg"; im.style.cssText = "width:100%;border-radius:10px";
+    var im = new Image(); im.src = DATA.IMG + "gamecard.jpg"; im.style.cssText = "width:100%;border-radius:10px;display:block";
     node.appendChild(im);
-    var t = el("div");
-    t.style.cssText = "position:absolute;left:8%;top:52%;font-size:13px;font-weight:700;color:#1a1a1a;line-height:1.5;text-shadow:0 1px 0 rgba(255,255,255,.7)";
-    t.innerHTML = "ID : minigames<br>password : " + DATA.ANS.p19;
-    node.appendChild(t);
+    var GC = DATA.GAMECARD;
+    var lines = ["ID : minigames", "password : " + DATA.ANS.p19];
+    var tn = [];
+    GC.boxes.forEach(function (bx, i) {
+      var t = el("div");
+      t.setAttribute("data-t", i === 0 ? "gcId" : "gcPw");
+      t.style.cssText = "position:absolute;left:" + bx.x + "%;top:" + bx.y + "%;width:" + bx.w + "%;height:" + bx.h + "%;" +
+        /* line-height:normal — 1 로 조이면 줄상자가 글자(ascent+descent)보다 짧아 '넘침'으로 잡힌다(v0.15.1 명판과 같은 건) */
+        "display:flex;align-items:center;justify-content:center;color:#1a1a1a;font-weight:700;line-height:normal;white-space:nowrap";
+      t.textContent = lines[i];
+      node.appendChild(t);
+      tn.push(t);
+    });
+    function fit() {
+      var sizes = tn.map(function (t) {
+        var r = t.getBoundingClientRect();
+        if (!r.width || !r.height) return 0;
+        return W.fitPlate(t, r.width, r.height, GC.pad) || 0;
+      });
+      var s = Math.min.apply(null, sizes.filter(function (v) { return v > 0; }));
+      if (!isFinite(s) || s <= 0) return;
+      tn.forEach(function (t) {
+        var sp = t.querySelector("span.pl");
+        if (sp) sp.style.fontSize = s.toFixed(2) + "px";
+      });
+    }
     openZoom({ id: "gamecard", title: "GAME CARD", node: node, cap: "미니게임 앱 계정 카드." });
+    if (im.complete) fit(); else im.onload = fit;
+    setTimeout(fit, 40); setTimeout(fit, 220);
   };
   /* ★v0.15 [7] 팜플렛 탭 → **팜플렛만** 뜬다. 셀로판은 인벤에서 고른 뒤
      팜플렛을 탭해야 나타난다(고르지 않고 탭하면 아무 일도 없다). */
