@@ -10951,7 +10951,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 (function () {
   "use strict";
 
-  var BUILD = "ODY-S1-20260912-0014";
+  var BUILD = "ODY-S1-20260912-1111";
   var LSKEY = "odyssey.s1.v1";
 
   var qs = new URLSearchParams(location.search);
@@ -11382,7 +11382,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     goldKey: { name: "금색 열쇠", img: IMG + "ic_goldkey.png", zoomText: "금색 열쇠.\n둥근 사각형 문에 맞을 것 같다." },
     cardKey: { name: "카드키", img: IMG + "ic_cardkey.png", zoomText: "흰 플라스틱 카드키.\n카드 슬롯에 넣는 물건." },
     pamphlet: { name: "팜플렛", img: IMG + "ic_pamphlet.png", zoom: "pamphlet" },
-    cellophane: { name: "셀로판", img: IMG + "ic_cellophane.png", zoomText: "투명한 셀로판지.\n동그라미가 다섯 개 뚫려 있다.\n팜플렛에 겹쳐 보면?" },
+    cellophane: { name: "셀로판", img: IMG + "ic_cellophane.png", zoom: "cellophane", zoomText: "투명한 셀로판지." },
     telescope: { name: "쌍안경", img: IMG + "ic_telescope.png", zoomText: "작은 쌍안경.\n창문에 대고 보면 될 것 같다." },
     peanut: { name: "땅콩", img: IMG + "ic_peanut.png", zoomText: "기내에서 주는 땅콩 한 봉지.\n누가 배고파하던데…" },
     ladder: { name: "사다리", img: IMG + "ic_ladder.png", zoomText: "접이식 사다리.\n높은 데 올라갈 때 쓴다." },
@@ -13040,6 +13040,44 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     return s;
   }
 
+  /* ★v0.16.2 셀로판 필름 그리기 — #17 팜플렛 위젯과 셀로판 확대 팝업이 **같은 그림**을 쓴다.
+     (구멍 좌표는 부르는 쪽에서 글자 span 실측으로 넘긴다) */
+  var celloUid = 0;
+  function celloFilmSVG(W, H, holes) {
+    var mid = "hm" + (++celloUid);
+    var s = '<svg width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg">';
+    s += '<defs><mask id="' + mid + '"><rect width="' + W + '" height="' + H + '" fill="#fff"/>';
+    holes.forEach(function (h) { s += '<circle cx="' + h.x.toFixed(1) + '" cy="' + h.y.toFixed(1) + '" r="8.5" fill="#000"/>'; });
+    s += '</mask></defs>';
+    s += '<rect width="' + W + '" height="' + H + '" rx="8" fill="#6b6c74" opacity=".22" mask="url(#' + mid + ')"/>';
+    s += '<rect width="' + W + '" height="' + H + '" rx="8" fill="none" stroke="#3a3a41" stroke-width="1.2" opacity=".85"/>';
+    holes.forEach(function (h) { s += '<circle cx="' + h.x.toFixed(1) + '" cy="' + h.y.toFixed(1) + '" r="8.5" fill="none" stroke="#2a2a2f" stroke-width="1.4"/>'; });
+    /* align mark 는 SVG 밖에 이미지로 얹는다(celloAlignMark) */
+    s += "</svg>";
+    return s;
+  }
+  /* ★v0.15.3 정렬 마크 = 리플릿 로고를 흑백 외곽선으로 딴 것.
+     팜플렛 사진 로고와 **같은 자리·같은 크기** 라서, 겹치면 정확히 포개진다.
+     (마크 이미지는 로고 둘레로 22% 여유를 두고 잘랐으므로 그만큼 넓혀 놓는다) */
+  function celloAlignMark(cello, useBg, lg) {
+    var mk = cello.querySelector("img.alignMark");
+    if (!mk && useBg && Array.isArray(window.__IMG) && window.__IMG.indexOf("cello_align.png") >= 0) {
+      mk = document.createElement("img");
+      mk.className = "alignMark";
+      mk.src = DATA.IMG + "cello_align.png";
+      mk.alt = "";
+      cello.appendChild(mk);
+    }
+    if (mk) {
+      var MG = 0.22;
+      mk.style.left = (lg.x - lg.w * MG).toFixed(2) + "px";
+      mk.style.top = (lg.y - lg.h * MG).toFixed(2) + "px";
+      mk.style.width = (lg.w * (1 + MG * 2)).toFixed(2) + "px";
+      mk.style.height = (lg.h * (1 + MG * 2)).toFixed(2) + "px";
+    }
+    return mk;
+  }
+
   /* ════════════════ 7. 팜플렛 × 셀로판 드래그 정렬 (#17) ════════════════ */
   function pamphlet(opt) {
     /* ★v0.15 [10] 배경 사진(gen/63)이 있으면 리플릿만 잘라 세로로 꽉 채우고,
@@ -13180,41 +13218,41 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         var r = sp.getBoundingClientRect();
         return { x: r.left - sr.left + r.width / 2, y: r.top - sr.top + r.height / 2, ch: t.ch };
       });
-      var s = '<svg width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg">';
-      s += '<defs><mask id="hm"><rect width="' + W + '" height="' + H + '" fill="#fff"/>';
-      holes.forEach(function (h) { s += '<circle cx="' + h.x.toFixed(1) + '" cy="' + h.y.toFixed(1) + '" r="8.5" fill="#000"/>'; });
-      s += '</mask></defs>';
-      s += '<rect width="' + W + '" height="' + H + '" rx="8" fill="#6b6c74" opacity=".22" mask="url(#hm)"/>';
-      s += '<rect width="' + W + '" height="' + H + '" rx="8" fill="none" stroke="#3a3a41" stroke-width="1.2" opacity=".85"/>';
-      holes.forEach(function (h) { s += '<circle cx="' + h.x.toFixed(1) + '" cy="' + h.y.toFixed(1) + '" r="8.5" fill="none" stroke="#2a2a2f" stroke-width="1.4"/>'; });
-      /* align mark 는 SVG 밖에 이미지로 얹는다(아래) */
-      s += "</svg>";
-      cello.innerHTML = s;
-      /* ★v0.15.3 정렬 마크 = 리플릿 로고를 흑백 외곽선으로 딴 것.
-         팜플렛 사진 로고와 **같은 자리·같은 크기** 라서, 겹치면 정확히 포개진다.
-         (마크 이미지는 로고 둘레로 22% 여유를 두고 잘랐으므로 그만큼 넓혀 놓는다) */
-      var mk = cello.querySelector("img.alignMark");
-      if (!mk && useBg && Array.isArray(window.__IMG) && window.__IMG.indexOf("cello_align.png") >= 0) {
-        mk = document.createElement("img");
-        mk.className = "alignMark";
-        mk.src = DATA.IMG + "cello_align.png";
-        mk.alt = "";
-        cello.appendChild(mk);
-      }
-      if (mk) {
-        var MG = 0.22;
-        mk.style.left = (LOGO_X - LOGO_W * MG).toFixed(2) + "px";
-        mk.style.top = (LOGO_Y - LOGO_H * MG).toFixed(2) + "px";
-        mk.style.width = (LOGO_W * (1 + MG * 2)).toFixed(2) + "px";
-        mk.style.height = (LOGO_H * (1 + MG * 2)).toFixed(2) + "px";
-      }
-      cello._holes = holes;
+      cello.innerHTML = celloFilmSVG(W, H, holes);
       cello._logo = { x: LOGO_X, y: LOGO_Y, w: LOGO_W, h: LOGO_H };
+      celloAlignMark(cello, useBg, cello._logo);
+      cello._holes = holes;
     }
 
     var ox = 92, oy = 66;   /* 처음엔 어긋난 상태 */
     function place() { cello.style.transform = "translate(" + ox + "px," + oy + "px)"; }
     place();
+
+    /* ★v0.16.2 셀로판 확대 팝업 — 팜플렛은 안 보이게 두고(구멍 좌표 계산용) 필름만 보여준다.
+       구멍은 #17 과 **같은 방식**(렌더된 글자 span 실측)으로 잡으므로 좌표가 정확히 같다.
+       드래그·스냅·자물쇠 등록 없음(정적 표시). */
+    if (opt.filmOnly) {
+      paper.style.visibility = "hidden";
+      cello.classList.add("snapped");
+      ox = 0; oy = 0; place();
+      setTimeout(function () { refit(); build(); }, 30);
+      setTimeout(function () { refit(); build(); }, 180);
+      window.__celloZoomState = function () {
+        var lg = cello._logo || null;
+        var m2 = cello.querySelector("img.alignMark");
+        var sr2 = stage.getBoundingClientRect();
+        return {
+          W: W, H: H, useBg: useBg, filmOnly: true, logo: lg,
+          mark: m2 ? (function () {
+            var r2 = m2.getBoundingClientRect();
+            return { cx: +(r2.left - sr2.left + r2.width / 2).toFixed(2), cy: +(r2.top - sr2.top + r2.height / 2).toFixed(2),
+                     w: +r2.width.toFixed(2), h: +r2.height.toFixed(2) };
+          })() : null,
+          holes: (cello._holes || []).map(function (h) { return { ch: h.ch, hole: [+h.x.toFixed(1), +h.y.toFixed(1)] }; })
+        };
+      };
+      return host;
+    }
 
     var sx = 0, sy = 0, bx = 0, by = 0;
     G.drag(cello, {
@@ -15709,6 +15747,13 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       }
     });
     openZoom({ id: "pamphlet", title: "팜플렛 + 셀로판", node: pam, cap: "셀로판과 팜플렛이 겹쳐 있다." });
+  };
+
+  /* ★v0.16.2 셀로판 확대 = #17 에서 팜플렛 위에 올라가는 **그 필름 자체**(아이콘 아님).
+     구멍 좌표는 팜플렛 위젯을 안 보이게 붙여 같은 방식으로 실측한다. */
+  ZOOM.cellophane = function () {
+    var it = DATA.ITEMS.cellophane;
+    openZoom({ id: "cellophane", title: it.name, node: W.pamphlet({ filmOnly: true }), cap: it.zoomText || "" });
   };
 
   /* ═══════════ #5 헤드셋 — 5곡 연속 재생 (★v0.7) ═══════════
