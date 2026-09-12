@@ -1,5 +1,5 @@
 /* 비행기에서 내리고 싶다. — 오프라인 서비스워커 (자동 생성) */
-const CACHE = "odyssey-ODY-S1-20260912-1816";
+const CACHE = "odyssey-ODY-S1-20260912-2116";
 const PRECACHE = [
  "./",
  "./index.html",
@@ -10,6 +10,8 @@ const PRECACHE = [
  "./img/app_minigame.png",
  "./img/app_qr.png",
  "./img/archer.jpg",
+ "./img/archer.png",
+ "./img/archery_field.jpg",
  "./img/bin_L1.jpg",
  "./img/bin_L1_open_case.jpg",
  "./img/bin_L1_open_empty.jpg",
@@ -56,14 +58,19 @@ const PRECACHE = [
  "./img/hint_phonecase.jpg",
  "./img/ic_blanket.png",
  "./img/ic_butter.jpg",
+ "./img/ic_butter.png",
  "./img/ic_cardkey.jpg",
  "./img/ic_cardkey.png",
  "./img/ic_case.png",
  "./img/ic_cellophane.png",
  "./img/ic_dna.jpg",
+ "./img/ic_dna.png",
  "./img/ic_drop.jpg",
+ "./img/ic_drop.png",
  "./img/ic_dynamite.jpg",
+ "./img/ic_dynamite.png",
  "./img/ic_fire.jpg",
+ "./img/ic_fire.png",
  "./img/ic_gamecard.png",
  "./img/ic_goldkey.jpg",
  "./img/ic_goldkey.png",
@@ -126,12 +133,16 @@ const PRECACHE = [
  "./img/window_open.jpg",
  "./img/window_shade.jpg",
  "./img/window_shade_plain.jpg",
+ "./audio/ad_bgm.mp3",
  "./audio/binoc.mp3",
+ "./audio/bow_shot.mp3",
+ "./audio/main_bgm.mp3",
  "./audio/song1.mp3",
  "./audio/song2.mp3",
  "./audio/song3.mp3",
  "./audio/song4.mp3",
- "./audio/song5.mp3"
+ "./audio/song5.mp3",
+ "./audio/sudoku_bgm.mp3"
 ];
 
 self.addEventListener("install", (e) => {

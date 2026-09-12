@@ -349,19 +349,29 @@ body.dbg .ifeHot:active{box-shadow:0 0 0 2px rgba(255,255,255,.95)}
 #adBox .adTag{font-size:9px;letter-spacing:1.5px;color:var(--n6);border:1px solid var(--line2);border-radius:3px;padding:2px 7px;display:inline-block;margin-bottom:14px}
 #adCount{font-size:34px;font-weight:200;color:var(--accent);margin:10px 0}
 
-/* 화살 */
-#arch{position:relative;width:100%;height:100%;background:#f7f7f8;border-radius:var(--r);overflow:hidden;touch-action:none}
-#archer{position:absolute;left:2%;width:22%;transition:top .05s linear}
-#archer img{width:100%}
+/* 화살 — ★v0.17 흰 배경 폐기, 카툰 초원 배경(cover) 위에 누끼 캐릭터·과녁 */
+#arch{position:relative;width:100%;height:100%;background:#8ed3f5 center bottom/cover no-repeat;
+  border-radius:var(--r);overflow:hidden;touch-action:none}
+/* ★v0.17 AD 라벨 — 반투명 회색 라운드 박스 + 흰 글씨. 캐릭터(left 13%)·과녁(right 3%)과 안 겹친다 */
+.archAd{position:absolute;left:7px;top:7px;z-index:5;pointer-events:none;
+  background:rgba(58,58,64,.55);color:#fff;font-size:9px;font-weight:700;letter-spacing:1.4px;
+  line-height:1;padding:5px 7px 4px;border-radius:7px;border:1px solid rgba(255,255,255,.18)}
+#archer{position:absolute;left:13%;width:22%;transition:top .05s linear;
+  filter:drop-shadow(0 5px 6px rgba(32,60,20,.3))}
+#archer img{width:100%;display:block}
 .tgt{position:absolute;right:3%;width:19%;aspect-ratio:1;border-radius:50%;background:
   radial-gradient(circle,#fff 0 30%,#4a4a50 30% 45%,#fff 45% 60%,#4a4a50 60% 75%,#fff 75% 100%);
-  border:1px solid #2a2a2f;display:grid;place-items:center;overflow:hidden}
-.tgt img{width:54%;height:54%;object-fit:contain}
+  border:1px solid #2a2a2f;display:grid;place-items:center;overflow:hidden;
+  box-shadow:0 3px 7px rgba(24,48,16,.32)}
+.tgt img{width:58%;height:58%;object-fit:contain}
 .tgt.hit{filter:grayscale(1) brightness(1.2);opacity:.3}
-#arrow{position:absolute;width:16%;height:4px;background:#6b6b72;border-radius:2px;display:none}
-#arrow::after{content:"";position:absolute;right:-7px;top:-3px;border:5px solid transparent;border-left-color:#3a3a41}
-.updown{position:absolute;font-size:20px;animation:blink 1.1s ease-in-out infinite;color:#4a4a50}
-#archMsg{position:absolute;left:0;right:0;top:8px;text-align:center;font-size:13px;font-weight:700;color:#2a2a2f;letter-spacing:.2px}
+#arrow{position:absolute;width:16%;height:4px;background:#8a6134;border-radius:2px;display:none;
+  box-shadow:0 1px 2px rgba(0,0,0,.25)}
+#arrow::after{content:"";position:absolute;right:-7px;top:-3px;border:5px solid transparent;border-left-color:#6f6f78}
+.updown{position:absolute;font-size:20px;animation:blink 1.1s ease-in-out infinite;color:#fff;
+  text-shadow:0 1px 3px rgba(0,0,0,.5)}
+#archMsg{position:absolute;left:0;right:0;top:8px;text-align:center;font-size:13px;font-weight:700;
+  color:#fff;letter-spacing:.2px;text-shadow:0 1px 4px rgba(0,0,0,.55);z-index:4}
 
 /* 네모로직 */
 #nono{display:flex;flex-direction:column;align-items:center}
@@ -848,7 +858,7 @@ body.dbg .cvcell.cabBtn:active{box-shadow:inset 0 0 0 3px rgba(255,255,255,.8)}
 
 </div>
 
-<script>window.__AUDIO = ["binoc.mp3","song1.mp3","song2.mp3","song3.mp3","song4.mp3","song5.mp3"]; window.__IMG = ["app_kakao.png","app_map.png","app_minigame.png","app_qr.png","archer.jpg","bin_L1.jpg","bin_L1_open_case.jpg","bin_L1_open_empty.jpg","bin_L2.jpg","bin_L2_open_cello.jpg","bin_L2_open_empty.jpg","bin_R1.jpg","bin_R1_open_card.jpg","bin_R1_open_empty.jpg","bin_R2.jpg","bin_R2_open_empty.jpg","bin_R2_open_key.jpg","blanket_zoom.jpg","book_empty.jpg","book_tile.jpg","case_open_empty.jpg","case_open_headset.jpg","ceiling_open_cardkey.jpg","ceiling_open_empty.jpg","cello_align.png","char_front.jpg","char_happy.jpg","char_hipL.jpg","char_hipR.jpg","char_hungry.jpg","crew_blanket.jpg","crew_tray.jpg","dialbox.jpg","dialbox_open.jpg","food_bread.png","food_cake.png","food_omu.png","food_salad.png","galley_cart.jpg","galley_drawer.jpg","galley_snack.jpg","galley_upper.jpg","galley_upper_empty.jpg","galley_upper_open.jpg","gamecard.jpg","headphones.jpg","headset_case.jpg","headset_worn.jpg","hint_phonecase.jpg","ic_blanket.png","ic_butter.jpg","ic_cardkey.jpg","ic_cardkey.png","ic_case.png","ic_cellophane.png","ic_dna.jpg","ic_drop.jpg","ic_dynamite.jpg","ic_fire.jpg","ic_gamecard.png","ic_goldkey.jpg","ic_goldkey.png","ic_headphones.jpg","ic_headphones.png","ic_ladder.png","ic_pamphlet.png","ic_passport.png","ic_peanut.png","ic_phone.png","ic_silverkey.jpg","ic_silverkey.png","ic_telescope.png","ic_ticket.png","ic_tile_beige.png","ic_tile_black.png","ic_tile_brown.png","ic_tile_dark.png","ife_ic_blanket.png","ife_ic_meal.png","ife_ic_tv.png","ife_off.jpg","ife_on.jpg","ife_photo1.jpg","ife_photo2.jpg","ife_photo3.jpg","ife_photo4.jpg","lav_cab1.jpg","lav_cab1_empty.jpg","lav_cab1_open.jpg","lav_cab2.jpg","lav_cab2_empty.jpg","lav_cab2_open.jpg","lav_cabtop.jpg","lav_cabtop_empty.jpg","lav_cabtop_open.jpg","lav_ceiling.jpg","lav_tissue.jpg","lav_tissue_idle.jpg","lav_tissue_roll.jpg","map_aisle.jpg","map_gate.jpg","map_seat.jpg","map_seat_tray.jpg","meal_tray.jpg","oway_plane.jpg","pamphlet_bg.jpg","pamphlet_body_bg.jpg","passport.jpg","shade_logo.png","tile_beige.jpg","tile_black.jpg","tile_brown.jpg","tile_dark.jpg","tissue_mask.png","travel1.jpg","travel2.jpg","travel3.jpg","travel4.jpg","window_open.jpg","window_shade.jpg","window_shade_plain.jpg"];</script>
+<script>window.__AUDIO = ["ad_bgm.mp3","binoc.mp3","bow_shot.mp3","main_bgm.mp3","song1.mp3","song2.mp3","song3.mp3","song4.mp3","song5.mp3","sudoku_bgm.mp3"]; window.__IMG = ["app_kakao.png","app_map.png","app_minigame.png","app_qr.png","archer.jpg","archer.png","archery_field.jpg","bin_L1.jpg","bin_L1_open_case.jpg","bin_L1_open_empty.jpg","bin_L2.jpg","bin_L2_open_cello.jpg","bin_L2_open_empty.jpg","bin_R1.jpg","bin_R1_open_card.jpg","bin_R1_open_empty.jpg","bin_R2.jpg","bin_R2_open_empty.jpg","bin_R2_open_key.jpg","blanket_zoom.jpg","book_empty.jpg","book_tile.jpg","case_open_empty.jpg","case_open_headset.jpg","ceiling_open_cardkey.jpg","ceiling_open_empty.jpg","cello_align.png","char_front.jpg","char_happy.jpg","char_hipL.jpg","char_hipR.jpg","char_hungry.jpg","crew_blanket.jpg","crew_tray.jpg","dialbox.jpg","dialbox_open.jpg","food_bread.png","food_cake.png","food_omu.png","food_salad.png","galley_cart.jpg","galley_drawer.jpg","galley_snack.jpg","galley_upper.jpg","galley_upper_empty.jpg","galley_upper_open.jpg","gamecard.jpg","headphones.jpg","headset_case.jpg","headset_worn.jpg","hint_phonecase.jpg","ic_blanket.png","ic_butter.jpg","ic_butter.png","ic_cardkey.jpg","ic_cardkey.png","ic_case.png","ic_cellophane.png","ic_dna.jpg","ic_dna.png","ic_drop.jpg","ic_drop.png","ic_dynamite.jpg","ic_dynamite.png","ic_fire.jpg","ic_fire.png","ic_gamecard.png","ic_goldkey.jpg","ic_goldkey.png","ic_headphones.jpg","ic_headphones.png","ic_ladder.png","ic_pamphlet.png","ic_passport.png","ic_peanut.png","ic_phone.png","ic_silverkey.jpg","ic_silverkey.png","ic_telescope.png","ic_ticket.png","ic_tile_beige.png","ic_tile_black.png","ic_tile_brown.png","ic_tile_dark.png","ife_ic_blanket.png","ife_ic_meal.png","ife_ic_tv.png","ife_off.jpg","ife_on.jpg","ife_photo1.jpg","ife_photo2.jpg","ife_photo3.jpg","ife_photo4.jpg","lav_cab1.jpg","lav_cab1_empty.jpg","lav_cab1_open.jpg","lav_cab2.jpg","lav_cab2_empty.jpg","lav_cab2_open.jpg","lav_cabtop.jpg","lav_cabtop_empty.jpg","lav_cabtop_open.jpg","lav_ceiling.jpg","lav_tissue.jpg","lav_tissue_idle.jpg","lav_tissue_roll.jpg","map_aisle.jpg","map_gate.jpg","map_seat.jpg","map_seat_tray.jpg","meal_tray.jpg","oway_plane.jpg","pamphlet_bg.jpg","pamphlet_body_bg.jpg","passport.jpg","shade_logo.png","tile_beige.jpg","tile_black.jpg","tile_brown.jpg","tile_dark.jpg","tissue_mask.png","travel1.jpg","travel2.jpg","travel3.jpg","travel4.jpg","window_open.jpg","window_shade.jpg","window_shade_plain.jpg"];</script>
 <script>
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -10958,7 +10968,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 (function () {
   "use strict";
 
-  var BUILD = "ODY-S1-20260912-1816";
+  var BUILD = "ODY-S1-20260912-2116";
   var LSKEY = "odyssey.s1.v1";
 
   var qs = new URLSearchParams(location.search);
@@ -11075,9 +11085,215 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     unlocked = true;
   }
   function audioUnlocked() { return unlocked; }
+
+  /* ═══════════ ★v0.17 BGM 매니저 ═══════════
+     게임 전체 배경음(main)과 미니게임 전용 BGM(sudoku·ad)을 **상태 한 곳**에서 관리한다.
+       · wantMain — 게임이 시작됐는가 (첫 제스처 = '시작하기' 탭에서 켜짐)
+       · over     — 지금 화면을 덮는 전용 BGM ("sudoku" | "ad" | null)
+       · holds    — **다른 음악이 나오는 중**이라 메인을 멈춰야 하는 이유
+                    ("songs" = 헤드셋 5곡 #5, "binoc" = 쌍안경 #23)
+     지금 울려야 할 트랙 = over  ?  over
+                        : (holds 없음 && wantMain) ? "main"
+                        : 없음(무음)
+     · 전환은 320ms 페이드. 메인은 **멈춘 자리에서 이어서**, 미니게임 BGM 은 열 때마다 처음부터.
+     · 볼륨은 GainNode(있으면) / element.volume 으로 0.42~0.5 — 효과음·대사가 안 묻게.
+     · iOS: v0.15[1] 과 같은 이유로 첫 제스처에서 **모든 BGM 엘리먼트를 무음 재생해 풀어** 둔다
+       (뒤에 스크립트가 제스처 밖에서 play() 해도 막히지 않게).
+     · 검증 훅: window.__bgmState()                                                        */
+  var BGM_DEF = {
+    main: { file: "main_bgm.mp3", vol: 0.42, resume: true },
+    sudoku: { file: "sudoku_bgm.mp3", vol: 0.46, resume: false },
+    ad: { file: "ad_bgm.mp3", vol: 0.46, resume: false }
+  };
+  var BGM_FADE = 320;
+  var bgmRec = {}, bgmFade = {}, bgmCur = null, bgmOver = null, bgmHolds = {}, bgmWantMain = false, bgmTimer = null;
+
+  function haveAudio(file) { return Array.isArray(window.__AUDIO) && window.__AUDIO.indexOf(file) >= 0; }
+  function bgmRecOf(name) {
+    var def = BGM_DEF[name];
+    if (!def || !haveAudio(def.file)) return null;
+    var r = bgmRec[name];
+    if (r) return r;
+    var au = new Audio("audio/" + def.file);
+    au.loop = true; au.preload = "auto";
+    au.setAttribute("playsinline", ""); au.setAttribute("webkit-playsinline", "");
+    r = { au: au, gain: null, unlocked: false };
+    var a = audio();
+    if (a && a.createMediaElementSource) {
+      try {
+        var s = a.createMediaElementSource(au), g = a.createGain();
+        g.gain.value = 0.0001; s.connect(g); g.connect(a.destination);
+        r.gain = g;
+      } catch (e) { r.gain = null; }
+    }
+    if (!r.gain) { try { au.volume = 0; } catch (e) {} }
+    bgmRec[name] = r;
+    return r;
+  }
+  function bgmSetVol(name, to, ms, after) {
+    var r = bgmRec[name]; if (!r) return;
+    if (bgmFade[name]) { clearInterval(bgmFade[name]); bgmFade[name] = null; }
+    var a = audio();
+    if (r.gain && a) {
+      var t = a.currentTime;
+      try {
+        r.gain.gain.cancelScheduledValues(t);
+        r.gain.gain.setValueAtTime(Math.max(0.0001, r.gain.gain.value), t);
+        r.gain.gain.linearRampToValueAtTime(Math.max(0.0001, to), t + ms / 1000);
+      } catch (e) {}
+      if (after) setTimeout(after, ms + 30);
+      return;
+    }
+    var from = 0; try { from = r.au.volume; } catch (e) {}
+    var steps = Math.max(1, Math.round(ms / 40)), k = 0;
+    bgmFade[name] = setInterval(function () {
+      k++;
+      try { r.au.volume = Math.max(0, Math.min(1, from + (to - from) * (k / steps))); } catch (e) {}
+      if (k >= steps) { clearInterval(bgmFade[name]); bgmFade[name] = null; if (after) after(); }
+    }, ms / steps);
+  }
+  function bgmHoldCount() { var n = 0; for (var k in bgmHolds) if (bgmHolds[k]) n++; return n; }
+  function bgmWant() {
+    if (bgmOver) return bgmOver;
+    if (bgmWantMain && bgmHoldCount() === 0) return "main";
+    return null;
+  }
+  function bgmDo() {
+    var want = bgmWant();
+    if (want && !bgmRecOf(want)) want = null;          /* 음원 파일이 없으면 그냥 무음 */
+    if (want === bgmCur) { bgmKick(); return; }
+    var prev = bgmCur;
+    bgmCur = want;
+    if (prev) (function (p) {
+      bgmSetVol(p, 0.0001, BGM_FADE, function () {
+        if (bgmCur === p) return;                      /* 그새 다시 켜졌으면 두고 간다 */
+        var r = bgmRec[p]; if (!r) return;
+        try { r.au.pause(); } catch (e) {}
+        if (!BGM_DEF[p].resume) { try { r.au.currentTime = 0; } catch (e) {} }
+      });
+    })(prev);
+    if (want) {
+      var r = bgmRecOf(want);
+      audio();
+      if (!BGM_DEF[want].resume) { try { r.au.currentTime = 0; } catch (e) {} }
+      try { r.au.muted = false; } catch (e) {}
+      try { var pr = r.au.play(); if (pr && pr.catch) pr.catch(function () {}); } catch (e) {}
+      bgmSetVol(want, BGM_DEF[want].vol, BGM_FADE);
+    }
+  }
+  /* 여러 번 연달아 바뀌어도(닫고 곧바로 열기) 한 번만 적용 — ad→ad 처럼 같은 트랙이면 안 끊긴다 */
+  function bgmApply(now) {
+    if (bgmTimer) { clearTimeout(bgmTimer); bgmTimer = null; }
+    if (now) { bgmDo(); return; }
+    bgmTimer = setTimeout(function () { bgmTimer = null; bgmDo(); }, 0);
+  }
+  /* 자동재생이 막혀 멈춰 있으면 다음 사용자 입력에서 다시 시도 */
+  function bgmKick() {
+    if (!bgmCur) return;
+    var r = bgmRec[bgmCur];
+    if (!r || !r.au.paused) return;
+    try { var pr = r.au.play(); if (pr && pr.catch) pr.catch(function () {}); } catch (e) {}
+  }
+  function bgmUnlock() {
+    Object.keys(BGM_DEF).forEach(function (n) {
+      var r = bgmRecOf(n);
+      if (!r || r.unlocked) return;
+      r.unlocked = true;
+      try {
+        r.au.muted = true;
+        var p = r.au.play();
+        var fin = function () {
+          try {
+            if (bgmCur !== n) { r.au.pause(); r.au.currentTime = 0; }
+            r.au.muted = false;
+          } catch (e) {}
+        };
+        if (p && p.then) p.then(fin, function () { try { r.au.muted = false; } catch (e) {} });
+        else fin();
+      } catch (e) { try { r.au.muted = false; } catch (e2) {} }
+    });
+    sfxUnlock();
+  }
+  var BGM = {
+    start: function () { bgmWantMain = true; bgmApply(true); },   /* 제스처 안에서 즉시 */
+    stopAll: function () { bgmWantMain = false; bgmOver = null; bgmHolds = {}; bgmApply(true); },
+    over: function (name) { bgmOver = BGM_DEF[name] ? name : null; bgmApply(); },
+    hold: function (k) { bgmHolds[k] = 1; bgmApply(); },
+    release: function (k) { delete bgmHolds[k]; bgmApply(); },
+    flush: function () { bgmApply(true); }
+  };
+  window.__bgmState = function () {
+    var out = { cur: bgmCur, want: bgmWant(), over: bgmOver, wantMain: bgmWantMain,
+                holds: Object.keys(bgmHolds), unlocked: unlocked,
+                ctx: actx ? actx.state : null, tracks: {}, playing: [] };
+    Object.keys(bgmRec).forEach(function (k) {
+      var r = bgmRec[k];
+      out.tracks[k] = {
+        file: BGM_DEF[k].file, paused: !!r.au.paused, muted: !!r.au.muted,
+        loop: !!r.au.loop, t: +(r.au.currentTime || 0).toFixed(2), dur: +(r.au.duration || 0).toFixed(2),
+        gain: r.gain ? +r.gain.gain.value.toFixed(3) : null, vol: +(r.au.volume != null ? r.au.volume : 0).toFixed(2)
+      };
+      if (!r.au.paused && !r.au.muted) out.playing.push(k);
+    });
+    return out;
+  };
+
+  /* ───────── ★v0.17 파일 효과음(one-shot) ─────────
+     window.__AUDIO 에 파일이 있을 때만 재생하고, 없으면 false 를 돌려줘 기존 신호음으로 폴백한다. */
+  var SFX_FILES = ["bow_shot.mp3"];
+  var sfxRec = {};
+  function sfxRecOf(file) {
+    if (!haveAudio(file)) return null;
+    var r = sfxRec[file];
+    if (r) return r;
+    var au = new Audio("audio/" + file);
+    au.preload = "auto";
+    au.setAttribute("playsinline", ""); au.setAttribute("webkit-playsinline", "");
+    r = { au: au, gain: null, unlocked: false };
+    var a = audio();
+    if (a && a.createMediaElementSource) {
+      try {
+        var s = a.createMediaElementSource(au), g = a.createGain();
+        g.gain.value = 1; s.connect(g); g.connect(a.destination);
+        r.gain = g;
+      } catch (e) { r.gain = null; }
+    }
+    sfxRec[file] = r;
+    return r;
+  }
+  function sfxUnlock() {
+    SFX_FILES.forEach(function (f) {
+      var r = sfxRecOf(f);
+      if (!r || r.unlocked) return;
+      r.unlocked = true;
+      try {
+        r.au.muted = true;
+        var p = r.au.play();
+        var fin = function () { try { r.au.pause(); r.au.currentTime = 0; r.au.muted = false; } catch (e) {} };
+        if (p && p.then) p.then(fin, function () { try { r.au.muted = false; } catch (e) {} });
+        else fin();
+      } catch (e) { try { r.au.muted = false; } catch (e2) {} }
+    });
+  }
+  window.__sfxLog = [];
+  function sfxFile(file, vol) {
+    var r = sfxRecOf(file);
+    if (!r) return false;
+    audio();
+    var v = vol == null ? 1 : vol;
+    if (r.gain) { try { r.gain.gain.cancelScheduledValues(0); r.gain.gain.value = v; } catch (e) {} }
+    else { try { r.au.volume = v; } catch (e) {} }
+    try { r.au.muted = false; r.au.currentTime = 0; } catch (e) {}
+    try { var p = r.au.play(); if (p && p.catch) p.catch(function () {}); } catch (e) { return false; }
+    window.__sfxLog.push({ file: file, at: Date.now() });
+    if (window.__sfxLog.length > 40) window.__sfxLog.shift();
+    return true;
+  }
+
   /* 첫 사용자 입력에서 한 번만 */
+  function firstGesture() { unlockAudio(); bgmUnlock(); bgmKick(); }
   ["pointerdown", "touchend", "mousedown", "keydown"].forEach(function (ev) {
-    document.addEventListener(ev, unlockAudio, { capture: true, once: false, passive: true });
+    document.addEventListener(ev, firstGesture, { capture: true, once: false, passive: true });
   });
 
   /* ★v0.15 [5] iOS 더블탭 확대 완전 차단 —
@@ -11334,7 +11550,8 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     $: $, el: el, clear: clear, on: on, toast: toast,
     beep: beep, sfxOk: sfxOk, sfxBad: sfxBad, sfxTap: sfxTap, buzz: buzz, audio: audio, syncInvH: syncInvH,
     sha256: sha256, drag: drag, tapper: tapper,
-    sharedAudio: sharedAudio, unlockAudio: unlockAudio, audioUnlocked: audioUnlocked
+    sharedAudio: sharedAudio, unlockAudio: unlockAudio, audioUnlocked: audioUnlocked,
+    BGM: BGM, sfxFile: sfxFile, haveAudio: haveAudio
   };
 })();
 
@@ -11543,12 +11760,13 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 
   var KANA = "あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをん".split("");
 
+  /* ★v0.17 과녁·재생화면 아이콘 = 흰 배경을 지운 투명 PNG (초원 위에 흰 상자가 안 뜨게) */
   var SONGS = {
-    blood: { name: "피 땀 눈물", icon: IMG + "ic_drop.jpg", tone: 392 },
-    fire: { name: "불타오르네", icon: IMG + "ic_fire.jpg", tone: 466 },
-    dna: { name: "DNA", icon: IMG + "ic_dna.jpg", tone: 523 },
-    butter: { name: "Butter", icon: IMG + "ic_butter.jpg", tone: 587 },
-    dynamite: { name: "Dynamite", icon: IMG + "ic_dynamite.jpg", tone: 659 }
+    blood: { name: "피 땀 눈물", icon: IMG + "ic_drop.png", tone: 392 },
+    fire: { name: "불타오르네", icon: IMG + "ic_fire.png", tone: 466 },
+    dna: { name: "DNA", icon: IMG + "ic_dna.png", tone: 523 },
+    butter: { name: "Butter", icon: IMG + "ic_butter.png", tone: 587 },
+    dynamite: { name: "Dynamite", icon: IMG + "ic_dynamite.png", tone: 659 }
   };
 
   /* ─────────────────────────────────────────────────────────
@@ -13430,6 +13648,8 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     root.appendChild(top); root.appendChild(body); root.appendChild(foot);
     root.classList.add("show");
     document.body.classList.add("fullOpen");   /* ★v0.13.1 상단바·인벤과 겹치지 않게 */
+    /* ★v0.17 이 전체화면이 쓰는 전용 BGM (없으면 메인 BGM 이 그대로 흐른다) */
+    G.BGM.over(o.bgm || null);
     o.build(body, foot);
     stack.push(o);
     return { body: body, foot: foot };
@@ -13439,6 +13659,10 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     var root = $("full");
     clear(root); root.classList.remove("show");
     if (!stack.length) document.body.classList.remove("fullOpen");
+    /* ★v0.17 아래에 남은 전체화면의 BGM 으로 되돌린다(없으면 메인 복귀).
+       광고→활쏘기처럼 **같은 트랙**으로 곧바로 이어지면 BGM 매니저가 합쳐서 안 끊는다. */
+    var below = stack.length ? stack[stack.length - 1] : null;
+    G.BGM.over((below && below.bgm) || null);
   }
   /** ★디버그 전용 "바로 풀기" — ?debug=1 이 아니면 DOM에 아예 만들지 않는다 */
   function dbgSolveBtn(fn) {
@@ -13645,7 +13869,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     var cur = (G.S.misc.sud && G.S.misc.sud.length === 81) ? G.S.misc.sud.slice() : s.puzzle.slice();
     var sel = -1;
     openFull({
-      title: "SUDOKU", right: "",
+      title: "SUDOKU", right: "", bgm: "sudoku",       /* ★v0.17 스도쿠 전용 BGM */
       build: function (body, foot) {
         var grid = el("div"); grid.id = "sud"; grid.setAttribute("data-t", "sudoku");
         var cells = [];
@@ -13732,7 +13956,8 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   /* ═══════════ 광고 전환 연출 ═══════════ */
   function openAd(onGo) {
     openFull({
-      title: "", right: "",
+      /* ★v0.17 광고 BGM 은 여기(카운트다운)에서 시작해 활쏘기까지 **끊기지 않고** 이어진다 */
+      title: "", right: "", bgm: "ad",
       build: function (body, foot) {
         /* ★v0.16.3 [지시9] 보상 문구·골드 버튼 폐지 — "곧 광고가 나옵니다" 만 띄우고 3초 뒤 자동 시작 */
         var box = el("div"); box.id = "adBox"; box.setAttribute("data-t", "adWait");
@@ -13757,10 +13982,18 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     var need = order.slice();      // 노래 순서
     var step = 0;
     openFull({
-      title: "🏹", right: "",
+      title: "🏹", right: "", bgm: "ad",              /* ★v0.17 광고 BGM 을 그대로 이어받는다 */
       build: function (body, foot) {
         var stage = el("div"); stage.id = "arch"; stage.setAttribute("data-t", "archery");
+        /* ★v0.17 흰 배경 폐기 → 카툰 초원 배경을 세로로 꽉 채운다(cover) */
+        if (window.__IMG && window.__IMG.indexOf("archery_field.jpg") >= 0) {
+          stage.style.backgroundImage = "url(" + DATA.IMG + "archery_field.jpg)";
+        }
         body.appendChild(stage);
+        /* ★v0.17 AD 라벨 — 반투명 회색 라운드 박스 + 흰 글씨(북쑥 확정). 왼쪽 위 */
+        var adTag = el("div", "archAd", "AD");
+        adTag.setAttribute("data-t", "archAd");
+        stage.appendChild(adTag);
         /* ★v0.16.3 [지시10] "노래가 나온 순서대로 쏴!" 문구 삭제(북쑥). ↕ 드래그 온보딩은 그대로 */
         var msg = el("div"); msg.id = "archMsg"; msg.textContent = "";
         stage.appendChild(msg);
@@ -13781,7 +14014,9 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         });
 
         var ar = el("div"); ar.id = "archer";
-        var ai = new Image(); ai.src = DATA.IMG + "archer.jpg"; ar.appendChild(ai);
+        /* ★v0.17 흰 배경을 지운 투명 PNG(archer.png). 없으면 예전 jpg 로 폴백 */
+        var af = (window.__IMG && window.__IMG.indexOf("archer.png") >= 0) ? "archer.png" : "archer.jpg";
+        var ai = new Image(); ai.src = DATA.IMG + af; ar.appendChild(ai);
         ar.style.top = "42%";
         stage.appendChild(ar);
         var ud = el("div", "updown", "↕");
@@ -13810,11 +14045,13 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         function fire() {
           if (firing) return;
           firing = true;
-          G.beep(300, .08, "square", .1);
+          /* ★v0.17 발사 순간 활시위 효과음 — 음원이 없으면 예전 신호음으로 폴백 */
+          if (!G.sfxFile("bow_shot.mp3", 0.9)) G.beep(300, .08, "square", .1);
           arrow.style.display = "block";
           arrow.style.top = (pos + 8) + "%";
-          arrow.style.left = "22%";
-          var x = 22;
+          /* ★v0.17 궁수를 오른쪽(13%)으로 옮겼으므로 화살도 활 앞에서 출발한다(판정과 무관) */
+          arrow.style.left = "30%";
+          var x = 30;
           var iv = setInterval(function () {
             x += 6; arrow.style.left = x + "%";
             if (x >= 76) {
@@ -14888,6 +15125,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   var binocAu = null;
   function binocPlay() {
     if (!Array.isArray(window.__AUDIO) || window.__AUDIO.indexOf("binoc.mp3") < 0) return;
+    G.BGM.hold("binoc");                            /* ★v0.17 다른 음악이 나오는 동안 메인 BGM 정지 */
     if (!binocAu) {
       binocAu = new Audio(DATA.IMG.replace("img/", "") + "audio/binoc.mp3");
       binocAu.loop = true;                       /* 끝나면 즉시 처음부터 */
@@ -14904,6 +15142,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
              t: +binocAu.currentTime.toFixed(2), dur: +(binocAu.duration || 0).toFixed(2) };
   };
   function binocStop() {
+    G.BGM.release("binoc");                         /* ★v0.17 닫으면 메인 BGM 복귀 */
     if (!binocAu) return;
     try { binocAu.pause(); binocAu.currentTime = 0; } catch (e) {}
   }
@@ -15947,6 +16186,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     } catch (e) {}
   }
   function stopSongs() {
+    G.BGM.release("songs");                         /* ★v0.17 노래가 끝나면 메인 BGM 복귀 */
     songRun++;
     songTimers.forEach(function (t) { if (t && t.iv) clearInterval(t.iv); else clearTimeout(t); });
     songTimers = [];
@@ -15979,6 +16219,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   var songTick = null;
   function playSongs() {
     stopSongs();
+    G.BGM.hold("songs");                            /* ★v0.17 5곡 재생 동안 메인 BGM 정지 */
     var order = DATA.TEMP.songOrder;
     var run = songRun;
 
@@ -16053,6 +16294,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       if (!$("zoom").classList.contains("show")) return;
       if (i >= order.length) {
         G.setFlag("heardSongs");
+        G.BGM.release("songs");                     /* ★v0.17 5곡이 다 끝나면 메인 BGM 복귀 */
         head.style.display = "none";
         barWrap.style.display = "none";
         if (dbg) dbg.style.display = "none";
@@ -16256,6 +16498,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     }
     $("intro").style.display = "none";
     G.audio();
+    G.BGM.start();                                  /* ★v0.17 메인 BGM — 첫 제스처(시작하기 탭) 안에서 시작 */
     render();
   }
 
