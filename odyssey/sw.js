@@ -1,5 +1,5 @@
 /* 비행기에서 내리고 싶다. — 오프라인 서비스워커 (자동 생성) */
-const CACHE = "odyssey-ODY-S1-20260913-0001";
+const CACHE = "odyssey-ODY-S1-20260913-0141";
 const PRECACHE = [
  "./",
  "./index.html",
@@ -46,6 +46,8 @@ const PRECACHE = [
  "./img/food_omu.png",
  "./img/food_salad.png",
  "./img/galley_cart.jpg",
+ "./img/galley_cart_empty.jpg",
+ "./img/galley_cart_open.jpg",
  "./img/galley_drawer.jpg",
  "./img/galley_snack.jpg",
  "./img/galley_upper.jpg",
@@ -120,8 +122,11 @@ const PRECACHE = [
  "./img/pamphlet_bg.jpg",
  "./img/pamphlet_body_bg.jpg",
  "./img/passport.jpg",
+ "./img/passport_p1.jpg",
+ "./img/passport_p2.jpg",
  "./img/phone_wall.jpg",
  "./img/shade_logo.png",
+ "./img/ticket_bg.jpg",
  "./img/tile_beige.jpg",
  "./img/tile_black.jpg",
  "./img/tile_brown.jpg",

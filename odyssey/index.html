@@ -363,9 +363,10 @@ body.dbg .ifeHot:active{box-shadow:0 0 0 2px rgba(255,255,255,.95)}
 #arch{position:relative;width:100%;height:100%;background:#8ed3f5 center bottom/cover no-repeat;
   border-radius:var(--r);overflow:hidden;touch-action:none}
 /* ★v0.17 AD 라벨 — 반투명 회색 라운드 박스 + 흰 글씨. 캐릭터(left 13%)·과녁(right 3%)과 안 겹친다 */
-.archAd{position:absolute;left:7px;top:7px;z-index:5;pointer-events:none;
-  background:rgba(58,58,64,.55);color:#fff;font-size:9px;font-weight:700;letter-spacing:1.4px;
-  line-height:1;padding:5px 7px 4px;border-radius:7px;border:1px solid rgba(255,255,255,.18)}
+/* ★v0.17.4 [지시23] AD 박스·글씨 확대 — 9px/5·7 → 13px/8·11 (32.9×17.5 → 약 47×26, 1.45배) */
+.archAd{position:absolute;left:8px;top:8px;z-index:5;pointer-events:none;
+  background:rgba(58,58,64,.55);color:#fff;font-size:14px;font-weight:700;letter-spacing:2.2px;
+  line-height:1;padding:8px 12px 7px;border-radius:10px;border:1px solid rgba(255,255,255,.18)}
 #archer{position:absolute;left:13%;width:22%;transition:top .05s linear;
   filter:drop-shadow(0 5px 6px rgba(32,60,20,.3))}
 #archer img{width:100%;display:block}
@@ -380,8 +381,20 @@ body.dbg .ifeHot:active{box-shadow:0 0 0 2px rgba(255,255,255,.95)}
 #arrow::after{content:"";position:absolute;right:-7px;top:-3px;border:5px solid transparent;border-left-color:#6f6f78}
 .updown{position:absolute;font-size:20px;animation:blink 1.1s ease-in-out infinite;color:#fff;
   text-shadow:0 1px 3px rgba(0,0,0,.5)}
+/* ★v0.17.4 [지시22] 밝은 하늘 배경에서 흰 글씨가 안 보여 **검은색**으로(하얀 외곽선으로 가독 보강) */
 #archMsg{position:absolute;left:0;right:0;top:8px;text-align:center;font-size:13px;font-weight:700;
-  color:#fff;letter-spacing:.2px;text-shadow:0 1px 4px rgba(0,0,0,.55);z-index:4}
+  color:#15161b;letter-spacing:.2px;text-shadow:0 1px 3px rgba(255,255,255,.75),0 0 6px rgba(255,255,255,.6);z-index:4}
+/* ★v0.17.4 [지시19] 발사 버튼 = 스테이지 안쪽 아래 가운데(캐릭터 13~35%·과녁 78~97% 와 겹침 0) */
+.archFire{position:absolute;left:50%;transform:translateX(-50%);bottom:10px;z-index:6;
+  padding:10px 18px;font-size:15px;box-shadow:0 4px 12px rgba(0,0,0,.32)}
+/* ★v0.17.4 [지시24] 네모로직 클리어 문구 */
+.nonoClear{position:absolute;left:0;right:0;top:42%;text-align:center;font-size:26px;font-weight:800;
+  letter-spacing:3px;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.8);pointer-events:none;z-index:3;
+  animation:clearPop .5s ease-out 1}
+.nonoClear.quiet{animation:none}
+@keyframes clearPop{0%{opacity:0;transform:scale(.7)}60%{opacity:1;transform:scale(1.08)}100%{opacity:1;transform:scale(1)}}
+/* 반짝반짝 — 격자 글로우를 클리어 동안 유지 */
+#nono.win #nonoGrid{animation:nonoGlow 1.5s ease-out 2}
 
 /* 네모로직 */
 #nono{display:flex;flex-direction:column;align-items:center}
@@ -568,6 +581,14 @@ body.dbg .cvcell.hot.ifeBtn:active,body.dbg .cvcell.hot.ifeTile:active{box-shado
 .cvcell.namePlate.onDark .cv{color:#d9d9de !important;text-shadow:0 1px 2px rgba(0,0,0,.65) !important}
 .cvcell.namePlate .cv{background:transparent !important;box-shadow:none !important;
   color:#2b2b30;font-weight:700;letter-spacing:1px;text-shadow:0 1px 0 rgba(255,255,255,.5)}
+/* ★v0.17.4 [지시12] 갤리 카트 완료 표시 — 대상 영역을 그대로 덮는 녹색 판(두 곳 같은 스타일) */
+.cvcell.extra.cartDone{pointer-events:none;background:rgba(42,150,80,.92);border:2px solid rgba(255,255,255,.42);
+  border-radius:5px;box-shadow:0 2px 8px rgba(0,0,0,.42);animation:none}
+.cvcell.extra.cartDone.round{border-radius:50%}
+body.dbg.hints .cvcell.extra.cartDone{box-shadow:0 2px 8px rgba(0,0,0,.42)}
+/* ★v0.17.4 [지시11] 탑승권에 인쇄된 아이콘 줄 — 조작 대상이 아니라 인쇄 장식 */
+.cvcell.tickIcons{pointer-events:none;background:transparent;box-shadow:none;opacity:.92}
+.cvcell.tickIcons svg{width:100%;height:100%;display:block}
 .cvcell.extra.lbl{pointer-events:none}
 .cvcell.extra.lbl .cv{background:transparent;box-shadow:none;font-size:20px !important}
 
@@ -877,7 +898,7 @@ body.dbg .cvcell.cabBtn:active{box-shadow:inset 0 0 0 3px rgba(255,255,255,.8)}
 
 </div>
 
-<script>window.__AUDIO = ["ad_bgm.mp3","binoc.mp3","bow_shot.mp3","main_bgm.mp3","song1.mp3","song2.mp3","song3.mp3","song4.mp3","song5.mp3","sudoku_bgm.mp3"]; window.__IMG = ["app_kakao.png","app_map.png","app_minigame.png","app_qr.png","archer.jpg","archer.png","archery_field.jpg","bin_L1.jpg","bin_L1_open_case.jpg","bin_L1_open_empty.jpg","bin_L2.jpg","bin_L2_open_cello.jpg","bin_L2_open_empty.jpg","bin_R1.jpg","bin_R1_open_card.jpg","bin_R1_open_empty.jpg","bin_R2.jpg","bin_R2_open_empty.jpg","bin_R2_open_key.jpg","blanket_zoom.jpg","book_empty.jpg","book_tile.jpg","case_open_empty.jpg","case_open_headset.jpg","ceiling_open_cardkey.jpg","ceiling_open_empty.jpg","cello_align.png","char_front.jpg","char_happy.jpg","char_hipL.jpg","char_hipR.jpg","char_hungry.jpg","crew_blanket.jpg","crew_tray.jpg","dialbox.jpg","dialbox_open.jpg","food_bread.png","food_cake.png","food_omu.png","food_salad.png","galley_cart.jpg","galley_drawer.jpg","galley_snack.jpg","galley_upper.jpg","galley_upper_empty.jpg","galley_upper_open.jpg","gamecard.jpg","headphones.jpg","headset_case.jpg","headset_worn.jpg","hint_phonecase.jpg","ic_blanket.png","ic_butter.jpg","ic_butter.png","ic_cardkey.jpg","ic_cardkey.png","ic_case.png","ic_cellophane.png","ic_dna.jpg","ic_dna.png","ic_drop.jpg","ic_drop.png","ic_dynamite.jpg","ic_dynamite.png","ic_fire.jpg","ic_fire.png","ic_gamecard.png","ic_goldkey.jpg","ic_goldkey.png","ic_headphones.jpg","ic_headphones.png","ic_ladder.png","ic_pamphlet.png","ic_passport.png","ic_peanut.png","ic_phone.png","ic_silverkey.jpg","ic_silverkey.png","ic_telescope.png","ic_ticket.png","ic_tile_beige.png","ic_tile_black.png","ic_tile_brown.png","ic_tile_dark.png","ife_ic_blanket.png","ife_ic_meal.png","ife_ic_tv.png","ife_off.jpg","ife_on.jpg","ife_photo1.jpg","ife_photo2.jpg","ife_photo3.jpg","ife_photo4.jpg","lav_cab1.jpg","lav_cab1_empty.jpg","lav_cab1_open.jpg","lav_cab2.jpg","lav_cab2_empty.jpg","lav_cab2_open.jpg","lav_cabtop.jpg","lav_cabtop_empty.jpg","lav_cabtop_open.jpg","lav_ceiling.jpg","lav_tissue.jpg","lav_tissue_idle.jpg","lav_tissue_roll.jpg","map_aisle.jpg","map_gate.jpg","map_seat.jpg","map_seat_tray.jpg","meal_tray.jpg","oway_plane.jpg","pamphlet_bg.jpg","pamphlet_body_bg.jpg","passport.jpg","phone_wall.jpg","shade_logo.png","tile_beige.jpg","tile_black.jpg","tile_brown.jpg","tile_dark.jpg","tissue_mask.png","travel1.jpg","travel2.jpg","travel3.jpg","travel4.jpg","window_open.jpg","window_shade.jpg","window_shade_plain.jpg"];</script>
+<script>window.__AUDIO = ["ad_bgm.mp3","binoc.mp3","bow_shot.mp3","main_bgm.mp3","song1.mp3","song2.mp3","song3.mp3","song4.mp3","song5.mp3","sudoku_bgm.mp3"]; window.__IMG = ["app_kakao.png","app_map.png","app_minigame.png","app_qr.png","archer.jpg","archer.png","archery_field.jpg","bin_L1.jpg","bin_L1_open_case.jpg","bin_L1_open_empty.jpg","bin_L2.jpg","bin_L2_open_cello.jpg","bin_L2_open_empty.jpg","bin_R1.jpg","bin_R1_open_card.jpg","bin_R1_open_empty.jpg","bin_R2.jpg","bin_R2_open_empty.jpg","bin_R2_open_key.jpg","blanket_zoom.jpg","book_empty.jpg","book_tile.jpg","case_open_empty.jpg","case_open_headset.jpg","ceiling_open_cardkey.jpg","ceiling_open_empty.jpg","cello_align.png","char_front.jpg","char_happy.jpg","char_hipL.jpg","char_hipR.jpg","char_hungry.jpg","crew_blanket.jpg","crew_tray.jpg","dialbox.jpg","dialbox_open.jpg","food_bread.png","food_cake.png","food_omu.png","food_salad.png","galley_cart.jpg","galley_cart_empty.jpg","galley_cart_open.jpg","galley_drawer.jpg","galley_snack.jpg","galley_upper.jpg","galley_upper_empty.jpg","galley_upper_open.jpg","gamecard.jpg","headphones.jpg","headset_case.jpg","headset_worn.jpg","hint_phonecase.jpg","ic_blanket.png","ic_butter.jpg","ic_butter.png","ic_cardkey.jpg","ic_cardkey.png","ic_case.png","ic_cellophane.png","ic_dna.jpg","ic_dna.png","ic_drop.jpg","ic_drop.png","ic_dynamite.jpg","ic_dynamite.png","ic_fire.jpg","ic_fire.png","ic_gamecard.png","ic_goldkey.jpg","ic_goldkey.png","ic_headphones.jpg","ic_headphones.png","ic_ladder.png","ic_pamphlet.png","ic_passport.png","ic_peanut.png","ic_phone.png","ic_silverkey.jpg","ic_silverkey.png","ic_telescope.png","ic_ticket.png","ic_tile_beige.png","ic_tile_black.png","ic_tile_brown.png","ic_tile_dark.png","ife_ic_blanket.png","ife_ic_meal.png","ife_ic_tv.png","ife_off.jpg","ife_on.jpg","ife_photo1.jpg","ife_photo2.jpg","ife_photo3.jpg","ife_photo4.jpg","lav_cab1.jpg","lav_cab1_empty.jpg","lav_cab1_open.jpg","lav_cab2.jpg","lav_cab2_empty.jpg","lav_cab2_open.jpg","lav_cabtop.jpg","lav_cabtop_empty.jpg","lav_cabtop_open.jpg","lav_ceiling.jpg","lav_tissue.jpg","lav_tissue_idle.jpg","lav_tissue_roll.jpg","map_aisle.jpg","map_gate.jpg","map_seat.jpg","map_seat_tray.jpg","meal_tray.jpg","oway_plane.jpg","pamphlet_bg.jpg","pamphlet_body_bg.jpg","passport.jpg","passport_p1.jpg","passport_p2.jpg","phone_wall.jpg","shade_logo.png","ticket_bg.jpg","tile_beige.jpg","tile_black.jpg","tile_brown.jpg","tile_dark.jpg","tissue_mask.png","travel1.jpg","travel2.jpg","travel3.jpg","travel4.jpg","window_open.jpg","window_shade.jpg","window_shade_plain.jpg"];</script>
 <script>
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -10987,7 +11008,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 (function () {
   "use strict";
 
-  var BUILD = "ODY-S1-20260913-0001";
+  var BUILD = "ODY-S1-20260913-0141";
   var LSKEY = "odyssey.s1.v1";
 
   var qs = new URLSearchParams(location.search);
@@ -11657,7 +11678,9 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     p9Prize: "goldKey",                          // Q6 #9 카트 보상(금색 열쇠)
     p14Prize: "telescope",                       // ★15:54 확정: #14 서랍장 보상 = 쌍안경
     p18Answer: "https://m.site.naver.com/1DmdB", // ★실물 명함 QR 해독값(2026-09-10, jsQR)
-    p18Prize: "tileBeige",                       // ★임시(북쑥 확인 전): #18 QR 보상 = 베이지 색상판
+    /* ★v0.17.4 [지시25] #18 QR 보상 폐지 — 베이지 색상판 출처가 **여권 2페이지**로 옮겨졌다.
+       QR 성공은 다마고치 등장(#24)으로만 이어진다(아이템 보상 없음). */
+    p18Prize: null,
     /* ★v0.13 #22(노노그램) 보상 삭제 — 완성 이펙트만. 색상판은 #8·cab2·#18·#26 에서 나온다 */
     p22Picture: "숫자 7",                        // Q11 #22 완성 그림
     /* ★22:48 확정(v0.7): 불타오르네 → 피 땀 눈물 → DNA → Butter → Dynamite.
@@ -12178,7 +12201,18 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         { x: 51.2, y: 36.88, w: 10.5, h: 15.14 },
         { x: 64.2, y: 36.88, w: 10.5, h: 15.14 }
       ],
-      keyhole: { x: 46.3, y: 24.3, w: 7.4, h: 9.9 }
+      keyhole: { x: 46.3, y: 24.3, w: 7.4, h: 9.9 },
+      /* ★v0.17.4 [지시12] 완료 표시(녹색 판) 좌표 — 렌더 실측
+         · 국기 4칸 = 위 cells 그대로(셀 모양 그대로 채운다)
+         · 열쇠구멍 원형 은색판 = galley_cart.jpg(1000×667) 어두운 테두리 링 스캔
+           x 470~529 / y 162~225 → 47.0/24.29/5.95/9.45 (렌더에서 거의 정원) */
+      keyPlate: { x: 47.0, y: 24.29, w: 5.95, h: 9.45 },
+      /* ★v0.17.4 [지시16] 문이 열린 카트 + 선반 위 금열쇠 / 빈 선반.
+         금열쇠 실물 bbox(1536×1024 기준 x616~899 / y546~642 = 40.1/53.3/18.4/9.4) 에
+         탭 여유를 더해 44px 이상 되게 넓힌 칸 */
+      openImg: "galley_cart_open.jpg",
+      emptyImg: "galley_cart_empty.jpg",
+      prizeCell: { x: 38.3, y: 48.0, w: 22.0, h: 20.0 }
     },
     /* ★v0.5 #25 갤리 간식 수납칸 — 정사각 홈 4개.
        gen/43_galley_snack_cab/pick.png 이 오면 img 만 채우고 cells 를 스캔값으로 바꾸면 된다. */
@@ -12293,6 +12327,24 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     }
   };
 
+  /* ★v0.17.4 [지시11] 탑승권 확대 = 실사 사진(원목 트레이 위 MARU AIR 탑승권, 1200×800).
+     · crop : 카드 전체가 팝업에 꽉 차게(사방 나무 여백만 조금)
+     · iconRow : 절취선(x76.5%) 오른쪽 · 바코드(아래끝 y64.3%) 아래 · 카드 오른쪽 끝(x93.3%)·아래끝(y79.5%)
+                 안쪽의 빈 여백. 실측으로 잡은 인쇄 자리 — #3 아이콘 6개가 옅은 회색 인쇄처럼 들어간다. */
+  /* ★v0.17.4 [지시25] 여권 — 탭하면 신원 페이지, 스크롤(드래그)하면 한 장 넘어가고
+     2페이지 오른쪽에 베이지 색상판이 놓여 있다. 판을 탭하면 획득하고 여권은 더 안 열린다.
+     tileCell = clean.png(1536×1024) 실측 x947~1213 / y366~642 (=61.7/35.7/17.3/27.0) 에 탭 여유 */
+  var PASSPORT = {
+    img1: "passport_p1.jpg", img2: "passport_p2.jpg", nw: 1200, nh: 800,
+    tileCell: { x: 59.5, y: 33.0, w: 21.5, h: 32.0 }
+  };
+
+  var TICKET = {
+    img: "ticket_bg.jpg", nw: 1200, nh: 800,
+    crop: { x: 3.5, y: 18.0, w: 93.0, h: 65.0 },
+    iconRow: { x: 77.5, y: 68.0, w: 15.5, h: 8.0 }
+  };
+
   /* ★v0.16.3 [지시7] 게임카드 사진(gamecard.jpg 900×567) 오른쪽 흰 라운드 상자 2개 —
      흰 픽셀 스캔 실측(테두리 안쪽 흰 면): 위 391,149~701,268 · 아래 391,298~701,415.
      원본 이미지 % 로 적어 두면 팝업 크기가 달라져도 그대로 따라간다. */
@@ -12335,7 +12387,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     IMG: IMG, TEMP: TEMP, ITEMS: ITEMS, MAPS: MAPS, ANS: ANS, P25_INIT: P25_INIT, PIN_HASH: PIN_HASH, P26_HASH: P26_HASH,
     FOOD: FOOD, FOOD_BG: FOOD_BG, FLAGS: FLAGS, UTENSIL: UTENSIL, IFE_ICONS: IFE_ICONS,
     KANA: KANA, SONGS: SONGS,
-    PAMPHLET: PAMPHLET_A, PAMPHLET_TARGETS: PAMPHLET_TARGETS, PAMPHLET_BG: PAMPHLET_BG, HINT_ART: HINT_ART, KAKAO_MSG: KAKAO_MSG, KAKAO_FROM: KAKAO_FROM
+    PASSPORT: PASSPORT, TICKET: TICKET, PAMPHLET: PAMPHLET_A, PAMPHLET_TARGETS: PAMPHLET_TARGETS, PAMPHLET_BG: PAMPHLET_BG, HINT_ART: HINT_ART, KAKAO_MSG: KAKAO_MSG, KAKAO_FROM: KAKAO_FROM
   };
 })();
 
@@ -12819,7 +12871,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     (opt.extras || []).forEach(function (e) {
       overlays.push({
         x: e.x, y: e.y, w: e.w, h: e.h, t: e.t, cls: "extra " + (e.cls || ""),
-        build: function (nd) { if (e.label) { var v = el("div", "cv"); v.textContent = e.label; nd.appendChild(v); } },
+        build: function (nd) { if (e.build) { e.build(nd); return; } if (e.label) { var v = el("div", "cv"); v.textContent = e.label; nd.appendChild(v); } },
         onTap: e.onTap
       });
     });
@@ -13663,8 +13715,12 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       cello._holes = holes;
     }
 
-    var ox = 92, oy = 66;   /* 처음엔 어긋난 상태 */
-    function place() { cello.style.transform = "translate(" + ox + "px," + oy + "px)"; }
+    /* ★v0.17.4 [지시15C] 처음엔 위치도 어긋나고 **각도도 120° 돌아간** 상태로 시작한다.
+       (정렬 마크도 셀로판 안에 있으므로 같이 돌아간다) */
+    var ox = 92, oy = 66, ang = 120;
+    var ANG_TOL = 8, POS_TOL = 8;          /* 스냅 허용치 — 각도 ±8° · 위치 ±8px */
+    function place() { cello.style.transform = "translate(" + ox + "px," + oy + "px) rotate(" + ang.toFixed(2) + "deg)"; }
+    function angDiff() { var d = ((ang % 360) + 360) % 360; return Math.min(d, 360 - d); }
     place();
 
     /* ★v0.16.2 셀로판 확대 팝업 — 팜플렛은 안 보이게 두고(구멍 좌표 계산용) 필름만 보여준다.
@@ -13673,7 +13729,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     if (opt.filmOnly) {
       paper.style.visibility = "hidden";
       cello.classList.add("snapped");
-      ox = 0; oy = 0; place();
+      ox = 0; oy = 0; ang = 0; place();
       setTimeout(function () { refit(); build(); }, 30);
       setTimeout(function () { refit(); build(); }, 180);
       window.__celloZoomState = function () {
@@ -13693,23 +13749,74 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       return host;
     }
 
+    /* ★v0.17.4 [지시15B] 이미 맞춰 놓은 뒤 다시 열면 — 정렬된 상태 그대로 **고정**(드래그·회전 없음) */
+    if (opt.fixed) {
+      ox = 0; oy = 0; ang = 0; snapped = true; place();
+      cello.classList.add("snapped");
+      setTimeout(function () { refit(); build(); }, 30);
+      setTimeout(function () { refit(); build(); }, 180);
+      window.__pamState = pamState;
+      return host;
+    }
+
     var sx = 0, sy = 0, bx = 0, by = 0;
+    /* ★v0.17.4 [지시15C] 두 손가락 회전 — 두 포인터 사이 각도 변화만큼 셀로판을 돌린다.
+       한 손가락 이동(위치 조절)은 그대로. 두 손가락이 닿아 있는 동안에는 이동을 멈춘다. */
+    var ptrs = {}, rotBase = null, rotating = false;
+    var moveTries = 0, hinted = false;
+    function ptrCount() { return Object.keys(ptrs).length; }
+    function twoAngle() {
+      var k = Object.keys(ptrs); if (k.length < 2) return 0;
+      var a = ptrs[k[0]], b = ptrs[k[1]];
+      return Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI;
+    }
+    cello.addEventListener("pointerdown", function (e) {
+      if (snapped) return;
+      ptrs[e.pointerId] = { x: e.clientX, y: e.clientY };
+      if (ptrCount() === 2) { rotBase = { a: ang, t: twoAngle() }; rotating = true; }
+    });
+    cello.addEventListener("pointermove", function (e) {
+      if (snapped || !ptrs[e.pointerId]) return;
+      ptrs[e.pointerId] = { x: e.clientX, y: e.clientY };
+      if (ptrCount() >= 2 && rotBase) {
+        ang = rotBase.a + (twoAngle() - rotBase.t);
+        place();
+        e.preventDefault();
+      }
+    });
+    function ptrUp(e) {
+      if (!ptrs[e.pointerId]) return;
+      delete ptrs[e.pointerId];
+      if (ptrCount() < 2 && rotating) { rotBase = null; rotating = false; trySnap(); }
+    }
+    cello.addEventListener("pointerup", ptrUp);
+    cello.addEventListener("pointercancel", ptrUp);
+    function trySnap() {
+      if (snapped) return false;
+      if (Math.abs(ox) <= POS_TOL && Math.abs(oy) <= POS_TOL && angDiff() <= ANG_TOL) { doSnap(); return true; }
+      return false;
+    }
     G.drag(cello, {
       start: function (p) { if (snapped) return; sx = p.x; sy = p.y; bx = ox; by = oy; },
       move: function (p) {
-        if (snapped) return;
+        if (snapped || ptrCount() >= 2) return;      /* 두 손가락일 땐 회전만 */
         ox = Math.max(-40, Math.min(W * 0.7, bx + (p.x - sx)));
         oy = Math.max(-40, Math.min(H * 0.7, by + (p.y - sy)));
         place();
       },
       end: function () {
-        if (snapped) return;
-        if (Math.abs(ox) <= 8 && Math.abs(oy) <= 8) doSnap();
+        if (snapped || rotating) return;
+        if (trySnap()) return;
+        /* ★[지시15C] 한 손가락 이동만 3번쯤 했는데 각도가 여전히 틀려 있으면 한 번만 알려 준다 */
+        if (angDiff() > ANG_TOL) {
+          moveTries++;
+          if (moveTries >= 3 && !hinted) { hinted = true; G.toast("두 손가락으로 각도 조절이 가능할 것 같다", 2600); }
+        }
       }
     });
 
     function doSnap() {
-      snapped = true; ox = 0; oy = 0; place();
+      snapped = true; ox = 0; oy = 0; ang = 0; place();
       cello.classList.add("snapped");
       G.sfxOk(); G.buzz([30, 40, 60]);
       stage.animate([{ transform: "translateX(0)" }, { transform: "translateX(-4px)" }, { transform: "translateX(4px)" }, { transform: "translateX(0)" }], { duration: 260 });
@@ -13722,13 +13829,15 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     setTimeout(function () { refit(); build(); }, 180);
 
     /* ★v0.15 검증용 — 정렬된 상태에서 표적 글자 중심과 구멍 중심의 거리(px) */
-    window.__pamState = function () {
+    function pamState() {
       var sr = stage.getBoundingClientRect();
       return {
         useBg: useBg, W: W, H: H, bodyFs: bodyFs,
         pad: { x: +PADX.toFixed(2), y: +PADY.toFixed(2), slack: +SLACK.toFixed(2), xPct: +(PADX / BODY.w * 100).toFixed(2), slackPct: +(SLACK / BODY.h * 100).toFixed(2) },
         overflow: { h: tx.scrollHeight - INNER.h, w: tx.scrollWidth - INNER.w },
         off: { x: ox, y: oy }, snapped: snapped,
+        ang: +ang.toFixed(2), angDiff: +angDiff().toFixed(2), angTol: ANG_TOL, posTol: POS_TOL,
+        fixed: !!opt.fixed, moveTries: (typeof moveTries === "number" ? moveTries : 0), hinted: !!(typeof hinted !== "undefined" && hinted),
         logo: cello._logo || null,
         mark: (function () {
           var m2 = cello.querySelector("img.alignMark"); if (!m2) return null;
@@ -13751,7 +13860,11 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
                    d: r ? +Math.hypot(cx - h.x - ox, cy - h.y - oy).toFixed(2) : null };
         })
       };
-    };
+    }
+    window.__pamState = pamState;
+    /* 검증용 — 두 손가락 회전을 코드로 재현하지 않고 각도만 세팅 */
+    window.__pamSetAng = function (v) { ang = v; place(); };
+    window.__pamTrySnap = function () { return trySnap(); };
     register({ answer: "셀로판을 로고에 맞춰(정렬 마크)", force: doSnap });
     host._snap = doSnap;
     return host;
@@ -14142,6 +14255,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   function openArchery(order, onWin, onBack) {
     var need = order.slice();      // 노래 순서
     var step = 0;
+    var shots = [];                // ★v0.17.4 [지시21] 이번 판에 맞춘 순서
     openFull({
       title: "🏹", right: "", bgm: "ad",              /* ★v0.17 광고 BGM 을 그대로 이어받는다 */
       build: function (body, foot) {
@@ -14158,6 +14272,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         /* ★v0.16.3 [지시10] "노래가 나온 순서대로 쏴!" 문구 삭제(북쑥). ↕ 드래그 온보딩은 그대로 */
         var msg = el("div"); msg.id = "archMsg"; msg.textContent = "";
         stage.appendChild(msg);
+        function say(t) { msg.textContent = t; }
 
         /* 과녁: 화면에 아이콘이 붙은 5개 (배치는 섞되 고정 seed) */
         var ids = order.slice();
@@ -14195,12 +14310,22 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
             setPos((q.y - r2.top) / r2.height * 100 - 9);
           }
         });
+        /* ★v0.17.4 [지시20] 드래그 없이 탭만 3번이면 조작 안내를 한 번 띄운다 */
+        var tapOnly = 0, movedOnce = false, scrollHinted = false;
         G.drag(stage, {
+          start: function () { movedOnce = false; },
           move: function (q) {
+            movedOnce = true;
             var r2 = stage.getBoundingClientRect();
             setPos((q.y - r2.top) / r2.height * 100 - 9);
+          },
+          end: function () {
+            if (movedOnce) return;
+            tapOnly++;
+            if (tapOnly >= 3 && !scrollHinted) { scrollHinted = true; say("스크롤 해서 캐릭터를 움직여봐"); }
           }
         });
+        window.__archTapHint = function () { return { taps: tapOnly, shown: scrollHinted }; };
 
         var firing = false;
         function fire() {
@@ -14221,6 +14346,11 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
             }
           }, 16);
         }
+        /* ★v0.17.4 [지시21] 쏘는 도중에는 리셋하지 않는다 — **5개를 다 쏜 뒤**에 순서를 본다. */
+        function resetShots() {
+          shots = []; step = 0;
+          targets.forEach(function (t) { t.hit = false; t.node.classList.remove("hit"); });
+        }
         function resolve() {
           /* 화살 높이와 가장 가까운 과녁 */
           var best = null, bd = 1e9;
@@ -14228,27 +14358,30 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
             var d = Math.abs((t.top + 9.5) - (pos + 9));
             if (d < bd) { bd = d; best = t; }
           });
-          if (!best || bd > 11) { msg.textContent = "빗나갔다"; G.sfxBad(); return; }
-          if (best.id === need[step]) {
-            best.hit = true; best.node.classList.add("hit");
-            step++;
-            G.sfxOk();
-            if (step >= need.length) {
-              msg.textContent = "명중! 전부 맞췄다";
-              setTimeout(onWin, 700);
-            } else msg.textContent = step + " / " + need.length;
+          if (!best || bd > 11 || best.hit) { say("빗나갔다"); G.sfxBad(); return; }
+          best.hit = true; best.node.classList.add("hit");
+          shots.push(best.id);
+          step = shots.length;
+          G.sfxOk();
+          if (shots.length < need.length) { say(step + " / " + need.length); return; }
+          var okAll = shots.every(function (v, i) { return v === need[i]; });
+          if (okAll) {
+            say("명중! 전부 맞췄다");
+            setTimeout(onWin, 700);
           } else {
-            msg.textContent = "순서가 틀렸어 — 처음부터";
+            say("순서가 틀린 것 같다.");
             G.sfxBad(); G.buzz(160);
-            step = 0;
-            targets.forEach(function (t) { t.hit = false; t.node.classList.remove("hit"); });
+            setTimeout(resetShots, 650);
           }
         }
 
-        var fb = el("button", "fbtn primary", "🏹 발사");
+        /* ★v0.17.4 [지시19] 발사 버튼을 스테이지 **안쪽**(초원 아래 가운데)으로 옮긴다.
+           스테이지에 걸린 드래그(스크롤) 핸들러가 이 탭을 삼키지 않게 pointerdown 을 여기서 끊는다. */
+        var fb = el("button", "fbtn primary archFire", "🏹 발사");
         fb.setAttribute("data-t", "fire");
         fb.onclick = fire;
-        foot.appendChild(fb);
+        fb.addEventListener("pointerdown", function (e) { e.stopPropagation(); });
+        stage.appendChild(fb);
         foot.appendChild(dbgSolveBtn(function () {
           targets.forEach(function (t) { t.hit = true; t.node.classList.add("hit"); });
           step = need.length; msg.textContent = "명중! 전부 맞췄다";
@@ -14268,7 +14401,9 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
             setTimeout(next, 900);
           })();
         };
-        window.__archTargets = function () { return targets.map(function (t) { return { id: t.id, top: t.top }; }); };
+        window.__archTargets = function () { return targets.map(function (t) { return { id: t.id, top: t.top, hit: t.hit }; }); };
+        window.__archShots = function () { return { shots: shots.slice(), need: need.slice(), msg: msg.textContent }; };
+        window.__archShootAt = function (topPct) { setPos(topPct - 0.5); fire(); };
       }
     });
   }
@@ -14431,25 +14566,41 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
             cells[i].textContent = state[i] === 2 ? "\u2715" : "";
           }
         }
-        function check() {
-          if (done) return;
+        function solvedNow() {
           for (var r = 0; r < N; r++) for (var c = 0; c < N; c++) {
             var want = NONO[r][c], got = state[r * N + c] === 1 ? 1 : 0;
-            if (want !== got) return;
+            if (want !== got) return false;
           }
+          return true;
+        }
+        function check() {
+          if (done) return;
+          if (!solvedNow()) return;
+          finish(false);
+        }
+        /* ★v0.17.4 [지시24] 완성하면 "클리어" 문구 + 반짝 이펙트를 띄우고 **다 풀린 판 그대로 고정**한다.
+           자동 퇴장 없음(되돌아가기는 플레이어가 직접) · 다시 들어오면 이 완성 화면이 그대로 뜬다. */
+        function finish(silent) {
           done = true;
-          G.sfxOk(); G.buzz([30, 40, 60]);
-          /* ★보상 없음 — 반짝이는 성공 이펙트만 1.5초 */
+          if (!silent) { G.sfxOk(); G.buzz([30, 40, 60]); }
           wrap.classList.add("win");
           fx.setAttribute("data-t", "nonoWin");
-          setTimeout(function () { onWin(); }, 1500);
+          if (!wrap.querySelector(".nonoClear")) {
+            var cl = el("div", "nonoClear" + (silent ? " quiet" : ""), "클리어");
+            cl.setAttribute("data-t", "nonoClear");
+            wrap.appendChild(cl);
+          }
+          onWin();
         }
         paint(); paintTools();
+        /* 이미 다 채워진 판으로 다시 들어왔으면 완성 화면을 그대로 보여 준다(연출·소리 없이) */
+        if (solvedNow()) finish(true);
         window.__nonoFill = function () {
           for (var r = 0; r < N; r++) for (var c = 0; c < N; c++) state[r * N + c] = NONO[r][c] ? 1 : 0;
           G.S.misc.nono = state.slice(); G.save(); paint(); check();
         };
         window.__nonoState = function () { return state.slice(); };
+        window.__nonoDone = function () { return { done: done, clear: !!wrap.querySelector(".nonoClear"), solved: solvedNow() }; };
       }
     });
   }
@@ -14754,7 +14905,8 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         vp.classList.add("hit");
         G.sfxOk(); G.buzz([40, 40, 60]);
         hint.textContent = "인식됨 ✓";
-        MAIN.prize(DATA.TEMP.p18Prize, "QR 인식 성공!");
+        /* ★v0.17.4 [지시25] QR 보상(베이지 색상판) 폐지 — 인식 성공은 다마고치 등장으로만 이어진다 */
+        if (DATA.TEMP.p18Prize) MAIN.prize(DATA.TEMP.p18Prize, "QR 인식 성공!");
         G.setFlag("p18");
         setTimeout(function () { go("qr"); }, 900);   /* → #24 다마고치 화면 */
       } else {
@@ -15734,29 +15886,51 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     c.cap("이미 열었다.");
   };
 
+  /* ★v0.17.4 [지시12·16] 갤리 카트 #9
+     · 설명 문구·체크박스 칩 삭제 — 진행 상태는 **녹색 판**으로만 보여 준다
+       (국기 4칸을 먼저 맞추면 그 4칸에, 열쇠를 먼저 꽂으면 원형 은색판 자리에 정확히 맞춘 녹색 판)
+     · 둘 다 끝나면 문이 열린 사진 → **사진 속 금열쇠를 직접 탭**해 꺼낸다(#16 짐칸R2 와 같은 흐름) */
   CU.cart = function (c) {
     c.title("갤리 카트");
+    var L = DATA.LOCKS.p9;
+    var hasOpen = hasImg(L.openImg) && hasImg(L.emptyImg);
     if (G.solved("p9")) {
+      if (hasOpen) {
+        var gotG = G.has("goldKey") || G.flag("tookGold");
+        c.stage.appendChild(imgStage(DATA.IMG + (gotG ? L.emptyImg : L.openImg),
+          gotG ? [] : [pick(L.prizeCell, "takeGoldKey", "goldKey", "tookGold")]));
+        c.cap(gotG ? "비어 있다." : "카트가 열렸다.");
+        return;
+      }
       c.stage.appendChild(imgStage(DATA.IMG + "galley_cart.jpg", []));
       c.cap("카트가 열려 있다.");
       return;
     }
-    var L = DATA.LOCKS.p9;
     function tryOpen() {
       if (G.flag("cartFlags") && G.flag("cartKeyed")) {
         G.markSolved("p9");
-        prize(DATA.TEMP.p9Prize, "카트가 열렸다");
+        if (!hasOpen) prize(DATA.TEMP.p9Prize, "카트가 열렸다");   /* 사진이 없을 때만 즉시 지급 */
         setTimeout(reopenCU, 300);
       }
+    }
+    /* 완료 표시 = 대상 영역에 정확히 맞춘 녹색 판(두 곳 같은 스타일) */
+    var donePlates = [];
+    if (G.flag("cartFlags")) {
+      L.cells.forEach(function (cl, i2) {
+        /* 칸(=탭 영역)은 홈 그림자까지 포함해 실제 흰 창보다 조금 크다 → 창에 맞춰 안쪽으로 조금 좁힌다 */
+        donePlates.push({ x: cl.x + 0.55, y: cl.y + 1.0, w: cl.w - 1.1, h: cl.h - 2.1, t: "cartDoneFlag" + i2, cls: "cartDone", build: function () {} });
+      });
+    }
+    if (G.flag("cartKeyed")) {
+      donePlates.push({ x: L.keyPlate.x, y: L.keyPlate.y, w: L.keyPlate.w, h: L.keyPlate.h,
+        t: "cartDoneKey", cls: "cartDone round", build: function () {} });
     }
     c.stage.appendChild(W.imgLock({
       id: "p9", img: L.img, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells, faces: L.faces, faceLight: L.faceLight, faceDy: L.faceDy,
       kind: "icon", cands: DATA.FLAGS, answer: DATA.ANS.p9, pre: G.flag("cartFlags"),
       extras: [{
         x: L.keyhole.x, y: L.keyhole.y, w: L.keyhole.w, h: L.keyhole.h, t: "cartKey",
-        /* ★v0.10.2 사진 위 라벨은 "여기 누르세요" 표시라 플레이 모드에서 제거.
-           꽂힌 상태는 캡션(관찰 서술)으로만 알린다. 디버그에서는 그대로 보인다. */
-        label: G.DEBUG ? (G.flag("cartKeyed") ? "✓" : "🔑") : "",
+        label: "",
         onTap: function () {
           if (G.flag("cartKeyed")) return;
           var sel = S.sel;                       /* ★v0.10 인벤에서 고른 뒤 여기를 탭 */
@@ -15769,16 +15943,10 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
           G.take("silverKey"); G.setFlag("cartKeyed"); G.sfxOk();
           tryOpen(); reopenCU();
         }
-      }],
+      }].concat(donePlates),
       onSolve: function () { G.setFlag("cartFlags"); tryOpen(); if (!G.solved("p9")) reopenCU(); }
     }));
-    var info = el("div", "row");
-    info.appendChild(el("div", "chip", (G.flag("cartFlags") ? "✅" : "⬜") + " 국기 4칸"));
-    info.appendChild(el("div", "chip", (G.flag("cartKeyed") ? "✅" : "⬜") + " 열쇠 구멍"));
-    c.panel.appendChild(info);
-    c.cap(G.flag("cartKeyed")
-      ? "열쇠가 꽂혀 있다. 국기 4칸이 남았다."
-      : "국기 4칸과 열쇠 구멍. 둘 다 맞아야 열린다.");
+    c.cap("카트.");
   };
 
   /* ★v0.9 #13 갤리 상단 수납함 — 2층 팝업 구조.
@@ -16216,19 +16384,125 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 
   /* ═══════════ 아이템 확대(ZOOM) ═══════════ */
   var ZOOM = {};
+  /* ★v0.17.4 [지시25] 여권 = 두 페이지짜리 실사.
+     ① 탭하면 신원 페이지 ② 스크롤(좌우 드래그)하면 책장처럼 한 장 넘어간다
+     ③ 2페이지 오른쪽의 베이지 색상판을 탭하면 획득 ④ 획득 뒤에는 아예 열리지 않는다
+     ⑤ 1페이지에서 드래그 없이 탭만 3번이면 안내 1회(북쑥 지정 문구) */
   ZOOM.passport = function () {
-    openZoom({ id: "passport", title: "여권", img: DATA.IMG + "passport.jpg", cap: "대한민국 여권." });
+    var P = DATA.PASSPORT;
+    if (G.flag("tookBeige")) return;                 /* 다 꺼낸 뒤에는 탭해도 안 열린다 */
+    if (!(hasImg(P.img1) && hasImg(P.img2))) {
+      openZoom({ id: "passport", title: "여권", img: DATA.IMG + "passport.jpg", cap: "여권." });
+      return;
+    }
+    var host = el("div");
+    host.setAttribute("data-t", "passportBook");
+    host.style.cssText = "position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center;overflow:hidden";
+    var page = 0, busy = false, taps = 0, hinted = false;
+    var slot = el("div");
+    slot.style.cssText = "position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center";
+    host.appendChild(slot);
+    function draw(anim) {
+      var old = slot.firstChild;
+      var node;
+      if (page === 1) {
+        node = imgStage(DATA.IMG + P.img2, [
+          { x: P.tileCell.x, y: P.tileCell.y, w: P.tileCell.w, h: P.tileCell.h, t: "takeTileBeige", cls: "hot",
+            onTap: function () {
+              if (G.flag("tookBeige")) return;
+              G.setFlag("tookBeige");
+              prize("tileBeige", "");
+              closeZoom();                            /* 이제 여권은 열리지 않는다 */
+            } }
+        ], { nw: P.nw, nh: P.nh });
+      } else {
+        node = imgStage(DATA.IMG + P.img1, [], { nw: P.nw, nh: P.nh });
+      }
+      node.setAttribute("data-page", String(page + 1));
+      if (anim) {
+        node.style.opacity = "0";
+        node.style.transform = "translateX(" + (anim > 0 ? 26 : -26) + "px)";
+        node.style.transition = "opacity .26s ease, transform .26s ease";
+      }
+      slot.appendChild(node);
+      if (old) {
+        old.style.transition = "opacity .22s ease, transform .22s ease";
+        old.style.position = "absolute"; old.style.left = "0"; old.style.top = "0"; old.style.right = "0"; old.style.bottom = "0";
+        old.style.opacity = "0";
+        old.style.transform = "translateX(" + (anim > 0 ? -26 : 26) + "px)";
+        setTimeout(function () { if (old.parentNode) old.parentNode.removeChild(old); }, 280);
+      }
+      if (anim) setTimeout(function () { node.style.opacity = "1"; node.style.transform = "none"; }, 20);
+    }
+    function go(to, dir) {
+      if (busy || to === page || to < 0 || to > 1) return;
+      busy = true; page = to;
+      G.sfxTap();
+      draw(dir);
+      setTimeout(function () { busy = false; }, 300);
+    }
+    draw(0);
+    var sx0 = 0, moved = false;
+    G.drag(host, {
+      start: function (q) { sx0 = q.x; moved = false; },
+      move: function (q) { if (Math.abs(q.x - sx0) > 16) moved = true; },
+      end: function (q) {
+        var dx = q.x - sx0;
+        if (dx < -30) { go(1, 1); return; }            /* 왼쪽으로 넘기면 다음 장 */
+        if (dx > 30) { go(0, -1); return; }            /* 오른쪽으로 넘기면 앞 장 */
+        if (moved) return;
+        if (page === 0) {
+          taps++;
+          if (taps >= 3 && !hinted) { hinted = true; G.toast("스크롤하여 페이지를 넘길 수 있을 것 같다.", 2600); }
+        }
+      }
+    });
+    window.__passportState = function () {
+      return { page: page + 1, taps: taps, hinted: hinted, took: !!G.flag("tookBeige"),
+               cell: !!host.querySelector('[data-t="takeTileBeige"]') };
+    };
+    openZoom({ id: "passport", title: "여권", node: host, cap: "여권." });
   };
+  /* ★v0.17.4 [지시11] 탑승권 = 실사 사진. 사진 속 카드를 크롭해 팝업에 꽉 차게 보여 주고,
+     #3 아이콘 6개(순서 불변)를 **흑백 플랫 픽토그램**으로 카드 빈 여백에 인쇄된 것처럼 얹는다.
+     (컬러 이모지 폐기 · 캡션의 관찰 유도 문구 삭제 — 지시6·8·10 과 같은 원칙) */
+  var TICK_INK = "#5f646c";
+  var TICK_PICTO = {
+    plane: '<path d="M12 1.6 L13.8 8.6 L23 12.6 V14.8 L13.8 12.8 L13.3 18.6 L16 20.6 V22.2 L12 21.1 L8 22.2 V20.6 L10.7 18.6 L10.2 12.8 L1 14.8 V12.6 L10.2 8.6 Z"/>',
+    music: '<ellipse cx="8.2" cy="18.2" rx="4.2" ry="3.2"/><rect x="11.4" y="3.2" width="1.9" height="15"/>' +
+           '<path d="M13.3 3.2 C17 4.4 19.6 6 19.6 9.6 C19.6 6.9 17 5.9 13.3 6.9 Z"/>',
+    tv: '<rect x="2.6" y="4.2" width="18.8" height="12.6" rx="2.2" fill="none" stroke="' + TICK_INK + '" stroke-width="2.1"/>' +
+        '<rect x="11.1" y="16.8" width="1.8" height="3"/><rect x="7.4" y="19.8" width="9.2" height="1.9" rx=".9"/>'
+  };
+  function tickIconsSVG(ids) {
+    var n = ids.length, gap = 8, cell = 24, W = n * cell + (n - 1) * gap, H = 30;
+    var out = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">';
+    out += '<g fill="' + TICK_INK + '">';
+    ids.forEach(function (id, i) {
+      out += '<g transform="translate(' + (i * (cell + gap)) + ',3) scale(' + (cell / 24).toFixed(4) + ')" data-ic="' + id + '">' + (TICK_PICTO[id] || '') + '</g>';
+    });
+    out += '</g></svg>';
+    return out;
+  }
   ZOOM.ticket = function () {
-    var node = el("div");
-    node.style.cssText = "width:100%;max-width:330px;background:#faf7f0;color:#2b2b2b;border-radius:6px;padding:14px 14px 10px;position:relative";
-    node.innerHTML =
-      '<div style="font-size:11px;letter-spacing:2px;color:#7d776c">MARU AIR</div>' +
-      '<div style="font-size:19px;font-weight:800;margin:4px 0 8px">ICN → DPS</div>' +
-      '<div style="display:flex;gap:14px;font-size:12px"><div><b>SEAT</b><br>23A</div><div><b>GATE</b><br>27</div><div><b>BOARDING</b><br>09:10</div></div>' +
-      '<div style="position:absolute;right:10px;bottom:8px;font-size:14px;letter-spacing:1px">' +
-      DATA.ANS.p3.map(function (k) { return DATA.IFE_ICONS[k]; }).join("") + "</div>";
-    openZoom({ id: "ticket", title: "탑승권", node: node, cap: "구석에 아이콘이 나열돼 있다." });
+    var A = DATA.TICKET;
+    if (!hasImg(A.img)) {                     /* 사진이 없으면 예전 종이 카드로 폴백 */
+      var node = el("div");
+      node.style.cssText = "width:100%;max-width:330px;background:#faf7f0;color:#2b2b2b;border-radius:6px;padding:14px 14px 10px;position:relative";
+      node.innerHTML =
+        '<div style="font-size:11px;letter-spacing:2px;color:#7d776c">MARU AIR</div>' +
+        '<div style="font-size:19px;font-weight:800;margin:4px 0 8px">ICN → DPS</div>' +
+        '<div style="display:flex;gap:14px;font-size:12px"><div><b>SEAT</b><br>23A</div><div><b>GATE</b><br>27</div><div><b>BOARDING</b><br>09:10</div></div>' +
+        '<div style="position:absolute;right:10px;bottom:8px;width:42%;height:16px">' + tickIconsSVG(DATA.ANS.p3) + '</div>';
+      openZoom({ id: "ticket", title: "탑승권", node: node, cap: "탑승권." });
+      return;
+    }
+    var R = A.iconRow;
+    var stage = imgStage(DATA.IMG + A.img, [{
+      x: R.x, y: R.y, w: R.w, h: R.h, t: "tickIcons", cls: "tickIcons",
+      build: function (n2) { n2.innerHTML = tickIconsSVG(DATA.ANS.p3); }
+    }], { crop: A.crop, nw: A.nw, nh: A.nh });
+    openZoom({ id: "ticket", title: "탑승권", node: stage, cap: "탑승권." });
   };
   ZOOM.blanket = function () {
     openZoom({ id: "blanket", title: "담요", img: DATA.IMG + "blanket_zoom.jpg", cap: "무늬 사이에 글자가 반복된다." });
@@ -16409,6 +16683,13 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 
   ZOOM.pamphlet = function (withCello) {
     pamCello = !!withCello;                              /* ★v0.17.1 지금 열린 팜플렛이 겹침 상태인가 */
+    /* ★v0.17.4 [지시15B] 이미 맞춘 뒤에는 **정렬 완료 상태로 고정된 화면**만 뜬다(셀로판은 소모됨) */
+    if (G.flag("p17") && hasImg(DATA.PAMPHLET_BG.img)) {
+      pamCello = true;
+      openZoom({ id: "pamphlet", title: "팜플렛 + 셀로판", node: W.pamphlet({ fixed: true }),
+        cap: "셀로판과 팜플렛이 겹쳐 있다." });
+      return;
+    }
     if (!withCello) {
       function useCello() {
         if (S.sel !== "cellophane") return;              /* 고르지 않았으면 아무 일 없음 */
@@ -16431,13 +16712,12 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     }
     var pam = W.pamphlet({
       onSnap: function () {
-        /* ★v0.15.5 읽어낸 글자를 토스트로 알려 주지 않는다 — 구멍에 걸린 글자만 보인다.
-           캡션도 관찰 서술 그대로("셀로판과 팜플렛이 겹쳐 있다."). 내부 처리(p17 플래그)는 그대로. */
+        /* ★v0.17.4 [지시15A·B] 성공 팝업 삭제 — 아무 창도 안 띄우고 **정렬된 화면 그대로** 둔다.
+           플레이어가 직접 읽는다. 내부 처리(p17 플래그 → 천장 개방)는 그대로 유지하고,
+           다 쓴 셀로판은 인벤에서 뺀다(소모). 다시 팜플렛을 열면 정렬 완료 화면이 뜬다. */
         G.setFlag("p17");
-        setTimeout(function () {
-          closeZoom();
-          story(["🚻", "강조된 글자를 순서대로 읽으면\n\n화 장 실 천 장\n\n화장실 천장에 뭔가 있다!"], function () { render(); });
-        }, 900);
+        G.take("cellophane"); S.sel = null;
+        renderInv(); render();
       }
     });
     openZoom({ id: "pamphlet", title: "팜플렛 + 셀로판", node: pam, cap: "셀로판과 팜플렛이 겹쳐 있다." });
@@ -16697,25 +16977,48 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   }
 
 
-  /* ═══════════ 미니게임 체인 (#19~#22) ═══════════ */
-  function openMinigame() {
+  /* ═══════════ 미니게임 체인 (#19~#22) ═══════════
+     ★v0.17.4 [지시18] 앱을 나갔다 다시 들어오면 **마지막으로 있던 화면**으로 돌아간다.
+       S.misc.mgView = "sudoku" | "ad"(광고→활쏘기) | "nono" — 저장에 남으므로 재로드해도 유지.
+       진행 순서 잠금은 그대로: 스도쿠를 풀기 전에는 광고게임, 활쏘기 전에는 네모로직으로 안 간다. */
+  function setMgView(v) { S.misc.mgView = v; G.save(); }
+  function mgSudoku() {
+    setMgView("sudoku");
     GAMES.openSudoku(function () {
       G.setFlag("sudokuDone");
       GAMES.closeFull();
-      GAMES.openAd(function () {
-        GAMES.closeFull();
-        GAMES.openArchery(DATA.TEMP.songOrder, function () {
-          G.setFlag("archDone");
-          GAMES.closeFull();
-          GAMES.openNono(function () {
-            /* ★v0.17.1 보상 없음 — 완성 그림(사번)이 #26 힌트인 순수 관찰형 퍼즐로 원복.
-               짙은갈색 색상판은 #25 간식칸 1번 홈에 처음부터 끼워져 있다(DATA.P25_INIT). */
-            G.setFlag("nonoDone");
-            GAMES.closeFull();
-          }, function () { GAMES.closeFull(); });
-        }, function () { GAMES.closeFull(); });
-      });
+      mgAd();
     }, function () { GAMES.closeFull(); });
+  }
+  function mgAd() {
+    setMgView("ad");
+    GAMES.openAd(function () {
+      GAMES.closeFull();
+      GAMES.openArchery(DATA.TEMP.songOrder, function () {
+        G.setFlag("archDone");
+        GAMES.closeFull();
+        mgNono();
+      }, function () { GAMES.closeFull(); });
+    });
+  }
+  function mgNono() {
+    setMgView("nono");
+    GAMES.openNono(function () {
+      /* ★v0.17.1 보상 없음 — 완성 그림(사번)이 #26 힌트인 순수 관찰형 퍼즐.
+         ★v0.17.4 [지시24] 완성해도 **자동 퇴장하지 않는다** — 다 풀린 판이 그대로 남는다. */
+      G.setFlag("nonoDone");
+    }, function () { GAMES.closeFull(); });
+  }
+  function openMinigame() {
+    var v = S.misc.mgView;
+    if (v === "nono" && !G.flag("archDone")) v = null;
+    if (v === "ad" && !G.flag("sudokuDone")) v = null;
+    if (v !== "sudoku" && v !== "ad" && v !== "nono") {
+      v = !G.flag("sudokuDone") ? "sudoku" : (!G.flag("archDone") ? "ad" : "nono");
+    }
+    if (v === "sudoku") mgSudoku();
+    else if (v === "ad") mgAd();
+    else mgNono();
   }
 
   /* ═══════════ 연출 ═══════════ */
