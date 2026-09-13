@@ -1,5 +1,5 @@
 /* 발리 가는 길에서 생긴 일 — 오프라인 서비스워커 (자동 생성) */
-const CACHE = "odyssey-ODY-S1-20260913-2104";
+const CACHE = "odyssey-ODY-S1-20260913-2243";
 const PRECACHE = [
  "./",
  "./index.html",
@@ -12,6 +12,7 @@ const PRECACHE = [
  "./img/archer.jpg",
  "./img/archer.png",
  "./img/archery_field.jpg",
+ "./img/bali_ending.jpg",
  "./img/bin_L1.jpg",
  "./img/bin_L1_open_case.jpg",
  "./img/bin_L1_open_empty.jpg",
@@ -27,6 +28,7 @@ const PRECACHE = [
  "./img/blanket_zoom.jpg",
  "./img/book_empty.jpg",
  "./img/book_tile.jpg",
+ "./img/bridge_walk.jpg",
  "./img/case_open_empty.jpg",
  "./img/case_open_headset.jpg",
  "./img/ceiling_open_cardkey.jpg",
@@ -49,6 +51,8 @@ const PRECACHE = [
  "./img/galley_cart_empty.jpg",
  "./img/galley_cart_open.jpg",
  "./img/galley_drawer.jpg",
+ "./img/galley_drawer_empty.jpg",
+ "./img/galley_drawer_open.jpg",
  "./img/galley_snack.jpg",
  "./img/galley_snack_empty.jpg",
  "./img/galley_snack_open.jpg",
@@ -130,6 +134,7 @@ const PRECACHE = [
  "./img/passport_p1.jpg",
  "./img/passport_p2.jpg",
  "./img/phone_wall.jpg",
+ "./img/seat_runway.jpg",
  "./img/shade_logo.png",
  "./img/ticket_bg.jpg",
  "./img/tile_beige.jpg",
@@ -147,12 +152,14 @@ const PRECACHE = [
  "./audio/ad_bgm.mp3",
  "./audio/binoc.mp3",
  "./audio/bow_shot.mp3",
+ "./audio/footstep.mp3",
  "./audio/main_bgm.mp3",
  "./audio/song1.mp3",
  "./audio/song2.mp3",
  "./audio/song3.mp3",
  "./audio/song4.mp3",
  "./audio/song5.mp3",
+ "./audio/storm.mp3",
  "./audio/sudoku_bgm.mp3"
 ];
 
