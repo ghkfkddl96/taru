@@ -494,13 +494,20 @@ body.dbg .ifeHot:active{box-shadow:0 0 0 2px rgba(255,255,255,.95)}
 .gmIco>img{display:block;width:100% !important;height:100% !important;
   max-width:none !important;max-height:none !important;object-fit:fill;border-radius:0}
 /* ★v0.17.15 [지시2] 북쑥 "태풍 크기는 조금 줄여주고" — 74 → **52px**(지도 가림 축소).
-   눈·나선팔은 그대로 읽힌다(원본 위성사진 해상도가 충분). 도달 순간 크기도 같은 비율로 122 → 86px. */
+   눈·나선팔은 그대로 읽힌다(원본 위성사진 해상도가 충분). */
 .gmIco.typhoon{width:52px;height:52px;z-index:2;opacity:.96}
 .gmIco.typhoon>img{animation:spin 16s linear infinite}
-/* 도달 순간 — 폭풍이 커지며 비행기를 감싼다(비행기는 z-index 로 그 위에 남는다) */
-.gmIco.typhoon.hit{width:86px;height:86px;opacity:1}
-.gmIco.typhoon.hit::before{content:"";position:absolute;inset:-26%;border-radius:50%;
-  background:radial-gradient(circle,rgba(40,50,70,.42) 0%,rgba(40,50,70,0) 72%)}
+/* ★v0.17.17 [지시3] 태풍의 눈 — 가운데는 검고 테두리로 갈수록 투명해지는 방사형 그라데이션 점.
+   위성 구름 그림(회전) 위에 얹되 **점은 돌지 않는다**(회전은 .gmIco>img 에만 걸려 있다).
+   z-index 로 그림 위에 올린다(.gmIco.typhoon 이 z:2 로 이미 스태킹 컨텍스트다). */
+.gmIco.typhoon::after{content:"";position:absolute;left:50%;top:50%;width:32%;height:32%;
+  transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;z-index:1;
+  background:radial-gradient(circle,rgba(0,0,0,.95) 0%,rgba(0,0,0,.80) 32%,
+    rgba(0,0,0,.38) 62%,rgba(0,0,0,0) 100%)}
+.gmIco.typhoon.emo::after{display:none}       /* 이모지 폴백(🌀)에는 얹지 않는다 */
+/* ★v0.17.17 [지시2] 도달 순간 **크기는 고정**이다 — 예전 52→86px 확대와 어두운 후광(::before)은
+   "겹칠 때 커진다" 는 인상을 줘서 폐지했다. 남은 건 불투명도 + 상태 표시용 클래스뿐. */
+.gmIco.typhoon.hit{opacity:1}
 /* ★v0.17.14 24px 짜리 흰 기체는 옅은 바다색 위에서 그냥 사라진다(실측: tools/plane-contrast-lab.mjs).
    흰 후광 대신 **짙은 테두리 + 그림자**로 분리하고 기체를 살짝 진하게 눌렀다(후보 A~E 중 D). */
 .gmIco.plane{z-index:3;width:24px;height:24px;
@@ -513,8 +520,7 @@ body.dbg .ifeHot:active{box-shadow:0 0 0 2px rgba(255,255,255,.95)}
 .gmIco.plane.emo{font-size:26px}
 /* 이모지는 마커 div 자체가 글자다 — div 를 돌리면 translate(-50%,-50%) 가 지워져 자리가 틀어진다.
    그래서 폴백에서는 회전 없이 크기만 키운다(안전용 경로라 연출보다 정확도 우선). */
-.gmIco.typhoon.emo{font-size:21px}
-.gmIco.typhoon.hit.emo{font-size:37px}
+.gmIco.typhoon.emo{font-size:21px}   /* ★v0.17.17 .hit 확대(37px) 폐지 — 크기 고정 */
 /* 도착 파문 — 지도에 그려진 "발리" 마커 위로 원이 퍼진다 */
 .gmIco.pin{width:0;height:0;z-index:2}
 .gmIco.pin.arrive::after{content:"";position:absolute;left:50%;top:50%;width:20px;height:20px;
@@ -540,16 +546,23 @@ body.dbg .ifeHot:active{box-shadow:0 0 0 2px rgba(255,255,255,.95)}
 
 /* ★v0.17.15 [지시1] 인트로 스토리텔링 시퀀스 — 브리지 걷기 → 활주로 자리 → 암전 → 하늘 자리
    → 구글맵(태풍) → 기내방송 → 여파 코멘트. 사진이 화면을 꽉 채우고 자막이 아래에 얹힌다.
-   ★걷기 컷은 사진을 **세로로 118%** 로 키워 두고 위아래로 흔든다 — bob 진폭(±1.6%)보다
-     여유(위아래 각 9%)가 훨씬 커서 어떤 프레임에서도 사진 가장자리가 드러나지 않는다. */
+   ★v0.17.17 [지시5] 걷기 컷의 상하 bob 을 **완전히 뺐다**(북쑥: "지진급"). 그래서 사진을
+     세로 118% 로 키워 여유를 두던 규칙(`.seqBg.walk img{height:118%}`)도 함께 폐지했다 —
+     흔들리지 않으니 여유가 필요 없고, 괜히 위아래를 더 잘라 낼 이유도 없다.
+     걷는 느낌은 **발소리(footstep.mp3, 520ms 간격)** 만으로 낸다. */
 #story.seq{padding:0;gap:0;background:#08080a;-webkit-backdrop-filter:none;backdrop-filter:none;
   justify-content:flex-end;overflow:hidden}
 .seqBg{position:absolute;inset:0;overflow:hidden;background:#08080a;z-index:0}
 #story .seqBg img{position:absolute;left:50%;top:50%;width:100%;height:100%;
   max-width:none;max-height:none;object-fit:cover;border-radius:0;
   transform:translate(-50%,-50%)}
-#story .seqBg.walk img{height:118%}
 .seqBg.dim::after{content:"";position:absolute;inset:0;background:rgba(0,0,0,.46)}
+/* ★v0.17.17 [지시4] 태풍 도달 = 화면 셰이크(#app.shaking) 폐지 → **폰 뒤 배경만 점등**.
+   폰 목업(.seqStage z:2)보다 아래(z:1)에 깔리므로 폰 화면(지도)은 조금도 밝아지지 않는다.
+   번개처럼 푸른기 도는 흰빛. 켜고 끄는 건 JS(main.js bgFlash) 가 5회 반복한다. */
+.seqFlash{position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:#e8eeff;opacity:0;transition:opacity .09s linear}
+.seqFlash.on{opacity:.88}
 /* 폰 목업(구글맵 컷)이 얹히는 층 */
 .seqStage{position:absolute;inset:0;z-index:2;display:flex;align-items:center;justify-content:center;
   padding:calc(var(--safeT) + 18px) 18px calc(var(--safeB) + 104px);pointer-events:none}
@@ -561,6 +574,8 @@ body.dbg .ifeHot:active{box-shadow:0 0 0 2px rgba(255,255,255,.95)}
   font-size:14px;line-height:1.78;color:var(--n8);white-space:pre-line;text-align:center;
   box-shadow:0 8px 26px rgba(0,0,0,.5);transition:opacity .22s}
 .seqCap:empty{opacity:0}
+/* ★v0.17.17 [지시7] 기내방송은 **노란 글씨** — 주인공 혼잣말(회백색)과 눈으로 구분된다 */
+.seqCap.pa{color:#ffd75e}
 .seqNext{display:block;margin:7px auto 0;width:14px;height:14px;opacity:.55;
   animation:seqBlink 1.5s ease-in-out infinite}
 .seqNext::after{content:"";display:block;width:7px;height:7px;margin:2px auto 0;
@@ -595,8 +610,8 @@ body.dbg .ifeHot:active{box-shadow:0 0 0 2px rgba(255,255,255,.95)}
 @keyframes gcShine{0%{background-position:0 0}100%{background-position:300% 0}}
 @keyframes gcPop{0%{transform:scale(.2) rotate(-6deg);opacity:0}60%{transform:scale(1.12) rotate(2deg)}100%{transform:scale(1) rotate(0)}}
 .gcHead{font-size:17px;font-weight:800;margin:6px 0 5px;color:#17181c}
-.gcBody{font-size:13px;line-height:1.7;color:#3a3d45;white-space:pre-line}
-#story.gc .btn{margin-top:13px;max-width:220px}
+/* ★v0.17.17 [지시8] "→ 2차로" 버튼 폐지 — 카드가 마지막 화면이다(`#story.gc .btn` 규칙도 삭제) */
+.gcBody{font-size:13px;line-height:1.7;color:#3a3d45;white-space:pre-line;margin-bottom:2px}
 
 /* ───────── 오버레이/기타 ───────── */
 .overlay{
@@ -1139,7 +1154,7 @@ body.dbg .cvcell.cabBtn:active{box-shadow:inset 0 0 0 3px rgba(255,255,255,.8)}
 
 </div>
 
-<script>window.__AUDIO = ["ad_bgm.mp3","binoc.mp3","bow_shot.mp3","footstep.mp3","main_bgm.mp3","song1.mp3","song2.mp3","song3.mp3","song4.mp3","song5.mp3","storm.mp3","sudoku_bgm.mp3"]; window.__IMG = ["app_kakao.png","app_map.png","app_minigame.png","app_qr.png","archer.jpg","archer.png","archery_field.jpg","bali_ending.jpg","bin_L1.jpg","bin_L1_open_case.jpg","bin_L1_open_empty.jpg","bin_L2.jpg","bin_L2_open_cello.jpg","bin_L2_open_empty.jpg","bin_R1.jpg","bin_R1_open_card.jpg","bin_R1_open_empty.jpg","bin_R2.jpg","bin_R2_open_empty.jpg","bin_R2_open_key.jpg","blanket_zoom.jpg","book_empty.jpg","book_tile.jpg","bridge_walk.jpg","case_open_empty.jpg","case_open_headset.jpg","ceiling_open_cardkey.jpg","ceiling_open_empty.jpg","cello_align.png","char_front.jpg","char_happy.jpg","char_hipL.jpg","char_hipR.jpg","char_hungry.jpg","crew_blanket.jpg","crew_tray.jpg","dialbox.jpg","dialbox_open.jpg","food_bread.png","food_cake.png","food_omu.png","food_salad.png","galley_cart.jpg","galley_cart_empty.jpg","galley_cart_open.jpg","galley_drawer.jpg","galley_drawer_empty.jpg","galley_drawer_open.jpg","galley_snack.jpg","galley_snack_empty.jpg","galley_snack_open.jpg","galley_upper.jpg","galley_upper_empty.jpg","galley_upper_open.jpg","gamecard.jpg","gmap_bali.jpg","gmap_plane.png","gmap_typhoon.png","headphones.jpg","headset_case.jpg","headset_worn.jpg","hint_phonecase.jpg","ic_blanket.png","ic_butter.jpg","ic_butter.png","ic_cardkey.jpg","ic_cardkey.png","ic_case.png","ic_cellophane.png","ic_dna.jpg","ic_dna.png","ic_drop.jpg","ic_drop.png","ic_dynamite.jpg","ic_dynamite.png","ic_fire.jpg","ic_fire.png","ic_gamecard.png","ic_goldkey.jpg","ic_goldkey.png","ic_headphones.jpg","ic_headphones.png","ic_ladder.png","ic_pamphlet.png","ic_passport.png","ic_peanut.png","ic_phone.png","ic_silverkey.jpg","ic_silverkey.png","ic_telescope.png","ic_ticket.png","ic_tile_beige.png","ic_tile_black.png","ic_tile_brown.png","ic_tile_dark.png","ife_ic_blanket.png","ife_ic_meal.png","ife_ic_tv.png","ife_off.jpg","ife_on.jpg","ife_photo1.jpg","ife_photo2.jpg","ife_photo3.jpg","ife_photo4.jpg","lav_cab1.jpg","lav_cab1_empty.jpg","lav_cab1_open.jpg","lav_cab2.jpg","lav_cab2_empty.jpg","lav_cab2_open.jpg","lav_cabtop.jpg","lav_cabtop_empty.jpg","lav_cabtop_open.jpg","lav_ceiling.jpg","lav_tissue.jpg","lav_tissue_idle.jpg","lav_tissue_roll.jpg","map_aisle.jpg","map_galley.jpg","map_gate.jpg","map_lav.jpg","map_lav_ladder.jpg","map_seat.jpg","map_seat_tray.jpg","meal_tray.jpg","oway_plane.jpg","pamphlet_bg.jpg","pamphlet_body_bg.jpg","passport.jpg","passport_p1.jpg","passport_p2.jpg","phone_wall.jpg","seat_runway.jpg","shade_logo.png","ticket_bg.jpg","tile_beige.jpg","tile_black.jpg","tile_brown.jpg","tile_dark.jpg","tissue_mask.png","travel1.jpg","travel2.jpg","travel3.jpg","travel4.jpg","window_open.jpg","window_shade.jpg","window_shade_plain.jpg"];</script>
+<script>window.__AUDIO = ["ad_bgm.mp3","binoc.mp3","bow_shot.mp3","footstep.mp3","main_bgm.mp3","mictap.mp3","song1.mp3","song2.mp3","song3.mp3","song4.mp3","song5.mp3","storm.mp3","sudoku_bgm.mp3"]; window.__IMG = ["app_kakao.png","app_map.png","app_minigame.png","app_qr.png","archer.jpg","archer.png","archery_field.jpg","bali_ending.jpg","bin_L1.jpg","bin_L1_open_case.jpg","bin_L1_open_empty.jpg","bin_L2.jpg","bin_L2_open_cello.jpg","bin_L2_open_empty.jpg","bin_R1.jpg","bin_R1_open_card.jpg","bin_R1_open_empty.jpg","bin_R2.jpg","bin_R2_open_empty.jpg","bin_R2_open_key.jpg","blanket_zoom.jpg","book_empty.jpg","book_tile.jpg","bridge_walk.jpg","case_open_empty.jpg","case_open_headset.jpg","ceiling_open_cardkey.jpg","ceiling_open_empty.jpg","cello_align.png","char_front.jpg","char_happy.jpg","char_hipL.jpg","char_hipR.jpg","char_hungry.jpg","crew_blanket.jpg","crew_tray.jpg","dialbox.jpg","dialbox_open.jpg","food_bread.png","food_cake.png","food_omu.png","food_salad.png","galley_cart.jpg","galley_cart_empty.jpg","galley_cart_open.jpg","galley_drawer.jpg","galley_drawer_empty.jpg","galley_drawer_open.jpg","galley_snack.jpg","galley_snack_empty.jpg","galley_snack_open.jpg","galley_upper.jpg","galley_upper_empty.jpg","galley_upper_open.jpg","gamecard.jpg","gmap_bali.jpg","gmap_plane.png","gmap_typhoon.png","headphones.jpg","headset_case.jpg","headset_worn.jpg","hint_phonecase.jpg","ic_blanket.png","ic_butter.jpg","ic_butter.png","ic_cardkey.jpg","ic_cardkey.png","ic_case.png","ic_cellophane.png","ic_dna.jpg","ic_dna.png","ic_drop.jpg","ic_drop.png","ic_dynamite.jpg","ic_dynamite.png","ic_fire.jpg","ic_fire.png","ic_gamecard.png","ic_goldkey.jpg","ic_goldkey.png","ic_headphones.jpg","ic_headphones.png","ic_ladder.png","ic_pamphlet.png","ic_passport.png","ic_peanut.png","ic_phone.png","ic_silverkey.jpg","ic_silverkey.png","ic_telescope.png","ic_ticket.png","ic_tile_beige.png","ic_tile_black.png","ic_tile_brown.png","ic_tile_dark.png","ife_ic_blanket.png","ife_ic_meal.png","ife_ic_tv.png","ife_off.jpg","ife_on.jpg","ife_photo1.jpg","ife_photo2.jpg","ife_photo3.jpg","ife_photo4.jpg","lav_cab1.jpg","lav_cab1_empty.jpg","lav_cab1_open.jpg","lav_cab2.jpg","lav_cab2_empty.jpg","lav_cab2_open.jpg","lav_cabtop.jpg","lav_cabtop_empty.jpg","lav_cabtop_open.jpg","lav_ceiling.jpg","lav_tissue.jpg","lav_tissue_idle.jpg","lav_tissue_roll.jpg","map_aisle.jpg","map_galley.jpg","map_gate.jpg","map_lav.jpg","map_lav_ladder.jpg","map_seat.jpg","map_seat_tray.jpg","meal_tray.jpg","oway_plane.jpg","pamphlet_bg.jpg","pamphlet_body_bg.jpg","passport.jpg","passport_p1.jpg","passport_p2.jpg","phone_wall.jpg","seat_runway.jpg","shade_logo.png","ticket_bg.jpg","tile_beige.jpg","tile_black.jpg","tile_brown.jpg","tile_dark.jpg","tissue_mask.png","travel1.jpg","travel2.jpg","travel3.jpg","travel4.jpg","window_open.jpg","window_shade.jpg","window_shade_plain.jpg"];</script>
 <script>
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -11249,7 +11264,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 (function () {
   "use strict";
 
-  var BUILD = "ODY-S1-20260913-2353";
+  var BUILD = "ODY-S1-20260914-0553";
   var LSKEY = "odyssey.s1.v1";
 
   var qs = new URLSearchParams(location.search);
@@ -11893,8 +11908,9 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   /* ───────── ★v0.17 파일 효과음(one-shot) ─────────
      window.__AUDIO 에 파일이 있을 때만 재생하고, 없으면 false 를 돌려줘 기존 신호음으로 폴백한다. */
   /* ★v0.17.15 [지시1·3] 인트로 효과음 2종 추가 — footstep(브리지 걷기, 걸음마다 재생) ·
-     storm(태풍 도달, 강풍+천둥). 출처·라이선스는 gen/audio_minigames/LICENSES.md §9·§10 (둘 다 CC0). */
-  var SFX_FILES = ["bow_shot.mp3", "footstep.mp3", "storm.mp3"];
+     storm(태풍 도달, 강풍+천둥). 출처·라이선스는 gen/audio_minigames/LICENSES.md §9·§10 (둘 다 CC0).
+     ★v0.17.17 [지시7] mictap(기내방송 시작 — 마이크 톡톡) 추가. 출처는 같은 문서 §13 (CC0). */
+  var SFX_FILES = ["bow_shot.mp3", "footstep.mp3", "storm.mp3", "mictap.mp3"];
   var sfxRec = {};
   function sfxRecOf(file) {
     if (!haveAudio(file)) return null;
@@ -15953,6 +15969,21 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     var s = Math.max(W / MAPW, H / MAPH);
     return [((W - MAPW * s) / 2 + x * s) / W * 100, ((H - MAPH * s) / 2 + y * s) / H * 100];
   }
+  /* ★v0.17.17 [지시1] mapPct 의 **역함수** — 상자 가로 pct(%) 자리에 해당하는 지도 좌표 x(px).
+     인트로 컷이 태풍을 "폰 화면 오른쪽 경계" 에 정확히 걸쳐 세울 때 쓴다(pct=100 → 중심이 경계 →
+     .gmapBox{overflow:hidden} 이 오른쪽 절반을 잘라 낸다). 상자 크기(=cover 크롭)마다 달라지므로
+     상수로 못 박을 수 없다. */
+  function mapXOfPct(g, pct) {
+    var W = g.clientWidth || 1, H = g.clientHeight || 1;
+    var s = Math.max(W / MAPW, H / MAPH);
+    return (pct / 100 * W - (W - MAPW * s) / 2) / s;
+  }
+  /** 화면 길이(CSS px) → 지도 좌표 길이(px). 화면 밖 대기 거리를 재는 데 쓴다. */
+  function mapLen(g, px) {
+    var W = g.clientWidth || 1, H = g.clientHeight || 1;
+    return px / Math.max(W / MAPW, H / MAPH);
+  }
+
   /* 마커는 자기 지도 좌표를 들고 있다가 상자 크기가 바뀌면 다시 자리를 잡는다. */
   function layoutMap(g) {
     var ms = g.querySelectorAll(".gmIco");
@@ -16141,6 +16172,8 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     /* ★v0.17.13 지도 좌표계(0 0 948 1400) + 항로 접선 — 인트로 컷이 태풍을 화면 밖에서 밀어 넣고
        비행기 기수를 항로에 맞출 때 쓴다 */
     routeAngle: routeAngle, faceAlong: faceAlong, MAPW: MAPW, MAPH: MAPH,
+    /* ★v0.17.17 [지시1] 태풍을 폰 화면 오른쪽 경계에 반쯤 걸쳐 세우기 위한 역변환 */
+    mapXOfPct: mapXOfPct, mapLen: mapLen,
     statusbar: statusbar
   };
 })();
@@ -18286,56 +18319,71 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   }
 
   /* ★v0.17.15 [지시1] 인트로 스토리텔링 시퀀스 — 탑승권을 내고 기내로 들어가기까지.
-       ①보딩 브리지를 1인칭으로 걷는다(사진이 위아래로 흔들리고, **bob 에 맞춰** 발소리)
-       ②활주로가 보이는 자리 ③검은 암전 → 하늘이 보이는 원래 자리
-       ④구글맵 — 반쯤 왔다 → 태풍 등장 → 태풍이 내 위치에 닿으면 흔들림 + **바람·천둥 소리**
+       ①보딩 브리지를 1인칭으로 걷는다 ②활주로가 보이는 자리 ③검은 암전 → 하늘이 보이는 원래 자리
+       ④구글맵 — 반쯤 왔다 → 태풍 등장 → 태풍이 내 위치에 닿으면 **바람·천둥 소리**
          (v0.17.9~14 의 "쿠구구궁" 글자는 북쑥 지시로 폐지 — 글자 대신 소리다)
        ⑤암전 → 기내방송 → 여파 코멘트 3개 → 본 게임(좌석 맵)
-     탭(클릭)으로 한 칸씩 진행한다. 문구는 북쑥이 준 원문 그대로다(오탈자처럼 보여도 그대로).
+     탭(클릭)으로 한 칸씩 진행한다.
+     ★v0.17.17 인트로 연출 폴리시 — 북쑥 지시 8건 중 이 블록이 받는 것:
+       [1] 태풍은 **폰 화면 오른쪽 경계에 반쯤 걸쳐** 멈춘다(비행기 바로 오른쪽).
+       [2] 접근 속도를 확실히 늦추고(2200 → 4600ms), 겹칠 때 **커지는 연출 제거**(크기 고정).
+       [4] 화면 셰이크 폐지 → **폰 뒤 배경만 몇 번 점등**(검정→밝음→검정). 소리는 그대로.
+       [5] 브리지 상하 bob 폐지 → 사진은 정지, 걷는 느낌은 **발소리만**.
+       [6] 독백 문구 전면 교체(코디네이터 확정 카피). ⑧ 기내방송만 **원문 그대로**.
+       [7] 기내방송은 **노란 글씨** + 시작 순간 **마이크 톡톡**(mictap.mp3).
      세이브 호환: 이 컷은 게이트에서 탑승권을 낼 때만 돈다 — 세이브가 있는 재접속은
        resumeGame() 이 인트로를 통째로 건너뛰므로 예전과 똑같다.
-     검증·디버그: window.__introAt() (지금 몇 번째 컷인지) · window.__introGo(n) (그 컷으로 점프)
-                  window.__introWalk() (걷기 bob·발소리 동기 수치) · window.__introSkip() (끝까지) */
+     검증·디버그: window.__introAt() (지금 몇 번째 컷인지 · 점등 상태·횟수) · window.__introGo(n)
+                  window.__introWalk() (발소리 동기 수치) · window.__introFlash(on) (점등 고정)
+                  window.__introSkip() (끝까지) */
   var WALK_STEP_MS = 520;      /* 한 걸음 = 520ms (보통 걷기 속도 ≈ 115 steps/min) */
-  var WALK_AMP = 1.6;          /* 사진을 위아래로 ±1.6%(사진 높이 기준) 흔든다 — 여유 9% 안쪽 */
-  var INTRO_TY_MS = 2200;      /* 태풍이 내 위치까지 다가오는 시간 */
-  var INTRO_SHAKE = 2400;      /* 흔들림(=태풍 소리) 지속 */
+  var WALK_LEAD = 180;         /* ★v0.17.17 첫 걸음까지의 여유(webkit 첫 페인트 지연 흡수) */
+  /* ★v0.17.17 [지시5] 상하 bob(±1.6%) 폐지 — 북쑥 "지진급이라 거슬린다". 발소리만 남는다. */
+  var INTRO_TY_MS = 4600;      /* ★v0.17.17 [지시2] 태풍이 내 위치까지 다가오는 시간(2200 → 4600) */
+  var INTRO_STORM = 2400;      /* 태풍 도달 연출(배경 점등 + 소리) 지속 */
+  /* ★v0.17.17 [지시4] 폰 뒤 배경 점등 — 5회, 한 번에 120ms 켜고 400ms 간격(총 1.72초) */
+  var FLASH_N = 5, FLASH_ON = 120, FLASH_GAP = 400;
   var INTRO_FADE = 700;        /* 암전 페이드 */
+  var TY_PX = 52;              /* .gmIco.typhoon 크기(CSS px) — 화면 밖 대기 거리 계산용 */
   var BRIDGE_IMG = "bridge_walk.jpg", RUNWAY_IMG = "seat_runway.jpg", SKY_IMG = "map_seat.jpg";
 
-  /* 컷 목록. sc = 배경 전환 · act = 자동 연출 · cap = 자막(원문 그대로) */
+  /* 컷 목록. sc = 배경 전환 · act = 자동 연출 · cap = 자막 · pa = 기내방송(노란 글씨) · mic = 마이크 톡톡
+     ★v0.17.17 [지시6] 독백은 코디네이터 확정 카피 그대로다(여행 기대감 톤).
+       ⑧ 기내방송 2컷만 **북쑥 원문 그대로** — 오탈자처럼 보여도 손대지 않는다. */
   var INTRO_CUTS = [
-    { sc: "bridge", cap: "드디어 기다리고 기다리던 안식휴가다!" },
-    { cap: "발리까지 꽤 긴 비행시간이지만 무사히 도착해서 휴양을 즐겨야겠다." },
-    { sc: "runway", cap: "자리에 앉았다." },
-    /* ★자유문(북쑥 지정 아님) — 발리 가는 설렘 한 줄 */
-    { cap: "창밖에 활주로가 보인다. 이제 진짜 출발이다. 벌써 설렌다!" },
-    { sc: "sky", fade: true, cap: "무사히 비행중이다. 지금 어디쯤 왔는지 확인해볼까?" },
-    { sc: "gmap", cap: "반정도 온 것같다." },
-    { act: "tyIn", cap: "저게 뭐지..? 태풍인가?!" },
-    { act: "tyHit" },                               /* 접근 → 흔들림 + 태풍 소리 → 암전 (자동) */
-    { sc: "sky", cap: "(기내방송) 아차차.... 이번에는 조심해서 잘 가고있었는데 태풍때문에 버뮤다삼각지대를 또 지나고 말았습니다." },
-    { cap: "운행에는 문제가 없으니 걱정하지 않으셔도 괜찮습니다" },
-    { cap: "태풍으로 인한 피해가 크지않아 다행이다." },
-    { cap: "하지만... 이렇게 또 버뮤다 삼각지대를 지나게 되다니, 무슨 변화가 있을지 걱정된다" },
-    { cap: "어찌됐든 얼마나 도착했는지 다시 확인해보자!" }
+    { sc: "bridge", cap: "드디어 출발! 기다리고 기다리던 안식휴가다!" },
+    { cap: "발리까지는 좀 멀지만… 도착하면 뭐부터 할지 벌써 설렌다. 완벽한 휴양, 시작해 볼까!" },
+    { sc: "runway", cap: "자리 찾았다. 창가 자리라니, 완전 좋아." },
+    { cap: "창밖에 활주로가 보여. 두근두근… 이제 진짜 간다!" },
+    { sc: "sky", fade: true, cap: "어느새 하늘 위다. 지금 어디쯤 왔으려나? 지도나 볼까." },
+    { sc: "gmap", cap: "오, 벌써 반은 왔네. 순조로운데?" },
+    { act: "tyIn", cap: "…저게 뭐지? 설마 태풍인가?!" },
+    { act: "tyHit" },                               /* 접근 → 배경 점등 + 태풍 소리 → 암전 (자동) */
+    { sc: "sky", pa: true, mic: true, cap: "(기내방송) 아차차.... 이번에는 조심해서 잘 가고있었는데 태풍때문에 버뮤다삼각지대를 또 지나고 말았습니다." },
+    { pa: true, cap: "운행에는 문제가 없으니 걱정하지 않으셔도 괜찮습니다" },
+    { cap: "휴… 피해가 크지 않아서 다행이다." },
+    { cap: "그런데 또 버뮤다 삼각지대라니… 이번엔 무슨 일이 생기려나. 조금 걱정되는데." },
+    { cap: "어찌 됐든! 얼마나 왔는지 다시 확인해 보자!" }
   ];
 
   function introSeq(done) {
-    var s = $("story"), app = $("app");
+    var s = $("story");
     clear(s); s.classList.remove("big", "cut"); s.classList.add("show", "seq");
     s.onclick = null;
 
     var bg = el("div", "seqBg");        bg.setAttribute("data-t", "seqBg");
+    /* ★v0.17.17 [지시4] 폰 뒤 배경 점등 층 — 폰 목업(.seqStage z:2)보다 **아래**(z:1) 라
+       번쩍여도 폰 화면(지도)은 조금도 변하지 않는다. 예전 #app.shaking 셰이크를 대신한다. */
+    var flash = el("div", "seqFlash");  flash.setAttribute("data-t", "seqFlash");
     var stage = el("div", "seqStage");  stage.setAttribute("data-t", "seqStage");
     var cap = el("div", "seqCap");      cap.setAttribute("data-t", "seqCap");
     var fade = el("div", "seqFade");    fade.setAttribute("data-t", "seqFade");
-    s.appendChild(bg); s.appendChild(stage); s.appendChild(cap); s.appendChild(fade);
+    s.appendChild(bg); s.appendChild(flash); s.appendChild(stage); s.appendChild(cap); s.appendChild(fade);
 
     /* 인트로에서 쓰는 효과음은 미리 준비해 둔다 — 첫 발소리가 한 박 늦지 않게 */
     if (G.sfxWarm) { G.sfxWarm("footstep.mp3"); G.sfxWarm("storm.mp3"); }
 
-    var timers = [], iv = null, rafId = 0, busy = false, at = -1, scene = null;
+    var timers = [], iv = null, busy = false, at = -1, scene = null, flashes = 0;
     var ty = null, plane = null, gbox = null;
     function later(fn, ms) { var t = setTimeout(fn, ms); timers.push(t); return t; }
     function stopTimers() { timers.forEach(clearTimeout); timers = []; if (iv) { clearInterval(iv); iv = null; } }
@@ -18351,26 +18399,21 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       return true;
     }
 
-    /* ── 걷기: 사진을 위아래로 흔들고 **가장 낮은 지점(위상 0.5)** 마다 발소리 ──
-       CSS 애니메이션과 setTimeout 을 따로 돌리면 둘이 어긋난다 → 한 rAF 루프에서
-       위상을 직접 계산해 화면과 소리를 **같은 시계**로 맞춘다. */
+    /* ── 걷기 ──
+       ★v0.17.17 [지시5] 사진을 위아래로 흔들던 bob 은 **완전히 뺐다**(북쑥: "지진급" 이라 거슬림).
+         사진은 정지한 채로 두고, 걷는 느낌은 **발소리만**으로 낸다.
+         발소리 경로는 예전 그대로다 — **자기교정 타이머**로 다음 착지(위상 k−0.5)의 절대시각을
+         매번 다시 계산해 재무장하므로 박자(520ms)가 밀리거나 누적되지 않는다. */
     var walk = { on: false, t0: 0, steps: 0, last: 0, err: [], sfx: 0, timer: null };
     function walkStart() {
       if (walk.on) return;
-      var img = bg.querySelector("img");
       walk.on = true; walk.steps = 0; walk.last = 0; walk.err = []; walk.sfx = 0;
-      walk.t0 = now();
+      /* ★v0.17.17 시계를 WALK_LEAD 만큼 **앞당겨 잡는다** = 첫 걸음이 그만큼 늦게 떨어진다.
+         디코드·첫 페인트 직후라 webkit 은 아직 바빠서, 첫 박이 260ms 뒤면 40ms 넘게 밀렸다.
+         440ms 로 벌려 주면 브라우저가 자리를 잡고 첫 박부터 정확해진다. 연출상으로도 사진이
+         한 박 보이고 걷기 시작하는 편이 자연스럽다. */
+      walk.t0 = now() + WALK_LEAD;
       bg.classList.add("walk");
-      /* 그림은 rAF 로 매 프레임 **절대시각에서 다시 계산**한다(프레임이 밀려도 위상이 안 밀린다) */
-      (function tick() {
-        if (!walk.on) return;
-        var ph = (now() - walk.t0) / WALK_STEP_MS;
-        if (img) img.style.transform = "translate(-50%,-50%) translateY(" +
-          (-WALK_AMP * Math.cos(2 * Math.PI * ph)).toFixed(3) + "%)";
-        rafId = requestAnimationFrame(tick);
-      })();
-      /* 소리는 rAF 가 아니라 **자기교정 타이머**로 — 한 프레임 밀린다고 발소리까지 밀리면 안 된다.
-         매번 다음 착지(위상 k−0.5)의 절대시각을 다시 계산해 재무장하므로 오차가 누적되지 않는다. */
       armStep();
     }
     function armStep() {
@@ -18388,15 +18431,45 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     }
     function walkStop() {
       walk.on = false;
-      if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
       if (walk.timer) { clearTimeout(walk.timer); walk.timer = null; }
       bg.classList.remove("walk");
+    }
+    /* ★v0.17.17 발소리 시계는 **브리지 사진이 디코드되고 한 번 그려진 뒤**에 건다.
+       사진을 붙이자마자 시작하면 webkit 이 디코드·첫 페인트로 메인 스레드를 잡아 **첫 걸음만**
+       100ms 넘게 밀렸다(실측 110~125ms · chromium 은 12ms 이내). 2·3번째부터는 자기교정
+       타이머라 늘 정확했다. decode() → rAF 2회(= 그 사진이 실제로 그려진 프레임 다음)에서
+       t0 을 잡으면 첫 박부터 맞는다. decode() 가 없거나 실패하는 브라우저를 위해 0.5초 안전망. */
+    function walkWhenReady() {
+      var im = bg.querySelector("img"), fired = false;
+      var go1 = function () {
+        if (fired) return; fired = true;
+        if (window.requestAnimationFrame) {
+          requestAnimationFrame(function () { requestAnimationFrame(function () { if (bg.querySelector("img")) walkStart(); }); });
+        } else walkStart();
+      };
+      later(go1, 500);
+      if (!im) { fired = true; walkStart(); return; }
+      if (im.decode) { try { im.decode().then(go1, go1); return; } catch (e) {} }
+      if (im.complete) go1(); else { im.onload = go1; im.onerror = go1; }
     }
     function now() { return (window.performance && performance.now) ? performance.now() : Date.now(); }
 
     /* ── 구글맵 컷: 폰 목업 안에 구글맵 앱과 **같은 지도** ── */
-    var TY_OFF = [1180, 90];      /* 화면 밖(오른쪽 위) — 여기서 들어온다 */
-    var TY_FAR = [755, 300];      /* 처음 보이는 자리 — 지도 크롭(가시 x 37~911) 안쪽, 비행기와 멀찍이 */
+    /* ★v0.17.17 [지시1] 태풍이 멈추는 자리 = **폰 화면 오른쪽 경계**, 높이는 **비행기와 같게**.
+         마커 중심을 경계(상자 가로 100%)에 올리면 .gmapBox{overflow:hidden} 이 오른쪽 절반을
+         잘라 내므로 "화면 밖에서 반쯤 걸쳐 들어온 태풍" 이 된다. 폰 화면 테두리 = 지도 상자
+         테두리다(.cutScreen 안에서 .gmapBox 가 flex:1 로 꽉 찬다).
+       지도는 cover 크롭이라 같은 경계라도 상자 크기마다 지도 좌표가 달라진다 → 상수로 못 박지
+         않고 PHONE.mapXOfPct 로 **매번 실측**한다. (예전 TY_FAR=[755,300] 은 화면 안쪽이었다) */
+    function tyPark() {
+      var y = PHONE.routeAt(PHONE.PLANE_T0)[1];            /* 비행기와 같은 높이 = 바로 오른쪽 */
+      if (!gbox || !gbox.clientWidth) return [880, y];     /* 아직 배치 전 — 안전한 임시값 */
+      return [PHONE.mapXOfPct(gbox, 100), y];
+    }
+    function tyOff() {                                     /* 완전히 화면 밖(경계 + 태풍 지름) */
+      var p = tyPark();
+      return [p[0] + (gbox && gbox.clientWidth ? PHONE.mapLen(gbox, TY_PX + 12) : 300), p[1]];
+    }
     function buildGmap() {
       clear(stage);
       var ph = el("div", "cutPhone");
@@ -18413,10 +18486,12 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       plane.setAttribute("data-t", "introPlane");
       ty = PHONE.marker(gbox, "typhoon", "", 1);
       ty.setAttribute("data-t", "introTyphoon");
-      PHONE.moveTo(ty, TY_OFF[0], TY_OFF[1]);
       scr.appendChild(gbox);
       ph.appendChild(scr);
       stage.appendChild(ph);
+      /* ★대기 자리는 상자가 **실제로 배치된 뒤**에야 잴 수 있다(clientWidth 를 읽어 레이아웃 확정) */
+      void gbox.clientWidth;
+      PHONE.moveTo(ty, tyOff()[0], tyOff()[1]);
       /* ★"쿠구구궁" 글자는 폐지됐다(북쑥 지시: 글자 대신 소리). 옛 검증이 잡던 손잡이만 빈 채로 남긴다. */
       var boom = el("div", "cutBoom"); boom.setAttribute("data-t", "introBoom"); boom.textContent = "";
       stage.appendChild(boom);
@@ -18436,9 +18511,11 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     function fadeOut(after) { fade.classList.add("on"); later(after, INTRO_FADE + 30); }
     function fadeIn() { later(function () { fade.classList.remove("on"); }, 20); }
 
-    /* ── 자막 ── */
-    function say(text, tappable) {
+    /* ── 자막 ──
+       ★v0.17.17 [지시7] pa = 기내방송. 글씨를 **노랗게**(.seqCap.pa) 해서 혼잣말과 구분한다. */
+    function say(text, tappable, pa) {
       clear(cap);
+      cap.classList.toggle("pa", !!pa);
       if (!text) return;
       cap.appendChild(document.createTextNode(text));
       if (tappable !== false) {
@@ -18446,11 +18523,23 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       }
     }
 
+    /* ── ★v0.17.17 [지시4] 폰 뒤 배경 점등 (검정 → 밝음 → 검정, 5회) ──
+       예전 #app.shaking 화면 셰이크를 대신한다. 폰 목업은 z-index 로 이 층 **위**에 있어
+       지도는 조금도 흔들리거나 밝아지지 않는다. 바람·천둥 소리는 그대로 함께 난다. */
+    function bgFlash() {
+      for (var i = 0; i < FLASH_N; i++) {
+        (function (k) {
+          later(function () { flash.classList.add("on"); flashes++; }, k * FLASH_GAP);
+          later(function () { flash.classList.remove("on"); }, k * FLASH_GAP + FLASH_ON);
+        })(i);
+      }
+    }
+
     /* ── 진행 ── */
     function setScene(name) {
       if (name === scene) return;
       scene = name;
-      if (name === "bridge") { photo(BRIDGE_IMG); walkStart(); clear(stage); }
+      if (name === "bridge") { photo(BRIDGE_IMG); clear(stage); walkWhenReady(); }
       else if (name === "runway") { photo(RUNWAY_IMG); clear(stage); }
       else if (name === "sky") { photo(SKY_IMG); clear(stage); }
       else if (name === "gmap") { photo(SKY_IMG, true); buildGmap(); }
@@ -18461,34 +18550,38 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       var c = INTRO_CUTS[n];
       var show = function () {
         if (c.sc) setScene(c.sc);
+        /* ★v0.17.17 [지시7] 방송 시작 순간 마이크 톡톡 — 파일이 없는 빌드는 그냥 조용히 넘어간다 */
+        if (c.mic) G.sfxFile("mictap.mp3", 0.7);
         if (c.act === "tyIn") {
           busy = true; say(c.cap, false);
-          moveTy(TY_OFF, TY_FAR, 900, function () { busy = false; say(c.cap); });
+          moveTy(tyOff(), tyPark(), 900, function () { busy = false; say(c.cap); });
           return;
         }
         if (c.act === "tyHit") { busy = true; say(""); quake(); return; }
-        busy = false; say(c.cap);
+        busy = false; say(c.cap, true, c.pa);
       };
       if (c.fade && n > 0) { busy = true; fadeOut(function () { show(); fadeIn(); }); }
       else show();
     }
     function quake() {
-      moveTy(TY_FAR, PHONE.routeAt(PHONE.PLANE_T0), INTRO_TY_MS, function () {
+      /* ★v0.17.17 [지시2] 경계에 반쯤 걸쳐 있던 태풍이 **천천히**(INTRO_TY_MS) 비행기로 다가온다.
+         겹쳐도 크기는 그대로다(.hit 은 이제 불투명도만 올린다 — CSS 52→86px 확대 폐지). */
+      moveTy(tyPark(), PHONE.routeAt(PHONE.PLANE_T0), INTRO_TY_MS, function () {
         ty.classList.add("hit");
-        app.classList.add("shaking");
         /* 글자 없이 **소리**로 — 태풍(강풍+천둥). 파일이 없는 빌드는 예전 저음으로 폴백한다. */
         if (!G.sfxFile("storm.mp3", 1)) G.beep(70, 1.6, "sawtooth", .18);
         G.buzz([200, 80, 300]);
+        bgFlash();                                   /* ★셰이크 대신 폰 뒤 배경 점등 */
         later(function () {
-          app.classList.remove("shaking");
+          flash.classList.remove("on");
           fadeOut(function () { go(at + 1); fadeIn(); });
-        }, INTRO_SHAKE);
+        }, INTRO_STORM);
       });
     }
     function advance() { if (!busy) go(at + 1); }
     function finish() {
       stopTimers(); walkStop();
-      app.classList.remove("shaking");
+      flash.classList.remove("on");
       s.onclick = null;
       s.classList.remove("show", "seq"); clear(s);
       G.syncOverlay();
@@ -18497,20 +18590,38 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       if (f) f();
     }
 
+    /* ★v0.17.17 [지시7] 마이크 톡톡은 **한 박 늦게** 워밍한다 — 인트로가 시작하는 순간
+       같이 load() 하면 webkit 에서 첫 발소리 타이머가 100ms 넘게 밀렸다(실측).
+       기내방송은 한참 뒤(컷 ⑧)라 1.2초 여유를 두고 준비해도 늦지 않는다. */
+    if (G.sfxWarm) later(function () { G.sfxWarm("mictap.mp3"); }, 1200);
+
     s.onclick = advance;
     window.__introAt = function () {
       return { at: at, busy: busy, scene: scene, cap: cap.textContent || "",
-               total: INTRO_CUTS.length, shaking: app.classList.contains("shaking") };
+               total: INTRO_CUTS.length,
+               /* ★v0.17.17 셰이크(#app.shaking) 폐지 → 폰 뒤 배경 점등 상태·누적 횟수 */
+               flash: flash.classList.contains("on"), flashes: flashes,
+               pa: cap.classList.contains("pa") };
     };
-    window.__introGo = function (n) { stopTimers(); busy = false; app.classList.remove("shaking"); go(n); };
+    /* ★v0.17.17 stopTimers() 는 암전을 되돌리는 타이머까지 지운다 — 컷 점프가 암전 도중에
+       일어나면 .seqFade 가 켜진 채 남아 화면이 통째로 까맣게 굳는다(검증 캡처가 전부 검정으로
+       나와서 발견). 점프할 때는 암전·점등을 모두 내리고 시작한다. */
+    window.__introGo = function (n) {
+      stopTimers(); busy = false;
+      flash.classList.remove("on"); fade.classList.remove("on");
+      go(n);
+    };
     window.__introWalk = function () {
       var e = walk.err, m = 0, i;
       for (i = 0; i < e.length; i++) m = Math.max(m, Math.abs(e[i]));
-      return { on: walk.on, stepMs: WALK_STEP_MS, ampPct: WALK_AMP, steps: walk.steps,
+      /* ★v0.17.17 bob 폐지 — ampPct 는 0 으로 고정(옛 검증이 읽던 키는 남긴다) */
+      return { on: walk.on, stepMs: WALK_STEP_MS, ampPct: 0, bob: false, steps: walk.steps,
                sfxPlayed: walk.sfx, lateMaxMs: +m.toFixed(1),
                lateAvgMs: e.length ? +(e.reduce(function (a, b) { return a + b; }, 0) / e.length).toFixed(1) : 0,
                samples: e.slice(-8) };
     };
+    /* 검증용 — 점등은 120ms 라 캡처보다 짧다. 이 훅으로 켠 채 고정해 찍는다. */
+    window.__introFlash = function (on) { flash.classList.toggle("on", !!on); };
     window.__introSkip = function () { finish(); };
 
     go(0);
@@ -18526,7 +18637,10 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   /* ★v0.17.15 [지시A] 엔딩 확장 — 도착 코멘트 2컷(탭으로 진행) → **GAME CLEAR 화면**.
        문구는 북쑥 지정 원문 그대로. 클리어 화면 구성은 싱가포르 방탈출의 그것을 그대로 따왔다
        (엔딩 사진 꽉 채운 배경 + 떠다니는 폭죽 이모지 + 반투명 유리 카드 + 무지개 반짝 제목).
-       예전 "→ 2차로 / 2차 준비 중입니다" 흐름은 카드 버튼으로 그대로 남겼다. */
+     ★v0.17.17 [지시8] "→ 2차로" 버튼과 "2차 준비 중입니다" 예고 화면을 **폐지**했다
+       (2차 게임은 만들지 않는다). 클리어 카드가 **마지막 화면**으로 그대로 머문다 — 버튼이
+       없으니 잘못 눌러 빈 예고 화면으로 빠질 일도 없다. 다시 하고 싶으면 링크를 새로 열면
+       되고(세이브의 s1done 은 그대로 남는다), 처음부터는 타이틀의 ☰ → "처음부터" 로 간다. */
   var END_BEATS = [
     { emoji: "🛬🌴", txt: "우여곡절이 많았지만 무사히 발리에 도착했다!" },
     { emoji: "🌺", txt: "이제 휴가를 즐기는 일 뿐이야!! 아자아자!!" }
@@ -18582,18 +18696,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     card.appendChild(el("div", "gcTitle", "GAME CLEAR!!"));
     card.appendChild(el("div", "gcHead", "발리, 무사 도착!"));
     card.appendChild(el("div", "gcBody",
-      "버뮤다 삼각지대를 지나온 오디세이 1편 — 탈출 성공!\n이제 진짜 휴가를 즐기자 🌴"));
-    var b = el("button", "btn primary", "→ 2차로");
-    b.setAttribute("data-t", "toS2");
-    b.onclick = function () {
-      clear(s); s.classList.remove("gc"); s.removeAttribute("data-t");
-      s.appendChild(el("div", "bigemoji", "🏝️"));
-      s.appendChild(el("div", "txt", "2차\n\n준비 중입니다.\n곧 이어집니다."));
-      var b2 = el("button", "btn ghost", "처음 화면으로");
-      b2.onclick = function () { s.classList.remove("show"); clear(s); };
-      s.appendChild(b2);
-    };
-    card.appendChild(b);
+      "버뮤다 삼각지대를 지나 무사히 발리 도착 — 탈출 성공!\n이제 진짜 휴가를 즐기자 🌴"));
     s.appendChild(card);
     G.sfxOk();
     G.buzz([40, 60, 120]);
