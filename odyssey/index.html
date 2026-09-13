@@ -11158,7 +11158,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 (function () {
   "use strict";
 
-  var BUILD = "ODY-S1-20260913-1647";
+  var BUILD = "ODY-S1-20260913-1723";
   var LSKEY = "odyssey.s1.v1";
 
   var qs = new URLSearchParams(location.search);
@@ -13421,6 +13421,8 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     }
 
     var solved = false;
+    /* ★v0.17.12 [지시1] 디버그 '통과'(force) 중에는 힌트 선행 게이트를 무시한다(기존 관례 유지). */
+    var forcing = false;
     if (opt.pre) { for (i = 0; i < n; i++) idx[i] = cands[i].indexOf(ansArr[i]); solved = true; }
     var cellNodes = [];
     var overlays = opt.cells.map(function (c, i) {
@@ -13503,6 +13505,13 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       } else {
         for (i = 0; i < n; i++) if (got[i] !== ansArr[i]) return;
       }
+      /* ★v0.17.12 [지시1] 지식 자물쇠 **힌트 선행 게이트**.
+         정답을 알아도 힌트(쌍안경 뷰 · 노노그램 완성)를 얻기 전에는 열리지 않는다.
+         ★거절 연출은 일반 오답과 **완전히 같다** — 즉 아무 일도 일어나지 않는다(소리·문구·리셋 전부 없음).
+           imgLock 은 원래 틀린 값에서 그냥 조용히 return 하므로, 게이트도 같은 자리에서 같은 방식으로 return 한다.
+           → 플레이어는 "게이트가 있다" 는 사실 자체를 알 수 없다(티를 내지 않는다).
+         ★디버그 '통과' 버튼(force)은 forcing 플래그로 게이트를 건너뛴다(기존 관례). */
+      if (!forcing && typeof opt.gate === "function" && !opt.gate()) return;
       win();
     }
     function win() {
@@ -13522,7 +13531,8 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       cands: isHash ? null : cands,
       force: isHash
         ? function () { win(); }
-        : function () { for (var i = 0; i < n; i++) idx[i] = cands[i].indexOf(ansArr[i]); paint(); check(); }
+        /* ★v0.17.12 힌트 선행 게이트를 건너뛰고 연다 — 디버그 '통과' 는 예전 그대로 무조건 통과 */
+        : function () { forcing = true; for (var i = 0; i < n; i++) idx[i] = cands[i].indexOf(ansArr[i]); paint(); check(); forcing = false; }
     });
     function refit() {
       if (view && view._fit) view._fit();
@@ -16281,6 +16291,9 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       binocPlay();
       S.sel = null; renderInv();
       G.setFlag("p23seen");
+      /* ★v0.17.12 [지시1] #27(HAWAIIAN) 힌트 선행 게이트 플래그 — **쌍안경으로 창밖을 본 순간** 선다.
+         세이브에 남으므로 재로드해도 유지된다. (p23seen 과 같은 순간이지만 게이트용으로 이름을 따로 둔다) */
+      G.setFlag("binocSeen");
       return;
     }
     var node = W.shade({
@@ -16983,6 +16996,10 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         id: "p27", img: DATA.IMG + "lav_cab2.jpg", nw: L.nw, nh: L.nh,
         crop: L.crop, cells: L.cells, faces: L.faces, faceLight: L.faceLight, faceDy: L.faceDy,
         pool: "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(""), size: 12, answer: DATA.ANS.p27,
+        /* ★v0.17.12 [지시1] 힌트 선행 게이트 — **쌍안경으로 창밖을 본 적**(binocSeen)이 있어야 정답이 먹는다.
+           그 전에는 HAWAIIAN 을 정확히 넣어도 일반 오답과 똑같이 아무 일도 안 일어난다.
+           (p23seen 은 v0.17.11 까지 쓰던 같은 순간의 플래그 — 옛 세이브 호환용 fallback) */
+        gate: function () { return G.flag("binocSeen") || G.flag("p23seen"); },
         onSolve: function () { G.markSolved("p27"); reopenCU(); }
       }));
       c.cap("상단 수납장.");                       /* ★v0.17.3 [지시8] 자물쇠 스펙 라벨 삭제 */
@@ -17136,6 +17153,9 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       c.stage.appendChild(W.imgLock({
         id: "p26", img: L.img, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells, faces: L.faces, faceLight: L.faceLight, faceDy: L.faceDy,
         pool: "0123456789".split(""), size: 10, hash: DATA.P26_HASH,
+        /* ★v0.17.12 [지시1] 힌트 선행 게이트 — **#22 네모네모로직을 푼 적**(nonoDone = p22 solved)이 있어야
+           정답이 먹는다. 그 전에는 맞는 6자리를 넣어도 일반 오답과 똑같이 아무 일도 안 일어난다. */
+        gate: function () { return G.flag("nonoDone") || G.solved("p22"); },
         onSolve: function () { G.markSolved("p26"); reopenCU(); }
       }));
       c.cap("상단 수납장.");                       /* ★v0.17.3 [지시8] 자물쇠 스펙 라벨 삭제 */
