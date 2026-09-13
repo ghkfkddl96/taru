@@ -602,6 +602,32 @@ body.dbg .cvcell.hot.ifeBtn:active,body.dbg .cvcell.hot.ifeTile:active{box-shado
 .ifeScreenOv{position:absolute;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#000}
 .ifeScreenOv img{max-width:100%;max-height:100%;object-fit:contain}
 /* ★v0.14 #27 명판 각인 — 판 위에 새긴 글자처럼 */
+/* ★v0.17.6 [지시6B] 여권 페이지 넘김 — 펼침 사진 2장을 제본선에서 갈라 3겹으로 쌓고
+   가운데 한 장(.pbLeaf)만 제본선을 축으로 rotateY. 드래그 진행도 t 를 그대로 각도로 쓴다.
+   앞면 = p1 오른쪽 면 / 뒷면 = p2 왼쪽 면 (rotateY(180deg) 라 배경은 평범하게 깐다).
+   perspective 는 .pbWrap 에만 두고 preserve-3d 는 .pbLeaf 에만 — overflow:hidden 과 안 부딪힌다. */
+/* perspective-origin 을 왼쪽으로 옮긴 건 의도 — 정중앙이면 장이 딱 90° 일 때 투영폭이 0 이 돼
+   한 프레임 "사라졌다" 보인다. 시점을 살짝 옆으로 두면 세워진 순간에도 종이 옆면이 남는다. */
+.pbWrap{position:relative;flex:0 0 auto;border-radius:var(--r);overflow:hidden;background:var(--n1);
+  perspective:1150px;-webkit-perspective:1150px;perspective-origin:18% 50%;-webkit-perspective-origin:18% 50%}
+.pbHalf{position:absolute;top:0;height:100%;background-repeat:no-repeat}
+.pbGutter{position:absolute;top:0;height:100%;z-index:2;opacity:0;pointer-events:none;
+  background:linear-gradient(270deg,rgba(0,0,0,.5) 0%,rgba(0,0,0,.12) 22%,rgba(0,0,0,0) 55%)}
+.pbLeaf{position:absolute;top:0;height:100%;z-index:3;transform-origin:left center;
+  transform-style:preserve-3d;-webkit-transform-style:preserve-3d;will-change:transform;backface-visibility:visible}
+.pbFace{position:absolute;left:0;top:0;width:100%;height:100%;background-repeat:no-repeat;
+  backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.pbBack{transform:rotateY(180deg)}
+.pbShade{position:absolute;inset:0;opacity:0;pointer-events:none}
+.pbFront .pbShade{background:linear-gradient(90deg,rgba(0,0,0,.55) 0%,rgba(0,0,0,.14) 34%,rgba(0,0,0,0) 72%)}
+.pbBack .pbShade{background:linear-gradient(90deg,rgba(0,0,0,.5) 0%,rgba(0,0,0,.1) 40%,rgba(0,0,0,0) 76%)}
+/* 장이 딱 세워지는 순간(t≈0.5) 보이는 **종이 옆면**.
+   chromium 은 perspective-origin 덕에 얇은 면이 남지만 webkit 은 투영폭이 0 이 돼 한 프레임 사라진다.
+   두 엔진 모두 같게 보이도록 제본선 자리에 종이색 얇은 띠를 같이 깔아 준다. */
+.pbEdge{position:absolute;top:2%;height:96%;width:5px;margin-left:-2px;z-index:2;opacity:0;pointer-events:none;border-radius:1px;
+  background:linear-gradient(90deg,#cfcabf 0%,#f4f1e9 45%,#d6d1c4 100%);box-shadow:0 0 7px rgba(0,0,0,.38)}
+.pbCell{position:absolute;z-index:4;border:0;background:transparent;padding:0}
+body.dbg.hints .pbCell{box-shadow:inset 0 0 0 2px rgba(255,255,255,.45);border-radius:6px}
 .cvcell.namePlate{pointer-events:none}
 .cvcell.namePlate.onDark .cv{color:#d9d9de !important;text-shadow:0 1px 2px rgba(0,0,0,.65) !important}
 .cvcell.namePlate .cv{background:transparent !important;box-shadow:none !important;
@@ -11033,7 +11059,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 (function () {
   "use strict";
 
-  var BUILD = "ODY-S1-20260913-0839";
+  var BUILD = "ODY-S1-20260913-1003";
   var LSKEY = "odyssey.s1.v1";
 
   var qs = new URLSearchParams(location.search);
@@ -12359,9 +12385,16 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   /* ★v0.17.4 [지시25] 여권 — 탭하면 신원 페이지, 스크롤(드래그)하면 한 장 넘어가고
      2페이지 오른쪽에 베이지 색상판이 놓여 있다. 판을 탭하면 획득하고 여권은 더 안 열린다.
      tileCell = clean.png(1536×1024) 실측 x947~1213 / y366~642 (=61.7/35.7/17.3/27.0) 에 탭 여유 */
+  /* ★v0.17.6 [지시6A] 실비율 v2 — gen/77·78 검수본을 **책자만** 같은 박스로 크롭(tools/make-passport-v2.mjs).
+     · 책자 bbox(테두리 flood fill 최대 연결요소) p1 1276×914(1.3961) / p2 1278×912(1.4013) — 차 0.16%
+       → 가로 정규화(스케일) 불필요. 공통 크롭 1276×912(1.3991) ≈ 실여권 펼침 176×125mm(1.4080), 오차 0.6%
+     · 출력 1200×858 (nw/nh)
+     · spine = 제본선 실측 위치 % — 페이지 넘김 회전축
+     · tileCell = 크롭 좌표계에서 다시 잰 베이지 판 bbox(중심 73.47% / 47.97%)에 탭 여유 */
   var PASSPORT = {
-    img1: "passport_p1.jpg", img2: "passport_p2.jpg", nw: 1200, nh: 800,
-    tileCell: { x: 59.5, y: 33.0, w: 21.5, h: 32.0 }
+    img1: "passport_p1.jpg", img2: "passport_p2.jpg", nw: 1200, nh: 858,
+    spine: 49.80,
+    tileCell: { x: 66.4, y: 38.0, w: 14.2, h: 20.0 }
   };
 
   /* ★v0.17.5 [지시2·3] 배경이 흰색으로 바뀌고(누끼) 아이콘은 2줄×3개로 커졌다.
@@ -16418,7 +16451,15 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   /* ★v0.17.4 [지시25] 여권 = 두 페이지짜리 실사.
      ① 탭하면 신원 페이지 ② 스크롤(좌우 드래그)하면 책장처럼 한 장 넘어간다
      ③ 2페이지 오른쪽의 베이지 색상판을 탭하면 획득 ④ 획득 뒤에는 아예 열리지 않는다
-     ⑤ 1페이지에서 드래그 없이 탭만 3번이면 안내 1회(북쑥 지정 문구) */
+     ⑤ 1페이지에서 드래그 없이 탭만 3번이면 안내 1회(북쑥 지정 문구)
+
+     ★v0.17.6 [지시6B] 넘김이 "이미지 바꿔끼기"였던 걸 **손가락을 따라가는 실제 페이지 넘김**으로.
+       구조 — 펼침 사진 2장을 제본선(P.spine)에서 좌/우로 갈라 3겹으로 쌓는다.
+         · 바닥 왼쪽 = p1 왼쪽 면      · 바닥 오른쪽 = p2 오른쪽 면
+         · 넘어가는 장(leaf) = 앞면 p1 오른쪽 면 / 뒷면 p2 왼쪽 면 — 제본선을 축으로 rotateY
+       t(0~1) 만큼 rotateY(-180°·t). t=0 이면 보이는 게 p1 펼침, t=1 이면 p2 펼침 — 중간은 실제로 반쯤 넘어간 모습.
+       드래그 이동량 ÷ 페이지 폭 = t (실시간 추종). 손을 떼면 t≥0.5 또는 속도 임계면 완료, 아니면 스프링백.
+       transform 만 건드려서 60fps. 판 탭·탭3회 안내·획득 후 비활성은 그대로. */
   ZOOM.passport = function () {
     var P = DATA.PASSPORT;
     if (G.flag("tookBeige")) return;                 /* 다 꺼낸 뒤에는 탭해도 안 열린다 */
@@ -16429,69 +16470,131 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     var host = el("div");
     host.setAttribute("data-t", "passportBook");
     host.style.cssText = "position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center;overflow:hidden";
-    var page = 0, busy = false, taps = 0, hinted = false;
-    var slot = el("div");
-    slot.style.cssText = "position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center";
-    host.appendChild(slot);
-    function draw(anim) {
-      var old = slot.firstChild;
-      var node;
-      if (page === 1) {
-        node = imgStage(DATA.IMG + P.img2, [
-          { x: P.tileCell.x, y: P.tileCell.y, w: P.tileCell.w, h: P.tileCell.h, t: "takeTileBeige", cls: "hot",
-            onTap: function () {
-              if (G.flag("tookBeige")) return;
-              G.setFlag("tookBeige");
-              prize("tileBeige", "");
-              closeZoom();                            /* 이제 여권은 열리지 않는다 */
-            } }
-        ], { nw: P.nw, nh: P.nh });
-      } else {
-        node = imgStage(DATA.IMG + P.img1, [], { nw: P.nw, nh: P.nh });
-      }
-      node.setAttribute("data-page", String(page + 1));
-      if (anim) {
-        node.style.opacity = "0";
-        node.style.transform = "translateX(" + (anim > 0 ? 26 : -26) + "px)";
-        node.style.transition = "opacity .26s ease, transform .26s ease";
-      }
-      slot.appendChild(node);
-      if (old) {
-        old.style.transition = "opacity .22s ease, transform .22s ease";
-        old.style.position = "absolute"; old.style.left = "0"; old.style.top = "0"; old.style.right = "0"; old.style.bottom = "0";
-        old.style.opacity = "0";
-        old.style.transform = "translateX(" + (anim > 0 ? -26 : 26) + "px)";
-        setTimeout(function () { if (old.parentNode) old.parentNode.removeChild(old); }, 280);
-      }
-      if (anim) setTimeout(function () { node.style.opacity = "1"; node.style.transform = "none"; }, 20);
+
+    var I1 = DATA.IMG + P.img1, I2 = DATA.IMG + P.img2;
+    var SP = P.spine;                                 /* 제본선 위치 % (실측) */
+    /* 반쪽 상자 안에 "사진의 그 반쪽"이 딱 차도록 배경을 키운다 */
+    var BGL = (100 / SP * 100).toFixed(3) + "% 100%";           /* 왼쪽 면용 */
+    var BGR = (100 / (100 - SP) * 100).toFixed(3) + "% 100%";   /* 오른쪽 면용 */
+
+    var wrap = el("div", "pbWrap");
+    host.appendChild(wrap);
+
+    var baseL = el("div", "pbHalf");
+    baseL.style.cssText = "left:0;width:" + SP + "%;background-image:url('" + I1 + "');background-size:" + BGL + ";background-position:0 0";
+    var baseR = el("div", "pbHalf");
+    baseR.style.cssText = "left:" + SP + "%;width:" + (100 - SP) + "%;background-image:url('" + I2 + "');background-size:" + BGR + ";background-position:100% 0";
+    wrap.appendChild(baseL); wrap.appendChild(baseR);
+
+    var gut = el("div", "pbGutter");                  /* 장이 들리면 왼쪽 면에 지는 그림자 */
+    gut.style.cssText = "left:0;width:" + SP + "%";
+    wrap.appendChild(gut);
+    var edge = el("div", "pbEdge");                   /* 세워진 순간 보이는 종이 옆면(엔진 차이 보정) */
+    edge.style.left = SP + "%";
+    wrap.appendChild(edge);
+
+    var leaf = el("div", "pbLeaf");
+    leaf.style.cssText = "left:" + SP + "%;width:" + (100 - SP) + "%";
+    var front = el("div", "pbFace pbFront");
+    front.style.backgroundImage = "url('" + I1 + "')";
+    front.style.backgroundSize = BGR; front.style.backgroundPosition = "100% 0";
+    /* 뒷면 = p2 의 **왼쪽** 면. rotateY(180deg) 로 뒤집혀 있어 배경은 평범하게 깔면 된다. */
+    var back = el("div", "pbFace pbBack");
+    back.style.backgroundImage = "url('" + I2 + "')";
+    back.style.backgroundSize = BGL; back.style.backgroundPosition = "0 0";
+    var shF = el("div", "pbShade"), shB = el("div", "pbShade");
+    front.appendChild(shF); back.appendChild(shB);
+    leaf.appendChild(front); leaf.appendChild(back);
+    wrap.appendChild(leaf);
+
+    /* 베이지 색상판 — p2 오른쪽 면에 있으니 바닥 오른쪽 좌표계 = 펼침 사진 % 그대로 */
+    var T = P.tileCell;
+    var cell = el("button", "pbCell");
+    cell.setAttribute("data-t", "takeTileBeige");
+    cell.style.cssText = "left:" + T.x + "%;top:" + T.y + "%;width:" + T.w + "%;height:" + T.h + "%;display:none";
+    G.tapper(cell, { tap: function () {
+      if (G.flag("tookBeige") || t < 0.995) return;
+      G.setFlag("tookBeige");
+      prize("tileBeige", "");
+      closeZoom();                                    /* 이제 여권은 열리지 않는다 */
+    } });
+    wrap.appendChild(cell);
+
+    var t = 0, pageW = 1, taps = 0, hinted = false, anim = null;
+    function paint() {
+      leaf.style.transform = "rotateY(" + (-180 * t).toFixed(3) + "deg)";
+      var s = Math.sin(Math.PI * Math.min(1, Math.max(0, t)));   /* 0 → 1 → 0 : 들렸을 때 가장 진하게 */
+      shF.style.opacity = (0.40 * s).toFixed(3);
+      shB.style.opacity = (0.28 * s).toFixed(3);
+      gut.style.opacity = (0.55 * s).toFixed(3);
+      edge.style.opacity = Math.max(0, 1 - Math.abs(t - 0.5) / 0.18).toFixed(3);
+      cell.style.display = t > 0.995 ? "block" : "none";
     }
-    function go(to, dir) {
-      if (busy || to === page || to < 0 || to > 1) return;
-      busy = true; page = to;
-      G.sfxTap();
-      draw(dir);
-      setTimeout(function () { busy = false; }, 300);
+    function setT(v) { t = Math.min(1, Math.max(0, v)); paint(); }
+    function glide(to, ms) {
+      if (anim) cancelAnimationFrame(anim);
+      var from = t, t0 = 0;
+      if (Math.abs(to - from) < 0.001) { setT(to); return; }
+      function step(ts) {
+        if (!t0) t0 = ts;
+        var k = Math.min(1, (ts - t0) / ms);
+        var e = 1 - Math.pow(1 - k, 3);                /* ease-out cubic */
+        setT(from + (to - from) * e);
+        if (k < 1) anim = requestAnimationFrame(step); else { anim = null; G.sfxTap(); }
+      }
+      anim = requestAnimationFrame(step);
     }
-    draw(0);
-    var sx0 = 0, moved = false;
+    function fit() {
+      var stage = host.parentNode;
+      if (!stage) return;
+      var r = stage.getBoundingClientRect();
+      if (!r.width || !r.height) return;
+      var ar = P.nh / P.nw;
+      var W = Math.min(r.width, r.height / ar), H = W * ar;
+      wrap.style.width = W + "px"; wrap.style.height = H + "px";
+      pageW = Math.max(1, W * (100 - SP) / 100);
+    }
+    setTimeout(fit, 20); setTimeout(fit, 180); setTimeout(fit, 600);
+    window.addEventListener("resize", fit);
+    paint();
+
+    var sx0 = 0, t0v = 0, moved = false, lastX = 0, lastT = 0, vel = 0;
     G.drag(host, {
-      start: function (q) { sx0 = q.x; moved = false; },
-      move: function (q) { if (Math.abs(q.x - sx0) > 16) moved = true; },
-      end: function (q) {
-        var dx = q.x - sx0;
-        if (dx < -30) { go(1, 1); return; }            /* 왼쪽으로 넘기면 다음 장 */
-        if (dx > 30) { go(0, -1); return; }            /* 오른쪽으로 넘기면 앞 장 */
-        if (moved) return;
-        if (page === 0) {
-          taps++;
-          if (taps >= 3 && !hinted) { hinted = true; G.toast("스크롤하여 페이지를 넘길 수 있을 것 같다.", 2600); }
+      start: function (q) {
+        if (anim) { cancelAnimationFrame(anim); anim = null; }
+        fit();
+        sx0 = q.x; t0v = t; moved = false; lastX = q.x; lastT = Date.now(); vel = 0;
+      },
+      move: function (q) {
+        if (Math.abs(q.x - sx0) > 10) moved = true;
+        var now = Date.now(), dt = Math.max(1, now - lastT);
+        vel = (q.x - lastX) / dt;                     /* px/ms — 왼쪽이면 음수 */
+        lastX = q.x; lastT = now;
+        setT(t0v - (q.x - sx0) / pageW);              /* 손가락 이동량만큼 실시간 추종 */
+      },
+      end: function () {
+        if (!moved) {                                 /* 드래그가 아니라 탭 */
+          if (t < 0.005) {
+            taps++;
+            if (taps >= 3 && !hinted) { hinted = true; G.toast("스크롤하여 페이지를 넘길 수 있을 것 같다.", 2600); }
+          }
+          return;
         }
+        var to;
+        if (vel < -0.45) to = 1;                      /* 빠르게 왼쪽으로 → 넘김 완료 */
+        else if (vel > 0.45) to = 0;                  /* 빠르게 오른쪽으로 → 되돌림 */
+        else to = t >= 0.5 ? 1 : 0;                   /* 아니면 절반 기준 */
+        glide(to, 260);
       }
     });
+
     window.__passportState = function () {
-      return { page: page + 1, taps: taps, hinted: hinted, took: !!G.flag("tookBeige"),
-               cell: !!host.querySelector('[data-t="takeTileBeige"]') };
+      return { page: t >= 0.5 ? 2 : 1, t: +t.toFixed(4), turning: !!anim, taps: taps, hinted: hinted,
+               took: !!G.flag("tookBeige"), cell: cell.style.display !== "none",
+               ang: +(-180 * t).toFixed(2), spine: SP };
     };
+    /* 검증용 — 진행도를 직접 세팅(캡처·회귀 검사) */
+    window.__pbSetT = function (v) { if (anim) { cancelAnimationFrame(anim); anim = null; } setT(v); };
     openZoom({ id: "passport", title: "여권", node: host, cap: "여권." });
   };
   /* ★v0.17.4 [지시11] 탑승권 = 실사 사진. 사진 속 카드를 크롭해 팝업에 꽉 차게 보여 주고,
