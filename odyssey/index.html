@@ -2,19 +2,19 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<title>비행기에서 내리고 싶다.</title>
+<title>발리 가는 길에서 생긴 일</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="dark">
 <meta name="theme-color" content="#0b0b0c">
 <meta name="robots" content="noindex, nofollow">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="비행기에서 내리고 싶다.">
+<meta name="apple-mobile-web-app-title" content="발리 가는 길에서 생긴 일">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon.png">
 <link rel="icon" href="icon.png">
 <style>
-/* 비행기에서 내리고 싶다. — 1차(비행기) · 세로 폰 화면 전용
+/* 발리 가는 길에서 생긴 일 — 1차(비행기) · 세로 폰 화면 전용
    ★UI 톤(북쑥 지시 2026-09-10 11:23): 싱가포르판의 핑크 대신 **모노톤**.
      무채색(흰·연회색·짙은회색·검정) + 절제된 포인트 1색(웜 오프화이트 --accent).
      여백 넉넉 / 얇은 테두리 / 작은 라운드 / 그림자 최소 / 굵기 대비로 위계.
@@ -457,22 +457,56 @@ body.dbg .ifeHot:active{box-shadow:0 0 0 2px rgba(255,255,255,.95)}
 .reticle{position:absolute;inset:14%;border:1px dashed rgba(255,255,255,.4);border-radius:6px;pointer-events:none}
 #qrView.hit .reticle{border-color:rgba(255,255,255,.9);border-style:solid}
 
-/* 구글맵 — 지도라 무채색+최소 채도 */
-#gmap{position:relative;width:100%;height:100%;background:#e9e9ec;border-radius:var(--r);overflow:hidden}
-#gmap .sea{position:absolute;inset:0;background:#dcdce0}
-#gmap .land{position:absolute;background:#c6c6cb;border-radius:40%}
+/* 구글맵 — 지도라 무채색+최소 채도
+   ★v0.17.9 id(#gmap·#planeIco·#typhoonIco) → 클래스로. 인트로 컷이 폰 **밖**에도 같은 지도를
+   띄우기 때문에 한 화면에 지도가 둘일 수 있다(id 면 중복된다). */
+.gmapWrap{flex:1;position:relative;min-height:0}
+.gmapBox{position:relative;width:100%;height:100%;background:#e9e9ec;border-radius:var(--r);overflow:hidden}
+.gmapBox .sea{position:absolute;inset:0;background:#dcdce0}
+.gmapBox .land{position:absolute;background:#c6c6cb;border-radius:40%}
+.gmRoute{position:absolute;inset:0;width:100%;height:100%}
+.gmCap{position:absolute;left:8px;top:6px;font-size:10px;color:#2a2a2f;
+  background:rgba(255,255,255,.85);border-radius:6px;padding:2px 6px}
 /* ★v0.17.3 [지시3] GPS 끊김 화면 — 지도는 회색·흐릿하게, 그 위에 알림 창 하나 */
-#gmap.dead{filter:grayscale(1) brightness(.82) blur(1.2px)}
+.gmapBox.dead{filter:grayscale(1) brightness(.82) blur(1.2px)}
 .gmapDead{flex:1;position:relative;min-height:0;display:flex;align-items:center;justify-content:center;padding:10px}
-.gmapDead #gmap{position:absolute;inset:0;width:auto;height:auto;border-radius:0}
+.gmapDead .gmapBox{position:absolute;inset:0;width:auto;height:auto;border-radius:0}
 .gpsBox{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:10px;
   background:rgba(16,16,19,.86);border:1px solid rgba(255,255,255,.14);border-radius:14px;
   padding:18px 20px;box-shadow:0 8px 24px rgba(0,0,0,.45)}
 .gpsIco{width:62px;height:62px}
 .gpsMsg{font-size:13px;font-weight:700;color:#e8e9ee;letter-spacing:.2px}
-#planeIco,#typhoonIco{position:absolute;font-size:26px;transition:left .1s linear, top .1s linear}
-#typhoonIco{font-size:30px;animation:spin 2.4s linear infinite}
+/* 지도 위 마커 — 좌표는 % 라 지도 크기가 달라도 같은 자리에 찍힌다(translate 로 중심 정렬) */
+.gmIco{position:absolute;font-size:26px;line-height:1;transform:translate(-50%,-50%);
+  transition:left .1s linear, top .1s linear}
+.gmIco.typhoon{font-size:30px;z-index:2}
+.gmIco.typhoon::before{content:"";position:absolute;inset:-6px;border-radius:50%;
+  background:radial-gradient(circle,rgba(60,70,90,.30) 0%,rgba(60,70,90,0) 70%)}
+/* 도달 순간 — 폭풍이 커지며 비행기를 감싼다(비행기는 z-index 로 그 위에 남는다) */
+.gmIco.typhoon.hit{font-size:52px;opacity:.82}
+.gmIco.typhoon.hit::before{inset:-18px;background:radial-gradient(circle,rgba(40,50,70,.5) 0%,rgba(40,50,70,0) 72%)}
+.gmIco.plane{z-index:3}
+.gmIco.pin{font-size:20px}
+.gmIco.pinLbl{font-size:9px;font-weight:700;color:#2a2a2f;background:rgba(255,255,255,.88);
+  border-radius:5px;padding:1px 4px;letter-spacing:.4px;transform:translate(-50%,8px)}
+.gmIco.plane.landed{filter:drop-shadow(0 0 6px rgba(255,255,255,.85))}
+/* 태풍만 돈다 — 회전과 중심 정렬(translate)을 한 transform 에 같이 넣는다 */
+.gmIco.typhoon{animation:spinC 2.4s linear infinite}
+@keyframes spinC{from{transform:translate(-50%,-50%) rotate(0)}to{transform:translate(-50%,-50%) rotate(360deg)}}
 @keyframes spin{to{transform:rotate(360deg)}}
+
+/* ★v0.17.9 [지시C-2] 인트로 폭풍 컷 — 스토리 오버레이 안의 폰 목업(구글맵 앱과 같은 그림) */
+#story.cut{gap:18px}
+.cutPhone{position:relative;width:min(62vw,228px);height:min(74vh,430px);border-radius:26px;background:#0d0d0f;
+  border:1px solid rgba(255,255,255,.16);box-shadow:0 12px 34px rgba(0,0,0,.5);padding:7px;display:flex}
+.cutIsland{position:absolute;top:12px;left:50%;transform:translateX(-50%);width:62px;height:17px;
+  border-radius:10px;background:#000;z-index:6}
+.cutScreen{flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden;border-radius:20px;
+  background:linear-gradient(170deg,#26262a 0%,#141416 60%,#0d0d0f 100%)}
+.cutScreen .gmapBox{flex:1;min-height:0;border-radius:0}
+.cutBack{color:var(--n6)}
+.cutBoom{min-height:30px;font-size:23px;font-weight:800;letter-spacing:5px;color:#f2f2f5;
+  text-shadow:0 2px 10px rgba(0,0,0,.6)}
 
 /* ───────── 오버레이/기타 ───────── */
 .overlay{
@@ -627,6 +661,9 @@ body.dbg.hints .cvcell{box-shadow:inset 0 0 0 2px rgba(255,255,255,.30)}
 body.dbg.hints .cvcell.extra{box-shadow:inset 0 0 0 2px rgba(255,255,255,.45);border-radius:50%;animation:glow 2.6s ease-in-out infinite}
 .cvcell.extra .cv{background:rgba(6,6,8,.5);font-size:13px !important}
 /* IFE 인디케이터 */
+/* ★v0.17.9 [지시G] 꺼진 IFE 화면에 새겨진 Z 마크 — 조작 대상이 아니다 */
+.cvcell.ifeZ{pointer-events:none;background:transparent;border:0}
+.cvcell.ifeZ svg{width:100%;height:100%;display:block}
 .ifeDot{position:absolute;border-radius:50%;border:2px solid rgba(255,255,255,.55);background:rgba(255,255,255,.06);
   transition:background .18s, border-color .18s}
 .ifeDot.on{background:#5bbf7a;border-color:#8fe0a5}
@@ -908,7 +945,7 @@ body.dbg .cvcell.cabBtn:active{box-shadow:inset 0 0 0 3px rgba(255,255,255,.8)}
 
   <!-- 상단 바 -->
   <div id="topbar">
-    <div id="roomName">비행기에서 내리고 싶다.</div>
+    <div id="roomName">발리 가는 길에서 생긴 일</div>
     <div id="topRight">
       <button class="tbtn" id="btnMenu" data-t="menu">☰</button>
     </div>
@@ -977,7 +1014,7 @@ body.dbg .cvcell.cabBtn:active{box-shadow:inset 0 0 0 3px rgba(255,255,255,.8)}
     <span class="deco" style="bottom:26%;left:16%;animation-delay:.7s">☁️</span>
     <span class="deco" style="bottom:18%;right:18%;animation-delay:1.6s">💫</span>
     <div class="bigemoji">🛫🌺</div>
-    <h1>비행기에서 내리고 싶다.</h1>
+    <h1>발리 가는 길에서 생긴 일</h1>
     <p id="introText"></p><!-- ★v0.15.5 인트로 문구는 나중에 채운다(지금은 비움) -->
     <div id="offlineBanner" class="banner wait">오프라인 준비 중…</div>
     <button class="btn primary" data-t="start" id="btnStart">시작하기</button>
@@ -11097,7 +11134,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 (function () {
   "use strict";
 
-  var BUILD = "ODY-S1-20260913-1135";
+  var BUILD = "ODY-S1-20260913-1406";
   var LSKEY = "odyssey.s1.v1";
 
   var qs = new URLSearchParams(location.search);
@@ -11237,9 +11274,14 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 
   /* ───────── 소리(Web Audio, 음원 없이 신호음) ───────── */
   var actx = null;
+  /* ★v0.17.9 [지시E] "interrupted" 는 사파리 전용 상태다 —
+     전화·알람·다른 앱의 소리처럼 **시스템이 오디오를 빼앗아 갔을 때** 들어가고,
+     "suspended"(백그라운드 진입·자동재생 차단)와 달리 이름이 달라서 여기서 안 걸러 주면
+     돌아와도 영영 안 깨어난다. 둘 다 같이 본다. */
+  function ctxDead(a) { return !!a && (a.state === "suspended" || a.state === "interrupted"); }
   function audio() {
     if (!actx) { try { actx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { actx = null; } }
-    if (actx && actx.state === "suspended") { try { actx.resume(); } catch (e) {} }
+    if (ctxDead(actx)) { try { actx.resume(); } catch (e) {} }
     return actx;
   }
 
@@ -11317,7 +11359,23 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
        실측으로 루프 = 62마디(248비트·126.112s), 겹침 = 120ms 가 최적이었다.
        곡 끝 2마디는 아우트로라 잦아들어(마지막 100ms −23.4dB) 루프에 넣으면 안 된다 —
        64마디 통짜로 이으면 경계 차 8.71dB·급변 4.44dB, 62마디로 끊으면 1.02dB·0.68dB.
-       오프비트 오차 0.0ms. def.loop 가 없으면 예전처럼 무음 트림 + 꼬리 접기로 폴백한다. */
+       오프비트 오차 0.0ms. def.loop 가 없으면 예전처럼 무음 트림 + 꼬리 접기로 폴백한다.
+
+     ★v0.17.9 [지시A·B] 광고게임 BGM(ad_bgm) 도 같은 방식으로 —
+       ①음량: 파일 자체가 다른 곡보다 작았다(EBU R128 적분 라우드니스 **-17.8 LUFS**,
+         스도쿠 곡 -12.5 LUFS → 체감 5.3 LU 차이). 게인만 올리면 트루피크가 -0.9dBFS 라
+         바로 클리핑이라, **파일을 +7dB 올리고 트루피크 리미터(-1.4dBFS)** 로 눌러 다시 구웠다.
+           결과 -12.7 LUFS · TP -1.4dBFS · LRA 1.5→1.6LU(다이내믹 손상 없음) · 클리핑 0.
+           vol 은 0.46 그대로 — 이제 스도쿠 곡과 같은 게인에서 같은 크기로 들린다.
+       ②박자 루프: 이 곡(Happy Adventure Loop)은 **파일 통째가 딱 24마디(96비트)** 다.
+         실측 = 2,064,384샘플 / 44.1kHz = 46.811429s, 비트 487.619ms 로 나누면 96.0000박
+         (오프비트 0.0ms). 그래서 자르지 않고 **파일 전체를 루프**로 돌린다(startSec 0·beats 96).
+         · 애초에 이어 붙으라고 만든 트랙이라 끝→처음 파형이 이미 이어진다(원본 단차 0.0005).
+           리미터를 그냥 걸면 경계에서 게인 엔벨로프가 튀어 단차가 0.144 로 벌어지길래,
+           **원본을 3번 이어 붙여 리미터를 먹인 뒤 가운데 한 벌만 잘라냈다** → 단차 0.0025.
+         · 그래서 겹칠 재료가 필요 없다(xfadeSec 0). 자를 데가 없으니 남길 꼬리도 없다.
+       ③스도쿠·네모로직은 v0.17.7 부터 메인과 **같은 음원**이라 이 작업으로 자동 적용된다
+         (bgmSameFileAsMain → 메인 버퍼 루프를 그대로 이어 듣는다). 손댈 곳 없음. */
   var BGM_DEF = {
     main: {
       file: "sudoku_bgm.mp3", vol: 0.42, resume: true, seamless: true,
@@ -11326,7 +11384,12 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
               startSec: 0.010159, beats: 248, xfadeSec: 0.120 }
     },
     sudoku: { file: "sudoku_bgm.mp3", vol: 0.46, resume: false },
-    ad: { file: "ad_bgm.mp3", vol: 0.46, resume: false }
+    ad: {
+      file: "ad_bgm.mp3", vol: 0.46, resume: false, seamless: true,
+      /* tools/beat-grid.mjs src/assets/audio/ad_bgm.mp3 (BPM·비트 검출) + 파일 길이 실측(96.0000박) */
+      loop: { bpm: 123.047, beatsPerBar: 4, beatSec: 0.487619048,
+              startSec: 0, beats: 96, xfadeSec: 0 }
+    }
   };
   var BGM_FADE = 320;
   var BGM_SEAM_WAIT = 4000;   /* 디코드를 이만큼 기다려도 안 되면 엘리먼트로 폴백 */
@@ -11420,6 +11483,10 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       var bl = Math.round(LP.beats * LP.beatSec * sr);          /* 루프 길이(비트 정수배) */
       var be = bs + bl;
       var bx = Math.round((LP.xfadeSec || 0) * sr);
+      /* ★v0.17.9 루프가 **파일 끝까지**인 트랙(ad = 통째 24마디)은 반올림으로 be 가 N 을
+         몇 샘플 넘길 수 있다 — decodeAudioData 가 컨텍스트 샘플레이트(보통 48k)로 리샘플하면
+         길이가 정수로 안 떨어지기 때문이다. 10ms 이내면 파일 끝으로 스냅한다(폴백 방지). */
+      if (be > N && be - N <= Math.round(sr * 0.01)) { be = N; bl = be - bs; }
       if (be + bx > N) bx = Math.max(0, N - be);                /* 겹칠 재료가 모자라면 줄인다 */
       if (be <= N && bl > sr) {
         /* 겹침 재료는 [be, be+bx) — 루프 **뒤쪽**이라 루프 길이를 건드리지 않는다.
@@ -11733,10 +11800,85 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   }
 
   /* 첫 사용자 입력에서 한 번만 */
-  function firstGesture() { unlockAudio(); bgmUnlock(); bgmKick(); }
+  function firstGesture() { unlockAudio(); bgmUnlock(); bgmKick(); wake("gesture"); }
   ["pointerdown", "touchend", "mousedown", "keydown"].forEach(function (ev) {
     document.addEventListener(ev, firstGesture, { capture: true, once: false, passive: true });
   });
+
+  /* ═══════════ ★v0.17.9 [지시E] 앱 전환·홈 화면에 갔다 오면 소리가 꺼진 채 남던 문제 ═══════════
+     증상: 다른 앱을 보다 돌아오면 BGM 이 안 나온다. 화면을 몇 번 만져야 돌아오거나, 아예 안 돌아온다.
+     원인: iOS 는 백그라운드로 나가는 순간 AudioContext 를 **suspended** 로 내리고,
+           전화·알람 같은 인터럽션에서는 사파리 전용 상태인 **interrupted** 로 만든다.
+           둘 다 **스스로는 복구되지 않는다** —
+             · 버퍼 루프 트랙: 컨텍스트 시계가 멈춰 소리도 위치도 정지(노드는 살아 있다)
+             · 엘리먼트 트랙: 시스템이 pause 시켜 둔다
+           게임 쪽에는 "돌아왔다" 를 듣는 귀가 없어서 그대로 방치됐다.
+     고침: 돌아오는 길목 네 군데에서 깨운다 — visibilitychange(visible) · focus · pageshow ·
+           AudioContext.onstatechange(보이는 동안 죽으면 바로 되살리기).
+           깨우는 순서는 ①ctx.resume() ②bgmApply(true) 로 **지금 상태(wantMain/over/holds)** 를 다시 적용
+           ③bgmKick() 으로 멈춰 있는 트랙 재시작. 버퍼 소스는 노드가 살아 있으니 resume 만으로
+           **멈춘 자리에서** 이어지고, 엘리먼트는 kick 이 play() 를 다시 부른다.
+     제스처가 필요한 경우: 사파리가 resume() 을 제스처 밖에서 거부할 수 있다.
+           그때는 위 firstGesture(pointerdown·touchend·mousedown·keydown, once:false 로 **매 입력마다** 돈다)가
+           그대로 받아 준다 — 복귀 후 **첫 탭**에서 확실히 재개된다. 그 경로에도 wake() 를 붙여 놨다.
+     검증 훅: window.__bgmWake() 로 수동 호출 · window.__bgmWakeLog() 로 시도 기록 확인 */
+  var wakeLog = [];
+  /** 지금 울려야 할 트랙이 실제로는 멈춰 있는가 (버퍼=노드 없음 / 엘리먼트=pause) */
+  function bgmStalled() {
+    var r = bgmCur && bgmRec[bgmCur];
+    if (!r) return false;
+    if (r.seam) {
+      if (r.bufState === "loading") return false;     /* 아직 디코드 중 — 곧 스스로 튼다 */
+      if (r.bufState === "ready") return !r.node;
+    }
+    try { return !!r.au.paused; } catch (e) { return false; }
+  }
+  function wake(why) {
+    var had = !!actx, st0 = actx ? actx.state : null;
+    /* 아직 소리를 한 번도 쓴 적 없고 틀 것도 없으면 컨텍스트를 새로 만들지 않는다(조용히 지나간다) */
+    if (!had && !bgmCur && !bgmWantMain) return;
+    /* 입력마다 도는 제스처 경로는 **실제로 문제가 있을 때만** 손댄다(정상일 땐 기록도 안 남긴다) */
+    if (why === "gesture" && !ctxDead(actx) && !bgmStalled()) return;
+    var a = audio();                                  /* 여기서 resume() 이 걸린다 */
+    var fin = function () {
+      bgmApply(true);                                 /* 지금 상태에 맞는 트랙 재적용 */
+      bgmKick();                                      /* 멈춰 있으면 다시 재생 */
+      wakeLog.push({ why: why, at: Date.now(), was: st0, now: actx ? actx.state : null,
+                     cur: bgmCur, playing: !!(bgmCur && bgmRec[bgmCur] && bgmRec[bgmCur].playing) });
+      if (wakeLog.length > 30) wakeLog.shift();
+    };
+    if (a && a.resume && ctxDead(a)) {
+      try { var p = a.resume(); if (p && p.then) { p.then(fin, fin); return; } } catch (e) {}
+    }
+    fin();
+  }
+  document.addEventListener("visibilitychange", function () {
+    if (document.visibilityState === "visible") wake("visible");
+  });
+  window.addEventListener("focus", function () { wake("focus"); });
+  /* bfcache 복귀(뒤로가기·앱 전환 후 사파리 복원)도 같은 길목이다 */
+  window.addEventListener("pageshow", function () { wake("pageshow"); });
+  /* 보이는 동안 컨텍스트가 죽으면(인터럽션) 곧바로 되살려 본다 */
+  (function watchCtx() {
+    var seen = null;
+    setInterval(function () {
+      if (!actx) return;
+      var st = actx.state;
+      if (st !== seen) {
+        seen = st;
+        if (ctxDead(actx) && document.visibilityState === "visible" && (bgmCur || bgmWantMain)) wake("statechange:" + st);
+      }
+    }, 1000);
+  })();
+  window.__bgmWake = wake;
+  window.__bgmWakeLog = function () { return wakeLog.slice(); };
+  /* 검증 전용 — 실제 iOS 가 백그라운드에서 하는 짓(컨텍스트 정지)을 흉내 낸다.
+     헤드리스 브라우저는 탭을 숨겨도 컨텍스트를 안 멈추기 때문에 이 훅으로 같은 상황을 만든다. */
+  window.__bgmSuspend = function () {
+    if (!actx || !actx.suspend) return null;
+    try { var p = actx.suspend(); if (p && p.then) return p.then(function () { return actx.state; }); } catch (e) {}
+    return actx.state;
+  };
 
   /* ★v0.15 [5] iOS 더블탭 확대 완전 차단 —
      touch-action:manipulation 만으로는 Safari 가 여전히 확대하는 경우가 있어
@@ -12038,7 +12180,9 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     p24DanceLock: "화장실 하단 수납장(수납장1)",  // Q17 춤 순서(◀▶ 5회) 입력 위치
     ladderFrom: "화장실 하단 수납장(수납장1)",    // Q19 사다리 출처 = 춤 순서 자물쇠 보상
     p24Dance: ["L", "R", "R", "L", "R"],       // Q18 춤(골반 씰룩) 순서
-    gmapPass: "2579",                            // Q14 구글맵 비번(조각 ①②③④)
+    /* ★v0.17.9 [지시C] **폐지** — `gmapPass: "2579"`(Q14 구글맵 4자리 비번).
+       북쑥 확정 설계로 #11 은 비밀번호가 없는 문제가 됐다. 관문은 GPS 복구 하나뿐이고
+       복구된 지도를 열면 곧바로 덴파사르 도착 엔딩이다. (QUESTIONS Q14·Q39·Q49 종결) */
     pamphletText: "A"                            // Q15 팜플렛 문구(후보 A)
   };
 
@@ -12174,8 +12318,8 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     p16: "858",                                                  // #16 카톡 숫자
     p27: "HAWAIIAN",                                              // ★v0.14 #27 화장실 상단 수납장2(알파벳 8칸)
     p19: "soeasytoyou",                                          // #19 미니게임 앱 비번
-    p25: ["black", "brown", "dark", "beige"],                    // ★v0.5 #25 색상판 순서(왼→오)
-    p11: TEMP.gmapPass                                           // #11 구글맵(임시)
+    p25: ["black", "brown", "dark", "beige"]                     // ★v0.5 #25 색상판 순서(왼→오)
+    /* ★v0.17.9 [지시C] **폐지** — `p11: TEMP.gmapPass`. #11 에는 이제 입력할 정답이 없다. */
   };
 
   /* ★v0.17.1 #25 간식칸 초기 배치 — 짙은갈색판이 **1번(맨 왼쪽) 홈**에 처음부터 끼워져 있다.
@@ -12636,6 +12780,11 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     screen: { x: 26.9, y: 19.5, w: 44.7, h: 42.8 },
     /* ★v0.4: 큰 원 → 작은 점. 지름 = 스크린 폭의 3%, 간격 균일, 스크린 세로 중앙 아래쪽 */
     dots: { y: 45.0, size: 1.34, sizeY: 2.0, x0: 40.3, gap: 3.31 },
+    /* ★v0.17.9 [지시G] 꺼진 화면에 새기는 Z 마크(읽는 순서 암시).
+       스크린 = x 26.9~71.6 · y 19.5~62.3, 인디케이터 점줄 = x 40.3~57.2 · y 45.0~47.0.
+       Z 박스는 스크린 가로 중앙(49.25%)에 두고 점줄 **위쪽**만 쓴다 → 겹침 0(위 3.1% · 아래 4.6% 여유).
+       SVG 비율 100:46 을 픽셀로 맞추려고 h 를 이미지 세로% 로 환산: 26%×1100×0.46 ÷ 738 = 17.8% */
+    zmark: { x: 36.25, y: 22.6, w: 26.0, h: 17.8 },
     /* ★v0.10 탭 영역을 버튼줄과 같은 높이(8.6%)로 키웠다 — 원래 6.2% 는 어떤 배율에서도
        44px 을 못 넘겨(그러려면 패널이 화면 밖으로 나간다) 여기만 히트 영역을 넓혔다.
        (그린 아이콘 크기는 그대로, 눌리는 범위만 커진다) */
@@ -13656,8 +13805,11 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     inkClip.appendChild(ink);
     layer.appendChild(inkClip);
     stack.appendChild(layer);
+    /* ★v0.17.9 [지시H] ↕ 는 **기본 숨김** — 드래그 없이 탭만 3번이면 그때 한 번 나타난다
+       (활쏘기 "스크롤 해서…"·여권 안내와 같은 1회 온보딩. 표시 방식은 그대로, 등장 조건만 바뀜) */
     var hint = el("div", "dragHint", "↕");
     stack.appendChild(hint);
+    var hTaps = 0, hShown = false, hDragged = false;
     wrap.appendChild(stack);
 
     /* 사진 실측(이미지 세로 %) */
@@ -13687,19 +13839,32 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       /* 인쇄된 것들은 하우징 선 위로는 안 보인다(가리개가 아직 안 나온 부분) */
       var icp = "inset(" + TOP.toFixed(2) + "% 0 0 0)";
       inkClip.style.clipPath = icp; inkClip.style.webkitClipPath = icp;
-      hint.style.display = d > g.D * 0.985 ? "none" : "block";
+      hint.style.display = (hShown && d <= g.D * 0.985) ? "block" : "none";
       centerDigits();
     }
-    var startY = 0, startD = 0;
+    var startY = 0, startD = 0, hMoved = false;
     G.drag(stack, {
-      start: function (q) { startY = q.y; startD = d; },
-      move: function (q) { d = startD + (q.y - startY); apply(); },
+      start: function (q) { startY = q.y; startD = d; hMoved = false; },
+      move: function (q) {
+        /* 손가락이 6px 넘게 움직이면 드래그 — 조작을 아는 것이므로 안내를 아예 끈다 */
+        if (!hMoved && Math.abs(q.y - startY) > 6) { hMoved = true; hDragged = true; hTaps = 0; hShown = false; }
+        d = startD + (q.y - startY); apply();
+      },
       end: function () {
+        if (!hMoved && !hDragged && !hShown) {          /* 드래그가 아니라 탭 */
+          hTaps++;
+          if (hTaps >= 3) { hShown = true; apply(); }
+        }
         var g = geom();
         if (d > g.D * 0.9) { d = g.D; apply(); if (opt.onClosed) opt.onClosed(); }
         else if (d < g.D * 0.08) { d = 0; apply(); }
       }
     });
+    /* 검증 훅 */
+    wrap._hint = function () {
+      return { taps: hTaps, shown: hShown, dragged: hDragged,
+               visible: getComputedStyle(hint).display !== "none" };
+    };
     if (opt.closed) d = 1e9;
     apply();
     setTimeout(apply, 30); setTimeout(apply, 250); setTimeout(apply, 700);
@@ -13769,8 +13934,11 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     var artCv = document.createElement("canvas"); artCv.className = "tissueArt";
     stack.appendChild(artCv);
     wrap.appendChild(stack);
+    /* ★v0.17.9 [지시H] 가리개와 같은 규칙 — ↕ 기본 숨김, 드래그 없이 탭 3번이면 한 번 등장.
+       카운트는 이 위젯 것만 센다(가리개와 독립). */
     var hint = el("div", "dragHint", "↕");
     wrap.appendChild(hint);
+    var hTaps = 0, hShown = false, hDragged = false;
 
     var artImg = new Image();
     artImg.onload = function () { apply(); };
@@ -13821,7 +13989,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       tear.style.clipPath = tcp; tear.style.webkitClipPath = tcp;
       tear.style.display = cut >= PEND - 0.5 ? "none" : "block";
       drawArt(g, g.top0 + d);
-      hint.style.display = d > g.D * 0.985 ? "none" : "block";
+      hint.style.display = (hShown && d <= g.D * 0.985) ? "block" : "none";
     }
     /* ★v0.13.4 곡면 투영 없음 — 그림은 어디서든 **평면 그대로**, 시작선 위만 잘린다 */
     function drawArt(g, top) {
@@ -13841,15 +14009,26 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       artCv.style.clipPath = acp; artCv.style.webkitClipPath = acp;
     }
 
-    var startY = 0, startD = 0;
+    var startY = 0, startD = 0, hMoved = false;
     G.drag(stack, {
-      start: function (q) { startY = q.y; startD = d; },
-      move: function (q) { d = startD + (q.y - startY); apply(); },     /* 1:1 */
+      start: function (q) { startY = q.y; startD = d; hMoved = false; },
+      move: function (q) {
+        if (!hMoved && Math.abs(q.y - startY) > 6) { hMoved = true; hDragged = true; hTaps = 0; hShown = false; }
+        d = startD + (q.y - startY); apply();                          /* 1:1 */
+      },
       end: function () {
+        if (!hMoved && !hDragged && !hShown) {
+          hTaps++;
+          if (hTaps >= 3) { hShown = true; apply(); }
+        }
         var g = geom();
         if (d > g.D * 0.98) { d = g.D; apply(); if (opt.onFull) opt.onFull(); }
       }
     });
+    wrap._hint = function () {
+      return { taps: hTaps, shown: hShown, dragged: hDragged,
+               visible: getComputedStyle(hint).display !== "none" };
+    };
     setTimeout(apply, 20); setTimeout(apply, 200); setTimeout(apply, 600);
     window.addEventListener("resize", apply);
     register({ answer: "휴지를 끝까지 풀어", force: function () { d = geom().D; apply(); if (opt.onFull) opt.onFull(); } });
@@ -14975,12 +15154,17 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 
   var view = "lock";
 
+  function isOpen() { return $("phoneWrap").classList.contains("show"); }
   function open() {
     $("phoneWrap").classList.add("show");
     render();
   }
   function close() {
     stopCam();
+    /* ★v0.17.9 폰을 닫으면 끊김 창도 닫힌 것이다(이 상태로 새로고침해도 복구 안 됨)
+       + 진행 중이던 도착 애니메이션도 멈춘다(닫아 놓고 엔딩이 혼자 뜨는 걸 막는다) */
+    if (G.flag("gpsOnScreen")) G.setFlag("gpsOnScreen", false);
+    gmapStop();
     $("phoneWrap").classList.remove("show");
   }
   function go(v) { view = v; render(); }
@@ -15410,7 +15594,19 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     window.__tamaDance = dance;
   }
 
-  /* ═══════════ 구글맵 (#11 · 1차 결말) ═══════════ */
+  /* ═══════════ 구글맵 (#11 · 1차 결말) ═══════════
+     ★v0.17.9 [지시C] 북쑥 확정 설계 — **네 자리 비번 폐지**.
+       (검증 게이트 verify-v173 이 빌드 전문에서 옛 스펙 라벨 문자열을 찾아 잡는다 —
+        그래서 이 주석에서도 그 문구를 그대로 쓰지 않는다)
+       · 폐지: `ANS.p11` / `TEMP.gmapPass`("2579") / 4자리 순환 자물쇠 UI / `gmapOpen` 플래그.
+         (오랫동안 "구글맵 문제 미정" 으로 남아 있던 자리였다 — QUESTIONS Q14/Q39/Q49 종결)
+       · 남는 관문은 **GPS 복구** 하나다. 그것도 조건이 세졌다:
+         「GPS 연결 끊김」 창이 **떠 있는 상태에서 새로고침**해야 복구된다(gpsOnScreen).
+         예전엔 한 번 보기만 하면(gpsSeen) 그 뒤 아무 때나 새로고침해도 풀렸다.
+       · 복구된 지도를 열면 4자리 없이 **바로 엔딩** — 내 위치(비행기)가 덴파사르(DPS)로
+         날아가 도착하는 애니메이션 → MAIN.ending() 의 "무사 도착" 화면.
+       · 태풍이 다가와 흔들리던 옛 연출은 **인트로(탑승 직후)로 이관**했다(main.js introStorm). */
+
   /* ★v0.17.3 [지시3] GPS 픽토그램 + 빨간 사선 — 위치가 안 잡힌다는 표시 */
   var GPS_LOST_SVG =
     '<svg viewBox="0 0 72 72" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">' +
@@ -15420,15 +15616,61 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     '<g stroke-linecap="round"><line x1="12" y1="60" x2="60" y2="12" stroke="#1a1b21" stroke-width="10"/>' +
     '<line x1="12" y1="60" x2="60" y2="12" stroke="#d8453b" stroke-width="5.4"/></g></svg>';
 
-  /** 신호가 끊긴 지도 배경(회색·흐릿) — 조작 대상 없음 */
-  function deadMapBg() {
-    var g = el("div"); g.id = "gmap"; g.className = "dead";
-    g.innerHTML = '<div class="sea"></div>';
-    var l1 = el("div", "land"); l1.style.cssText = "left:-14%;top:-6%;width:60%;height:34%;background:#c6c6cb";
-    var l2 = el("div", "land"); l2.style.cssText = "right:-18%;bottom:-8%;width:70%;height:36%;background:#c6c6cb";
+  /* ── 지도 목업 ──────────────────────────────────────────────
+     ★v0.17.9 인트로 컷(폭풍)·엔딩(도착)·GPS 끊김 화면이 **같은 그림**을 쓰도록 한 곳에 모았다.
+       예전엔 id(#gmap·#planeIco·#typhoonIco)로 잡던 걸 클래스로 바꿨다 — 인트로에서는
+       폰 밖(스토리 오버레이)에도 같은 지도를 띄워야 해서 한 화면에 둘이 있을 수 있다. */
+  var ROUTE_D = "M14 12 C 40 34, 58 58, 84 88";     /* 인천 → 덴파사르 항로(퍼센트 좌표) */
+  var ROUTE_P = [[14, 12], [40, 34], [58, 58], [84, 88]];
+  /** 항로(3차 베지에) 위 t(0~1) 지점의 [x%, y%] */
+  function routeAt(t) {
+    var u = 1 - t, a = u * u * u, b = 3 * u * u * t, c = 3 * u * t * t, d = t * t * t;
+    return [a * ROUTE_P[0][0] + b * ROUTE_P[1][0] + c * ROUTE_P[2][0] + d * ROUTE_P[3][0],
+            a * ROUTE_P[0][1] + b * ROUTE_P[1][1] + c * ROUTE_P[2][1] + d * ROUTE_P[3][1]];
+  }
+  var PLANE_T0 = 0.42;      /* 지금 비행기가 와 있는 지점(항로 중간) */
+
+  /** 지도 한 장. opts: dead(회색·흐림) · route(항로 점선) · caption(좌상단 라벨) */
+  function mapBox(opts) {
+    opts = opts || {};
+    var g = el("div", "gmapBox" + (opts.dead ? " dead" : ""));
+    g.appendChild(el("div", "sea"));
+    var l1 = el("div", "land"); l1.style.cssText = "left:-14%;top:-6%;width:60%;height:34%";
+    var l2 = el("div", "land"); l2.style.cssText = "right:-18%;bottom:-8%;width:70%;height:36%";
     g.appendChild(l1); g.appendChild(l2);
+    if (opts.route) {
+      var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.setAttribute("viewBox", "0 0 100 100");
+      svg.setAttribute("preserveAspectRatio", "none");
+      svg.setAttribute("class", "gmRoute");
+      svg.innerHTML = '<path d="' + ROUTE_D + '" fill="none" stroke="#6a6a70" stroke-width="1.4" stroke-dasharray="3 2"/>';
+      g.appendChild(svg);
+    }
+    if (opts.caption) g.appendChild(el("div", "gmCap", opts.caption));
     return g;
   }
+  /** 지도 위 마커 하나 — kind: "plane" | "typhoon" | "pin" */
+  function marker(g, kind, glyph, t) {
+    var m = el("div", "gmIco " + kind, glyph);
+    var p = routeAt(t == null ? PLANE_T0 : t);
+    m.style.left = p[0] + "%"; m.style.top = p[1] + "%";
+    g.appendChild(m);
+    return m;
+  }
+  function moveTo(m, x, y) { m.style.left = x + "%"; m.style.top = y + "%"; }
+
+  /* ★v0.17.9 [지시C-1] "끊김 창이 떠 있는 동안" 을 저장에 남긴다.
+     새로고침은 페이지를 통째로 날리므로 **리로드 이전에** 기록해 둬야 판정할 수 있다.
+     화면을 벗어나면(뒤로·홈·폰 닫기·다른 뷰) 곧바로 지운다 → 닫힌 채 새로고침하면 복구 안 됨. */
+  function gpsOnScreen(on) {
+    if (!!G.flag("gpsOnScreen") === !!on) return;      /* 값이 그대로면 저장도 하지 않는다 */
+    G.setFlag("gpsOnScreen", !!on);
+  }
+
+  /* 도착 애니메이션 타이머 — 화면을 벗어나면(뒤로·폰 닫기) 멈춘다.
+     안 멈추면 폰을 닫아 둔 채로 엔딩이 혼자 떠 버린다. 다시 열면 처음부터 다시 난다. */
+  var gmapAnim = null;
+  function gmapStop() { if (gmapAnim) { clearInterval(gmapAnim); gmapAnim = null; } }
 
   function viewGmap() {
     var sc = screen();
@@ -15436,11 +15678,11 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     var body = el("div", "pBody");
     body.appendChild(header("구글맵", function () { go("home"); }));
 
-    /* ★v0.17.3 [지시3] 복구 전에는 GPS 가 끊겨 있다 — 비밀번호 칸도 뜨지 않는다 */
-    if (!G.flag("gmapOpen") && !G.flag("gpsRestored")) {
+    /* ★v0.17.3 [지시3] 복구 전에는 GPS 가 끊겨 있다 */
+    if (!G.flag("gpsRestored")) {
       var dead = el("div", "gmapDead");
       dead.setAttribute("data-t", "gpsLost");
-      dead.appendChild(deadMapBg());
+      dead.appendChild(mapBox({ dead: true }));
       var gbox = el("div", "gpsBox");
       var gico = el("div", "gpsIco"); gico.innerHTML = GPS_LOST_SVG;
       gbox.appendChild(gico);
@@ -15449,69 +15691,45 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       body.appendChild(dead);
       sc.appendChild(body);
       if (!G.flag("gpsSeen")) G.setFlag("gpsSeen");
+      gpsOnScreen(true);                                /* ★이 화면이 떠 있다 */
       return;
     }
 
-    if (!G.flag("gmapOpen")) {
-      var box = el("div");
-      box.style.cssText = "flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:14px";
-      box.appendChild(el("div", null, "🔒"));
-      box.appendChild(el("div", null, "잠긴 앱"));   /* ★v0.17.3 [지시8] 자물쇠 스펙 라벨 삭제 */
-      /* ★v0.5: 조각 아이템이 색상판으로 대체돼 힌트 출처가 빠짐 → 게임 내 힌트는 "준비 중"
-         (정답은 ?debug=1 의 '정답' 표시로만 확인) */
-      var frags = el("div", "gmHint", "힌트 준비 중");
-      box.appendChild(frags);
-      box.appendChild(W.cycleLock({
-        id: "p11", n: 4, pool: "0123456789".split(""), size: 10, answer: DATA.ANS.p11,
-        onSolve: function () { G.setFlag("gmapOpen"); render(); }
-      }));
-      body.appendChild(box);
-      sc.appendChild(body);
-      return;
-    }
-
-    /* 지도 + 태풍 접근 */
-    var map = el("div");
-    map.style.cssText = "flex:1;position:relative;min-height:0";
-    var g = el("div"); g.id = "gmap";
-    g.innerHTML = '<div class="sea"></div>';
-    var l1 = el("div", "land"); l1.style.cssText = "left:-14%;top:-6%;width:60%;height:34%;background:#c6c6cb";
-    var l2 = el("div", "land"); l2.style.cssText = "right:-18%;bottom:-8%;width:70%;height:36%;background:#c6c6cb";
-    g.appendChild(l1); g.appendChild(l2);
-    var route = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    route.setAttribute("viewBox", "0 0 100 100");
-    route.setAttribute("preserveAspectRatio", "none");
-    route.style.cssText = "position:absolute;inset:0;width:100%;height:100%";
-    route.innerHTML = '<path d="M14 12 C 40 34, 58 58, 84 88" fill="none" stroke="#6a6a70" stroke-width="1.4" stroke-dasharray="3 2"/>';
-    g.appendChild(route);
-    var plane = el("div", null, "✈️"); plane.id = "planeIco";
-    var ty = el("div", null, "🌀"); ty.id = "typhoonIco";
-    g.appendChild(plane); g.appendChild(ty);
-    var cap = el("div", null, "인천 → 덴파사르");
-    cap.style.cssText = "position:absolute;left:8px;top:6px;font-size:10px;color:#2a2a2f;background:rgba(255,255,255,.85);border-radius:6px;padding:2px 6px";
-    g.appendChild(cap);
+    /* ★v0.17.9 [지시C-3] 복구된 지도 = 곧바로 엔딩 — 내 위치가 덴파사르(DPS)까지 날아간다 */
+    var map = el("div", "gmapWrap");
+    map.setAttribute("data-t", "gmapArrive");
+    var g = mapBox({ route: true, caption: "인천 → 덴파사르" });
+    var pin = marker(g, "pin", "📍", 1);
+    pin.setAttribute("data-t", "gmDps");
+    marker(g, "pinLbl", "DPS", 1);                      /* 지도 라벨(디제틱) — 목적지 표시 */
+    var plane = marker(g, "plane", "✈️", PLANE_T0);
+    plane.setAttribute("data-t", "gmPlane");
     map.appendChild(g);
     body.appendChild(map);
     sc.appendChild(body);
 
-    var t = 0;
-    plane.style.left = "42%"; plane.style.top = "44%";
-    ty.style.left = "96%"; ty.style.top = "12%";
-    var iv = setInterval(function () {
-      t += 0.02;
-      ty.style.left = (96 - 58 * t) + "%";
-      ty.style.top = (12 + 30 * t) + "%";
+    var t = 0, STEP = 0.0145;                            /* 60ms × 69스텝 ≈ 4.1초 */
+    gmapStop();
+    gmapAnim = setInterval(function () {
+      t = Math.min(1, t + STEP);
+      var q = routeAt(PLANE_T0 + (1 - PLANE_T0) * t);
+      moveTo(plane, q[0], q[1]);
       if (t >= 1) {
-        clearInterval(iv);
-        MAIN.ending();
+        gmapStop();
+        plane.classList.add("landed");
+        G.beep(520, .18, "sine", .1);
+        setTimeout(function () { if (isOpen()) MAIN.ending(); }, 620);
       }
     }, 60);
-    window.__gmapSkip = function () { clearInterval(iv); MAIN.ending(); };
+    window.__gmapSkip = function () { gmapStop(); MAIN.ending(); };
   }
 
   function render() {
     if (view === "lock" && G.flag("phoneOpen")) view = "home";
     if (view !== "qr") stopCam();
+    /* ★v0.17.9 [지시C-1] 다른 화면을 그리는 순간 "끊김 창이 떠 있다" 는 내려간다.
+       (gmap 뷰면 viewGmap 이 다시 올린다 — 복구 후에는 올리지 않는다) */
+    if (view !== "gmap") { gpsOnScreen(false); gmapStop(); }
     if (view === "lock") viewLock();
     else if (view === "home") viewHome();
     else if (view === "kakao") viewKakao();
@@ -15522,8 +15740,10 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 
   window.PHONE = {
     open: function () { view = G.flag("phoneOpen") ? "home" : "lock"; open(); },
-    close: close, go: go, stopCam: stopCam,
-    isOpen: function () { return $("phoneWrap").classList.contains("show"); }
+    close: close, go: go, stopCam: stopCam, isOpen: isOpen,
+    /* ★v0.17.9 [지시C-2] 인트로 컷이 쓰는 지도 목업 — 구글맵 앱과 **같은 그림**이다 */
+    mapBox: mapBox, marker: marker, moveTo: moveTo, routeAt: routeAt, PLANE_T0: PLANE_T0,
+    statusbar: statusbar
   };
 })();
 
@@ -15818,6 +16038,21 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     '<path d="M9 14 4 9l5-5"/>' +
     '<path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>';
 
+  /* ★v0.17.9 [지시G] 꺼진 IFE 화면에 새기는 Z 마크(가로로 납작).
+     세 획(윗줄 왼→오 / 대각선 오른위→왼아래 / 아랫줄 왼→오) 끝마다 화살촉을 붙였다.
+     검은 화면에 "새겨진" 느낌 — 어두운 그림자 한 겹 아래, 밝은 획 한 겹 위. */
+  var Z_SVG = (function () {
+    var lines = '<path d="M10 9 H79"/><path d="M84 12.5 L22 33.5"/><path d="M15 37 H82"/>';
+    var heads = '<polygon points="89,9 79,5 79,13"/>' +
+                '<polygon points="13.5,36.4 21.7,29.4 24.3,37"/>' +
+                '<polygon points="92,37 82,33 82,41"/>';
+    return '<svg viewBox="0 0 100 46" preserveAspectRatio="xMidYMid meet" aria-hidden="true">' +
+      '<g class="zsh" transform="translate(0,1.3)" fill="rgba(0,0,0,.85)" stroke="rgba(0,0,0,.85)" ' +
+      'stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round">' + lines + heads + '</g>' +
+      '<g class="zmk" fill="rgba(228,232,240,.34)" stroke="rgba(228,232,240,.34)" ' +
+      'stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">' + lines + heads + '</g></svg>';
+  })();
+
   var CU = {};
 
   /* #2 게이트 */
@@ -15851,8 +16086,11 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       S.sel = null; renderInv();
       closeCU();
       transit("기내로 이동 중…", 1400, function () {
-        /* ★v0.15.5 자리 착석 오프닝 코멘트 삭제(인트로는 나중에 채운다) — 바로 좌석 맵 */
-        S.map = "seat"; G.setFlag("boarded"); G.save(); render();
+        /* ★v0.17.9 [지시C-2] 기내로 들어가기 직전 인트로 컷 — 폰 구글맵에 폭풍이 다가와
+           내 위치에 닿고, 그 순간 기체가 흔들린다. 끝나면 예전처럼 좌석 맵으로. */
+        introStorm(function () {
+          S.map = "seat"; G.setFlag("boarded"); G.save(); render();
+        });
       });
     }
     box.onclick = give;
@@ -15944,6 +16182,15 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
           });
         })(i);
       }
+      /* ★v0.17.9 [지시G] 꺼진 화면에 **납작한 Z 마크** — 탑승권 힌트 아이콘이 2줄(2×3)이 되면서
+         읽는 순서가 헷갈린다는 지적. 화면에 새겨진 표시처럼 은은하게 얹어 "윗줄 왼→오 · 대각선 ·
+         아랫줄 왼→오" 로 읽으라는 Z 순서를 암시한다. 획이 끝나는 쪽마다 화살촉이 붙는다.
+         · 자리 = 스크린(y 19.5~62.3%) 안, 인디케이터 점줄(y 45~47%) **위쪽** — 겹침 0.
+         · 조작 대상이 아니다(onTap 없음 → div, pointer-events 도 CSS 에서 끈다). */
+      overlays.push({
+        x: F.zmark.x, y: F.zmark.y, w: F.zmark.w, h: F.zmark.h, cls: "ifeZ",
+        build: function (n) { n.setAttribute("data-t", "ifeZ"); n.innerHTML = Z_SVG; }
+      });
       F.buttons.forEach(function (bt) {
         overlays.push({
           x: bt.x, y: bt.y, w: bt.w, h: bt.h, t: "ifeb_" + bt.id, cls: "ifeBtn",
@@ -17507,32 +17754,101 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     s.onclick = next;   /* 아무 데나 탭해도 넘어감 */
   }
 
+  /* ★v0.17.9 [지시C-2] 인트로 폭풍 컷 — 탑승권을 내고 기내로 들어가기 직전.
+       ①구글맵을 켠 스마트폰 화면(구글맵 앱과 **같은 지도 그림**을 폰 목업 안에 띄운다)
+       ②폭풍(태풍 아이콘)이 내 위치(비행기)로 다가와 **도달**
+       ③도달하는 순간 쿠구구궁 — 기존 태풍 컷의 흔들림 연출(#app.shaking + 저음 + 진동)
+     문구는 의성어 하나뿐이다(관찰·연출 위주, 설명·유도문 없음 — 북쑥 원칙).
+     검증·디버그용 건너뛰기: window.__introSkip() */
+  var INTRO_HOLD = 700, INTRO_STEP = 60, INTRO_STEPS = 40, INTRO_SHAKE = 1600;
+  function introStorm(done) {
+    var s = $("story"), app = $("app");
+    clear(s); s.classList.remove("big"); s.classList.add("show", "cut");
+    s.onclick = null;
+
+    var ph = el("div", "cutPhone");
+    ph.setAttribute("data-t", "introPhone");
+    ph.appendChild(el("div", "cutIsland"));     /* 실제 폰(#island)과 같은 인상 */
+    var scr = el("div", "cutScreen");
+    scr.appendChild(PHONE.statusbar());
+    var top = el("div", "pTop");
+    top.appendChild(el("div", "cutBack", "‹"));
+    top.appendChild(el("div", null, "구글맵"));
+    scr.appendChild(top);
+    var g = PHONE.mapBox({ route: true, caption: "인천 → 덴파사르" });
+    var plane = PHONE.marker(g, "plane", "✈️", PHONE.PLANE_T0);
+    plane.setAttribute("data-t", "introPlane");
+    var ty = PHONE.marker(g, "typhoon", "🌀", 1);
+    ty.setAttribute("data-t", "introTyphoon");
+    var here = PHONE.routeAt(PHONE.PLANE_T0);
+    PHONE.moveTo(ty, 104, -12);                 /* 폭풍은 화면 밖 오른쪽 위에서 들어온다 */
+    scr.appendChild(g);
+    ph.appendChild(scr);
+    s.appendChild(ph);
+    var boom = el("div", "cutBoom");            /* 도달 순간에만 글자가 들어온다 */
+    boom.setAttribute("data-t", "introBoom");
+    s.appendChild(boom);
+
+    var iv = null, timers = [];
+    function later(fn, ms) { timers.push(setTimeout(fn, ms)); }
+    function finish() {
+      if (iv) { clearInterval(iv); iv = null; }
+      timers.forEach(clearTimeout); timers = [];
+      app.classList.remove("shaking");
+      s.classList.remove("show", "cut"); clear(s);
+      G.syncOverlay();
+      var f = done; done = null;
+      if (f) f();
+    }
+    function quake() {
+      PHONE.moveTo(ty, here[0], here[1]);
+      ty.classList.add("hit");
+      boom.textContent = "쿠구구궁";
+      app.classList.add("shaking");
+      G.beep(70, 1.6, "sawtooth", .18);
+      G.buzz([200, 80, 300]);
+      later(finish, INTRO_SHAKE);
+    }
+    later(function () {
+      var k = 0;
+      iv = setInterval(function () {
+        k++;
+        var t = k / INTRO_STEPS;
+        PHONE.moveTo(ty, 104 + (here[0] - 104) * t, -12 + (here[1] + 12) * t);
+        if (k >= INTRO_STEPS) { clearInterval(iv); iv = null; quake(); }
+      }, INTRO_STEP);
+    }, INTRO_HOLD);
+
+    window.__introSkip = function () { if (done) { quakeNow(); } };
+    function quakeNow() {
+      if (iv) { clearInterval(iv); iv = null; }
+      timers.forEach(clearTimeout); timers = [];
+      quake();
+    }
+  }
+
+  /* ★v0.17.9 [지시C-3] 엔딩 = **무사 도착**.
+     예전 엔딩("기체가 크게 흔들렸다…")은 폐지하고 그 흔들림 연출은 인트로로 옮겼다.
+     여기로 오는 길은 하나뿐이다 — GPS 를 복구한 구글맵을 열면 비행기가 덴파사르까지 날아간다. */
   function ending() {
     PHONE.close();
-    var app = $("app");
-    app.classList.add("shaking");
-    G.beep(70, 1.6, "sawtooth", .18);
-    G.buzz([200, 80, 300]);
-    setTimeout(function () {
-      app.classList.remove("shaking");
-      G.setFlag("s1done");
-      var s = $("story");
-      clear(s); s.classList.add("show");
-      s.appendChild(el("div", "bigemoji", "🌀✈️"));
-      s.appendChild(el("div", "txt",
-        "기체가 크게 흔들렸다.\n창밖이 새하얘지고,\n안내 방송도 끊겼다.\n\n…그리고 아무 소리도 나지 않았다."));
-      var b = el("button", "btn primary", "→ 2차로");
-      b.setAttribute("data-t", "toS2");
-      b.onclick = function () {
-        clear(s);
-        s.appendChild(el("div", "bigemoji", "🏝️"));
-        s.appendChild(el("div", "txt", "2차\n\n준비 중입니다.\n곧 이어집니다."));
-        var b2 = el("button", "btn ghost", "처음 화면으로");
-        b2.onclick = function () { s.classList.remove("show"); clear(s); };
-        s.appendChild(b2);
-      };
-      s.appendChild(b);
-    }, 2600);
+    G.setFlag("s1done");
+    var s = $("story");
+    clear(s); s.classList.remove("big", "cut"); s.classList.add("show");
+    s.onclick = null;
+    s.appendChild(el("div", "bigemoji", "🛬🌴"));
+    s.appendChild(el("div", "txt", "바퀴가 활주로에 닿았다.\n\n덴파사르, 무사 도착."));
+    var b = el("button", "btn primary", "→ 2차로");
+    b.setAttribute("data-t", "toS2");
+    b.onclick = function () {
+      clear(s);
+      s.appendChild(el("div", "bigemoji", "🏝️"));
+      s.appendChild(el("div", "txt", "2차\n\n준비 중입니다.\n곧 이어집니다."));
+      var b2 = el("button", "btn ghost", "처음 화면으로");
+      b2.onclick = function () { s.classList.remove("show"); clear(s); };
+      s.appendChild(b2);
+    };
+    s.appendChild(b);
   }
 
   /* ═══════════ 디버그 ═══════════ */
@@ -17571,6 +17887,17 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       renderInv();
     };
     bar.appendChild(giveAll);
+
+    /* ★v0.17.9 [지시C-4] 컷 점프 — 인트로 폭풍 컷 / 덴파사르 도착 엔딩 (기존 관례대로 디버그 바에) */
+    var cut = el("button", null, "인트로컷");
+    cut.setAttribute("data-t", "dbgIntro");
+    cut.onclick = function () { introStorm(function () {}); };
+    bar.appendChild(cut);
+
+    var end = el("button", null, "엔딩");
+    end.setAttribute("data-t", "dbgEnding");
+    end.onclick = function () { ending(); };
+    bar.appendChild(end);
 
     var rst = el("button", null, "초기화");
     rst.setAttribute("data-t", "dbgReset");
@@ -17663,7 +17990,8 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   window.MAIN = {
     render: render, renderInv: renderInv, openCU: openCU, closeCU: closeCU, reopenCU: reopenCU,
     openZoom: openZoom, closeZoom: closeZoom, prize: prize, story: story, transit: transit,
-    ending: ending, openMinigame: openMinigame, CU: CU, ZOOM: ZOOM, startGame: startGame
+    ending: ending, introStorm: introStorm,   /* ★v0.17.9 인트로 폭풍 컷(디버그·검증에서 직접 호출) */
+    openMinigame: openMinigame, CU: CU, ZOOM: ZOOM, startGame: startGame
   };
 
   document.addEventListener("DOMContentLoaded", function () {
@@ -17675,11 +18003,18 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     buildDebug();
     sw();
     var had = G.load();
-    /* ★v0.17.3 [지시3] GPS 복구 — "GPS 연결 끊김" 화면을 본 뒤의 **사용자 새로고침** 한 번이면
-       위치가 다시 잡힌다. 서비스워커 자동 새로고침·☰처음부터는 G.markAutoNav() 로 빠져 있다. */
+    /* ★v0.17.3 [지시3] GPS 복구 — 사용자 새로고침 한 번이면 위치가 다시 잡힌다.
+       서비스워커 자동 새로고침·☰처음부터는 G.markAutoNav() 로 빠져 있다.
+       ★v0.17.9 [지시C-1] 조건 강화 — 이제 **「GPS 연결 끊김」 창이 떠 있는 상태**에서
+       새로고침해야 복구된다. 예전엔 한 번 보기만 하면(gpsSeen) 그 뒤 아무 화면에서
+       새로고침해도 풀렸는데, 그러면 "왜 풀렸는지" 가 안 보인다.
+       판정 재료 = phone.js 가 끊김 창을 그릴 때 켜고 화면을 벗어나면 끄는 `gpsOnScreen`
+       플래그(저장에 남으므로 리로드 뒤에도 직전 상태를 읽을 수 있다). */
     G.onReload(function () {
-      if (G.flag("gpsSeen") && !G.flag("gpsRestored")) G.setFlag("gpsRestored");
+      if (G.flag("gpsOnScreen") && !G.flag("gpsRestored")) G.setFlag("gpsRestored");
     });
+    /* 소비했으면(또는 그냥 새로 들어왔으면) 내린다 — 이번 로드에서 **다시 열어야** 유효하다 */
+    if (G.flag("gpsOnScreen")) G.setFlag("gpsOnScreen", false);
     /* ★v0.17.3 저장이 있으면 인트로 없이 곧장 이어 한다(새로고침 = 즉시 복귀).
        저장이 없거나 맵을 못 찾는 비정상 저장이면 예전처럼 인트로(이어하기 버튼)를 보여 준다. */
     if (had && S.started && DATA.MAPS[S.map]) resumeGame();
