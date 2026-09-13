@@ -499,8 +499,10 @@ body.dbg .ifeHot:active{box-shadow:0 0 0 2px rgba(255,255,255,.95)}
 .gmIco.typhoon>img{animation:spin 16s linear infinite}
 /* ★v0.17.17 [지시3] 태풍의 눈 — 가운데는 검고 테두리로 갈수록 투명해지는 방사형 그라데이션 점.
    위성 구름 그림(회전) 위에 얹되 **점은 돌지 않는다**(회전은 .gmIco>img 에만 걸려 있다).
-   z-index 로 그림 위에 올린다(.gmIco.typhoon 이 z:2 로 이미 스태킹 컨텍스트다). */
-.gmIco.typhoon::after{content:"";position:absolute;left:50%;top:50%;width:32%;height:32%;
+   z-index 로 그림 위에 올린다(.gmIco.typhoon 이 z:2 로 이미 스태킹 컨텍스트다).
+   ★v0.17.18 [지시5] 북쑥 "검은 점을 지금의 1/3 로" → 32% → **11%**(32/3 ≒ 10.7 을 올림).
+     52px 마커 기준 지름 16.6px → **5.7px**. 눈만 콕 찍힌 점이 된다. */
+.gmIco.typhoon::after{content:"";position:absolute;left:50%;top:50%;width:11%;height:11%;
   transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;z-index:1;
   background:radial-gradient(circle,rgba(0,0,0,.95) 0%,rgba(0,0,0,.80) 32%,
     rgba(0,0,0,.38) 62%,rgba(0,0,0,0) 100%)}
@@ -567,6 +569,28 @@ body.dbg .ifeHot:active{box-shadow:0 0 0 2px rgba(255,255,255,.95)}
 .seqStage{position:absolute;inset:0;z-index:2;display:flex;align-items:center;justify-content:center;
   padding:calc(var(--safeT) + 18px) 18px calc(var(--safeB) + 104px);pointer-events:none}
 .seqStage:empty{display:none}
+/* ★v0.17.18 [지시1] 태풍 도달 = 점등 **+ 화면 흔들림**(북쑥 추가 지시 — 점등은 그대로 두고 얹는다).
+   흔들림 곡선·진폭은 v0.17.16 까지 쓰던 #app.shaking 셰이크 그대로다(±2~7px · 0.42s 루프).
+   흔드는 대상만 다르다 — **#story 컨테이너나 #app 을 흔들면** 그 뒤(게임 화면·body)가 가장자리에
+   드러나므로, 인트로 오버레이 **안쪽 두 층**만 흔든다:
+     · .seqBg > img — 사진 자체. 상자(.seqBg)는 가만두고 사진만 움직인다.
+     · .seqStage — 폰 목업 층. 배경이 없어 아무 아티팩트도 없다.
+   .seqFlash(전면 단색)·.seqCap(도달 순간엔 빈 자막)은 흔들 이유가 없어 가만둔다.
+   점등(120ms×5 · 간격 400ms = 1.72초)과 **같은 구간**을 덮도록 JS(main.js bgFlash)가
+   SHAKE_MS(1.9초) 동안 #story 에 .quake 를 걸었다 뗀다.
+   ★사진이 ±7px 움직여도 가장자리에 검은 띠가 안 생기게 106% 로 깔아 두는데, 이건 **흔들 때만이
+     아니라 구글맵 컷 내내**다(.seqBg.dim = photo(SKY_IMG, true) 로 까는 그 컷 하나뿐).
+     흔들 때만 키우면 켜지는 순간·꺼지는 순간에 사진이 6% 튀어(줌 팝) 눈에 띈다 — webkit 실측에서
+     변위가 14px 이 아니라 19×25px 로 잡혀 드러났다. 이 사진은 폰 뒤에 깔리는 **어두운 배경**이라
+     3% 더 잘려도 표가 안 나고, 브리지·활주로·하늘 컷(사진이 주인공)은 100% 그대로다. */
+#story .seqBg.dim img{left:-3%;top:-3%;width:106%;height:106%;transform:none}
+/* ★사진 흔들기는 **.dim(구글맵 컷) 에서만** 건다 — 다른 컷의 사진은 transform:translate(-50%,-50%)
+   로 가운데를 잡고 있어서, 그 위에 셰이크 키프레임(transform)을 얹으면 중앙 정렬이 지워져
+   사진이 왼쪽 위로 튄다. 태풍 도달은 구글맵 컷에서만 일어나니 이걸로 충분하다. */
+#story.seq.quake .seqBg.dim img,
+#story.seq.quake .seqStage{animation:seqShake .42s cubic-bezier(.36,.07,.19,.97) infinite}
+@keyframes seqShake{10%,90%{transform:translate(-2px,1px)}20%,80%{transform:translate(4px,-2px)}
+  30%,50%,70%{transform:translate(-7px,3px)}40%,60%{transform:translate(7px,-3px)}}
 /* 자막 — 사진 위에 얹히는 반투명 카드. 아래 오른쪽에 다음 표시(▸) */
 .seqCap{position:relative;z-index:3;align-self:center;margin:0 0 calc(var(--safeB) + 26px);
   max-width:86%;padding:13px 17px 14px;
@@ -626,6 +650,13 @@ body.dbg .ifeHot:active{box-shadow:0 0 0 2px rgba(255,255,255,.95)}
 .banner{border-radius:6px;padding:7px 14px;font-size:11px;font-weight:600;border:1px solid var(--line);color:var(--n7);background:var(--n1);letter-spacing:.2px}
 .banner.ready{color:var(--ok);border-color:var(--n5)}
 .banner.err{color:var(--bad);border-color:var(--n5)}
+/* ★v0.17.18 [지시2] 시작 화면 소리 안내 — "오프라인 준비 완료 ✓" 배너는 그대로 두고 그 아래에
+   한 줄 안내 + 소리 테스트 버튼을 얹는다. 세로 여백을 잡아먹지 않게 안내글은 작게(11px),
+   버튼은 배너와 비슷한 크기의 ghost 버튼으로(탭 판정은 44px 이상 — padding 으로 확보). */
+#sndRow{display:flex;flex-direction:column;align-items:center;gap:7px;margin:-4px 0 0}
+#sndHint{font-size:11.5px;line-height:1.5;color:var(--n6);letter-spacing:.2px}
+#btnSndTest{margin:0;padding:10px 16px;font-size:12.5px;font-weight:600;border-radius:999px;min-height:40px}
+#btnSndTest.playing{color:var(--accent);border-color:var(--accent)}
 .buildId{position:absolute;bottom:calc(var(--safeB) + 8px);font-size:9px;color:var(--n5);font-family:ui-monospace,Menlo,monospace;letter-spacing:.5px}
 
 #story{position:absolute;inset:0;z-index:46;display:none;flex-direction:column;align-items:center;justify-content:center;
@@ -1147,6 +1178,12 @@ body.dbg .cvcell.cabBtn:active{box-shadow:inset 0 0 0 3px rgba(255,255,255,.8)}
     <h1>발리 가는 길에서 생긴 일</h1>
     <p id="introText"></p><!-- ★v0.15.5 인트로 문구는 나중에 채운다(지금은 비움) -->
     <div id="offlineBanner" class="banner wait">오프라인 준비 중…</div>
+    <!-- ★v0.17.18 [지시2] 소리 안내 + 소리 테스트. 배너(오프라인 준비 완료 ✓)는 위에 그대로 둔다.
+         이 버튼 탭이 iOS 오디오 언락(첫 제스처)을 겸한다 — 여기서 소리가 나면 본편도 난다. -->
+    <div id="sndRow">
+      <div id="sndHint">🔊 소리를 들으면서 진행해 주세요</div>
+      <button class="btn ghost" data-t="sndTest" id="btnSndTest">소리 테스트 ▶</button>
+    </div>
     <button class="btn primary" data-t="start" id="btnStart">시작하기</button>
     <button class="btn ghost" data-t="resume" id="btnResume" hidden>이어하기</button>
     <div class="buildId" id="buildId"></div>
@@ -11264,7 +11301,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 (function () {
   "use strict";
 
-  var BUILD = "ODY-S1-20260914-0615";
+  var BUILD = "ODY-S1-20260914-0756";
   var LSKEY = "odyssey.s1.v1";
 
   var qs = new URLSearchParams(location.search);
@@ -18331,6 +18368,10 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
        [5] 브리지 상하 bob 폐지 → 사진은 정지, 걷는 느낌은 **발소리만**.
        [6] 독백 문구 전면 교체(코디네이터 확정 카피). ⑧ 기내방송만 **원문 그대로**.
        [7] 기내방송은 **노란 글씨** + 시작 순간 **마이크 톡톡**(mictap.mp3).
+     ★v0.17.18 인트로·시작화면 미세조정 — 이 블록이 받는 것:
+       [1] 태풍 도달 = 점등 **+ 화면 흔들림**(점등은 유지. #app 이 아니라 사진·폰 목업 두 층만 흔든다).
+       [3] 기내방송 **맨 앞줄** "승객여러분 모두 무사하십니까?" 1탭 추가 — 마이크 톡톡은 이 줄로.
+       [4] mictap 게인 0.7 → 1.0 (파일도 +3dB 로 다시 구웠다).
      세이브 호환: 이 컷은 게이트에서 탑승권을 낼 때만 돈다 — 세이브가 있는 재접속은
        resumeGame() 이 인트로를 통째로 건너뛰므로 예전과 똑같다.
      검증·디버그: window.__introAt() (지금 몇 번째 컷인지 · 점등 상태·횟수) · window.__introGo(n)
@@ -18343,6 +18384,10 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   var INTRO_STORM = 2400;      /* 태풍 도달 연출(배경 점등 + 소리) 지속 */
   /* ★v0.17.17 [지시4] 폰 뒤 배경 점등 — 5회, 한 번에 120ms 켜고 400ms 간격(총 1.72초) */
   var FLASH_N = 5, FLASH_ON = 120, FLASH_GAP = 400;
+  /* ★v0.17.18 [지시1] 점등에 **화면 흔들림**을 얹는다(북쑥 추가 지시 — 점등은 그대로 둔다).
+     점등 구간(마지막 점등이 꺼지는 1.72초)을 조금 넘겨 끝나게 잡아 두 연출이 자연스럽게 겹친다.
+     흔드는 건 CSS(#story.seq.quake) 가 사진(.seqBg img)과 폰 목업 층(.seqStage) 두 곳에 건다. */
+  var SHAKE_MS = (FLASH_N - 1) * FLASH_GAP + FLASH_ON + 180;   /* = 1900ms */
   var INTRO_FADE = 700;        /* 암전 페이드 */
   var TY_PX = 52;              /* .gmIco.typhoon 크기(CSS px) — 화면 밖 대기 거리 계산용 */
   var BRIDGE_IMG = "bridge_walk.jpg", RUNWAY_IMG = "seat_runway.jpg", SKY_IMG = "map_seat.jpg";
@@ -18358,8 +18403,11 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     { sc: "sky", fade: true, cap: "어느새 하늘 위다. 지금 어디쯤 왔으려나? 지도나 볼까." },
     { sc: "gmap", cap: "오, 벌써 반은 왔네. 순조로운데?" },
     { act: "tyIn", cap: "…저게 뭐지? 설마 태풍인가?!" },
-    { act: "tyHit" },                               /* 접근 → 배경 점등 + 태풍 소리 → 암전 (자동) */
-    { sc: "sky", pa: true, mic: true, cap: "(기내방송) 아차차.... 이번에는 조심해서 잘 가고있었는데 태풍때문에 버뮤다삼각지대를 또 지나고 말았습니다." },
+    { act: "tyHit" },                               /* 접근 → 배경 점등 + 흔들림 + 태풍 소리 → 암전 (자동) */
+    /* ★v0.17.18 [지시3] 기내방송 **맨 앞줄 추가** — 마이크 톡톡(mic)이 이 첫 줄로 옮겨 왔다.
+       노란 글씨(pa)도 동일. 암전이 걷히고 첫 마디가 방송으로 시작한다. */
+    { sc: "sky", pa: true, mic: true, cap: "승객여러분 모두 무사하십니까?" },
+    { pa: true, cap: "(기내방송) 아차차.... 이번에는 조심해서 잘 가고있었는데 태풍때문에 버뮤다삼각지대를 또 지나고 말았습니다." },
     { pa: true, cap: "운행에는 문제가 없으니 걱정하지 않으셔도 괜찮습니다" },
     { cap: "휴… 피해가 크지 않아서 다행이다." },
     { cap: "그런데 또 버뮤다 삼각지대라니… 이번엔 무슨 일이 생기려나. 조금 걱정되는데." },
@@ -18383,7 +18431,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     /* 인트로에서 쓰는 효과음은 미리 준비해 둔다 — 첫 발소리가 한 박 늦지 않게 */
     if (G.sfxWarm) { G.sfxWarm("footstep.mp3"); G.sfxWarm("storm.mp3"); }
 
-    var timers = [], iv = null, busy = false, at = -1, scene = null, flashes = 0;
+    var timers = [], iv = null, busy = false, at = -1, scene = null, flashes = 0, shakes = 0;
     var ty = null, plane = null, gbox = null;
     function later(fn, ms) { var t = setTimeout(fn, ms); timers.push(t); return t; }
     function stopTimers() { timers.forEach(clearTimeout); timers = []; if (iv) { clearInterval(iv); iv = null; } }
@@ -18533,6 +18581,9 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
           later(function () { flash.classList.remove("on"); }, k * FLASH_GAP + FLASH_ON);
         })(i);
       }
+      /* ★v0.17.18 [지시1] 점등과 **같은 순간**에 흔들림을 켜고, 점등이 다 끝난 뒤 뗀다. */
+      s.classList.add("quake"); shakes++;
+      later(function () { s.classList.remove("quake"); }, SHAKE_MS);
     }
 
     /* ── 진행 ── */
@@ -18551,7 +18602,10 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       var show = function () {
         if (c.sc) setScene(c.sc);
         /* ★v0.17.17 [지시7] 방송 시작 순간 마이크 톡톡 — 파일이 없는 빌드는 그냥 조용히 넘어간다 */
-        if (c.mic) G.sfxFile("mictap.mp3", 0.7);
+        /* ★v0.17.18 [지시4] 재생 게인 0.7 → **1.0** (파일도 peak −4.3 → −1.4dB 로 다시 구웠다).
+           실효 peak −7.4 → −1.4dBFS = **+6.0dB**, 실효 mean −23.1 → −15.5dB = +7.6dB.
+           bow_shot(−0.2dB·게인1.0) · storm(−1.9dB·게인1.0) 과 같은 체감이 된다. */
+        if (c.mic) G.sfxFile("mictap.mp3", 1);
         if (c.act === "tyIn") {
           busy = true; say(c.cap, false);
           moveTy(tyOff(), tyPark(), 900, function () { busy = false; say(c.cap); });
@@ -18582,6 +18636,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     function finish() {
       stopTimers(); walkStop();
       flash.classList.remove("on");
+      s.classList.remove("quake");     /* ★v0.17.18 흔들림이 켜진 채 남지 않게 */
       s.onclick = null;
       s.classList.remove("show", "seq"); clear(s);
       G.syncOverlay();
@@ -18599,8 +18654,10 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     window.__introAt = function () {
       return { at: at, busy: busy, scene: scene, cap: cap.textContent || "",
                total: INTRO_CUTS.length,
-               /* ★v0.17.17 셰이크(#app.shaking) 폐지 → 폰 뒤 배경 점등 상태·누적 횟수 */
+               /* ★v0.17.17 셰이크(#app.shaking) 폐지 → 폰 뒤 배경 점등 상태·누적 횟수
+                  ★v0.17.18 [지시1] 점등 위에 흔들림을 다시 얹었다(#story.seq.quake · #app 은 그대로 안 흔든다) */
                flash: flash.classList.contains("on"), flashes: flashes,
+               quake: s.classList.contains("quake"), shakes: shakes, shakeMs: SHAKE_MS,
                pa: cap.classList.contains("pa") };
     };
     /* ★v0.17.17 stopTimers() 는 암전을 되돌리는 타이머까지 지운다 — 컷 점프가 암전 도중에
@@ -18609,6 +18666,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     window.__introGo = function (n) {
       stopTimers(); busy = false;
       flash.classList.remove("on"); fade.classList.remove("on");
+      s.classList.remove("quake");                 /* ★v0.17.18 흔들림도 함께 내린다 */
       go(n);
     };
     window.__introWalk = function () {
@@ -18622,6 +18680,23 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     };
     /* 검증용 — 점등은 120ms 라 캡처보다 짧다. 이 훅으로 켠 채 고정해 찍는다. */
     window.__introFlash = function (on) { flash.classList.toggle("on", !!on); };
+    /* ★v0.17.18 [지시1] 흔들림 검증·캡처용. phaseMs 를 주면 그 위상에서 **멈춰** 세운다
+       (0.42s 루프 중 126ms = 30% 가 최대 변위 −7px,+3px 지점). 안 주면 그냥 돌린다. */
+    window.__introQuake = function (on, phaseMs) {
+      s.classList.toggle("quake", !!on);
+      var els = [bg.querySelector("img"), stage];
+      els.forEach(function (e) {
+        if (!e) return;
+        if (on && phaseMs != null) {
+          e.style.animationDelay = (-phaseMs / 1000) + "s";
+          e.style.animationPlayState = "paused";
+        } else { e.style.animationDelay = ""; e.style.animationPlayState = ""; }
+      });
+      var e0 = els[0];
+      return { quake: s.classList.contains("quake"),
+               imgTr: e0 ? getComputedStyle(e0).transform : null,
+               stageTr: getComputedStyle(stage).transform };
+    };
     window.__introSkip = function () { finish(); };
 
     go(0);
@@ -18782,6 +18857,38 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     render();
   }
 
+  /* ★v0.17.18 [지시2] 시작 화면 "소리 테스트" — 짧은 소리를 한 번 내서 볼륨을 확인시킨다.
+     · 소재는 **mictap.mp3**("톡, 톡" 마이크 두드리는 소리). 고른 이유 둘 —
+       ①의미가 그대로 "소리 확인"이다 ②게임에서 가장 작은 효과음이라, 이게 들리면 나머지는 다 들린다.
+     · iOS 오디오 언락을 **겸한다**. 이 탭은 사용자 제스처 안이라 여기서 AudioContext 가 살아나고
+       (core.js 의 firstGesture 가 capture 단계에서 이미 unlockAudio/sfxUnlock 을 돌린다)
+       파일 엘리먼트도 play() 권한을 얻는다. BGM 은 여기서 시작하지 않는다(시작하기 탭에서만).
+     · 파일이 없는 빌드(오디오 자산 미포함)에서는 신호음 2개로 폴백한다. */
+  var sndTestT = null;
+  function soundTest() {
+    var b = $("btnSndTest");
+    G.audio();                                   /* AudioContext 생성·resume (제스처 안) */
+    if (G.unlockAudio) G.unlockAudio();           /* 엘리먼트 음원 언락(무음 play → pause) */
+    if (!G.sfxFile("mictap.mp3", 1)) {            /* ★v0.17.18 [지시4] 재생 게인 0.7 → 1.0 */
+      G.beep(880, .12, "sine", .22);
+      setTimeout(function () { G.beep(660, .16, "sine", .22); }, 180);
+    }
+    b.classList.add("playing");
+    b.textContent = "🔊 소리 나는 중…";
+    if (sndTestT) clearTimeout(sndTestT);
+    sndTestT = setTimeout(function () {
+      b.classList.remove("playing");
+      b.textContent = "소리 테스트 ▶";
+    }, 900);
+  }
+  /* 검증용 — 버튼이 실제로 소리를 재생했는지(파일/폴백) 확인한다 */
+  window.__sndTest = function () {
+    var b = $("btnSndTest");
+    return { label: b ? b.textContent : null, playing: !!(b && b.classList.contains("playing")),
+             hint: ($("sndHint") || {}).textContent || "",
+             plays: (window.__sfxLog || []).filter(function (x) { return x.file === "mictap.mp3"; }).length };
+  };
+
   function bind() {
     $("navL").onclick = function () { goMap("L"); };
     $("navR").onclick = function () { goMap("R"); };
@@ -18790,6 +18897,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     document.querySelector('[data-t="phoneClose"]').onclick = function () { PHONE.close(); render(); };
     $("btnStart").onclick = function () { startGame(true); };
     $("btnResume").onclick = function () { startGame(false); };
+    $("btnSndTest").onclick = soundTest;
     $("btnMenu").onclick = function () {
       /* ★v0.17.3 여기서 일어나는 재로드는 "사용자 새로고침" 이 아니다 — 감지에서 빼 둔다 */
       if (confirm("처음부터 다시 시작할까?")) { G.wipe(); G.markAutoNav(); location.href = location.pathname + location.search; }
