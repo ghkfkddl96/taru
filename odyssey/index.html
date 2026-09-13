@@ -11158,7 +11158,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 (function () {
   "use strict";
 
-  var BUILD = "ODY-S1-20260913-1513";
+  var BUILD = "ODY-S1-20260913-1647";
   var LSKEY = "odyssey.s1.v1";
 
   var qs = new URLSearchParams(location.search);
@@ -12250,7 +12250,10 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     cardKey: { name: "카드키", img: IMG + "ic_cardkey.png", zoomText: "흰 플라스틱 카드키." },
     pamphlet: { name: "팜플렛", img: IMG + "ic_pamphlet.png", zoom: "pamphlet" },
     cellophane: { name: "셀로판", img: IMG + "ic_cellophane.png", zoom: "cellophane", zoomText: "투명한 셀로판지." },
-    telescope: { name: "쌍안경", img: IMG + "ic_telescope.png", zoomText: "작은 쌍안경." },
+    /* ★v0.17.11 [지시2] 쌍안경은 **확대 팝업이 없다** — 탭 = 선택만.
+       싱가포르 방탈출(.cache/singapore-escape)에도 쌍안경 확대용 사진 자산은 없었고
+       인벤 아이콘 SVG 한 장뿐이라 가져올 게 없었다 → 확대 경로 자체를 없앤다(main.js inspect). */
+    telescope: { name: "쌍안경", img: IMG + "ic_telescope.png", noZoom: true },
     peanut: { name: "땅콩", img: IMG + "ic_peanut.png", zoomText: "기내에서 주는 땅콩 한 봉지." },
     ladder: { name: "사다리", img: IMG + "ic_ladder.png", zoomText: "접이식 사다리." },
     tileBlack: { name: "검정판", img: IMG + "ic_tile_black.png", tile: "black", zoomText: "검정색 나무 판." },
@@ -12513,9 +12516,12 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       openImg: "lav_cab2_open.jpg",
       emptyImg: "lav_cab2_empty.jpg",
       /* ★v0.17.3 [지시3] #27 보상 = 종이 카드(그림 힌트, 인벤에 안 들어감).
-         lav_cab2_empty.jpg(1264×847) 수납장 안쪽 = x 320~850 / y 110~690 →
-         뒷벽에 기대 놓인 카드 자리(원본 % 기준) */
-      cardCell: { x: 35.5, y: 43.0, w: 27.0, h: 27.0 },
+         ★v0.17.11 [지시7] 이제 카드가 **사진 안에 실제로 놓여 있다**(gen/80_cab2_paper).
+         엔진이 그리던 작은 카드 오버레이는 폐기하고, 사진 속 종이를 직접 탭한다.
+         실측 = tools/make-cab2-paper.mjs (밝기 215 이상 · 선반 제외 세로 ≤0.81H):
+           종이 px x 474~708 / y 524~685 (1264×847) → % x 37.50~56.01 · y 61.87~80.87
+         탭칸 = 거기에 가로 2.0% · 세로 3.0% 여유(오른쪽 접힌 면까지 들어온다) */
+      cardCell: { x: 35.50, y: 58.87, w: 22.59, h: 25.13 },
       /* ★v0.14 갈색판 실측 38.6/48.4/18.7/28.0 (탭 여유 포함) */
       prizeCell: PRIZE.tileBrown
     },
@@ -12694,27 +12700,39 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         { x: 55.5, y: 61.47, w: 2.9, h: 8.1 }
       ]
     },
-    /* ★v0.4: 케이스 전체가 보이게(v0.2 수준) 되돌림 */
+    /* ★v0.4: 케이스 전체가 보이게(v0.2 수준) 되돌림
+       ★v0.17.11 [지시6] 사진 교체 — gen/79_headset_case_v3 (정방향 음각 "BOSE").
+         케이스 형태·지퍼·배경은 v2 와 같고 각인만 정방향으로 들어왔다.
+         칸 4개는 **각인 글자 네 개 중심**에 하나씩 다시 앉혔다. 실측 = tools/measure-bose.mjs
+         (Sobel 윤곽 → 열 군집. 원본 1531×1027 기준, 아래 값은 이미지 % 라 축소본에서도 그대로):
+           B x 547~636 · O x 670~755 · S x 792~885 · E x 914~1002 / y 443~526 (네 글자 공통)
+           → 글자 중심 % : 38.63 / 46.54 / 54.77 / 62.57  ·  세로 중심 47.18 · 글자 높이 8.08
+         칸 폭은 글자 간격(최소 7.80%)보다 좁게 잡아 이웃 칸과 겹치지 않는다(간격 0.25~0.68%).
+         세로는 렌더 실측 보정으로 +0.40% 내렸다(축소·JPEG 후 각인 음영이 아래로 조금 무겁다).
+         초기값 "–"·순환·판정(BOSE)·brandFace 각인 글꼴은 그대로. */
     p5: {
       img: IMG + "headset_case.jpg", nw: 900, nh: 604,
       faceLight: true,        /* ★v0.12.2 앞면이 밝은 크림색 → 글자를 짙은 회색으로 */
       crop: { x: 5, y: 6, w: 90, h: 88 },
       cells: [
-        { x: 31.56, y: 43.38, w: 7.89, h: 11.92 },
-        { x: 41.11, y: 43.38, w: 7.89, h: 11.92 },
-        { x: 50.67, y: 43.38, w: 7.89, h: 11.92 },
-        { x: 60.22, y: 43.38, w: 7.89, h: 11.92 }
+        { x: 34.86, y: 41.48, w: 7.55, h: 12.20 },
+        { x: 42.77, y: 41.48, w: 7.55, h: 12.20 },
+        { x: 51.00, y: 41.48, w: 7.55, h: 12.20 },
+        { x: 58.80, y: 41.48, w: 7.55, h: 12.20 }
       ],
       /* ★v0.12.1 앞면(face) = 글자가 인쇄되는 평평한 정면. 칸(cells)=탭 영역은 홈 그림자까지
          포함하므로 글자를 칸 한가운데 두면 그림자 위에 얹힌다. 값은 tools/scan-faces.mjs 픽셀 산출.
          ★v0.12.2 한 자물쇠의 칸은 **같은 y·같은 높이·같은 폭** — 세로는 모든 칸 앞면의 교집합 띠
          하나만 쓰고 가로 위치만 칸마다 다르다(칸별로 글자 높이가 달라 보이던 문제).
-         (guide: shots/v122/guide_<id>.png — 빨강=공통 띠, 초록=칸) */
+         (guide: shots/v122/guide_<id>.png — 빨강=공통 띠, 초록=칸)
+         ★v0.17.11 [지시6] 이제 앞면 = **각인 글자 상자 그대로**(중심·높이 일치) — 글자칩이
+         각인 위에 겹쳐 앉는다. 칩이 각인을 덮어도 무방하고, 덮이지 않은 자리에서는
+         각인이 은은히 비쳐 "여기에 BOSE 가 새겨져 있었다" 가 보인다. */
       faces: [
-        { x: 32.44, y: 45.53, w: 6.89, h: 9.77 },
-        { x: 42.11, y: 45.53, w: 6.89, h: 9.77 },
-        { x: 51.67, y: 45.53, w: 6.89, h: 9.77 },
-        { x: 61.22, y: 45.53, w: 6.89, h: 9.77 }
+        { x: 35.18, y: 42.40, w: 6.90, h: 10.40 },
+        { x: 43.09, y: 42.40, w: 6.90, h: 10.40 },
+        { x: 51.32, y: 42.40, w: 6.90, h: 10.40 },
+        { x: 59.12, y: 42.40, w: 6.90, h: 10.40 }
       ]
     },
     p9: {
@@ -13929,6 +13947,10 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         d = startD + (q.y - startY); apply();
       },
       end: function () {
+        /* ★v0.17.11 [지시1] 사진을 **탭**한 경우 먼저 호출자에게 넘긴다(창문×쌍안경 useAt).
+           호출자가 true 를 돌려주면 그 탭은 거기서 끝 — 아래 ↕ 온보딩 집계도, 스냅도 건너뛴다
+           (뷰가 바뀌어 이 노드가 화면에서 빠지므로 스냅을 돌리면 안 된다). */
+        if (!hMoved && opt.onTap && opt.onTap()) return;
         if (!hMoved && !hDragged && !hShown) {          /* 드래그가 아니라 탭 */
           hTaps++;
           if (hTaps >= 3) { hShown = true; apply(); }
@@ -15896,6 +15918,9 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   function openCU(id) {
     var f = CU[id];
     if (!f) { G.toast("아직 준비 중"); return; }
+    /* ★v0.17.11 [지시1] 창문이 아닌 곳으로 가면 쌍안경 뷰는 내려간다
+       (reopenCU("window") 는 그대로 뷰를 유지한다) */
+    if (id !== "window") binocView = false;
     cuId = id;
     stopSlides(); binocStop();
     W.unregister();
@@ -15913,6 +15938,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   }
   function closeCU() {
     stopSlides(); binocStop();
+    binocView = false;                 /* ★v0.17.11 [지시1] 시트를 닫으면 쌍안경 뷰도 끝 */
     cuId = null; W.unregister();
     $("closeup").classList.remove("show");
     clear($("cuStage")); clear($("cuPanel"));
@@ -16077,6 +16103,9 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         key: "inv_" + id,
         tap: function () { invPrevSel = S.sel; selectItem(id); },
         dbl: function () {
+          /* ★v0.17.11 [지시2] 확대가 없는 아이템(쌍안경)은 더블탭도 아무 일 없다 —
+             첫 탭이 만든 **선택 상태를 되돌리지 않는다**(되돌리면 골랐다가 풀려 버린다). */
+          if (DATA.ITEMS[id] && DATA.ITEMS[id].noZoom) return;
           S.sel = invPrevSel; G.save(); renderInv();
           /* ★v0.17.1 팜플렛 팝업이 **겹치기 전 상태로** 열려 있을 때 셀로판을 더블탭하면
              필름 확대(ZOOM.cellophane) 대신 곧바로 겹침 화면으로 간다.
@@ -16114,22 +16143,22 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     S.sel = (S.sel === id) ? null : id;
     G.sfxTap();
     renderInv();
-    /* ★v0.10 아이템 사용은 전부 "고르고 → 사진 속 자리를 탭". 다만 창문×쌍안경처럼
-       탭할 자리가 따로 없는 곳은 고르는 즉시 화면이 바뀐다. */
-    if (S.sel && cuId && SELCU[cuId] && SELCU[cuId][S.sel] && $("closeup").classList.contains("show")) {
-      reopenCU();
-    }
+    /* ★v0.17.11 [지시1] 아이템 사용은 **예외 없이** "고르고 → 사진 속 자리를 탭".
+       예전엔 창문×쌍안경만 고르는 즉시 화면이 바뀌었는데(SELCU), 가방에서 누르자마자
+       쌍안경 뷰가 튀어나와 흐름이 어색했다(북쑥 지적) → 자동 전환 폐지.
+       이제 쌍안경은 고른 뒤 **창문 사진을 탭**해야 뷰로 들어간다(CU.window 의 onTap). */
   }
   function inspect(id) {
     var it = DATA.ITEMS[id];
     if (!it) return;
     if (it.action === "phone") { PHONE.open(); return; }
+    /* ★v0.17.11 [지시2] 확대할 사진이 없는 아이템은 확대 경로 자체를 막는다 —
+       싱가포르 방탈출에도 쌍안경 확대용 **사진 자산은 없었다**(인벤 아이콘 SVG 뿐).
+       그래서 쌍안경은 "탭 = 선택" 만 하고 팝업을 아예 띄우지 않는다. */
+    if (it.noZoom) return;
     if (it.zoom && ZOOM[it.zoom]) { ZOOM[it.zoom](); return; }
     openZoom({ id: id, title: it.name, img: it.img, cap: it.zoomText || "" });
   }
-  /* ★v0.10 "고르면 화면이 바뀌는" 곳 — 아이템을 쓰는 자리가 사진 안에 따로 없는 경우만.
-     (창문 × 쌍안경: 창밖을 보는 행동 자체라 별도 탭 자리가 없다) */
-  var SELCU = { window: { telescope: 1 } };
 
   /* ═══════════ 클로즈업 정의 ═══════════ */
   /* ★v0.10 IFE 뒤로가기 = 가로로 누운 U턴 화살표(폰 "되돌리기" 글리프).
@@ -16226,10 +16255,16 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     try { binocAu.pause(); binocAu.currentTime = 0; } catch (e) {}
   }
 
+  /* ★v0.17.11 [지시1] 쌍안경 뷰에 들어와 있는가.
+     예전엔 "인벤에서 쌍안경이 골라져 있다(S.sel)" 만으로 판정해서, 가방에서 고르는 순간
+     또는 창문을 여는 순간 곧바로 뷰가 튀어나왔다. 이제는 **창문 사진을 탭했을 때만** 켜진다.
+     시트를 닫거나 다른 클로즈업으로 가면 내려간다. */
+  var binocView = false;
+
   /* #12 창문 + #23 쌍안경 */
   CU.window = function (c) {
     c.title("창문");
-    if (S.sel === "telescope") {
+    if (binocView) {
       /* ★v0.6.3 쌍안경 뷰 — 싱가포르 방탈출의 .cu-binoc 마스크를 그대로 재사용.
          (안은 사진, 검은 원 테두리, 바깥은 어둡게)
          #23 에 보일 내용 이미지는 아직 미정 → 우선 22 창문 하늘(window_open.jpg) 위에 씌운다. */
@@ -16259,6 +16294,19 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       onClosed: function () {
         if (!G.flag("shadeDown")) G.setFlag("shadeDown");
         c.cap("창문.");
+      },
+      /* ★v0.17.11 [지시1] 창문 사진을 **탭**했을 때 — 다른 아이템들의 useAt 와 같은 규칙.
+         쌍안경을 골라 들었으면 그때서야 쌍안경 뷰로 들어간다(고르는 것만으론 아무 일 없다).
+         엉뚱한 걸 골랐으면 실패음 + 관찰 문구. 아무것도 안 골랐으면 여기서 손을 떼고
+         가리개 조작(드래그·↕ 온보딩 탭 3회)이 예전 그대로 흐르게 둔다.
+         true 를 돌려주면 "이 탭은 내가 처리했다" 는 뜻이다. */
+      onTap: function () {
+        var sel = S.sel;
+        if (!sel) return false;
+        if (sel !== "telescope") { G.sfxBad(); G.toast("여기에 쓸 물건이 아니다.", 1700); return true; }
+        binocView = true;                  /* 사진 탭 = 쌍안경으로 창밖을 본다 */
+        reopenCU();
+        return true;
       }
     });
     c.stage.appendChild(node);
@@ -16942,7 +16990,9 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     }
 
     /* ★v0.17.3 [지시3] #27 보상 = 안에 놓인 **종이 카드**(그림 힌트 · 인벤에 안 들어간다 — #8 종이와 같은 방식).
-       빈 수납장 사진은 그대로 두고 카드만 엔진 오버레이로 얹는다(사진 재생성 없음). */
+       ★v0.17.11 [지시7] 사진 자체에 접힌 종이가 들어왔다(gen/80_cab2_paper, 스파클 패치 完) →
+       엔진이 그리던 작은 카드 그림(GPS_CARD_MINI)은 폐기하고 **사진 속 종이를 직접 탭**한다.
+       사진이 아직 없을 때만 예전처럼 이모지 자리표시로 돌아간다. */
     if (!hasImg(L.emptyImg)) {
       var d = el("button", null, "📇");
       d.style.cssText = "font-size:54px;text-align:center;background:transparent;border:0;padding:0;color:inherit;display:block;margin:0 auto";
@@ -16954,8 +17004,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     }
     var cc = L.cardCell;
     c.stage.appendChild(imgStage(DATA.IMG + L.emptyImg, [
-      { x: cc.x, y: cc.y, w: cc.w, h: cc.h, t: "gpsCard", cls: "hot gpsCardSpot",
-        build: function (n) { n.innerHTML = GPS_CARD_MINI; },
+      { x: cc.x, y: cc.y, w: cc.w, h: cc.h, t: "gpsCard", cls: "hot",
         onTap: function () { ZOOM.gpsHint(); } }
     ]));
     c.cap("안에 종이 카드가 있다.");
@@ -17377,50 +17426,62 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   };
   /* ═══ ★v0.17.3 [지시3] #27 종이 카드에 그려진 그림 — 글자는 "GPS" 하나뿐 ═══
      ① 위치 핀 + 빨간 사선(신호 끊김) → ② 아래로 화살표 → ③ 새로고침 ↻ 버튼을 손가락이 누른다.
-     전부 엔진 SVG 픽토그램(플랫·굵은 선). 인벤에 안 들어가고 팝업으로만 본다. */
+
+     ★v0.17.11 [지시5] 전면 재작업(북쑥 지적: 손가락이 뻐큐 같고 선이 두꺼워 촌스럽다).
+       · 직접 그린 가짜 손 모양 폐기 → **Tabler Icons(MIT, © 2020-2024 Paweł Kuna)** 의
+         정식 라인 아이콘 path 를 그대로 인라인해 쓴다: map-pin · arrow-down · refresh · hand-click.
+         (원본 24×24 / stroke-width 2 도안을 scale 로 키우고, 굵기는 아래 표대로 다시 잡는다)
+       · 선 굵기를 확 줄였다 — 예전 8~13 → 화면상 3.2~4.6 (아이콘 기준 굵기 ÷ 배율).
+       · 구성(사선 GPS → 아래 화살표 → ↻ + 포인팅 핸드)·종이 배경·레이아웃은 그대로.
+     인벤에 안 들어가고 팝업으로만 본다. */
   var INK = "#23242b", RED = "#d4453c", PAPER = "#f2ecdf";
+  /* Tabler Icons (MIT) — 24×24 outline. 원본 path 문자열 그대로 */
+  var TB = {
+    mapPin: '<path d="M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"/>' +
+            '<path d="M17.657 16.657l-4.243 4.243a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 11.314 0z"/>',
+    arrowDown: '<path d="M12 5l0 14"/><path d="M18 13l-6 6"/><path d="M6 13l6 6"/>',
+    refresh: '<path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"/>' +
+             '<path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"/>',
+    handClick: '<path d="M8 13v-8.5a1.5 1.5 0 0 1 3 0v7.5"/>' +
+               '<path d="M11 11.5v-2a1.5 1.5 0 0 1 3 0v2.5"/>' +
+               '<path d="M14 10.5a1.5 1.5 0 0 1 3 0v1.5"/>' +
+               '<path d="M17 11.5a1.5 1.5 0 0 1 3 0v4.5a6 6 0 0 1 -6 6h-2h.208a6 6 0 0 1 -5.012 -2.7l-.196 -.3c-.312 -.479 -1.407 -2.388 -3.286 -5.728a1.5 1.5 0 0 1 .536 -2.022a1.867 1.867 0 0 1 2.28 .28l1.47 1.47"/>' +
+               '<path d="M5 3l-1 -1"/><path d="M4 7h-1"/><path d="M14 3l1 -1"/><path d="M15 6h1"/>'
+  };
+  /** 24×24 아이콘 한 벌을 (x,y)에 배율 k 로 놓는다. sw = **화면상** 최종 선 굵기 */
+  function tbIcon(name, x, y, k, sw, extra) {
+    return '<g data-i="' + name + '" transform="translate(' + x + ',' + y + ') scale(' + k + ')" ' +
+      'fill="none" stroke="' + INK + '" stroke-width="' + (sw / k).toFixed(3) + '" ' +
+      'stroke-linecap="round" stroke-linejoin="round"' + (extra || "") + '>' + TB[name] + '</g>';
+  }
   function gpsArt(w, h) {
     /* 기준 도안 320×430 을 그대로 쓰고 크기는 viewBox 로 맞춘다 */
     var s = '<svg viewBox="0 0 320 430" width="' + w + '"' + (h ? ' height="' + h + '"' : '') + ' xmlns="http://www.w3.org/2000/svg">';
-    s += '<rect x="2" y="2" width="316" height="426" rx="14" fill="' + PAPER + '" stroke="#cdc3ad" stroke-width="3"/>';
-    /* ① 핀 + 사선 */
-    s += '<g fill="none" stroke="' + INK + '" stroke-width="11" stroke-linecap="round" stroke-linejoin="round">';
-    s += '<path d="M160 152 C160 152 202 108 202 76 A42 42 0 0 0 118 76 C118 108 160 152 160 152 Z"/>';
-    s += '<circle cx="160" cy="74" r="15"/></g>';
-    s += '<line x1="112" y1="150" x2="208" y2="40" stroke="' + RED + '" stroke-width="13" stroke-linecap="round"/>';
-    s += '<text x="160" y="192" text-anchor="middle" font-family="sans-serif" font-size="30" font-weight="700" fill="' + INK + '">GPS</text>';
-    /* ② 화살표 */
-    s += '<g stroke="' + INK + '" fill="' + INK + '" stroke-width="10" stroke-linecap="round" stroke-linejoin="round">';
-    s += '<line x1="160" y1="210" x2="160" y2="252"/>';
-    s += '<polygon points="160,272 144,244 176,244"/></g>';
-    /* ③ 새로고침 버튼 + 누르는 손가락 */
-    s += '<rect x="96" y="288" width="76" height="76" rx="20" fill="none" stroke="' + INK + '" stroke-width="8"/>';
-    s += '<g fill="none" stroke="' + INK + '" stroke-width="8" stroke-linecap="round">';
-    s += '<path d="M156 326 A22 22 0 1 1 149 309"/></g>';
-    s += '<polygon points="156,300 158,322 137,313" fill="' + INK + '"/>';
-    /* 손가락 — 검지 하나를 세운 손 모양(플랫) */
-    s += '<g transform="translate(150,318) rotate(24)">';
-    s += '<path d="M18 6 a11 11 0 0 1 22 0 v46 h-22 z" fill="' + PAPER + '" stroke="' + INK + '" stroke-width="8" stroke-linejoin="round"/>';
-    s += '<path d="M8 50 h42 a14 14 0 0 1 14 14 v22 a14 14 0 0 1 -14 14 h-42 a14 14 0 0 1 -14 -14 v-22 a14 14 0 0 1 14 -14 z" fill="' + PAPER + '" stroke="' + INK + '" stroke-width="8" stroke-linejoin="round"/>';
-    s += '</g>';
+    s += '<rect x="2" y="2" width="316" height="426" rx="14" fill="' + PAPER + '" stroke="#cdc3ad" stroke-width="2"/>';
+    /* ① 위치 핀(map-pin) + 빨간 사선 — 24픽셀 도안을 4.4배(=105.6px), 선 4.2 */
+    s += tbIcon("mapPin", 107.2, 38, 4.4, 4.2);
+    s += '<line x1="100" y1="152" x2="220" y2="38" stroke="' + RED + '" stroke-width="5" stroke-linecap="round"/>';
+    s += '<text x="160" y="196" text-anchor="middle" font-family="sans-serif" font-size="27" font-weight="600" ' +
+         'letter-spacing="2" fill="' + INK + '">GPS</text>';
+    /* ② 아래로 화살표 — 2.4배(=57.6px), 선 3.6 */
+    s += tbIcon("arrowDown", 131.2, 214, 2.4, 3.6);
+    /* ③ 새로고침 버튼(둥근 네모 + refresh) — 버튼 선 3.2, 아이콘 선 3.6 */
+    s += '<rect x="98" y="286" width="76" height="76" rx="18" fill="none" stroke="' + INK + '" stroke-width="3.2"/>';
+    s += tbIcon("refresh", 110.8, 298.8, 2.1, 3.6);
+    /* ④ 그 버튼을 누르는 손 — Tabler hand-click, 2.9배(=69.6px) · 16° 기울임.
+       검지 끝이 버튼 **오른쪽 테두리**(≈176,318)에 닿는다 — 더 안쪽으로 넣으면 손이 ↻ 글리프를
+       덮어 "새로고침" 이 안 읽힌다(1차 렌더 확인). 버튼 선과 겹치는 자리는 종이색 굵은 선
+       (knockout)을 한 겹 먼저 깔아 지워 선이 엉키지 않게 한다. */
+    var HAND = 'translate(152,302) rotate(16) scale(2.9)';
+    s += '<g transform="' + HAND + '" fill="none" stroke="' + PAPER + '" stroke-width="' + (5.6 / 2.9).toFixed(3) + '" ' +
+         'stroke-linecap="round" stroke-linejoin="round">' + TB.handClick + '</g>';
+    s += '<g data-i="handClick" transform="' + HAND + '" fill="none" stroke="' + INK + '" stroke-width="' + (3.2 / 2.9).toFixed(3) + '" ' +
+         'stroke-linecap="round" stroke-linejoin="round">' + TB.handClick + '</g>';
     s += '</svg>';
     return s;
   }
-  /* 수납장 사진 위에 놓이는 작은 카드(한 장) — 탭하면 위 그림이 크게 뜬다 */
-  var GPS_CARD_MINI =
-    '<svg viewBox="0 0 120 96" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">' +
-    '<g transform="rotate(-3 60 48)">' +
-    '<rect x="10" y="8" width="100" height="80" rx="6" fill="' + PAPER + '" stroke="#b9ae97" stroke-width="2.4"/>' +
-    '<g fill="none" stroke="' + INK + '" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">' +
-    '<path d="M44 44 C44 44 57 31 57 21 A13 13 0 0 0 31 21 C31 31 44 44 44 44 Z"/>' +
-    '<circle cx="44" cy="20" r="4.6"/></g>' +
-    '<line x1="31" y1="43" x2="58" y2="12" stroke="' + RED + '" stroke-width="4.4" stroke-linecap="round"/>' +
-    '<rect x="66" y="20" width="30" height="30" rx="8" fill="none" stroke="' + INK + '" stroke-width="4"/>' +
-    '<path d="M89 36 A10 10 0 1 1 86 28" fill="none" stroke="' + INK + '" stroke-width="4" stroke-linecap="round"/>' +
-    '<polygon points="90,22 91,32 82,27" fill="' + INK + '"/>' +
-    '<line x1="30" y1="62" x2="90" y2="62" stroke="#b9ae97" stroke-width="3.2" stroke-linecap="round"/>' +
-    '<line x1="38" y1="72" x2="82" y2="72" stroke="#b9ae97" stroke-width="3.2" stroke-linecap="round"/>' +
-    '</g></svg>';
+  /* ★v0.17.11 [지시7] 수납장 사진 위에 엔진이 그리던 작은 카드(GPS_CARD_MINI)는 폐기 —
+     사진(gen/80_cab2_paper) 안에 접힌 종이가 실제로 들어와 있다. 이제 그 종이를 탭한다. */
   ZOOM.gpsHint = function () {
     var host = el("div");
     host.setAttribute("data-t", "gpsHintArt");
@@ -17428,6 +17489,8 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     host.innerHTML = gpsArt("100%", null);
     var svg = host.querySelector("svg");
     if (svg) { svg.style.width = "100%"; svg.style.height = "auto"; svg.style.display = "block"; }
+    /* ★v0.17.11 [지시3] 이 카드를 **본 뒤부터** 새로고침이 GPS 를 되살린다 */
+    if (!G.flag("gpsHintSeen")) G.setFlag("gpsHintSeen");
     openZoom({ id: "gpsHint", title: "종이 카드", node: host, cap: "카드에 그림이 그려져 있다." });
   };
 
@@ -18136,6 +18199,34 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     })();
   }
 
+  /* ★v0.17.11 [지시3] 힌트 카드를 본 사람이 구글맵을 안 연 채 새로고침했을 때 짚어 주는 한 줄 */
+  var GPS_NUDGE = "GPS 연결이 안 되는 앱을 열어서 한 번 더 해보면 될 것 같다.";
+  var gpsNudge = false;
+  /* ★v0.17.11 [지시4] 뒤로가기 이스터에그 문구(북쑥 지정 — 문장·이모지 그대로) */
+  var BACK_EGG = "이번에는 뒤에 아무것도 떨어져 있지 않을 것 같다...🥲";  /* 🥲 U+1F972 */
+
+  /* ★v0.17.11 [지시4] 브라우저 뒤로가기를 눌러도 게임에서 빠져나가지 않는다.
+     더미 history 항목을 하나 쌓아 두고, popstate 가 오면 토스트만 띄우고 다시 쌓는다.
+     · 새로고침 감지(core.js)와 무관하다 — pushState/popstate 는 문서를 다시 읽지 않고
+       navigation type 도 바꾸지 않는다(reload/back_forward 판정에 개입 0).
+     · 서비스워커 자동 새로고침(location.reload)·☰처음부터(location.href)도 그대로 동작한다.
+     · 몇 번을 눌러도 매번 뜬다(북쑥 OK). */
+  function backEgg() {
+    if (!window.history || !history.pushState) return;
+    function push() { try { history.pushState({ ody: 1 }, "", location.href); } catch (e) {} }
+    push();
+    window.addEventListener("popstate", function () {
+      G.toast(BACK_EGG, 2600);
+      push();                                    /* 다음 뒤로가기도 받아 낸다 */
+    });
+  }
+
+  /* 검증용 — GPS 퍼즐의 세 재료를 한 번에 읽는다 */
+  window.__gpsState = function () {
+    return { hintSeen: G.flag("gpsHintSeen"), onScreen: G.flag("gpsOnScreen"),
+             restored: G.flag("gpsRestored"), nudge: gpsNudge, nudgeText: GPS_NUDGE, backEgg: BACK_EGG };
+  };
+
   window.MAIN = {
     render: render, renderInv: renderInv, openCU: openCU, closeCU: closeCU, reopenCU: reopenCU,
     openZoom: openZoom, closeZoom: closeZoom, prize: prize, story: story, transit: transit,
@@ -18151,6 +18242,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     bind();
     buildDebug();
     sw();
+    backEgg();                /* ★v0.17.11 [지시4] 뒤로가기 이스터에그 */
     var had = G.load();
     /* ★v0.17.3 [지시3] GPS 복구 — 사용자 새로고침 한 번이면 위치가 다시 잡힌다.
        서비스워커 자동 새로고침·☰처음부터는 G.markAutoNav() 로 빠져 있다.
@@ -18158,15 +18250,26 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
        새로고침해야 복구된다. 예전엔 한 번 보기만 하면(gpsSeen) 그 뒤 아무 화면에서
        새로고침해도 풀렸는데, 그러면 "왜 풀렸는지" 가 안 보인다.
        판정 재료 = phone.js 가 끊김 창을 그릴 때 켜고 화면을 벗어나면 끄는 `gpsOnScreen`
-       플래그(저장에 남으므로 리로드 뒤에도 직전 상태를 읽을 수 있다). */
+       플래그(저장에 남으므로 리로드 뒤에도 직전 상태를 읽을 수 있다).
+       ★v0.17.11 [지시3] 조건을 한 겹 더 — **힌트 종이(#27 수납장2 카드)를 본 뒤**(gpsHintSeen)
+       부터만 새로고침이 의미를 갖는다. 카드를 안 봤으면 끊김 창을 띄운 채 새로고침해도
+       아무 일도 일어나지 않는다(우연히 풀려 버리는 걸 막는다).
+       그리고 카드를 본 사람이 **구글맵을 안 연 채** 새로고침했다면, 돌아왔을 때
+       "어디서 새로고침해야 하는지" 를 한 번 짚어 준다(토스트 1회). */
     G.onReload(function () {
-      if (G.flag("gpsOnScreen") && !G.flag("gpsRestored")) G.setFlag("gpsRestored");
+      if (!G.flag("gpsHintSeen") || G.flag("gpsRestored")) return;
+      if (G.flag("gpsOnScreen")) G.setFlag("gpsRestored");
+      else gpsNudge = true;
     });
     /* 소비했으면(또는 그냥 새로 들어왔으면) 내린다 — 이번 로드에서 **다시 열어야** 유효하다 */
     if (G.flag("gpsOnScreen")) G.setFlag("gpsOnScreen", false);
     /* ★v0.17.3 저장이 있으면 인트로 없이 곧장 이어 한다(새로고침 = 즉시 복귀).
        저장이 없거나 맵을 못 찾는 비정상 저장이면 예전처럼 인트로(이어하기 버튼)를 보여 준다. */
-    if (had && S.started && DATA.MAPS[S.map]) resumeGame();
+    if (had && S.started && DATA.MAPS[S.map]) {
+      resumeGame();
+      /* 복귀 직후 1회 — 화면이 다 그려진 뒤에 띄운다 */
+      if (gpsNudge) setTimeout(function () { G.toast(GPS_NUDGE, 3400); }, 700);
+    }
     else if (had && S.started) $("btnResume").hidden = false;
   });
 })();
