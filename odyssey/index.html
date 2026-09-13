@@ -269,6 +269,10 @@ input:focus{outline:none;border-color:var(--accent)}
 .slideDots i.on{background:var(--accent)}
 
 /* IFE 오버레이 */
+/* ★v0.17.10 [지시F] 배치(크롭·좌표 계산)가 끝나기 전에는 감춘다 — 여는 첫 프레임의 플래시 0.
+   display:none 이 아니라 visibility:hidden 이라 **자리는 그대로 차지한다**
+   (레이아웃이 안 흔들려야 fit()/apply() 가 정확한 크기를 잰다). */
+.preFit{visibility:hidden !important}
 .ifeWrap{position:relative;display:inline-block;max-width:100%;max-height:100%}
 .ifeWrap img.main{display:block}
 .ifeHot{position:absolute;border:0;background:transparent;border-radius:6px}
@@ -541,6 +545,12 @@ body.dbg .ifeHot:active{box-shadow:0 0 0 2px rgba(255,255,255,.95)}
   background:var(--n2);border:1px solid var(--line2);border-radius:var(--r);padding:11px 16px;font-size:13px;
   max-width:82%;text-align:center;opacity:0;pointer-events:none;transition:opacity .2s;white-space:pre-line;line-height:1.5}
 #toast.show{opacity:1}
+
+/* ★v0.17.10 [지시K] 헤드셋 재생 화면 이전/다음 곡 — IFE 뒤로가기와 같은 플랫 톤, 탭 44px */
+.songNav{flex:0 0 auto;width:44px;height:44px;padding:0;border:0;border-radius:12px;background:transparent;
+  color:var(--n8);font-size:26px;line-height:1;font-weight:400;
+  display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent}
+.songNav:active{background:rgba(255,255,255,.10);color:#fff}
 
 #shakeFlash{position:absolute;inset:0;z-index:45;pointer-events:none;background:#fff;opacity:0}
 #app.shaking{animation:shake .42s cubic-bezier(.36,.07,.19,.97) infinite}
@@ -815,6 +825,20 @@ body.dbg.hints .cvcell.extra.cartDone{box-shadow:0 2px 8px rgba(0,0,0,.42)}
   background:transparent !important;box-shadow:none !important;
   color:#fff;text-shadow:0 0 2px rgba(0,0,0,.9),0 0 4px rgba(0,0,0,.6)}
 .cvcell .cv.faceBox.light{color:#26282e;text-shadow:0 0 2px rgba(255,255,255,.95),0 0 4px rgba(255,255,255,.8)}
+/* ★v0.17.10 [지시I] 헤드셋 케이스(#5) 로고 자리 — "키패드 글자"가 아니라 **각인된 워드마크**로.
+   ①굵고 넓은 그로테스크 대문자(BRAND_FAM, 800) + 자간 0.1em — 오디오 브랜드 워드마크의 인상
+   ②색은 크림 표면에 눌러 찍은 느낌 — 글자는 표면보다 살짝 어둡게(#8d867a) 하고
+     위쪽에 그림자(눌린 깊이) · 아래쪽에 밝은 가장자리(빛 받는 면)를 준다.
+   힌트 문구는 없다(북쑥 원칙) — 생김새만으로 "아 저 로고구나" 가 서게 한다. */
+.cvcell .cv.faceBox.brandFace{
+  font-family:"Helvetica Neue",Helvetica,"Arial Black",Arial,-apple-system,sans-serif;
+  /* 자간을 줘도 자리는 안 밀린다 — fitText 가 **실제 글자 상자(Range)** 를 재서
+     잉크 중심을 앞면 중심에 맞추기 때문에 자간·정렬 보정이 따로 필요 없다. */
+  font-weight:800;letter-spacing:.10em;
+  color:#8d867a;
+  text-shadow:0 -1px 1px rgba(60,54,44,.55), 0 1px 0 rgba(255,255,255,.92);
+}
+.cvcell.done .cv.faceBox.brandFace{color:#4b7a5c;text-shadow:0 1px 0 rgba(255,255,255,.9)}
 /* 눌림 피드백도 앞면 안에서만 — 글자만 흐려진다(상자 없음) */
 .cvcell:active .cv.faceBox{opacity:.5}
 .cvcell.done .cv.faceBox{color:var(--ok);text-shadow:0 0 2px rgba(0,0,0,.9)}
@@ -1024,7 +1048,7 @@ body.dbg .cvcell.cabBtn:active{box-shadow:inset 0 0 0 3px rgba(255,255,255,.8)}
 
 </div>
 
-<script>window.__AUDIO = ["ad_bgm.mp3","binoc.mp3","bow_shot.mp3","song1.mp3","song2.mp3","song3.mp3","song4.mp3","song5.mp3","sudoku_bgm.mp3"]; window.__IMG = ["app_kakao.png","app_map.png","app_minigame.png","app_qr.png","archer.jpg","archer.png","archery_field.jpg","bin_L1.jpg","bin_L1_open_case.jpg","bin_L1_open_empty.jpg","bin_L2.jpg","bin_L2_open_cello.jpg","bin_L2_open_empty.jpg","bin_R1.jpg","bin_R1_open_card.jpg","bin_R1_open_empty.jpg","bin_R2.jpg","bin_R2_open_empty.jpg","bin_R2_open_key.jpg","blanket_zoom.jpg","book_empty.jpg","book_tile.jpg","case_open_empty.jpg","case_open_headset.jpg","ceiling_open_cardkey.jpg","ceiling_open_empty.jpg","cello_align.png","char_front.jpg","char_happy.jpg","char_hipL.jpg","char_hipR.jpg","char_hungry.jpg","crew_blanket.jpg","crew_tray.jpg","dialbox.jpg","dialbox_open.jpg","food_bread.png","food_cake.png","food_omu.png","food_salad.png","galley_cart.jpg","galley_cart_empty.jpg","galley_cart_open.jpg","galley_drawer.jpg","galley_snack.jpg","galley_upper.jpg","galley_upper_empty.jpg","galley_upper_open.jpg","gamecard.jpg","headphones.jpg","headset_case.jpg","headset_worn.jpg","hint_phonecase.jpg","ic_blanket.png","ic_butter.jpg","ic_butter.png","ic_cardkey.jpg","ic_cardkey.png","ic_case.png","ic_cellophane.png","ic_dna.jpg","ic_dna.png","ic_drop.jpg","ic_drop.png","ic_dynamite.jpg","ic_dynamite.png","ic_fire.jpg","ic_fire.png","ic_gamecard.png","ic_goldkey.jpg","ic_goldkey.png","ic_headphones.jpg","ic_headphones.png","ic_ladder.png","ic_pamphlet.png","ic_passport.png","ic_peanut.png","ic_phone.png","ic_silverkey.jpg","ic_silverkey.png","ic_telescope.png","ic_ticket.png","ic_tile_beige.png","ic_tile_black.png","ic_tile_brown.png","ic_tile_dark.png","ife_ic_blanket.png","ife_ic_meal.png","ife_ic_tv.png","ife_off.jpg","ife_on.jpg","ife_photo1.jpg","ife_photo2.jpg","ife_photo3.jpg","ife_photo4.jpg","lav_cab1.jpg","lav_cab1_empty.jpg","lav_cab1_open.jpg","lav_cab2.jpg","lav_cab2_empty.jpg","lav_cab2_open.jpg","lav_cabtop.jpg","lav_cabtop_empty.jpg","lav_cabtop_open.jpg","lav_ceiling.jpg","lav_tissue.jpg","lav_tissue_idle.jpg","lav_tissue_roll.jpg","map_aisle.jpg","map_gate.jpg","map_seat.jpg","map_seat_tray.jpg","meal_tray.jpg","oway_plane.jpg","pamphlet_bg.jpg","pamphlet_body_bg.jpg","passport.jpg","passport_p1.jpg","passport_p2.jpg","phone_wall.jpg","shade_logo.png","ticket_bg.jpg","tile_beige.jpg","tile_black.jpg","tile_brown.jpg","tile_dark.jpg","tissue_mask.png","travel1.jpg","travel2.jpg","travel3.jpg","travel4.jpg","window_open.jpg","window_shade.jpg","window_shade_plain.jpg"];</script>
+<script>window.__AUDIO = ["ad_bgm.mp3","binoc.mp3","bow_shot.mp3","main_bgm.mp3","song1.mp3","song2.mp3","song3.mp3","song4.mp3","song5.mp3","sudoku_bgm.mp3"]; window.__IMG = ["app_kakao.png","app_map.png","app_minigame.png","app_qr.png","archer.jpg","archer.png","archery_field.jpg","bin_L1.jpg","bin_L1_open_case.jpg","bin_L1_open_empty.jpg","bin_L2.jpg","bin_L2_open_cello.jpg","bin_L2_open_empty.jpg","bin_R1.jpg","bin_R1_open_card.jpg","bin_R1_open_empty.jpg","bin_R2.jpg","bin_R2_open_empty.jpg","bin_R2_open_key.jpg","blanket_zoom.jpg","book_empty.jpg","book_tile.jpg","case_open_empty.jpg","case_open_headset.jpg","ceiling_open_cardkey.jpg","ceiling_open_empty.jpg","cello_align.png","char_front.jpg","char_happy.jpg","char_hipL.jpg","char_hipR.jpg","char_hungry.jpg","crew_blanket.jpg","crew_tray.jpg","dialbox.jpg","dialbox_open.jpg","food_bread.png","food_cake.png","food_omu.png","food_salad.png","galley_cart.jpg","galley_cart_empty.jpg","galley_cart_open.jpg","galley_drawer.jpg","galley_snack.jpg","galley_upper.jpg","galley_upper_empty.jpg","galley_upper_open.jpg","gamecard.jpg","headphones.jpg","headset_case.jpg","headset_worn.jpg","hint_phonecase.jpg","ic_blanket.png","ic_butter.jpg","ic_butter.png","ic_cardkey.jpg","ic_cardkey.png","ic_case.png","ic_cellophane.png","ic_dna.jpg","ic_dna.png","ic_drop.jpg","ic_drop.png","ic_dynamite.jpg","ic_dynamite.png","ic_fire.jpg","ic_fire.png","ic_gamecard.png","ic_goldkey.jpg","ic_goldkey.png","ic_headphones.jpg","ic_headphones.png","ic_ladder.png","ic_pamphlet.png","ic_passport.png","ic_peanut.png","ic_phone.png","ic_silverkey.jpg","ic_silverkey.png","ic_telescope.png","ic_ticket.png","ic_tile_beige.png","ic_tile_black.png","ic_tile_brown.png","ic_tile_dark.png","ife_ic_blanket.png","ife_ic_meal.png","ife_ic_tv.png","ife_off.jpg","ife_on.jpg","ife_photo1.jpg","ife_photo2.jpg","ife_photo3.jpg","ife_photo4.jpg","lav_cab1.jpg","lav_cab1_empty.jpg","lav_cab1_open.jpg","lav_cab2.jpg","lav_cab2_empty.jpg","lav_cab2_open.jpg","lav_cabtop.jpg","lav_cabtop_empty.jpg","lav_cabtop_open.jpg","lav_ceiling.jpg","lav_tissue.jpg","lav_tissue_idle.jpg","lav_tissue_roll.jpg","map_aisle.jpg","map_gate.jpg","map_seat.jpg","map_seat_tray.jpg","meal_tray.jpg","oway_plane.jpg","pamphlet_bg.jpg","pamphlet_body_bg.jpg","passport.jpg","passport_p1.jpg","passport_p2.jpg","phone_wall.jpg","shade_logo.png","ticket_bg.jpg","tile_beige.jpg","tile_black.jpg","tile_brown.jpg","tile_dark.jpg","tissue_mask.png","travel1.jpg","travel2.jpg","travel3.jpg","travel4.jpg","window_open.jpg","window_shade.jpg","window_shade_plain.jpg"];</script>
 <script>
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -11134,7 +11158,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 (function () {
   "use strict";
 
-  var BUILD = "ODY-S1-20260913-1406";
+  var BUILD = "ODY-S1-20260913-1513";
   var LSKEY = "odyssey.s1.v1";
 
   var qs = new URLSearchParams(location.search);
@@ -11342,9 +11366,10 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
          "몸통 대비 -18dB 이상이 100ms 이상 지속"되는 첫/마지막 지점)하고,
          꼬리 BGM_XFADE 를 머리에 **등가파워로 미리 접어 구워** 경계 클릭까지 없앤다.
        · 디코드 전·실패 시엔 기존 엘리먼트 재생으로 그대로 폴백한다(동작 동일).
-       · ad 는 엘리먼트 그대로(짧게만 도는 트랙). sudoku 는 메인과 **같은 파일**이라
-         따로 버퍼를 뜨지 않는다 — 엘리먼트로 스트리밍(메모리 추가 0).
+       · sudoku 는 버퍼를 안 뜬다 — 엘리먼트로 스트리밍(메모리 추가 0).
+         ad 는 ★v0.17.9 부터 버퍼 루프다(아래 참고).
      ★v0.17.7 [지시3 변경] 메인 BGM = 스도쿠 곡(Cozy Puzzle In-Game 1, 130.2s).
+       ★v0.17.10 [지시J] 철회 — 메인은 별도 곡(main_bgm.mp3)으로 갈렸다. 아래 BGM_DEF 참고.
        파일을 복제하지 않고 **같은 sudoku_bgm.mp3 를 참조**한다 — sw 프리캐시가 1.8MB 가볍다.
 
      ★v0.17.8 [지시: 박자 맞춰 루프] def.loop —
@@ -11377,11 +11402,22 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
        ③스도쿠·네모로직은 v0.17.7 부터 메인과 **같은 음원**이라 이 작업으로 자동 적용된다
          (bgmSameFileAsMain → 메인 버퍼 루프를 그대로 이어 듣는다). 손댈 곳 없음. */
   var BGM_DEF = {
+    /* ★v0.17.10 [지시J] 북쑥 확정 — 메인 테마 = Attraction(Nu-Disco Pop, Pixabay).
+       원곡 193.9s 중 **루프로 쓰는 구간만 잘라** 넣었다(말미 7.4s 무음·페이드아웃 제거).
+         · 검출 그리드 = 69.33BPM · 주기 865.41ms (실제 박의 2배 주기로 물렸다 — 루프 길이가
+           이 주기의 정수배면 실제 박의 정수배이기도 하므로 그대로 쓴다)
+         · 자른 구간 = 원곡 62.346s~184.003s → 루프 **140주기(35마디) = 121.157s** + 꼬리 0.7s
+           (브레이크다운→빌드→드롭 한 바퀴가 통째로 들어가는 자리로 골랐다)
+         · 겹침 35ms 에서 경계 레벨차 ≈ 0.0dB · 급변 4.1dB · 단차 0.0049 · 오프비트 0.0ms
+         · 라우드니스 −18.3 → **−12.5 LUFS**(+8.5dB + 트루피크 리미터, TP −0.4dBFS, LRA 4.4→3.7)
+         · 1.96MB(원곡 3.10MB) — 북쑥이 말한 2MB 근처
+       ★스도쿠·네모로직은 Cozy Puzzle(sudoku_bgm.mp3) 그대로다 → 이제 메인과 **파일이 달라서**
+         bgmSameFileAsMain() 이 false 가 되고, v0.17.8 의 "같은 곡이면 이어재생" 은 자연히 비활성된다
+         (로직은 그대로 남겨 둔다 — 나중에 또 같은 곡을 쓰게 되면 다시 살아난다). */
     main: {
-      file: "sudoku_bgm.mp3", vol: 0.42, resume: true, seamless: true,
-      /* tools/beat-grid.mjs src/assets/audio/sudoku_bgm.mp3 --reserveBars 2 --xfades 120 */
-      loop: { bpm: 117.99, beatsPerBar: 4, beatSec: 0.508517007,
-              startSec: 0.010159, beats: 248, xfadeSec: 0.120 }
+      file: "main_bgm.mp3", vol: 0.42, resume: true, seamless: true,
+      loop: { bpm: 69.331, beatsPerBar: 4, beatSec: 0.86540771,
+              startSec: 0, beats: 140, xfadeSec: 0.035 }
     },
     sudoku: { file: "sudoku_bgm.mp3", vol: 0.46, resume: false },
     ad: {
@@ -11858,18 +11894,19 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   window.addEventListener("focus", function () { wake("focus"); });
   /* bfcache 복귀(뒤로가기·앱 전환 후 사파리 복원)도 같은 길목이다 */
   window.addEventListener("pageshow", function () { wake("pageshow"); });
-  /* 보이는 동안 컨텍스트가 죽으면(인터럽션) 곧바로 되살려 본다 */
-  (function watchCtx() {
-    var seen = null;
-    setInterval(function () {
-      if (!actx) return;
-      var st = actx.state;
-      if (st !== seen) {
-        seen = st;
-        if (ctxDead(actx) && document.visibilityState === "visible" && (bgmCur || bgmWantMain)) wake("statechange:" + st);
-      }
-    }, 1000);
-  })();
+  /* 보이는 동안 컨텍스트가 죽어 있으면(전화·알람 인터럽션처럼 이벤트가 안 오는 경우) 되살려 본다.
+     ★"상태가 바뀐 순간" 만 보면 안 된다 — 틱 사이에 죽었다 살았다 하면 놓친다.
+       그냥 **매 틱 죽어 있는지** 보고, 연속으로 거부당하면(제스처가 필요한 상황) 그만둔다.
+       그 뒤는 다음 탭(firstGesture → wake("gesture"))이 받는다. */
+  var ctxFails = 0;
+  setInterval(function () {
+    if (!actx || !ctxDead(actx)) { ctxFails = 0; return; }
+    if (document.visibilityState !== "visible") return;
+    if (!bgmCur && !bgmWantMain) return;
+    if (ctxFails >= 5) return;
+    ctxFails++;
+    wake("statechange:" + actx.state);
+  }, 1000);
   window.__bgmWake = wake;
   window.__bgmWakeLog = function () { return wakeLog.slice(); };
   /* 검증 전용 — 실제 iOS 가 백그라운드에서 하는 짓(컨텍스트 정지)을 흉내 낸다.
@@ -13127,8 +13164,10 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
        ①먼저 narrow 계열 글꼴을 시도하고(있으면 그대로 좁다)
        ②그래도 넓으면 scaleX 로 눌러 "잉크 폭 <= 앞면 폭 60%" 를 반드시 지킨다(iOS 폴백). */
     var narrow = !!v._narrow;
-    var fam = narrow ? '"Arial Narrow","Roboto Condensed","SF Compact Display","Helvetica Neue Condensed",sans-serif'
-                     : "sans-serif";
+    /* ★v0.17.10 [지시I] v._fam 이 있으면 그 글꼴로 잰다(브랜드 각인 칸) */
+    var fam = v._fam ? v._fam
+                     : (narrow ? '"Arial Narrow","Roboto Condensed","SF Compact Display","Helvetica Neue Condensed",sans-serif'
+                               : "sans-serif");
     var weight = cs.fontWeight || "400";
     var all = (glyphs && glyphs.length) ? glyphs : [txt];
     /* narrow 는 높이 기준으로 최대한 키우고(가로는 scaleX 로 맞춘다) */
@@ -13231,7 +13270,8 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   }
 
   function cropView(src, crop, overlays, opts) {
-    var wrap = el("div", "cropView");
+    var wrap = el("div", "cropView preFit");   /* ★v0.17.10 [지시F] 배치 전에는 감춘다(아래 참고) */
+    var imgReady = !src;                       /* 사진이 없는 판(placeholder)은 기다릴 게 없다 */
     var inner = el("div", "cropInner");
     var img = new Image();
     img.className = "cropImg";
@@ -13294,8 +13334,24 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         }
         if (o.onFit) o.onFit(n, { dispW: dispW, dispH: dispH, ox: ox, oy: oy });
       });
+      /* ★v0.17.10 [지시F] 자리가 다 잡히고 **사진까지 준비된 뒤**에만 보여 준다.
+         (자리만 맞춰 먼저 띄우면 사진 없는 빈 판 위에 칸·글자만 떠 있는 프레임이 생긴다) */
+      if (!imgReady && src && img.complete && img.naturalWidth > 0) imgReady = true;
+      if (imgReady) wrap.classList.remove("preFit");
     }
-    img.onload = fit;
+    /* 사진이 아예 없거나(placeholder) 실패하면 기다리지 않는다 — 영영 안 보이면 안 되니까 */
+    img.onload = function () { imgReady = true; fit(); };
+    img.onerror = function () { imgReady = true; fit(); };
+    /* ★v0.17.10 [지시F] "여는 순간 엉뚱한 자리에 잠깐 뜨는" 플래시의 정체 —
+       fit() 은 부모(stage)에 붙은 뒤에야 크기를 잴 수 있는데, 예전엔 첫 호출이 **+20ms 타이머**였다.
+       그 사이에 브라우저가 한두 프레임을 이미 그려 버려서
+         · 사진이 **원본 픽셀 크기 그대로**(예: 1100×738) 화면 밖까지 뻗치고
+         · 칸(cvcell)·글자칩(.cv)은 크기가 0에 가까운 채 좌상단에 뭉쳐 있다가
+       20ms 뒤에 제자리로 **뚝 떨어지는** 게 보였다(실측: 창문 3프레임, 카트·짐칸 1~2프레임).
+       → ①배치가 끝날 때까지 `.preFit`(visibility:hidden)로 감추고
+         ②붙자마자 도는 **rAF** 에서 첫 fit 을 돌린다(타이머보다 한 프레임 빠르다).
+       리플로우가 아니라 가시성만 늦추는 것이라 체감 지연은 없다(1프레임 ≈ 16ms). */
+    requestAnimationFrame(fit);
     setTimeout(fit, 20); setTimeout(fit, 180); setTimeout(fit, 600);
     window.addEventListener("resize", fit);
     if (src) img.src = src;
@@ -13307,6 +13363,9 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   /* ════════════════ 0-c. 이미지 위 인라인 자물쇠 (★v0.3) ════════════════
      별도 입력줄 없이, 클로즈업 이미지의 실제 다이얼 자리를 탭해서 값을 순환시킨다.  */
   var DASH = String.fromCharCode(0x2013);   /* ★v0.15 순환 입력칸 초기 표시 */
+  /* ★v0.17.10 [지시I] 브랜드 각인용 글꼴 — 오디오 브랜드 워드마크 특유의
+     굵고 넓은 그로테스크(헬베티카 계열). iOS 는 -apple-system 이 SF Pro 로 떨어진다. */
+  var BRAND_FAM = '"Helvetica Neue",Helvetica,"Arial Black",Arial,-apple-system,sans-serif';
 
   function imgLock(opt) {
     /* opt: {id, img, crop, cells:[{x,y,w,h}], answer, pool, size, kind:"text"|"icon",
@@ -13364,6 +13423,15 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
             v._glyphs = Object.keys(uni);
           }
           if (opt.narrow) { v._narrow = true; nd.classList.add("narrowNum"); }
+          /* ★v0.17.10 [지시I] 브랜드 각인 글꼴 — 케이스 로고 자리(#5)에만 쓴다.
+             기본 글자칸은 sans-serif 400 이라 "로고" 라기보다 키패드 글자처럼 보였다.
+             굵고 넓은 그로테스크(헬베티카 계열) 대문자 + 자간을 주고, 색은 크림 표면에
+             **눌러 찍은(각인)** 느낌으로 바꾼다(아래 CSS .brandFace).
+             ★fitText 는 캔버스로 글자 상자를 재므로 **같은 글꼴을 알려 줘야** 어긋나지 않는다 → v._fam */
+          if (opt.brandFace) {
+            v.classList.add("brandFace");
+            v._fam = BRAND_FAM;
+          }
           nd.appendChild(v); vnodes[i] = v; cellNodes[i] = nd;
           if (opt.pre) nd.classList.add("done");
         },
@@ -13747,10 +13815,18 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   function shade(opt) {
     var wrap = el("div"); wrap.id = "shadeWrap";
     var stack = el("div", "stack");
+    /* ★v0.17.10 [지시F] 북쑥이 본 "창문을 여는 순간 로고가 짧게 떴다 사라지는" 플래시 —
+       apply() 가 stack 의 실제 높이를 못 재면(아직 부모에 안 붙었다) 그냥 return 하는데,
+       예전엔 첫 성공이 **+30ms 타이머**라 그 전 3프레임이 이미 그려졌다. 그 프레임에서는
+         · 가리개 레이어에 clipPath 가 아직 없어 **가리개가 통째로 내려온 상태**로 보이고
+         · 로고(.shadeLogo)·코드(#shadeCode)는 left/top/width 가 안 잡혀
+           **레이어 전체 크기(370×515)로 늘어난 채** 엉뚱한 자리에 뜬다(실측 프레임 0~2).
+       → 첫 성공적인 배치까지 레이어를 통째로 감춘다(바탕 창문 사진은 그대로 보인다). */
+    var preFit = true;
     var base = new Image(); base.src = opt.base; base.className = "baseImg";
     stack.appendChild(base);
 
-    var layer = el("div", "shadeLayer");
+    var layer = el("div", "shadeLayer preFit");
     var sh = new Image(); sh.src = opt.shadeImg; sh.className = "shadeImg";
     layer.appendChild(sh);
     /* 가리개에 인쇄된 것들 — 한 레이어에 고정, 같이 내려온다 */
@@ -13841,6 +13917,8 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       inkClip.style.clipPath = icp; inkClip.style.webkitClipPath = icp;
       hint.style.display = (hShown && d <= g.D * 0.985) ? "block" : "none";
       centerDigits();
+      /* ★v0.17.10 [지시F] 가리개·로고·코드 자리가 다 잡혔다 — 이제 레이어를 보여 준다 */
+      if (preFit) { preFit = false; layer.classList.remove("preFit"); }
     }
     var startY = 0, startD = 0, hMoved = false;
     G.drag(stack, {
@@ -13867,6 +13945,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     };
     if (opt.closed) d = 1e9;
     apply();
+    requestAnimationFrame(apply);        /* ★v0.17.10 [지시F] 붙자마자 첫 프레임에 배치(타이머보다 빠르다) */
     setTimeout(apply, 30); setTimeout(apply, 250); setTimeout(apply, 700);
     window.addEventListener("resize", apply);
     if (opt.closed && opt.onClosed) setTimeout(opt.onClosed, 0);
@@ -13924,15 +14003,20 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     var stack = el("div", "tstack");
     var img = new Image(); img.src = opt.idle || opt.img; img.className = "tissueImg";
     stack.appendChild(img);
-    var layer = el("div", "tissueLayer");
+    /* ★v0.17.10 [지시F] 배치 전 플래시 — apply() 가 stack 높이를 못 재면 그냥 return 하는데
+       첫 성공이 +20ms 타이머라 그 전 프레임에서 찢긴 밑단(tissueTear)이 **원래 사진 자리**에,
+       그림 캔버스(tissueArt)가 **기본 크기(300×150)** 로 잠깐 떴다(실측 프레임 0→1 에서 230·365px 점프).
+       → 움직이는 세 겹을 첫 배치까지 감춘다(바탕 롤 사진은 그대로 보인다). */
+    var layer = el("div", "tissueLayer preFit");
     var img2 = new Image(); img2.src = opt.img; img2.className = "tissueImg";
     layer.appendChild(img2);
     stack.appendChild(layer);
     /* ★v0.13.3 찢긴 밑단 — 사진의 자락 끝 부분만 떼어 종이 끝에 붙인다(수평 직선 컷 방지) */
-    var tear = new Image(); tear.src = opt.img; tear.className = "tissueImg tissueTear";
+    var tear = new Image(); tear.src = opt.img; tear.className = "tissueImg tissueTear preFit";
     stack.appendChild(tear);
-    var artCv = document.createElement("canvas"); artCv.className = "tissueArt";
+    var artCv = document.createElement("canvas"); artCv.className = "tissueArt preFit";
     stack.appendChild(artCv);
+    var preFit = true;
     wrap.appendChild(stack);
     /* ★v0.17.9 [지시H] 가리개와 같은 규칙 — ↕ 기본 숨김, 드래그 없이 탭 3번이면 한 번 등장.
        카운트는 이 위젯 것만 센다(가리개와 독립). */
@@ -13990,6 +14074,14 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       tear.style.display = cut >= PEND - 0.5 ? "none" : "block";
       drawArt(g, g.top0 + d);
       hint.style.display = (hShown && d <= g.D * 0.985) ? "block" : "none";
+      /* ★v0.17.10 [지시F] 자리가 다 잡혔다 — 이제 보여 준다.
+         ★그림 캔버스만 따로 본다 — 무늬 이미지(artImg)가 아직이면 drawArt 가 그냥 돌아가서
+           캔버스가 **기본 크기(300×150)** 인 채로 남는다(webkit 실측). 그때 풀면 그게 플래시가 된다. */
+      if (preFit) {
+        preFit = false;
+        layer.classList.remove("preFit"); tear.classList.remove("preFit");
+      }
+      if (artImg.complete && artImg.naturalWidth) artCv.classList.remove("preFit");
     }
     /* ★v0.13.4 곡면 투영 없음 — 그림은 어디서든 **평면 그대로**, 시작선 위만 잘린다 */
     function drawArt(g, top) {
@@ -14029,6 +14121,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       return { taps: hTaps, shown: hShown, dragged: hDragged,
                visible: getComputedStyle(hint).display !== "none" };
     };
+    requestAnimationFrame(apply);       /* ★v0.17.10 [지시F] 붙자마자 첫 프레임에 배치 */
     setTimeout(apply, 20); setTimeout(apply, 200); setTimeout(apply, 600);
     window.addEventListener("resize", apply);
     register({ answer: "휴지를 끝까지 풀어", force: function () { d = geom().D; apply(); if (opt.onFull) opt.onFull(); } });
@@ -14131,7 +14224,10 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     host.style.cssText = "display:flex;align-items:center;justify-content:center;height:100%;width:100%";
     var stage = el("div"); stage.id = "pamStage";
     stage.style.width = W + "px"; stage.style.height = H + "px";
-    var paper = el("div"); paper.id = "pamPaper";
+    /* ★v0.17.10 [지시F] 팜플렛 본문은 붙은 뒤에야 크기를 잴 수 있어(scrollHeight 0)
+       글자 크기 맞추기(fitBody)가 +30ms 타이머에서야 먹혔다 → 두 프레임 뒤 본문이 21px 접히는 게 보였다.
+       → 첫 성공적인 맞춤까지 종이를 감추고, rAF 로 한 프레임 앞당겨 맞춘다. */
+    var paper = el("div", "preFit"); paper.id = "pamPaper";
     if (useBg) {
       /* background-size/position 으로 crop — 리플릿 영역이 정확히 paper 를 채운다 */
       paper.classList.add("photo");
@@ -14209,6 +14305,8 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         if (fs < 5) break;
         tx.style.fontSize = fs + "px";
       }
+      /* ★v0.17.10 [지시F] scrollHeight 가 잡혔다 = 붙었고 글자 크기가 확정됐다 → 이제 보여 준다 */
+      if (tx.scrollHeight > 0) paper.classList.remove("preFit");
       return fs;
     }
     var bodyFs = fitBody();
@@ -14218,6 +14316,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     /* ★v0.15.2 셀로판 없이 팜플렛만 볼 때 — 같은 리플릿 디자인 그대로, 셀로판만 없다.
        (예전에는 이때만 밋밋한 베이지 카드가 떠서 디자인이 따로 놀았다) */
     if (opt.noCello) {
+      requestAnimationFrame(refit);
       setTimeout(refit, 30); setTimeout(refit, 180);
       if (opt.t) host.setAttribute("data-t", opt.t);
       host.style.cursor = "default";
@@ -14263,6 +14362,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       paper.style.visibility = "hidden";
       cello.classList.add("snapped");
       ox = 0; oy = 0; ang = 0; place();
+      requestAnimationFrame(function () { refit(); build(); });
       setTimeout(function () { refit(); build(); }, 30);
       setTimeout(function () { refit(); build(); }, 180);
       window.__celloZoomState = function () {
@@ -14286,6 +14386,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     if (opt.fixed) {
       ox = 0; oy = 0; ang = 0; snapped = true; place();
       cello.classList.add("snapped");
+      requestAnimationFrame(function () { refit(); build(); });
       setTimeout(function () { refit(); build(); }, 30);
       setTimeout(function () { refit(); build(); }, 180);
       window.__pamState = pamState;
@@ -14358,7 +14459,8 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       setTimeout(function () { opt.onSnap && opt.onSnap(); }, 700);
     }
 
-    setTimeout(function () { refit(); build(); }, 30);
+    requestAnimationFrame(function () { refit(); build(); });
+      setTimeout(function () { refit(); build(); }, 30);
     setTimeout(function () { refit(); build(); }, 180);
 
     /* ★v0.15 검증용 — 정렬된 상태에서 표적 글자 중심과 구멍 중심의 거리(px) */
@@ -17224,6 +17326,8 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     var L = DATA.LOCKS.p5;
     var node = W.imgLock({
       id: "p5", img: L.img, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells, faces: L.faces, faceLight: L.faceLight, faceDy: L.faceDy,
+      /* ★v0.17.10 [지시I] 로고 자리 4칸은 **각인된 워드마크** 모양으로 찍는다(북쑥: 서체가 너무 달라 연상이 어렵다) */
+      brandFace: true,
       pool: "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(""), size: 12, answer: DATA.ANS.p5,
       onSolve: function () { G.markSolved("p5"); closeZoom(); setTimeout(function () { ZOOM.case(); }, 120); }
     });
@@ -17522,6 +17626,9 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       track: h ? h.textContent : "",              /* "3/5" — 화면에 실제로 보이는 것 */
       now: d ? d.textContent : "",                /* 곡 제목은 debug 에서만 존재 */
       ended: !!(e && e.style.display === "block"),
+      /* ★v0.17.10 [지시K] 넘김 버튼 상태 */
+      nav: !!document.querySelector('[data-t="songNav"]'),
+      navShown: (function () { var n = document.querySelector('[data-t="songNav"]'); return !!n && n.style.display !== "none"; })(),
       unlocked: !!(G.audioUnlocked && G.audioUnlocked()),
       nodes: songRec ? [{ url: String(songRec.url || ""), gain: songRec.gain ? +songRec.gain.gain.value.toFixed(3) : null,
                           t: +(songRec.au.currentTime || 0).toFixed(2), dur: +(songRec.au.duration || 0).toFixed(2),
@@ -17555,14 +17662,24 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     head.appendChild(el("span", null, "🎧 재생 중 · "));
     head.appendChild(num);
 
-    /* 곡 안 진행 바 */
+    /* 곡 안 진행 바 — ★v0.17.10 [지시K] 양옆에 이전/다음 곡 버튼(‹ ›)을 둔다 */
     var barWrap = el("div");
     barWrap.setAttribute("data-t", "songBar");
-    barWrap.style.cssText = "width:min(72%,260px);height:5px;margin:0 auto;border-radius:3px;background:var(--n3);overflow:hidden";
+    barWrap.style.cssText = "flex:1 1 auto;min-width:0;height:5px;border-radius:3px;background:var(--n3);overflow:hidden";
     var bar = el("div");
     bar.style.cssText = "height:100%;width:0%;background:var(--accent);border-radius:3px;transition:width .18s linear";
     barWrap.appendChild(bar);
-    node.appendChild(barWrap);
+    var nav = el("div");
+    nav.setAttribute("data-t", "songNav");
+    nav.style.cssText = "display:flex;align-items:center;justify-content:center;gap:8px;margin:0 auto;width:min(86%,320px)";
+    var prevBtn = el("button", "songNav", "‹");
+    prevBtn.setAttribute("data-t", "songPrev");
+    prevBtn.setAttribute("aria-label", "이전 곡");
+    var nextBtn = el("button", "songNav", "›");
+    nextBtn.setAttribute("data-t", "songNext");
+    nextBtn.setAttribute("aria-label", "다음 곡");
+    nav.appendChild(prevBtn); nav.appendChild(barWrap); nav.appendChild(nextBtn);
+    node.appendChild(nav);
 
     /* ★디버그에서만 곡 제목·아이콘 (검수용) */
     var dbg = null, dbgIc = null, dbgNm = null;
@@ -17604,20 +17721,39 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     }, 120);
     songTimers.push({ iv: songTick });
 
+    /* ★v0.17.10 [지시K] 순차 재생만 하던 것을 **임의 인덱스로 트는** 구조로 바꿨다.
+       i = 지금 틀고 있는 곡(예전에는 "다음에 틀 곡"이라 ‹ › 계산이 헷갈렸다). */
     var i = 0;
-    (function next() {
+    function finishAll() {
+      G.setFlag("heardSongs");
+      G.BGM.release("songs");                       /* ★v0.17 5곡이 다 끝나면 메인 BGM 복귀 */
+      head.style.display = "none";
+      nav.style.display = "none";                   /* 진행 바·넘김 버튼도 같이 접는다 */
+      if (dbg) dbg.style.display = "none";
+      end.style.display = "block";
+      $("zoomCaption").textContent = "더 이상 노래가 흘러나오지 않는다.";
+    }
+    /* 지금 곡만 멈춘다 — 화면·BGM hold·진행 바 티커는 그대로 둔다.
+       songRun 을 올려 예약돼 있던 페이드아웃·다음곡 콜백을 전부 무효화하고,
+       이 화면이 계속 살아 있도록 run 도 같이 올린다(티커는 run 을 본다). */
+    function stopCurrent() {
+      songRun++; run = songRun;
+      songTimers = songTimers.filter(function (t) {
+        if (t && t.iv) return true;                 /* 진행 바 티커는 남긴다 */
+        clearTimeout(t); return false;
+      });
+      if (songRec) {
+        try { songRec.au.pause(); } catch (e) {}
+        if (songRec.gain) { try { songRec.gain.gain.cancelScheduledValues(0); songRec.gain.gain.value = 0.0001; } catch (e) {} }
+      }
+      cur.rec = null; cur.tone = false;
+      bar.style.width = "0%";
+    }
+    function playAt(n) {
       if (run !== songRun) return;
       if (!$("zoom").classList.contains("show")) return;
-      if (i >= order.length) {
-        G.setFlag("heardSongs");
-        G.BGM.release("songs");                     /* ★v0.17 5곡이 다 끝나면 메인 BGM 복귀 */
-        head.style.display = "none";
-        barWrap.style.display = "none";
-        if (dbg) dbg.style.display = "none";
-        end.style.display = "block";
-        $("zoomCaption").textContent = "더 이상 노래가 흘러나오지 않는다.";
-        return;
-      }
+      if (n >= order.length) { i = order.length; finishAll(); return; }
+      i = Math.max(0, n);
       var id = order[i], sg = DATA.SONGS[id];
       num.textContent = (i + 1) + "/" + order.length;
       /* 곡이 바뀔 때 번호를 살짝 깜빡 */
@@ -17626,9 +17762,22 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       num.classList.add("trkPop");
       bar.style.width = "0%";
       if (dbg) { dbgIc.src = sg.icon; dbgIc.style.visibility = "visible"; dbgNm.textContent = sg.name; }
-      i++;
-      playSong(id, function () { if (run === songRun) next(); }, cur);
-    })();
+      var myRun = songRun;
+      playSong(id, function () { if (myRun === songRun) playAt(i + 1); }, cur);
+    }
+    /* ‹ = 이전 곡(1번에서 누르면 1번 처음부터) · › = 다음 곡(5번에서 누르면 종료 상태) */
+    function jump(d) {
+      if (end.style.display === "block") return;    /* 이미 끝난 화면에서는 무반응 */
+      var n = i + d;
+      if (n < 0) n = 0;
+      stopCurrent();
+      if (n >= order.length) { i = order.length; finishAll(); return; }
+      playAt(n);
+    }
+    prevBtn.onclick = function () { G.sfxTap(); jump(-1); };
+    nextBtn.onclick = function () { G.sfxTap(); jump(1); };
+    window.__songJump = jump;                       /* 검증용 */
+    playAt(0);
   }
 
   function playSong(id, done, cur) {

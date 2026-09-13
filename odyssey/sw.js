@@ -1,5 +1,5 @@
 /* 발리 가는 길에서 생긴 일 — 오프라인 서비스워커 (자동 생성) */
-const CACHE = "odyssey-ODY-S1-20260913-1406";
+const CACHE = "odyssey-ODY-S1-20260913-1513";
 const PRECACHE = [
  "./",
  "./index.html",
@@ -142,6 +142,7 @@ const PRECACHE = [
  "./audio/ad_bgm.mp3",
  "./audio/binoc.mp3",
  "./audio/bow_shot.mp3",
+ "./audio/main_bgm.mp3",
  "./audio/song1.mp3",
  "./audio/song2.mp3",
  "./audio/song3.mp3",
