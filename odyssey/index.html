@@ -465,10 +465,10 @@ body.dbg .ifeHot:active{box-shadow:0 0 0 2px rgba(255,255,255,.95)}
    ★v0.17.9 id(#gmap·#planeIco·#typhoonIco) → 클래스로. 인트로 컷이 폰 **밖**에도 같은 지도를
    띄우기 때문에 한 화면에 지도가 둘일 수 있다(id 면 중복된다). */
 .gmapWrap{flex:1;position:relative;min-height:0}
-.gmapBox{position:relative;width:100%;height:100%;background:#e9e9ec;border-radius:var(--r);overflow:hidden}
-.gmapBox .sea{position:absolute;inset:0;background:#dcdce0}
-.gmapBox .land{position:absolute;background:#c6c6cb;border-radius:40%}
-.gmRoute{position:absolute;inset:0;width:100%;height:100%}
+/* ★v0.17.13 바탕이 실제 구글맵 스크린샷(img/gmap_bali.jpg)으로 바뀌었다. 지도·항로는 SVG 한 장
+   (viewBox 0 0 948 1400, preserveAspectRatio=slice) — 세로가 꽉 차고 좌우만 잘린다. */
+.gmapBox{position:relative;width:100%;height:100%;background:#aecbe8;border-radius:var(--r);overflow:hidden}
+.gmRoute{position:absolute;inset:0;width:100%;height:100%;display:block}
 .gmCap{position:absolute;left:8px;top:6px;font-size:10px;color:#2a2a2f;
   background:rgba(255,255,255,.85);border-radius:6px;padding:2px 6px}
 /* ★v0.17.3 [지시3] GPS 끊김 화면 — 지도는 회색·흐릿하게, 그 위에 알림 창 하나 */
@@ -480,23 +480,29 @@ body.dbg .ifeHot:active{box-shadow:0 0 0 2px rgba(255,255,255,.95)}
   padding:18px 20px;box-shadow:0 8px 24px rgba(0,0,0,.45)}
 .gpsIco{width:62px;height:62px}
 .gpsMsg{font-size:13px;font-weight:700;color:#e8e9ee;letter-spacing:.2px}
-/* 지도 위 마커 — 좌표는 % 라 지도 크기가 달라도 같은 자리에 찍힌다(translate 로 중심 정렬) */
-.gmIco{position:absolute;font-size:26px;line-height:1;transform:translate(-50%,-50%);
-  transition:left .1s linear, top .1s linear}
-.gmIco.typhoon{font-size:30px;z-index:2}
-.gmIco.typhoon::before{content:"";position:absolute;inset:-6px;border-radius:50%;
-  background:radial-gradient(circle,rgba(60,70,90,.30) 0%,rgba(60,70,90,0) 70%)}
+/* 지도 위 마커 — 좌표는 % 라 지도 크기가 달라도 같은 자리에 찍힌다(translate 로 중심 정렬).
+   ★v0.17.13 이모지(✈️🌀📍) → 실제 아이콘 SVG. 비행기는 --rot(항로 접선)만큼 돌아간다. */
+.gmIco{position:absolute;line-height:1;transform:translate(-50%,-50%);
+  transition:left .1s linear, top .1s linear;--rot:0deg}
+.gmIco.typhoon{width:70px;height:70px;z-index:2;opacity:.9;
+  filter:drop-shadow(0 1px 3px rgba(20,30,50,.45))}
+.gmIco.typhoon::before{content:"";position:absolute;inset:-16%;border-radius:50%;
+  background:radial-gradient(circle,rgba(60,70,90,.26) 0%,rgba(60,70,90,0) 70%)}
+.gmIco.typhoon>svg{display:block;width:100%;height:100%;animation:spin 2.4s linear infinite}
 /* 도달 순간 — 폭풍이 커지며 비행기를 감싼다(비행기는 z-index 로 그 위에 남는다) */
-.gmIco.typhoon.hit{font-size:52px;opacity:.82}
-.gmIco.typhoon.hit::before{inset:-18px;background:radial-gradient(circle,rgba(40,50,70,.5) 0%,rgba(40,50,70,0) 72%)}
-.gmIco.plane{z-index:3}
-.gmIco.pin{font-size:20px}
-.gmIco.pinLbl{font-size:9px;font-weight:700;color:#2a2a2f;background:rgba(255,255,255,.88);
-  border-radius:5px;padding:1px 4px;letter-spacing:.4px;transform:translate(-50%,8px)}
-.gmIco.plane.landed{filter:drop-shadow(0 0 6px rgba(255,255,255,.85))}
-/* 태풍만 돈다 — 회전과 중심 정렬(translate)을 한 transform 에 같이 넣는다 */
-.gmIco.typhoon{animation:spinC 2.4s linear infinite}
-@keyframes spinC{from{transform:translate(-50%,-50%) rotate(0)}to{transform:translate(-50%,-50%) rotate(360deg)}}
+.gmIco.typhoon.hit{width:116px;height:116px;opacity:.84}
+.gmIco.typhoon.hit::before{inset:-32%;background:radial-gradient(circle,rgba(40,50,70,.5) 0%,rgba(40,50,70,0) 72%)}
+.gmIco.plane{z-index:3;width:24px;height:24px;
+  transform:translate(-50%,-50%) rotate(var(--rot));
+  filter:drop-shadow(0 1px 2px rgba(255,255,255,.9)) drop-shadow(0 0 3px rgba(255,255,255,.75))}
+.gmIco.plane>svg{display:block;width:100%;height:100%}
+/* 도착 파문 — 지도에 그려진 "발리" 마커 위로 원이 퍼진다 */
+.gmIco.pin{width:0;height:0;z-index:2}
+.gmIco.pin.arrive::after{content:"";position:absolute;left:50%;top:50%;width:20px;height:20px;
+  margin:-10px 0 0 -10px;border-radius:50%;border:3px solid #1a73e8;
+  animation:gmPing 1.1s ease-out 3}
+@keyframes gmPing{from{transform:scale(.4);opacity:.95}to{transform:scale(3.4);opacity:0}}
+.gmIco.plane.landed{filter:drop-shadow(0 0 7px rgba(26,115,232,.95)) drop-shadow(0 1px 2px rgba(255,255,255,.9))}
 @keyframes spin{to{transform:rotate(360deg)}}
 
 /* ★v0.17.9 [지시C-2] 인트로 폭풍 컷 — 스토리 오버레이 안의 폰 목업(구글맵 앱과 같은 그림) */
@@ -1048,7 +1054,7 @@ body.dbg .cvcell.cabBtn:active{box-shadow:inset 0 0 0 3px rgba(255,255,255,.8)}
 
 </div>
 
-<script>window.__AUDIO = ["ad_bgm.mp3","binoc.mp3","bow_shot.mp3","main_bgm.mp3","song1.mp3","song2.mp3","song3.mp3","song4.mp3","song5.mp3","sudoku_bgm.mp3"]; window.__IMG = ["app_kakao.png","app_map.png","app_minigame.png","app_qr.png","archer.jpg","archer.png","archery_field.jpg","bin_L1.jpg","bin_L1_open_case.jpg","bin_L1_open_empty.jpg","bin_L2.jpg","bin_L2_open_cello.jpg","bin_L2_open_empty.jpg","bin_R1.jpg","bin_R1_open_card.jpg","bin_R1_open_empty.jpg","bin_R2.jpg","bin_R2_open_empty.jpg","bin_R2_open_key.jpg","blanket_zoom.jpg","book_empty.jpg","book_tile.jpg","case_open_empty.jpg","case_open_headset.jpg","ceiling_open_cardkey.jpg","ceiling_open_empty.jpg","cello_align.png","char_front.jpg","char_happy.jpg","char_hipL.jpg","char_hipR.jpg","char_hungry.jpg","crew_blanket.jpg","crew_tray.jpg","dialbox.jpg","dialbox_open.jpg","food_bread.png","food_cake.png","food_omu.png","food_salad.png","galley_cart.jpg","galley_cart_empty.jpg","galley_cart_open.jpg","galley_drawer.jpg","galley_snack.jpg","galley_upper.jpg","galley_upper_empty.jpg","galley_upper_open.jpg","gamecard.jpg","headphones.jpg","headset_case.jpg","headset_worn.jpg","hint_phonecase.jpg","ic_blanket.png","ic_butter.jpg","ic_butter.png","ic_cardkey.jpg","ic_cardkey.png","ic_case.png","ic_cellophane.png","ic_dna.jpg","ic_dna.png","ic_drop.jpg","ic_drop.png","ic_dynamite.jpg","ic_dynamite.png","ic_fire.jpg","ic_fire.png","ic_gamecard.png","ic_goldkey.jpg","ic_goldkey.png","ic_headphones.jpg","ic_headphones.png","ic_ladder.png","ic_pamphlet.png","ic_passport.png","ic_peanut.png","ic_phone.png","ic_silverkey.jpg","ic_silverkey.png","ic_telescope.png","ic_ticket.png","ic_tile_beige.png","ic_tile_black.png","ic_tile_brown.png","ic_tile_dark.png","ife_ic_blanket.png","ife_ic_meal.png","ife_ic_tv.png","ife_off.jpg","ife_on.jpg","ife_photo1.jpg","ife_photo2.jpg","ife_photo3.jpg","ife_photo4.jpg","lav_cab1.jpg","lav_cab1_empty.jpg","lav_cab1_open.jpg","lav_cab2.jpg","lav_cab2_empty.jpg","lav_cab2_open.jpg","lav_cabtop.jpg","lav_cabtop_empty.jpg","lav_cabtop_open.jpg","lav_ceiling.jpg","lav_tissue.jpg","lav_tissue_idle.jpg","lav_tissue_roll.jpg","map_aisle.jpg","map_gate.jpg","map_seat.jpg","map_seat_tray.jpg","meal_tray.jpg","oway_plane.jpg","pamphlet_bg.jpg","pamphlet_body_bg.jpg","passport.jpg","passport_p1.jpg","passport_p2.jpg","phone_wall.jpg","shade_logo.png","ticket_bg.jpg","tile_beige.jpg","tile_black.jpg","tile_brown.jpg","tile_dark.jpg","tissue_mask.png","travel1.jpg","travel2.jpg","travel3.jpg","travel4.jpg","window_open.jpg","window_shade.jpg","window_shade_plain.jpg"];</script>
+<script>window.__AUDIO = ["ad_bgm.mp3","binoc.mp3","bow_shot.mp3","main_bgm.mp3","song1.mp3","song2.mp3","song3.mp3","song4.mp3","song5.mp3","sudoku_bgm.mp3"]; window.__IMG = ["app_kakao.png","app_map.png","app_minigame.png","app_qr.png","archer.jpg","archer.png","archery_field.jpg","bin_L1.jpg","bin_L1_open_case.jpg","bin_L1_open_empty.jpg","bin_L2.jpg","bin_L2_open_cello.jpg","bin_L2_open_empty.jpg","bin_R1.jpg","bin_R1_open_card.jpg","bin_R1_open_empty.jpg","bin_R2.jpg","bin_R2_open_empty.jpg","bin_R2_open_key.jpg","blanket_zoom.jpg","book_empty.jpg","book_tile.jpg","case_open_empty.jpg","case_open_headset.jpg","ceiling_open_cardkey.jpg","ceiling_open_empty.jpg","cello_align.png","char_front.jpg","char_happy.jpg","char_hipL.jpg","char_hipR.jpg","char_hungry.jpg","crew_blanket.jpg","crew_tray.jpg","dialbox.jpg","dialbox_open.jpg","food_bread.png","food_cake.png","food_omu.png","food_salad.png","galley_cart.jpg","galley_cart_empty.jpg","galley_cart_open.jpg","galley_drawer.jpg","galley_snack.jpg","galley_upper.jpg","galley_upper_empty.jpg","galley_upper_open.jpg","gamecard.jpg","gmap_bali.jpg","headphones.jpg","headset_case.jpg","headset_worn.jpg","hint_phonecase.jpg","ic_blanket.png","ic_butter.jpg","ic_butter.png","ic_cardkey.jpg","ic_cardkey.png","ic_case.png","ic_cellophane.png","ic_dna.jpg","ic_dna.png","ic_drop.jpg","ic_drop.png","ic_dynamite.jpg","ic_dynamite.png","ic_fire.jpg","ic_fire.png","ic_gamecard.png","ic_goldkey.jpg","ic_goldkey.png","ic_headphones.jpg","ic_headphones.png","ic_ladder.png","ic_pamphlet.png","ic_passport.png","ic_peanut.png","ic_phone.png","ic_silverkey.jpg","ic_silverkey.png","ic_telescope.png","ic_ticket.png","ic_tile_beige.png","ic_tile_black.png","ic_tile_brown.png","ic_tile_dark.png","ife_ic_blanket.png","ife_ic_meal.png","ife_ic_tv.png","ife_off.jpg","ife_on.jpg","ife_photo1.jpg","ife_photo2.jpg","ife_photo3.jpg","ife_photo4.jpg","lav_cab1.jpg","lav_cab1_empty.jpg","lav_cab1_open.jpg","lav_cab2.jpg","lav_cab2_empty.jpg","lav_cab2_open.jpg","lav_cabtop.jpg","lav_cabtop_empty.jpg","lav_cabtop_open.jpg","lav_ceiling.jpg","lav_tissue.jpg","lav_tissue_idle.jpg","lav_tissue_roll.jpg","map_aisle.jpg","map_gate.jpg","map_seat.jpg","map_seat_tray.jpg","meal_tray.jpg","oway_plane.jpg","pamphlet_bg.jpg","pamphlet_body_bg.jpg","passport.jpg","passport_p1.jpg","passport_p2.jpg","phone_wall.jpg","shade_logo.png","ticket_bg.jpg","tile_beige.jpg","tile_black.jpg","tile_brown.jpg","tile_dark.jpg","tissue_mask.png","travel1.jpg","travel2.jpg","travel3.jpg","travel4.jpg","window_open.jpg","window_shade.jpg","window_shade_plain.jpg"];</script>
 <script>
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -11158,7 +11164,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 (function () {
   "use strict";
 
-  var BUILD = "ODY-S1-20260913-1723";
+  var BUILD = "ODY-S1-20260913-1948";
   var LSKEY = "odyssey.s1.v1";
 
   var qs = new URLSearchParams(location.search);
@@ -15754,44 +15760,110 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
      ★v0.17.9 인트로 컷(폭풍)·엔딩(도착)·GPS 끊김 화면이 **같은 그림**을 쓰도록 한 곳에 모았다.
        예전엔 id(#gmap·#planeIco·#typhoonIco)로 잡던 걸 클래스로 바꿨다 — 인트로에서는
        폰 밖(스토리 오버레이)에도 같은 지도를 띄워야 해서 한 화면에 둘이 있을 수 있다. */
-  var ROUTE_D = "M14 12 C 40 34, 58 58, 84 88";     /* 인천 → 덴파사르 항로(퍼센트 좌표) */
-  var ROUTE_P = [[14, 12], [40, 34], [58, 58], [84, 88]];
-  /** 항로(3차 베지에) 위 t(0~1) 지점의 [x%, y%] */
+  /* ★v0.17.13 [지시A·C] 목업 지도(회색 네모 + 도형 두 개) → **실제 구글맵 그림**으로 교체.
+       에셋: img/gmap_bali.jpg — 북쑥이 준 구글맵 스크린샷(948×1711)에서
+             웹 메르카토르 캘리브레이션으로 덴파사르 위치를 역산해 "발리" 마커·라벨을 합성한 뒤
+             y 300..1700 을 잘라낸 948×1400 (gen/88_gmap_base).
+       좌표계: 이 크롭의 픽셀(0 0 948 1400)이 그대로 **지도 좌표계**다. 원본 y − 300.
+         · 서울  (693, 127)
+         · 발리  (411.5, 1307)
+       프레이밍(북쑥 지시): 세로를 상자 높이에 맞추고 **좌우를 잘라** 채운다 → cover.
+         SVG 는 preserveAspectRatio="xMidYMid slice" 로 같은 규칙을 쓰고,
+         HTML 마커는 아래 mapPct() 가 같은 식(scale = max(W/948, H/1400))으로 %를 계산한다.
+         상자 가로세로비는 실측 0.506(폰 구글맵)~0.606(인트로 컷) < 948/1400 = 0.677 이라
+         **두 경우 모두 세로가 꽉 차고 좌우만 잘린다** — 서울·발리 마커 동시 가시. */
+  var MAPW = 948, MAPH = 1400;
+  var SEOUL = [693, 127], BALI = [411.5, 1307];
+  /* 항로 = 2차 베지에. 제어점을 동쪽(오른쪽) 바다로 밀어 완만하게 볼록하게 만든다. */
+  var ROUTE_C = [720, 750];
+  var ROUTE_D = "M" + SEOUL[0] + " " + SEOUL[1] + " Q " + ROUTE_C[0] + " " + ROUTE_C[1] + " " + BALI[0] + " " + BALI[1];
+  /** 항로 위 t(0~1) 지점의 [x, y] — 지도 좌표계(px) */
   function routeAt(t) {
-    var u = 1 - t, a = u * u * u, b = 3 * u * u * t, c = 3 * u * t * t, d = t * t * t;
-    return [a * ROUTE_P[0][0] + b * ROUTE_P[1][0] + c * ROUTE_P[2][0] + d * ROUTE_P[3][0],
-            a * ROUTE_P[0][1] + b * ROUTE_P[1][1] + c * ROUTE_P[2][1] + d * ROUTE_P[3][1]];
+    var u = 1 - t;
+    return [u * u * SEOUL[0] + 2 * u * t * ROUTE_C[0] + t * t * BALI[0],
+            u * u * SEOUL[1] + 2 * u * t * ROUTE_C[1] + t * t * BALI[1]];
   }
-  var PLANE_T0 = 0.42;      /* 지금 비행기가 와 있는 지점(항로 중간) */
+  /** 항로 접선 각도(도) — 0 = 오른쪽, 시계방향. 비행기 기수 회전에 쓴다. */
+  function routeAngle(t) {
+    var u = 1 - t;
+    var dx = 2 * u * (ROUTE_C[0] - SEOUL[0]) + 2 * t * (BALI[0] - ROUTE_C[0]);
+    var dy = 2 * u * (ROUTE_C[1] - SEOUL[1]) + 2 * t * (BALI[1] - ROUTE_C[1]);
+    return Math.atan2(dy, dx) * 180 / Math.PI;
+  }
+  var PLANE_T0 = 0.44;      /* 지금 비행기가 와 있는 지점(항로 한가운데쯤 — 라벨을 안 가리는 바다 위) */
+
+  /* 지도 좌표(px) → 상자 안 퍼센트. cover(=slice)와 **같은 식**이라 SVG 와 정확히 겹친다. */
+  function mapPct(g, x, y) {
+    var W = g.clientWidth || 1, H = g.clientHeight || 1;
+    var s = Math.max(W / MAPW, H / MAPH);
+    return [((W - MAPW * s) / 2 + x * s) / W * 100, ((H - MAPH * s) / 2 + y * s) / H * 100];
+  }
+  /* 마커는 자기 지도 좌표를 들고 있다가 상자 크기가 바뀌면 다시 자리를 잡는다. */
+  function layoutMap(g) {
+    var ms = g.querySelectorAll(".gmIco");
+    for (var i = 0; i < ms.length; i++) {
+      var m = ms[i];
+      if (m.__mx == null) continue;
+      var p = mapPct(g, m.__mx, m.__my);
+      m.style.left = p[0] + "%"; m.style.top = p[1] + "%";
+    }
+  }
+
+  /* 비행기 = Bootstrap Icons "airplane-engines-fill" (MIT) — 기수가 위(-y)를 향한다.
+     태풍  = Material Symbols "cyclone" (Apache-2.0). 출처·라이선스: gen/88_gmap_base/LICENSES.md */
+  var PLANE_SVG =
+    '<svg viewBox="0 0 16 16" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">' +
+    '<path fill="#20242c" d="M8 0c-.787 0-1.292.592-1.572 1.151A4.35 4.35 0 0 0 6 3v3.691l-2 1V7.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.191l-1.17.585A1.5 1.5 0 0 0 0 10.618V12a.5.5 0 0 0 .582.493l1.631-.272.313.937a.5.5 0 0 0 .948 0l.405-1.214 2.21-.369.375 2.253-1.318 1.318A.5.5 0 0 0 5.5 16h5a.5.5 0 0 0 .354-.854l-1.318-1.318.375-2.253 2.21.369.405 1.214a.5.5 0 0 0 .948 0l.313-.937 1.63.272A.5.5 0 0 0 16 12v-1.382a1.5 1.5 0 0 0-.83-1.342L14 8.691V7.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v.191l-2-1V3c0-.568-.14-1.271-.428-1.849C9.292.591 8.787 0 8 0"/></svg>';
+  var TYPHOON_SVG =
+    '<svg viewBox="0 -960 960 960" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">' +
+    '<path fill="#38506e" d="M480-320q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47Zm0-80q33 0 56.5-23.5T560-480q0-33-23.5-56.5T480-560q-33 0-56.5 23.5T400-480q0 33 23.5 56.5T480-400Zm0 240q-114 0-203.5-13.5T125-202q-20-5-32.5-19.5T80-256q0-16 13.5-25.5T123-286q42 11 74.5 17.5L250-258q-42-43-66-100t-24-122q0-114 13.5-203.5T202-835q5-20 19.5-32.5T256-880q16 0 25.5 13.5T286-837q-12 42-18.5 74.5T258-710q43-42 100-66t122-24q114 0 203.5 13.5T835-758q20 5 32.5 19.5T880-704q0 16-13.5 25.5T837-674q-42-12-74.5-18.5T710-702q42 43 66 100t24 122q0 114-13.5 203.5T758-125q-5 20-19.5 32.5T704-80q-16 0-25.5-13.5T674-123q11-42 17.5-74.5L702-250q-43 42-100 66t-122 24Zm0-80q100 0 170-70t70-170q0-100-70-170t-170-70q-100 0-170 70t-70 170q0 100 70 170t170 70Z"/></svg>';
 
   /** 지도 한 장. opts: dead(회색·흐림) · route(항로 점선) · caption(좌상단 라벨) */
   function mapBox(opts) {
     opts = opts || {};
     var g = el("div", "gmapBox" + (opts.dead ? " dead" : ""));
-    g.appendChild(el("div", "sea"));
-    var l1 = el("div", "land"); l1.style.cssText = "left:-14%;top:-6%;width:60%;height:34%";
-    var l2 = el("div", "land"); l2.style.cssText = "right:-18%;bottom:-8%;width:70%;height:36%";
-    g.appendChild(l1); g.appendChild(l2);
-    if (opts.route) {
-      var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-      svg.setAttribute("viewBox", "0 0 100 100");
-      svg.setAttribute("preserveAspectRatio", "none");
-      svg.setAttribute("class", "gmRoute");
-      svg.innerHTML = '<path d="' + ROUTE_D + '" fill="none" stroke="#6a6a70" stroke-width="1.4" stroke-dasharray="3 2"/>';
-      g.appendChild(svg);
-    }
+    var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("viewBox", "0 0 " + MAPW + " " + MAPH);
+    svg.setAttribute("preserveAspectRatio", "xMidYMid slice");   /* = CSS cover: 세로 꽉·좌우 크롭 */
+    svg.setAttribute("class", "gmRoute");
+    var route = !opts.route ? "" :
+      '<path d="' + ROUTE_D + '" fill="none" stroke="#ffffff" stroke-opacity=".85" stroke-width="14" stroke-linecap="round"/>' +
+      '<path d="' + ROUTE_D + '" fill="none" stroke="#1a73e8" stroke-width="7" stroke-linecap="round" stroke-dasharray="18 15"/>';
+    svg.innerHTML =
+      '<image href="' + DATA.IMG + 'gmap_bali.jpg" x="0" y="0" width="' + MAPW + '" height="' + MAPH + '" preserveAspectRatio="none"/>' +
+      route;
+    g.appendChild(svg);
     if (opts.caption) g.appendChild(el("div", "gmCap", opts.caption));
+    /* 상자 크기가 정해진 뒤(그리고 바뀔 때마다) 마커 자리를 다시 잡는다 */
+    requestAnimationFrame(function () { layoutMap(g); });
+    if (window.ResizeObserver) { try { new ResizeObserver(function () { layoutMap(g); }).observe(g); } catch (e) {} }
     return g;
   }
-  /** 지도 위 마커 하나 — kind: "plane" | "typhoon" | "pin" */
+  /** 지도 위 마커 하나 — kind: "plane" | "typhoon" | "pin" | "pinLbl" */
   function marker(g, kind, glyph, t) {
-    var m = el("div", "gmIco " + kind, glyph);
+    var m = el("div", "gmIco " + kind);
+    if (kind === "plane") m.innerHTML = PLANE_SVG;
+    else if (kind === "typhoon") m.innerHTML = TYPHOON_SVG;
+    else if (glyph) m.textContent = glyph;
     var p = routeAt(t == null ? PLANE_T0 : t);
-    m.style.left = p[0] + "%"; m.style.top = p[1] + "%";
+    moveTo(m, p[0], p[1]);
+    if (kind === "plane") faceAlong(m, t == null ? PLANE_T0 : t);
     g.appendChild(m);
+    requestAnimationFrame(function () { layoutMap(g); });
     return m;
   }
-  function moveTo(m, x, y) { m.style.left = x + "%"; m.style.top = y + "%"; }
+  /** 마커를 지도 좌표(px)로 옮긴다 */
+  function moveTo(m, x, y) {
+    m.__mx = x; m.__my = y;
+    var g = m.parentNode;
+    var p = (g && g.clientWidth) ? mapPct(g, x, y)
+                                 : [x / MAPW * 100, y / MAPH * 100];   /* 아직 배치 전 — 임시값 */
+    m.style.left = p[0] + "%"; m.style.top = p[1] + "%";
+  }
+  /** 비행기 기수를 항로 접선과 정확히 맞춘다(아이콘 기본 방향 = 위쪽 → +90°) */
+  function faceAlong(m, t) {
+    m.style.setProperty("--rot", (routeAngle(t) + 90).toFixed(2) + "deg");
+  }
 
   /* ★v0.17.9 [지시C-1] "끊김 창이 떠 있는 동안" 을 저장에 남긴다.
      새로고침은 페이지를 통째로 날리므로 **리로드 이전에** 기록해 둬야 판정할 수 있다.
@@ -15833,10 +15905,12 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     var map = el("div", "gmapWrap");
     map.setAttribute("data-t", "gmapArrive");
     var g = mapBox({ route: true, caption: "인천 → 덴파사르" });
-    var pin = marker(g, "pin", "📍", 1);
+    /* ★v0.17.13 목적지는 이제 **지도에 그려진 "발리" 마커** 그 자체다.
+       예전 📍/DPS 글자 마커는 그 위에 겹쳐 지워 버리므로 폐지하고, 도착 순간 퍼지는
+       파문(pin)만 발리 좌표에 남긴다. data-t 는 그대로(gmDps) — 기존 검증이 잡는 손잡이. */
+    var pin = marker(g, "pin", "", 1);
     pin.setAttribute("data-t", "gmDps");
-    marker(g, "pinLbl", "DPS", 1);                      /* 지도 라벨(디제틱) — 목적지 표시 */
-    var plane = marker(g, "plane", "✈️", PLANE_T0);
+    var plane = marker(g, "plane", "", PLANE_T0);
     plane.setAttribute("data-t", "gmPlane");
     map.appendChild(g);
     body.appendChild(map);
@@ -15846,11 +15920,14 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     gmapStop();
     gmapAnim = setInterval(function () {
       t = Math.min(1, t + STEP);
-      var q = routeAt(PLANE_T0 + (1 - PLANE_T0) * t);
+      var tt = PLANE_T0 + (1 - PLANE_T0) * t;
+      var q = routeAt(tt);
       moveTo(plane, q[0], q[1]);
+      faceAlong(plane, tt);                              /* 이동 중에도 기수 = 접선 */
       if (t >= 1) {
         gmapStop();
         plane.classList.add("landed");
+        pin.classList.add("arrive");                     /* 발리 마커 위로 파문 */
         G.beep(520, .18, "sine", .1);
         setTimeout(function () { if (isOpen()) MAIN.ending(); }, 620);
       }
@@ -15877,6 +15954,9 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     close: close, go: go, stopCam: stopCam, isOpen: isOpen,
     /* ★v0.17.9 [지시C-2] 인트로 컷이 쓰는 지도 목업 — 구글맵 앱과 **같은 그림**이다 */
     mapBox: mapBox, marker: marker, moveTo: moveTo, routeAt: routeAt, PLANE_T0: PLANE_T0,
+    /* ★v0.17.13 지도 좌표계(0 0 948 1400) + 항로 접선 — 인트로 컷이 태풍을 화면 밖에서 밀어 넣고
+       비행기 기수를 항로에 맞출 때 쓴다 */
+    routeAngle: routeAngle, faceAlong: faceAlong, MAPW: MAPW, MAPH: MAPH,
     statusbar: statusbar
   };
 })();
@@ -15930,7 +16010,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     if (!f) { G.toast("아직 준비 중"); return; }
     /* ★v0.17.11 [지시1] 창문이 아닌 곳으로 가면 쌍안경 뷰는 내려간다
        (reopenCU("window") 는 그대로 뷰를 유지한다) */
-    if (id !== "window") binocView = false;
+    if (id !== "window") { binocView = false; binocToasted = false; }
     cuId = id;
     stopSlides(); binocStop();
     W.unregister();
@@ -15948,7 +16028,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   }
   function closeCU() {
     stopSlides(); binocStop();
-    binocView = false;                 /* ★v0.17.11 [지시1] 시트를 닫으면 쌍안경 뷰도 끝 */
+    binocView = false; binocToasted = false;   /* ★v0.17.11 [지시1] 시트를 닫으면 쌍안경 뷰도 끝 */
     cuId = null; W.unregister();
     $("closeup").classList.remove("show");
     clear($("cuStage")); clear($("cuPanel"));
@@ -16270,6 +16350,10 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
      또는 창문을 여는 순간 곧바로 뷰가 튀어나왔다. 이제는 **창문 사진을 탭했을 때만** 켜진다.
      시트를 닫거나 다른 클로즈업으로 가면 내려간다. */
   var binocView = false;
+  /* ★v0.17.13 [지시] 쌍안경 뷰에 들어간 순간 발견 비트 한 줄(토스트).
+     같은 뷰 안에서 다시 그려져도(reopenCU·재렌더) 연발되지 않게 한 번만. 뷰를 나가면 초기화 —
+     다음에 다시 들어가면 또 뜬다. 캡션("어디서 들어본 노래네!")은 v0.14 북쑥 지정 문구라 그대로. */
+  var binocToasted = false;
 
   /* #12 창문 + #23 쌍안경 */
   CU.window = function (c) {
@@ -16294,6 +16378,10 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       /* ★v0.17.12 [지시1] #27(HAWAIIAN) 힌트 선행 게이트 플래그 — **쌍안경으로 창밖을 본 순간** 선다.
          세이브에 남으므로 재로드해도 유지된다. (p23seen 과 같은 순간이지만 게이트용으로 이름을 따로 둔다) */
       G.setFlag("binocSeen");
+      if (!binocToasted) {
+        binocToasted = true;
+        G.toast("다른 비행기가 옆에 날고 있다. 그런데 tway가 아니라 oway네…?", 2500);
+      }
       return;
     }
     var node = W.shade({
@@ -18008,12 +18096,15 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     top.appendChild(el("div", null, "구글맵"));
     scr.appendChild(top);
     var g = PHONE.mapBox({ route: true, caption: "인천 → 덴파사르" });
-    var plane = PHONE.marker(g, "plane", "✈️", PHONE.PLANE_T0);
+    var plane = PHONE.marker(g, "plane", "", PHONE.PLANE_T0);
     plane.setAttribute("data-t", "introPlane");
-    var ty = PHONE.marker(g, "typhoon", "🌀", 1);
+    var ty = PHONE.marker(g, "typhoon", "", 1);
     ty.setAttribute("data-t", "introTyphoon");
     var here = PHONE.routeAt(PHONE.PLANE_T0);
-    PHONE.moveTo(ty, 104, -12);                 /* 폭풍은 화면 밖 오른쪽 위에서 들어온다 */
+    /* ★v0.17.13 좌표가 퍼센트 → **지도 픽셀(0 0 948 1400)** 로 바뀌었다.
+       (1180, 90) = 크롭 오른쪽 바깥·위쪽 — 폰/인트로 어느 상자에서도 화면 밖이다. */
+    var TY0 = [1180, 90];
+    PHONE.moveTo(ty, TY0[0], TY0[1]);           /* 폭풍은 화면 밖 오른쪽 위에서 들어온다 */
     scr.appendChild(g);
     ph.appendChild(scr);
     s.appendChild(ph);
@@ -18046,7 +18137,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       iv = setInterval(function () {
         k++;
         var t = k / INTRO_STEPS;
-        PHONE.moveTo(ty, 104 + (here[0] - 104) * t, -12 + (here[1] + 12) * t);
+        PHONE.moveTo(ty, TY0[0] + (here[0] - TY0[0]) * t, TY0[1] + (here[1] - TY0[1]) * t);
         if (k >= INTRO_STEPS) { clearInterval(iv); iv = null; quake(); }
       }, INTRO_STEP);
     }, INTRO_HOLD);
