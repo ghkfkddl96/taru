@@ -293,28 +293,53 @@ body.dbg .ifeHot:active{box-shadow:0 0 0 2px rgba(255,255,255,.95)}
 .pStatus{display:flex;justify-content:space-between;padding:11px 18px 0;font-size:10px;font-weight:600;color:var(--n8)}
 .pBody{flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden}
 .pApps{display:grid;grid-template-columns:repeat(4,1fr);gap:16px 4px;padding:28px 12px 0}
-.pApp{background:none;border:0;padding:0;display:flex;flex-direction:column;align-items:center;gap:5px}
+/* ★v0.17.5 [지시1] 라벨을 아이콘 바로 아래로 — 전엔 안 보이는 설치 진행바(3px+여백 3px)가
+   아이콘과 라벨 사이에 자리를 차지해 간격이 16px 이나 됐다. 진행바를 흐름에서 빼고(아래 .dlbar)
+   flex gap 0 + 라벨 margin-top 3px + line-height 1.25 → 아이콘 아래끝~글자 약 4px (iOS 홈 수준). */
+.pApp{background:none;border:0;padding:0;display:flex;flex-direction:column;align-items:center;gap:0}
 .pApp .ico{width:52px;height:52px;border-radius:22%;overflow:hidden;background:var(--n3);position:relative}
 .pApp .ico img{width:100%;height:100%;object-fit:cover}
-.pApp .lbl{font-size:9px;color:var(--n8);letter-spacing:.2px}
+/* ★v0.17.5 [지시2] 밝은 배경사진(동자승 석상) 위에서도 읽히게 — 회색(--n8) → 흰색 + 얇은 그림자 */
+.pApp .lbl{font-size:9px;line-height:1.25;margin-top:3px;color:#fff;font-weight:500;letter-spacing:.2px;
+  text-shadow:0 1px 2px rgba(0,0,0,.62), 0 0 3px rgba(0,0,0,.45)}
 /* ★v0.13.3 배지 래퍼 — clip 없는 상자. 배지는 아이콘 우상단 모서리에 살짝 겹쳐 온전한 원으로 */
 .pApp .icoWrap{position:relative;width:52px;height:52px;overflow:visible}
 .pApp .badge{position:absolute;width:18px;height:18px;border-radius:50%;background:var(--n9);color:var(--n0);
   font-size:10px;font-weight:700;display:grid;place-items:center;border:1.5px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.5);
   right:-3px;top:-3px;z-index:3;line-height:1}
-/* v0.2 설치 진행바: 아이콘 바로 아래, 아이콘 가로폭 */
-.pApp .dlbar{width:52px;height:3px;border-radius:2px;background:rgba(255,255,255,.2);overflow:hidden;margin-top:3px}
+/* v0.2 설치 진행바: 아이콘 바로 아래, 아이콘 가로폭
+   ★v0.17.5 .icoWrap 안에 절대배치 — 흐름에서 빠져 라벨 간격에 영향을 주지 않는다(전 16px → 4px). */
+.pApp .dlbar{position:absolute;left:0;top:calc(100% + 1px);width:52px;height:3px;border-radius:2px;
+  background:rgba(0,0,0,.35);box-shadow:0 0 0 1px rgba(255,255,255,.18);overflow:hidden;z-index:2}
 .pApp .dlbar i{display:block;height:100%;width:0;background:#7fbf8a;transition:width .1s linear}
+/* 설치가 도는 동안(=진행바가 보이는 동안)만 라벨을 아래로 내려 진행바와 겹치지 않게 */
+.pApp.dl .lbl{margin-top:9px}
 .pApp .badge.dlb{background:var(--n8);color:var(--n0);font-size:11px;line-height:1}
 .pApp.locked .ico{filter:grayscale(1) brightness(.65)}
+/* ★v0.17.5 [지시5] 잠금·암호 입력 화면 크기 재조정 — 게임 폰 화면은 286px 폭으로 실제 아이폰
+   (16 Pro, 402×874pt)의 71.1% 축소 모형이다. 지금까지 요소를 그 71% 안에서 "폰 화면 대비 비율"로
+   잡아 실기기에서 iOS 보다 29% 작게 보였다. 이번엔 실물 iOS pt 값을 **px 1:1** 로 넣되
+   프레임 폭·높이에 안 들어가는 것만 클램프한다(아래 각 항목 주석 = 실물 → 환산 근거). */
 .pLock{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:12px}
-.pLock .clock{font-size:38px;font-weight:200;letter-spacing:-1px;color:var(--n9)}
+/* 실물: iOS16+ 잠금 시계 96pt(화면 높이 11.0%) → 프레임 높이 636px 의 10.1% = 64px 로 클램프 */
+/* line-height 1.50 = 96px — 64px 시스템 폰트의 실제 글자상자(chromium 87 · webkit 92)를 담는 최소값
+   (verify-overflow 의 "글자가 상자 밖" 기준). 글자는 상자 안에서 세로 가운데라 보이는 크기는 그대로. */
+.pLock .clock{font-size:64px;line-height:1.50;font-weight:200;letter-spacing:-2px;color:#fff;
+  text-shadow:0 1px 4px rgba(0,0,0,.5), 0 0 10px rgba(0,0,0,.35)}
+/* 실물: "암호 입력" 17pt → 17px (1:1) */
+.pLockHint{font-size:17px;line-height:1.55;color:#fff;letter-spacing:.2px;
+  text-shadow:0 1px 3px rgba(0,0,0,.55), 0 0 6px rgba(0,0,0,.4)}
+/* 실물: 입력 점 지름 12pt · 중심 간격 24pt → 13px · 중심 간격 26px (1:1 + 밝은 배경 가독 보정) */
 .pDots{display:flex;gap:13px}
-.pDots i{width:11px;height:11px;border-radius:50%;border:1px solid var(--n8)}
-.pDots i.on{background:var(--n8)}
-.pKeys{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;width:186px}
-.pKey{width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.09);border:0;font-size:19px;font-weight:400;color:#fff}
-.pKey:active{background:rgba(255,255,255,.24)}
+.pDots i{width:13px;height:13px;border-radius:50%;border:1.5px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.45)}
+.pDots i.on{background:#fff}
+/* 실물: 키패드 원 지름 75pt · 가로 간격 23pt(합 271pt) → 286px 프레임에 1:1 이면 좌우 여백이 7px 밖에
+   안 남아 66px · 간격 14px(합 226px · 좌우 30px)로 클램프. 숫자는 실물 36pt(지름의 48%) → 26px(39%) */
+.pKeys{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;width:226px}
+.pKey{width:66px;height:66px;border-radius:50%;background:rgba(255,255,255,.14);border:0;font-size:26px;font-weight:300;color:#fff;
+  text-shadow:0 1px 3px rgba(0,0,0,.45)}
+.pKey:active{background:rgba(255,255,255,.30)}
+.pLock .lockMsg{text-shadow:0 1px 3px rgba(0,0,0,.55)}
 .pKey.blank{background:none}
 .pTop{display:flex;align-items:center;gap:8px;padding:9px 10px;background:var(--n2);border-bottom:1px solid var(--line);font-size:12px;font-weight:600;color:var(--n8)}
 .pBack{background:none;border:0;font-size:16px;padding:0 4px;color:var(--n8)}
@@ -11008,7 +11033,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 (function () {
   "use strict";
 
-  var BUILD = "ODY-S1-20260913-0141";
+  var BUILD = "ODY-S1-20260913-0839";
   var LSKEY = "odyssey.s1.v1";
 
   var qs = new URLSearchParams(location.search);
@@ -12339,10 +12364,13 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     tileCell: { x: 59.5, y: 33.0, w: 21.5, h: 32.0 }
   };
 
+  /* ★v0.17.5 [지시2·3] 배경이 흰색으로 바뀌고(누끼) 아이콘은 2줄×3개로 커졌다.
+     새 이미지 실측(원본 %): 절취선 77.28 · 스텁 인쇄물 아래끝 64.26 · 카드 오른끝 93.85 · 카드 아래끝 80.27
+     → 빈 여백 = x 77.6~93.8 · y 64.9~79.8 안에 여유를 두고 iconRow 를 다시 잡았다. */
   var TICKET = {
     img: "ticket_bg.jpg", nw: 1200, nh: 800,
     crop: { x: 3.5, y: 18.0, w: 93.0, h: 65.0 },
-    iconRow: { x: 77.5, y: 68.0, w: 15.5, h: 8.0 }
+    iconRow: { x: 78.0, y: 65.8, w: 14.6, h: 12.8 }
   };
 
   /* ★v0.16.3 [지시7] 게임카드 사진(gamecard.jpg 900×567) 오른쪽 흰 라운드 상자 2개 —
@@ -14680,7 +14708,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     var bigClock = el("div", "clock", nowHM());
     clockNodes.push(bigClock);
     box.appendChild(bigClock);
-    box.appendChild(el("div", null, "비밀번호 입력"));
+    box.appendChild(el("div", "pLockHint", "비밀번호 입력"));   /* ★v0.17.5 [지시5] 크기 지정용 클래스 */
     var dots = el("div", "pDots");
     for (var i = 0; i < 4; i++) dots.appendChild(el("i"));
     box.appendChild(dots);
@@ -14737,11 +14765,13 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     icoWrap.appendChild(ico);
     if (opts && opts.badge) icoWrap.appendChild(el("div", "badge", opts.badge));
     if (opts && opts.dlBadge) icoWrap.appendChild(el("div", "badge dlb", "\u2193"));
-    b.appendChild(icoWrap);
-    /* v0.2: 진행바는 아이콘 바로 아래, 아이콘 가로폭만큼 */
+    /* v0.2: 진행바는 아이콘 바로 아래, 아이콘 가로폭만큼
+       ★v0.17.5 [지시1] icoWrap 안(절대배치)으로 옮겼다 — 흐름에 두면 안 보여도 3+3px 자리를
+       차지해 아이콘~라벨 간격이 16px 이나 됐다. 이제 라벨은 아이콘 바로 아래 4px. */
     var bar = el("div", "dlbar"); bar.appendChild(el("i"));
-    if (!(opts && opts.dl)) bar.style.visibility = "hidden";
-    b.appendChild(bar);
+    if (!(opts && opts.dl)) bar.style.visibility = "hidden"; else b.classList.add("dl");
+    icoWrap.appendChild(bar);
+    b.appendChild(icoWrap);
     b.appendChild(el("div", "lbl", label));
     b.onclick = function () { G.sfxTap(); opts && opts.onTap && opts.onTap(b); };
     return b;
@@ -14798,6 +14828,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     if (badge) badge.remove();
     var bar = node.querySelector(".dlbar");
     bar.style.visibility = "visible";
+    node.classList.add("dl");                 /* ★v0.17.5 진행바가 보이는 동안만 라벨을 아래로 */
     var fill = bar.querySelector("i");
     var p = 0, T = 2400, t0 = Date.now();
     G.beep(520, 0.06, "sine", 0.07);
@@ -14809,7 +14840,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         G.setFlag("mgInstalled");
         node.classList.remove("locked");
         G.sfxOk();
-        setTimeout(function () { bar.style.visibility = "hidden"; go("home"); }, 500);
+        setTimeout(function () { bar.style.visibility = "hidden"; node.classList.remove("dl"); go("home"); }, 500);
       }
     }, 60);
   }
@@ -16474,12 +16505,19 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     tv: '<rect x="2.6" y="4.2" width="18.8" height="12.6" rx="2.2" fill="none" stroke="' + TICK_INK + '" stroke-width="2.1"/>' +
         '<rect x="11.1" y="16.8" width="1.8" height="3"/><rect x="7.4" y="19.8" width="9.2" height="1.9" rx=".9"/>'
   };
+  /* ★v0.17.5 [지시2] 아이콘이 너무 작다(북쑥) — 한 줄 6개로는 카드 여백(절취선 x77.3% ~
+     카드 오른끝 x93.8% = 16.5%) 안에서 더 못 키운다. **2줄 × 3개**로 바꾸고 셀을 24 → 48.
+     읽는 순서는 그대로(왼→오, 위→아래). 실측 렌더 31.0px → 58.2px = 1.88배. */
+  var TICK_COLS = 3, TICK_CELL = 48, TICK_GAPX = 14, TICK_GAPY = 12;
   function tickIconsSVG(ids) {
-    var n = ids.length, gap = 8, cell = 24, W = n * cell + (n - 1) * gap, H = 30;
+    var cols = Math.min(TICK_COLS, ids.length), rows = Math.ceil(ids.length / cols);
+    var W = cols * TICK_CELL + (cols - 1) * TICK_GAPX;
+    var H = rows * TICK_CELL + (rows - 1) * TICK_GAPY;
     var out = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">';
     out += '<g fill="' + TICK_INK + '">';
     ids.forEach(function (id, i) {
-      out += '<g transform="translate(' + (i * (cell + gap)) + ',3) scale(' + (cell / 24).toFixed(4) + ')" data-ic="' + id + '">' + (TICK_PICTO[id] || '') + '</g>';
+      var cx = (i % cols) * (TICK_CELL + TICK_GAPX), cy = ((i / cols) | 0) * (TICK_CELL + TICK_GAPY);
+      out += '<g transform="translate(' + cx + ',' + cy + ') scale(' + (TICK_CELL / 24).toFixed(4) + ')" data-ic="' + id + '">' + (TICK_PICTO[id] || '') + '</g>';
     });
     out += '</g></svg>';
     return out;
@@ -16493,7 +16531,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         '<div style="font-size:11px;letter-spacing:2px;color:#7d776c">MARU AIR</div>' +
         '<div style="font-size:19px;font-weight:800;margin:4px 0 8px">ICN → DPS</div>' +
         '<div style="display:flex;gap:14px;font-size:12px"><div><b>SEAT</b><br>23A</div><div><b>GATE</b><br>27</div><div><b>BOARDING</b><br>09:10</div></div>' +
-        '<div style="position:absolute;right:10px;bottom:8px;width:42%;height:16px">' + tickIconsSVG(DATA.ANS.p3) + '</div>';
+        '<div style="position:absolute;right:10px;bottom:8px;width:34%;height:34px">' + tickIconsSVG(DATA.ANS.p3) + '</div>';
       openZoom({ id: "ticket", title: "탑승권", node: node, cap: "탑승권." });
       return;
     }
@@ -16686,8 +16724,9 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     /* ★v0.17.4 [지시15B] 이미 맞춘 뒤에는 **정렬 완료 상태로 고정된 화면**만 뜬다(셀로판은 소모됨) */
     if (G.flag("p17") && hasImg(DATA.PAMPHLET_BG.img)) {
       pamCello = true;
-      openZoom({ id: "pamphlet", title: "팜플렛 + 셀로판", node: W.pamphlet({ fixed: true }),
-        cap: "셀로판과 팜플렛이 겹쳐 있다." });
+      /* ★v0.17.5 [지시4] "셀로판과 팜플렛이 겹쳐 있다." 삭제 — 겹친 건 플레이어 본인인데
+         남이 겹쳐 둔 듯한 서술이었다. 타이틀만 남기고 캡션은 비운다. */
+      openZoom({ id: "pamphlet", title: "팜플렛 + 셀로판", node: W.pamphlet({ fixed: true }), cap: "" });
       return;
     }
     if (!withCello) {
@@ -16720,7 +16759,8 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         renderInv(); render();
       }
     });
-    openZoom({ id: "pamphlet", title: "팜플렛 + 셀로판", node: pam, cap: "셀로판과 팜플렛이 겹쳐 있다." });
+    /* ★v0.17.5 [지시4] 같은 이유로 캡션 삭제 */
+    openZoom({ id: "pamphlet", title: "팜플렛 + 셀로판", node: pam, cap: "" });
   };
 
   /* ★v0.17.1 "팜플렛 위에 셀로판을 올린다" 공통 처리 — 선택 해제 → 팝업 닫고 120ms 뒤 겹침 화면.
