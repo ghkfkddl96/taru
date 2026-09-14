@@ -659,6 +659,8 @@ body.dbg .ifeHot:active{box-shadow:0 0 0 2px rgba(255,255,255,.95)}
    버튼은 배너와 비슷한 크기의 ghost 버튼으로(탭 판정은 44px 이상 — padding 으로 확보). */
 #sndRow{display:flex;flex-direction:column;align-items:center;gap:7px;margin:-4px 0 0}
 #sndHint{font-size:11.5px;line-height:1.5;color:var(--n6);letter-spacing:.2px}
+/* ★v0.17.25 iOS 오디오 언락 안내 — 한 단계 더 작고 흐리게(보조 문구) */
+#sndNote{font-size:10px;line-height:1.45;color:var(--n5);letter-spacing:.2px;max-width:230px;text-align:center}
 #btnSndTest{margin:0;padding:10px 16px;font-size:12.5px;font-weight:600;border-radius:999px;min-height:40px}
 #btnSndTest.playing{color:var(--accent);border-color:var(--accent)}
 .buildId{position:absolute;bottom:calc(var(--safeB) + 8px);font-size:9px;color:var(--n5);font-family:ui-monospace,Menlo,monospace;letter-spacing:.5px}
@@ -681,6 +683,9 @@ body.dbg .ifeHot:active{box-shadow:0 0 0 2px rgba(255,255,255,.95)}
   background:var(--n2);border:1px solid var(--line2);border-radius:var(--r);padding:11px 16px;font-size:13px;
   max-width:82%;text-align:center;opacity:0;pointer-events:none;transition:opacity .2s;white-space:pre-line;line-height:1.5}
 #toast.show{opacity:1}
+/* ★v0.17.25 탭-투-디스미스(sticky) 토스트 — 탭할 수 있게 pointer-events 활성 + 닫기 힌트 */
+#toast.hold{pointer-events:auto;cursor:pointer}
+#toast .toastHint{display:block;margin-top:5px;font-size:10px;opacity:.55;letter-spacing:.3px}
 
 /* ★v0.17.10 [지시K] 헤드셋 재생 화면 이전/다음 곡 — IFE 뒤로가기와 같은 플랫 톤, 탭 44px */
 .songNav{flex:0 0 auto;width:44px;height:44px;padding:0;border:0;border-radius:12px;background:transparent;
@@ -1261,6 +1266,8 @@ input.osk-focus{outline:none;box-shadow:0 0 0 2px rgba(120,150,255,.6) !importan
     <div id="sndRow">
       <div id="sndHint">🔊 소리를 들으면서 진행해 주세요</div>
       <button class="btn ghost" data-t="sndTest" id="btnSndTest">소리 테스트 ▶</button>
+      <!-- ★v0.17.25 iOS 오디오 언락 안내 — 첫 한두 번은 소리가 안 날 수 있다(북쑥) -->
+      <div id="sndNote">처음엔 한두 번 소리가 안 날 수 있어요. 안 들리면 다시 눌러 주세요.</div>
     </div>
     <button class="btn primary" data-t="start" id="btnStart">시작하기</button>
     <button class="btn ghost" data-t="resume" id="btnResume" hidden>이어하기</button>
@@ -11379,7 +11386,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 (function () {
   "use strict";
 
-  var BUILD = "ODY-S1-20260914-2158";
+  var BUILD = "ODY-S1-20260914-2227";
   var LSKEY = "odyssey.s1.v1";
 
   var qs = new URLSearchParams(location.search);
@@ -11497,11 +11504,9 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   function on(n, ev, fn) { n.addEventListener(ev, fn, { passive: ev !== "touchmove" && ev !== "touchstart" }); return n; }
 
   var toastTimer = null;
-  function toast(msg, ms) {
-    var t = $("toast");
-    t.textContent = msg;
-    /* ★v0.9.1 팝업이 열려 있으면 그 팝업의 캡션 **위** 12px 에 띄운다(캡션도 인벤도 가리지 않게).
-       팝업이 없으면 CSS 기본값(인벤 위)으로 돌린다. */
+  var toastHoldOff = null;                 /* ★v0.17.25 현재 sticky 토스트 정리 함수(있으면) */
+  /* 팝업이 열려 있으면 캡션 위 12px, 없으면 CSS 기본(인벤 위)으로 위치를 잡는다 */
+  function positionToast(t) {
     var sh = null, ids = ["zoom", "closeup"];
     for (var i = 0; i < ids.length; i++) {
       var n = document.getElementById(ids[i]);
@@ -11512,9 +11517,43 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       var r = cap.getBoundingClientRect();
       t.style.bottom = Math.round(window.innerHeight - r.top + 12) + "px";
     } else t.style.bottom = "";
+  }
+  function clearToastHold() { if (toastHoldOff) { toastHoldOff(); toastHoldOff = null; } }
+  function toast(msg, ms) {
+    if (ms === "hold") return toastHold(msg);   /* ★v0.17.25 toast(msg,"hold") = sticky */
+    var t = $("toast");
+    clearToastHold();                     /* sticky 가 떠 있으면 정리하고 일반 토스트로 */
+    t.classList.remove("hold");
+    t.textContent = msg;
+    positionToast(t);
     t.classList.add("show");
     clearTimeout(toastTimer);
     toastTimer = setTimeout(function () { t.classList.remove("show"); }, ms || 1900);
+  }
+  /* ★v0.17.25 탭-투-디스미스(sticky) 토스트 — 자동 타이머 없이 계속 떠 있고,
+     토스트를 탭/클릭하면 사라진다(그 토스트에 한해 pointer-events 활성 + 1회성 리스너).
+     새 sticky 를 띄우면 이전 것을 먼저 정리한다. 다음 단계 안내처럼 "읽어야 하는" 코멘트에 쓴다. */
+  function toastHold(msg) {
+    var t = $("toast");
+    clearTimeout(toastTimer);
+    clearToastHold();                     /* 이전 sticky 정리 */
+    clear(t);
+    t.appendChild(el("span", null, msg));
+    t.appendChild(el("span", "toastHint", "탭하면 닫힘"));
+    t.classList.add("hold");              /* pointer-events 활성(CSS) */
+    positionToast(t);
+    t.classList.add("show");
+    function dismiss() {
+      t.removeEventListener("click", dismiss);
+      t.classList.remove("show");
+      toastHoldOff = null;
+      setTimeout(function () { if (!t.classList.contains("show")) { t.classList.remove("hold"); clear(t); } }, 240);
+    }
+    t.addEventListener("click", dismiss);
+    toastHoldOff = function () {          /* 외부(새 토스트)에서 강제 정리할 때 */
+      t.removeEventListener("click", dismiss);
+      t.classList.remove("show", "hold"); clear(t);
+    };
   }
 
   /* ───────── 소리(Web Audio, 음원 없이 신호음) ───────── */
@@ -12438,7 +12477,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     save: save, load: load, wipe: wipe,
     flag: flag, setFlag: setFlag, has: has, give: give, take: take,
     solved: solved, markSolved: markSolved,
-    $: $, el: el, clear: clear, on: on, toast: toast,
+    $: $, el: el, clear: clear, on: on, toast: toast, toastHold: toastHold,
     beep: beep, sfxOk: sfxOk, sfxBad: sfxBad, sfxTap: sfxTap, buzz: buzz, audio: audio, syncInvH: syncInvH,
     sha256: sha256, drag: drag, tapper: tapper,
     sharedAudio: sharedAudio, unlockAudio: unlockAudio, audioUnlocked: audioUnlocked,
@@ -16117,12 +16156,16 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 
   /* ═══════════ #24 다마고치 (★v0.3b 뼈대 — 이미지는 자리표시자) ═══════════ */
   var danceTimer = null;
+  var danceGen = 0;                 /* ★v0.17.25 setTimeout 체인 세대 — 뷰 재렌더 시 스테일 콜백 무효화 */
   function tamaState() {
     if (!G.S.misc.tama) G.S.misc.tama = { state: "hungry" };
     return G.S.misc.tama;
   }
   function viewTama() {
-    if (danceTimer) { clearInterval(danceTimer); danceTimer = null; }
+    /* ★v0.17.25 춤은 이제 setTimeout 체인 — clearTimeout 으로 취소하고, 세대를 올려
+       이미 큐에 들어간 스테일 콜백이 새 뷰의 img/beep 을 못 건드리게 막는다. */
+    if (danceTimer) { clearTimeout(danceTimer); danceTimer = null; }
+    danceGen++;
     var t = tamaState();
     var sc = screen();
     sc.appendChild(statusbar());
@@ -16185,22 +16228,36 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       setTimeout(viewTama, 300);
     }
     function dance() {
-      if (danceTimer) return;
+      if (danceTimer) return;                 /* 재진입 가드(버튼·탭 두 트리거 공용) */
       var seq = DATA.TEMP.p24Dance;
+      /* ★v0.17.25 스텝 사이에 중립 프레임(front)을 끼운다 — 연속 같은 방향(R,R)도
+         hipR→front→hipR 로 보여 두 번이 확실히 구분된다. setInterval → setTimeout 체인.
+         스텝 총길이(GAP+HOLD)는 예전(danceMs)과 동일, 포즈 유지(HOLD)는 700ms 이상. */
+      var GAP = 240;                            /* 중립 프레임 유지 */
+      var HOLD = Math.max(700, DATA.TAMA.danceMs - GAP);  /* 포즈 유지(≥700) */
+      var gen = ++danceGen;                     /* 이 재생 세대 */
       var i = 0;
       bubble.textContent = "🎵";
       setImg("front");
-      danceTimer = setInterval(function () {
-        if (i >= seq.length) {
-          clearInterval(danceTimer); danceTimer = null;
+      function neutral() {                      /* 스텝 사이 중립 프레임 → 다음 포즈 예약 */
+        if (gen !== danceGen) return;           /* 스테일 콜백 가드 */
+        if (i >= seq.length) {                  /* 끝 → happy 복귀 + 플래그 */
+          danceTimer = null;
           setImg("happy"); bubble.textContent = DATA.TAMA.happyLine;
           G.setFlag("sawDance");
           return;
         }
+        setImg("front");
+        danceTimer = setTimeout(pose, GAP);
+      }
+      function pose() {                         /* 한 스텝의 포즈(hipL/hipR) + 비프 */
+        if (gen !== danceGen) return;
         setImg(seq[i] === "L" ? "hipL" : "hipR");
         G.beep(seq[i] === "L" ? 440 : 660, .09, "triangle", .08);
         i++;
-      }, DATA.TAMA.danceMs);
+        danceTimer = setTimeout(neutral, HOLD);
+      }
+      danceTimer = setTimeout(pose, GAP);       /* 첫 비트: front(GAP) → pose */
     }
     window.__tamaFeed = feed;
     window.__tamaDance = dance;
@@ -16920,7 +16977,8 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       G.setFlag("binocSeen");
       if (!binocToasted) {
         binocToasted = true;
-        G.toast("다른 비행기가 옆에 날고 있다. 그런데 tway가 아니라 oway네…?", 2500);
+        /* ★v0.17.25 너무 짧아 못 읽음(북쑥) → 탭-투-디스미스 sticky 로. 문구·1회 가드 불변. */
+        G.toastHold("다른 비행기가 옆에 날고 있다. 그런데 tway가 아니라 oway네…?");
       }
       return;
     }
@@ -19443,6 +19501,9 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   /* ★v0.17.11 [지시3] 힌트 카드를 본 사람이 구글맵을 안 연 채 새로고침했을 때 짚어 주는 한 줄 */
   var GPS_NUDGE = "GPS 연결이 안 되는 앱을 열어서 한 번 더 해보면 될 것 같다.";
   var gpsNudge = false;
+  /* ★v0.17.25 GPS 복구가 방금 일어난 로드에서만 뜨는 안내(다음 행동=폰 켜기 유도, 탭-투-디스미스) */
+  var GPS_RESTORED = "앗 GPS가 복구된 것 같다! 스마트폰을 켜보자!";
+  var gpsJustRestored = false;
   /* ★v0.17.11 [지시4] 뒤로가기 이스터에그 문구(북쑥 지정 — 문장·이모지 그대로) */
   var BACK_EGG = "이번에는 뒤에 아무것도 떨어져 있지 않을 것 같다...🥲";  /* 🥲 U+1F972 */
 
@@ -19465,7 +19526,8 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   /* 검증용 — GPS 퍼즐의 세 재료를 한 번에 읽는다 */
   window.__gpsState = function () {
     return { hintSeen: G.flag("gpsHintSeen"), onScreen: G.flag("gpsOnScreen"),
-             restored: G.flag("gpsRestored"), nudge: gpsNudge, nudgeText: GPS_NUDGE, backEgg: BACK_EGG };
+             restored: G.flag("gpsRestored"), justRestored: gpsJustRestored,
+             nudge: gpsNudge, nudgeText: GPS_NUDGE, restoredText: GPS_RESTORED, backEgg: BACK_EGG };
   };
 
   window.MAIN = {
@@ -19500,7 +19562,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
        "어디서 새로고침해야 하는지" 를 한 번 짚어 준다(토스트 1회). */
     G.onReload(function () {
       if (!G.flag("gpsHintSeen") || G.flag("gpsRestored")) return;
-      if (G.flag("gpsOnScreen")) G.setFlag("gpsRestored");
+      if (G.flag("gpsOnScreen")) { G.setFlag("gpsRestored"); gpsJustRestored = true; }  /* ★v0.17.25 이 로드에서 복구 전이 발생 */
       else gpsNudge = true;
     });
     /* 소비했으면(또는 그냥 새로 들어왔으면) 내린다 — 이번 로드에서 **다시 열어야** 유효하다 */
@@ -19511,6 +19573,8 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       resumeGame();
       /* 복귀 직후 1회 — 화면이 다 그려진 뒤에 띄운다 */
       if (gpsNudge) setTimeout(function () { G.toast(GPS_NUDGE, 3400); }, 700);
+      /* ★v0.17.25 GPS 복구가 방금 일어난 로드면, 씬 렌더 뒤 "폰을 켜보자" 안내를 sticky 로 1회 */
+      else if (gpsJustRestored) setTimeout(function () { G.toastHold(GPS_RESTORED); }, 700);
     }
     else if (had && S.started) $("btnResume").hidden = false;
   });
