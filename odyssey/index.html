@@ -11375,7 +11375,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 (function () {
   "use strict";
 
-  var BUILD = "ODY-S1-20260914-1534";
+  var BUILD = "ODY-S1-20260914-1703";
   var LSKEY = "odyssey.s1.v1";
 
   var qs = new URLSearchParams(location.search);
@@ -12593,17 +12593,21 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         { id: "upper", x: 30, y: 0.43, w: 38.01, h: 19.17, label: "상단 수납함", cu: "upper" },
         /* ★북쑥 확정 15:33: 간식 수납칸(#25 색상판 홈 4개 + 빈 명판) — 화면 바로 아래 가로줄 */
         { id: "snack", x: 24, y: 20.13, w: 29, h: 10.07, label: "간식 수납칸", cu: "snack" },
-        /* 카드슬롯 + 초록 LED 서랍 (#14).
-           ★v0.17.21 카드 꽂는 곳 재맵핑 — 예전 x26 y51 w26.5 h10.59 는 서랍 전면 전체를
-             덮되 중심이 실제 카드리더에서 아래(슬롯 대비 −6~−16px)·왼쪽(슬롯+LED 클러스터
-             대비 −13~14px)으로 처져 어색했다. 사진 실측(map_galley.jpg 670×1200):
-             카드리더 슬롯 본체 = 사진% x36.7~42.3 / y52.9~55.2, 슬롯+센서+초록LED 클러스터
-             = 사진% x36.5~49.1 / y52.5~56.3. tools/map-fit.mjs 로 3뷰포트 합집합을 뽑아
-             클러스터 중심에 정렬(스테이지 중심 x43·y55). 탭 최소 3뷰포트 전부 ≥52px
-             (chromium/webkit 402×738·390×844·375×667 = 60×63/59×74/56×55). 진단·검증
-             tools/diag-galley-slot.mjs. */
-        { id: "drawer", x: 35.5, y: 49.74, w: 15, h: 10.56, label: "서랍장", cu: "drawer" },
-        /* 열쇠구멍 + 창 1줄 4칸 카트 — 서랍장 합집합(≤60.30%)과 안 겹치게 62% 부터 */
+        /* 카드슬롯 서랍 (#14) — galley_drawer.jpg 클로즈업(핸들+가로 카드슬롯 홈+초록 LED)이
+           열리는 서랍. ★v0.17.22 위치 정정(북쑥) — v0.17.21 의 x35.5 y49.74(왼쪽 상단 유닛의
+           네모 카드리더+센서, 핸들 없음 → 클로즈업 불일치)는 **틀린 서랍**이었다. 실제 카드 문제
+           서랍 = 카트(cart, 왼쪽 제빙함)와 식기 다이얼박스(smallbox, 오른쪽 포크·숟가락) 사이
+           **오른쪽 하단 서랍 열의 아래 LED 서랍(LED2)**. 오른쪽 열에는 핸들+가로 슬롯+초록 LED
+           서랍이 둘(LED1 위, LED2 아래) 있고 둘 다 클로즈업과 형태 일치 — 북쑥 지정 "오른쪽 하단"
+           에 따라 아래(LED2) 확정. 사진 실측(map_galley.jpg 670×1200): 가로 카드슬롯 홈 =
+           사진% x60.0~63.4 / y65.3~66.1, 슬롯+초록 LED 클러스터 = 사진% x60.0~64.7 / y64.9~66.6.
+           tools/map-fit.mjs 로 3뷰포트 합집합을 슬롯 중심(스테이지 x61.5·y65)에 정렬. 탭 최소
+           3뷰포트 전부 ≥52px (chromium/webkit 402×738·390×844·375×667 = 56×64/55×75/53×56;
+           375 가 세로 22.3% 크롭이라 h 가 지배 제약 → 사진 h5.5 로 최소화). cart(≤스테이지
+           x52.5)와 2.0%·smallbox(스테이지 x69~)와 0.5% 간격, 겹침 0. 진단·검증
+           tools/diag-galley-slot.mjs. */
+        { id: "drawer", x: 54.5, y: 62.7, w: 14, h: 10.73, label: "서랍장", cu: "drawer" },
+        /* 열쇠구멍 + 창 1줄 4칸 카트 — 왼쪽 제빙함(오른쪽 끝 스테이지 52.5%) */
         { id: "cart", x: 27, y: 62, w: 25.5, h: 31.13, label: "카트", cu: "cart" },
         /* #8 다이얼 상자 = 오른쪽 식기(포크·나이프·젓가락·숟가락) 다이얼박스.
            ★오른쪽 끝은 86.6% 까지만 — 그 밖은 navR 화살표 자리(375×667 기준 86.67~97.87%) */
