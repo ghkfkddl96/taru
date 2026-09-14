@@ -887,6 +887,31 @@ body.dbg.hints .pbCell{box-shadow:inset 0 0 0 2px rgba(255,255,255,.45);border-r
 .cvcell.ifeBack{position:absolute}
 .cvcell.ifeBack::after{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
   min-width:44px;min-height:44px;width:100%;height:100%}
+/* ★v0.17.19 #5 헤드셋 케이스 — 로고 4칸 글자 끼우기 ─────────────────────────
+   글자는 26자 음각 스프라이트 시트(case_letters.png)를 background-position 으로 잘라 쓴다.
+   시트의 칸 하나 = 슬롯 하나(40×58 의 3배)라 슬롯/칩 어디에 얹어도 위치·크기가 저절로 맞는다. */
+.bcLetter{width:100%;height:100%;background-repeat:no-repeat;pointer-events:none;
+  /* 시트가 아직 안 붙은 칸(빈 칸)은 아무것도 안 보인다 */
+  opacity:0;transition:opacity .12s}
+.bcLetter.on{opacity:1}
+/* 전체컷의 글자 자리 — 표시 전용(탭은 위에 덮인 caseHit 가 받는다) */
+.cvcell.caseGlyph{pointer-events:none;background:transparent;border-radius:0}
+/* 4칸 전체를 감싸는 탭 영역 — 플레이 모드에선 보이지 않는다(.hot 과 같은 취급) */
+.cvcell.caseHit{background:transparent;border-radius:8px}
+/* 확대 뷰의 칸 — 끼운 글자를 빼는 탭 대상 */
+.cvcell.caseSlot{background:transparent;border-radius:3px}
+.cvcell.caseSlot:active{background:rgba(6,6,8,.14)}
+.cvcell.caseSlot.done{background:rgba(90,200,140,.16);box-shadow:inset 0 0 0 2px rgba(120,220,165,.55)}
+/* 글자칩 판 — 확대 뷰 아래(팝업 패널). 6개씩 2줄. */
+.bcTray{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;width:100%;max-width:340px;margin:0 auto}
+.bcChip{width:46px;aspect-ratio:40/58;padding:0;border:0;border-radius:5px;
+  background:#c8c7c2;box-shadow:0 1px 3px rgba(0,0,0,.45),inset 0 0 0 1px rgba(255,255,255,.34);
+  display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent}
+.bcChip:active{filter:brightness(.93)}
+/* 이미 칸에 들어간 칩은 자리를 지킨 채 빈 홈으로 남는다(줄이 흐트러지지 않게) */
+.bcChip.used{background:rgba(255,255,255,.05);box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
+.bcChip.used .bcLetter{opacity:0}
+
 /* ★v0.15 [6] 바닥 같은 '빈 자리' 탭 영역 — 플레이 모드에선 아무 표시도 없다(링은 디버그에서만) */
 .spot.floorSpot{background:transparent}
 .ifeDotsBar{position:absolute;left:0;right:0;bottom:4%;display:flex;gap:5px;justify-content:center;pointer-events:none}
@@ -1191,7 +1216,7 @@ body.dbg .cvcell.cabBtn:active{box-shadow:inset 0 0 0 3px rgba(255,255,255,.8)}
 
 </div>
 
-<script>window.__AUDIO = ["ad_bgm.mp3","binoc.mp3","bow_shot.mp3","footstep.mp3","main_bgm.mp3","mictap.mp3","song1.mp3","song2.mp3","song3.mp3","song4.mp3","song5.mp3","storm.mp3","sudoku_bgm.mp3"]; window.__IMG = ["app_kakao.png","app_map.png","app_minigame.png","app_qr.png","archer.jpg","archer.png","archery_field.jpg","bali_ending.jpg","bin_L1.jpg","bin_L1_open_case.jpg","bin_L1_open_empty.jpg","bin_L2.jpg","bin_L2_open_cello.jpg","bin_L2_open_empty.jpg","bin_R1.jpg","bin_R1_open_card.jpg","bin_R1_open_empty.jpg","bin_R2.jpg","bin_R2_open_empty.jpg","bin_R2_open_key.jpg","blanket_zoom.jpg","book_empty.jpg","book_tile.jpg","bridge_walk.jpg","case_open_empty.jpg","case_open_headset.jpg","ceiling_open_cardkey.jpg","ceiling_open_empty.jpg","cello_align.png","char_front.jpg","char_happy.jpg","char_hipL.jpg","char_hipR.jpg","char_hungry.jpg","crew_blanket.jpg","crew_tray.jpg","dialbox.jpg","dialbox_open.jpg","food_bread.png","food_cake.png","food_omu.png","food_salad.png","galley_cart.jpg","galley_cart_empty.jpg","galley_cart_open.jpg","galley_drawer.jpg","galley_drawer_empty.jpg","galley_drawer_open.jpg","galley_snack.jpg","galley_snack_empty.jpg","galley_snack_open.jpg","galley_upper.jpg","galley_upper_empty.jpg","galley_upper_open.jpg","gamecard.jpg","gmap_bali.jpg","gmap_plane.png","gmap_typhoon.png","headphones.jpg","headset_case.jpg","headset_worn.jpg","hint_phonecase.jpg","ic_blanket.png","ic_butter.jpg","ic_butter.png","ic_cardkey.jpg","ic_cardkey.png","ic_case.png","ic_cellophane.png","ic_dna.jpg","ic_dna.png","ic_drop.jpg","ic_drop.png","ic_dynamite.jpg","ic_dynamite.png","ic_fire.jpg","ic_fire.png","ic_gamecard.png","ic_goldkey.jpg","ic_goldkey.png","ic_headphones.jpg","ic_headphones.png","ic_ladder.png","ic_pamphlet.png","ic_passport.png","ic_peanut.png","ic_phone.png","ic_silverkey.jpg","ic_silverkey.png","ic_telescope.png","ic_ticket.png","ic_tile_beige.png","ic_tile_black.png","ic_tile_brown.png","ic_tile_dark.png","ife_ic_blanket.png","ife_ic_meal.png","ife_ic_tv.png","ife_off.jpg","ife_on.jpg","ife_photo1.jpg","ife_photo2.jpg","ife_photo3.jpg","ife_photo4.jpg","lav_cab1.jpg","lav_cab1_empty.jpg","lav_cab1_open.jpg","lav_cab2.jpg","lav_cab2_empty.jpg","lav_cab2_open.jpg","lav_cabtop.jpg","lav_cabtop_empty.jpg","lav_cabtop_open.jpg","lav_ceiling.jpg","lav_tissue.jpg","lav_tissue_idle.jpg","lav_tissue_roll.jpg","map_aisle.jpg","map_galley.jpg","map_gate.jpg","map_lav.jpg","map_lav_ladder.jpg","map_seat.jpg","map_seat_tray.jpg","meal_tray.jpg","oway_plane.jpg","pamphlet_bg.jpg","pamphlet_body_bg.jpg","passport.jpg","passport_p1.jpg","passport_p2.jpg","phone_wall.jpg","seat_runway.jpg","shade_logo.png","ticket_bg.jpg","tile_beige.jpg","tile_black.jpg","tile_brown.jpg","tile_dark.jpg","tissue_mask.png","travel1.jpg","travel2.jpg","travel3.jpg","travel4.jpg","window_open.jpg","window_shade.jpg","window_shade_plain.jpg"];</script>
+<script>window.__AUDIO = ["ad_bgm.mp3","binoc.mp3","bow_shot.mp3","footstep.mp3","main_bgm.mp3","mictap.mp3","sndtest.mp3","song1.mp3","song2.mp3","song3.mp3","song4.mp3","song5.mp3","storm.mp3","sudoku_bgm.mp3"]; window.__IMG = ["app_kakao.png","app_map.png","app_minigame.png","app_qr.png","archer.jpg","archer.png","archery_field.jpg","bali_ending.jpg","bin_L1.jpg","bin_L1_open_case.jpg","bin_L1_open_empty.jpg","bin_L2.jpg","bin_L2_open_cello.jpg","bin_L2_open_empty.jpg","bin_R1.jpg","bin_R1_open_card.jpg","bin_R1_open_empty.jpg","bin_R2.jpg","bin_R2_open_empty.jpg","bin_R2_open_key.jpg","blanket_zoom.jpg","book_empty.jpg","book_tile.jpg","bridge_walk.jpg","case_letters.png","case_open_empty.jpg","case_open_headset.jpg","case_popup.jpg","case_zoom.jpg","ceiling_open_cardkey.jpg","ceiling_open_empty.jpg","cello_align.png","char_front.jpg","char_happy.jpg","char_hipL.jpg","char_hipR.jpg","char_hungry.jpg","crew_blanket.jpg","crew_tray.jpg","dialbox.jpg","dialbox_open.jpg","food_bread.png","food_cake.png","food_omu.png","food_salad.png","galley_cart.jpg","galley_cart_empty.jpg","galley_cart_open.jpg","galley_drawer.jpg","galley_drawer_empty.jpg","galley_drawer_open.jpg","galley_snack.jpg","galley_snack_empty.jpg","galley_snack_open.jpg","galley_upper.jpg","galley_upper_empty.jpg","galley_upper_open.jpg","gamecard.jpg","gmap_bali.jpg","gmap_plane.png","gmap_typhoon.png","headphones.jpg","headset_worn.jpg","hint_phonecase.jpg","ic_blanket.png","ic_butter.jpg","ic_butter.png","ic_cardkey.jpg","ic_cardkey.png","ic_case.png","ic_cellophane.png","ic_dna.jpg","ic_dna.png","ic_drop.jpg","ic_drop.png","ic_dynamite.jpg","ic_dynamite.png","ic_fire.jpg","ic_fire.png","ic_gamecard.png","ic_goldkey.jpg","ic_goldkey.png","ic_headphones.jpg","ic_headphones.png","ic_ladder.png","ic_pamphlet.png","ic_passport.png","ic_peanut.png","ic_phone.png","ic_silverkey.jpg","ic_silverkey.png","ic_telescope.png","ic_ticket.png","ic_tile_beige.png","ic_tile_black.png","ic_tile_brown.png","ic_tile_dark.png","ife_ic_blanket.png","ife_ic_meal.png","ife_ic_tv.png","ife_off.jpg","ife_on.jpg","ife_photo1.jpg","ife_photo2.jpg","ife_photo3.jpg","ife_photo4.jpg","lav_cab1.jpg","lav_cab1_empty.jpg","lav_cab1_open.jpg","lav_cab2.jpg","lav_cab2_empty.jpg","lav_cab2_open.jpg","lav_cabtop.jpg","lav_cabtop_empty.jpg","lav_cabtop_open.jpg","lav_ceiling.jpg","lav_tissue.jpg","lav_tissue_idle.jpg","lav_tissue_roll.jpg","map_aisle.jpg","map_galley.jpg","map_gate.jpg","map_lav.jpg","map_lav_ladder.jpg","map_seat.jpg","map_seat_tray.jpg","meal_tray.jpg","oway_plane.jpg","pamphlet_bg.jpg","pamphlet_body_bg.jpg","passport.jpg","passport_p1.jpg","passport_p2.jpg","phone_wall.jpg","seat_runway.jpg","shade_logo.png","ticket_bg.jpg","tile_beige.jpg","tile_black.jpg","tile_brown.jpg","tile_dark.jpg","tissue_mask.png","travel1.jpg","travel2.jpg","travel3.jpg","travel4.jpg","window_open.jpg","window_shade.jpg","window_shade_plain.jpg"];</script>
 <script>
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -11301,7 +11326,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 (function () {
   "use strict";
 
-  var BUILD = "ODY-S1-20260914-0756";
+  var BUILD = "ODY-S1-20260914-1025";
   var LSKEY = "odyssey.s1.v1";
 
   var qs = new URLSearchParams(location.search);
@@ -11946,8 +11971,9 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
      window.__AUDIO 에 파일이 있을 때만 재생하고, 없으면 false 를 돌려줘 기존 신호음으로 폴백한다. */
   /* ★v0.17.15 [지시1·3] 인트로 효과음 2종 추가 — footstep(브리지 걷기, 걸음마다 재생) ·
      storm(태풍 도달, 강풍+천둥). 출처·라이선스는 gen/audio_minigames/LICENSES.md §9·§10 (둘 다 CC0).
-     ★v0.17.17 [지시7] mictap(기내방송 시작 — 마이크 톡톡) 추가. 출처는 같은 문서 §13 (CC0). */
-  var SFX_FILES = ["bow_shot.mp3", "footstep.mp3", "storm.mp3", "mictap.mp3"];
+     ★v0.17.17 [지시7] mictap(기내방송 시작 — 마이크 톡톡) 추가. 출처는 같은 문서 §13 (CC0).
+     ★v0.17.19 sndtest(시작 화면 소리 테스트 — 3.785초 비브라폰 징글) 추가. 같은 문서 §14 (CC0). */
+  var SFX_FILES = ["bow_shot.mp3", "footstep.mp3", "storm.mp3", "mictap.mp3", "sndtest.mp3"];
   var sfxRec = {};
   function sfxRecOf(file) {
     if (!haveAudio(file)) return null;
@@ -12445,8 +12471,10 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     gate: {
       name: "탑승 게이트", type: "img", img: IMG + "map_gate.jpg",
       left: null, right: null,
-      /* 스캐너(50.5/54.1/10.6/7.9)는 직원 상자 안에 들어가므로 맵에는 한 개만 — 클로즈업에서 둘 다 탭 가능 */
-      spots: [{ id: "s_staff", x: 36.6, y: 34.7, w: 28.3, h: 27.3, label: "직원", cu: "gate" }]
+      /* ★v0.17.19 [지시1] 팝업(CU.gate) 폐지 — 직원 자리는 이제 **클로즈업 없이** 바로
+         "탑승권 제출 / 관찰 코멘트" 를 처리하는 자리다(act:"gate").
+         data-t 는 예전 클로즈업 안 버튼과 같은 "gateReader" 로 둔다(검증 절차 그대로). */
+      spots: [{ id: "gateReader", x: 36.6, y: 34.7, w: 28.3, h: 27.3, label: "직원", act: "gate" }]
     },
     seat: {
       name: "내 자리", type: "img", img: IMG + "map_seat.jpg", imgIf: [["mealTray", IMG + "map_seat_tray.jpg"]],
@@ -12900,41 +12928,9 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         { x: 55.5, y: 61.47, w: 2.9, h: 8.1 }
       ]
     },
-    /* ★v0.4: 케이스 전체가 보이게(v0.2 수준) 되돌림
-       ★v0.17.11 [지시6] 사진 교체 — gen/79_headset_case_v3 (정방향 음각 "BOSE").
-         케이스 형태·지퍼·배경은 v2 와 같고 각인만 정방향으로 들어왔다.
-         칸 4개는 **각인 글자 네 개 중심**에 하나씩 다시 앉혔다. 실측 = tools/measure-bose.mjs
-         (Sobel 윤곽 → 열 군집. 원본 1531×1027 기준, 아래 값은 이미지 % 라 축소본에서도 그대로):
-           B x 547~636 · O x 670~755 · S x 792~885 · E x 914~1002 / y 443~526 (네 글자 공통)
-           → 글자 중심 % : 38.63 / 46.54 / 54.77 / 62.57  ·  세로 중심 47.18 · 글자 높이 8.08
-         칸 폭은 글자 간격(최소 7.80%)보다 좁게 잡아 이웃 칸과 겹치지 않는다(간격 0.25~0.68%).
-         세로는 렌더 실측 보정으로 +0.40% 내렸다(축소·JPEG 후 각인 음영이 아래로 조금 무겁다).
-         초기값 "–"·순환·판정(BOSE)·brandFace 각인 글꼴은 그대로. */
-    p5: {
-      img: IMG + "headset_case.jpg", nw: 900, nh: 604,
-      faceLight: true,        /* ★v0.12.2 앞면이 밝은 크림색 → 글자를 짙은 회색으로 */
-      crop: { x: 5, y: 6, w: 90, h: 88 },
-      cells: [
-        { x: 34.86, y: 41.48, w: 7.55, h: 12.20 },
-        { x: 42.77, y: 41.48, w: 7.55, h: 12.20 },
-        { x: 51.00, y: 41.48, w: 7.55, h: 12.20 },
-        { x: 58.80, y: 41.48, w: 7.55, h: 12.20 }
-      ],
-      /* ★v0.12.1 앞면(face) = 글자가 인쇄되는 평평한 정면. 칸(cells)=탭 영역은 홈 그림자까지
-         포함하므로 글자를 칸 한가운데 두면 그림자 위에 얹힌다. 값은 tools/scan-faces.mjs 픽셀 산출.
-         ★v0.12.2 한 자물쇠의 칸은 **같은 y·같은 높이·같은 폭** — 세로는 모든 칸 앞면의 교집합 띠
-         하나만 쓰고 가로 위치만 칸마다 다르다(칸별로 글자 높이가 달라 보이던 문제).
-         (guide: shots/v122/guide_<id>.png — 빨강=공통 띠, 초록=칸)
-         ★v0.17.11 [지시6] 이제 앞면 = **각인 글자 상자 그대로**(중심·높이 일치) — 글자칩이
-         각인 위에 겹쳐 앉는다. 칩이 각인을 덮어도 무방하고, 덮이지 않은 자리에서는
-         각인이 은은히 비쳐 "여기에 BOSE 가 새겨져 있었다" 가 보인다. */
-      faces: [
-        { x: 35.18, y: 42.40, w: 6.90, h: 10.40 },
-        { x: 43.09, y: 42.40, w: 6.90, h: 10.40 },
-        { x: 51.32, y: 42.40, w: 6.90, h: 10.40 },
-        { x: 59.12, y: 42.40, w: 6.90, h: 10.40 }
-      ]
-    },
+    /* ★v0.17.19 LOCKS.p5(헤드셋 케이스 순환 자물쇠)는 **폐지**됐다.
+       #5 는 이제 "전체컷 → 4칸 확대 → 글자칩 끼우기" 흐름이라 순환칸 규격을 쓰지 않는다.
+       새 좌표·소재는 아래 `CASE` 블록에 있다(정답 ANS.p5 "BOSE" 와 퍼즐 id 는 그대로). */
     p9: {
       img: IMG + "galley_cart.jpg", nw: 1000, nh: 667,
       crop: { x: 20, y: 19, w: 60, h: 38 },
@@ -13025,6 +13021,46 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       labels: [{ x: 31.1, y: 27.1, w: 4.3, h: 14.7 }, { x: 43.0, y: 27.4, w: 3.5, h: 14.2 },
                { x: 54.0, y: 27.4, w: 4.0, h: 14.5 }, { x: 65.1, y: 27.7, w: 3.6, h: 14.2 }]
     }
+  };
+
+  /* ═══════════════ ★v0.17.19 #5 헤드셋 케이스 — 로고 4칸 글자 끼우기 ═══════════════
+     흐름:  전체컷(로고가 빠진 케이스) → 4칸 자리를 탭 → 확대 뷰 → 글자칩 12개로 B·O·S·E 채우기.
+     정답(ANS.p5="BOSE")·퍼즐 id(p5)·보상 흐름·세이브 키는 **이전과 완전히 동일**하다.
+
+     소재 3장(전부 tools/make-v1719-case.mjs 가 gen/92_bose_case 승인본에서 생성):
+       · case_popup.jpg  758×1015 — 승인본 popup_case_white.png 에서 **4칸 안 글자만** 지운 판.
+       · case_zoom.jpg   900×660  — 확대 뷰. 승인본의 zoomCrop(300×220)을 **3배 해상도로 재렌더**
+                                    (사진 = 홈/글자 없는 원본을 바이큐빅 3배, 홈 4개 = SDF 재드로잉).
+       · case_letters.png 840×696 — 26자 음각 글자 스프라이트 시트(7열×4행, 칸 120×174 = 40×58 ×3).
+                                    칸 하나가 곧 "슬롯 하나"라 슬롯·칩 양쪽에 그대로 얹는다.
+
+     좌표는 전부 gen/92_bose_case/_zoom_framing.json 실측값을 % 로 옮긴 것이다(임의 보정 없음):
+       슬롯 40×58px @ 팝업(243/289/335/381, 483) · 확대(×3: 180/318/456/594, 240)  */
+  var CASE = {
+    popup: { img: IMG + "case_popup.jpg", nw: 758, nh: 1015 },
+    zoom: { img: IMG + "case_zoom.jpg", nw: 900, nh: 660 },
+    letters: { img: IMG + "case_letters.png", cols: 7, rows: 4 },
+    /* 팝업(758×1015) 기준 % — 글자가 끼워지면 전체컷에서도 보인다 */
+    popupCells: [
+      { x: 32.058, y: 47.586, w: 5.277, h: 5.714 },
+      { x: 38.127, y: 47.586, w: 5.277, h: 5.714 },
+      { x: 44.195, y: 47.586, w: 5.277, h: 5.714 },
+      { x: 50.264, y: 47.586, w: 5.277, h: 5.714 }
+    ],
+    /* 4칸 전체를 감싸는 탭 영역(확대 진입). 칸 띠(가로 23.5%·세로 5.7%)만으로는
+       402 뷰포트에서 세로 27px 밖에 안 돼 44px 규칙을 못 지킨다 → 사방으로 넓혔다.
+       실측(402×738): 98.2 × 57.6px. */
+    popupHit: { x: 30.079, y: 44.433, w: 27.441, h: 12.020 },
+    /* 확대 뷰(900×660) 기준 % */
+    zoomCells: [
+      { x: 20.000, y: 36.364, w: 13.333, h: 26.364 },
+      { x: 35.333, y: 36.364, w: 13.333, h: 26.364 },
+      { x: 50.667, y: 36.364, w: 13.333, h: 26.364 },
+      { x: 66.000, y: 36.364, w: 13.333, h: 26.364 }
+    ],
+    zoomBack: { x: 3.0, y: 3.6, w: 13.0, h: 17.7 },
+    /* 글자칩 12개 = 정답 4자 + 나머지 8자(시드 고정 셔플). 풀은 알파벳 전체. */
+    chipN: 12
   };
 
   /* #3/#7/#9/#10 IFE — ★v0.3b: 조작을 전부 "화면 안"에서. 스크린이 뷰 가로의 93% 를 차지하도록 크롭 */
@@ -13155,7 +13191,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
                  prizeCell: { x: 33.2, y: 38.6, w: 41.1, h: 36.2 } };
 
   window.DATA = {
-    LOCKS: LOCKS, IFE: IFE, TAMA: TAMA, TILES: TILES, BINOC: BINOC, BOOK: BOOK, DRAWER: DRAWER, PRIZE: PRIZE, GAMECARD: GAMECARD,
+    LOCKS: LOCKS, CASE: CASE, IFE: IFE, TAMA: TAMA, TILES: TILES, BINOC: BINOC, BOOK: BOOK, DRAWER: DRAWER, PRIZE: PRIZE, GAMECARD: GAMECARD,
     IMG: IMG, TEMP: TEMP, ITEMS: ITEMS, MAPS: MAPS, ANS: ANS, P25_INIT: P25_INIT, PIN_HASH: PIN_HASH, P26_HASH: P26_HASH,
     FOOD: FOOD, FOOD_BG: FOOD_BG, FLAGS: FLAGS, UTENSIL: UTENSIL, IFE_ICONS: IFE_ICONS,
     KANA: KANA, SONGS: SONGS,
@@ -15780,6 +15816,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     vp.appendChild(el("div", "reticle"));
     inner.appendChild(vp);
     var hint = el("div", null, "");   /* ★v0.15.5 안내 문구 없음 */
+    hint.setAttribute("data-t", "qrHint");   /* ★v0.17.19 게이트가 힌트 문구를 읽는 자리 */
     hint.style.cssText = "font-size:11px;color:#8b8d95;text-align:center;min-height:26px;padding:0 6px";
     inner.appendChild(hint);
     var manual = el("div");
@@ -15793,15 +15830,32 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     mb.style.cssText = "width:100%;margin:6px 0 0;padding:8px";
     mb.onclick = function () { hit(inp.value.trim()); };
     manual.appendChild(mb);
+    /* ★v0.17.19 [지시] 카메라로 못 찍는 상황(실물 QR 이 없을 때)을 위한 힌트 버튼.
+       누르면 위 안내 줄(hint)에 정답을 가리키는 문구가 뜬다 — 직접 입력 칸 바로 아래라
+       "여기에 뭘 넣어야 하는지" 와 같은 자리에서 읽힌다. */
+    var nb = el("button", "btn ghost", "QR코드 인식 불가 시 여기");
+    nb.setAttribute("data-t", "qrNoScan");
+    nb.style.cssText = "width:100%;margin:6px 0 0;padding:8px;font-size:11px";
+    nb.onclick = function () { G.sfxTap(); hint.textContent = "인공지능 화랑이의 이름이 정답인 것 같다"; };
+    manual.appendChild(nb);
     inner.appendChild(manual);
     body.appendChild(inner);
     sc.appendChild(body);
 
     frozen = false;
-    function hit(text) {
+    /* ★v0.17.19 [지시] 직접 입력은 **대소문자 무관**으로 "kopilot"·"kopliot" 두 철자를 받는다.
+       카메라 인식(jsQR 해독값 = TEMP.p18Answer URL)은 예전 그대로 — hit() 이 둘의 공용 입구라
+       "기존 값 정확히 일치 **또는** 소문자 정규화 후 두 철자 중 하나" 로 넓히기만 했다. */
+    var P18_WORDS = ["kopilot", "kopliot"];
+    function p18ok(text) {
+      if (text === DATA.TEMP.p18Answer) return true;
+      return P18_WORDS.indexOf(String(text).toLowerCase()) >= 0;
+    }
+    function hit(raw) {
       if (frozen) return;
+      var text = String(raw == null ? "" : raw).trim();
       if (!text) return;
-      if (text === DATA.TEMP.p18Answer) {
+      if (p18ok(text)) {
         frozen = true; stopCam();
         vp.classList.add("hit");
         G.sfxOk(); G.buzz([40, 40, 60]);
@@ -16415,6 +16469,8 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       }
       return;
     }
+    /* ★v0.17.19 [지시1] 팝업 없이 그 자리에서 처리하는 자리 — 지금은 게이트 직원 하나 */
+    if (sp.act === "gate") { gateGive(); return; }
     var cu = sp.cu;
     (sp.cuIf || []).forEach(function (p) { if (G.flag(p[0])) cu = p[1]; });
     openCU(cu);
@@ -16535,46 +16591,56 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 
   var CU = {};
 
-  /* #2 게이트 */
-  CU.gate = function (c) {
-    c.title("탑승 게이트");
-    /* ★v0.14 사진 속 직원을 직접 탭해 탑승권을 낸다(이모지 제거) */
-    var box, scan = null;
-    if (hasImg("map_gate.jpg")) {
-      /* 실측 bbox — 직원 36.6/34.7/28.3/27.3 · 스캐너 50.5/54.1/10.6/7.9 */
-      var st = imgStage(DATA.IMG + "map_gate.jpg", [
-        { x: 36.6, y: 34.7, w: 28.3, h: 27.3, t: "gateReader", cls: "hot" },
-        { x: 50.5, y: 54.1, w: 10.6, h: 7.9, t: "gateScan", cls: "hot" }]);
-      c.stage.appendChild(st);
-      box = st.querySelector('[data-t="gateReader"]');
-      scan = st.querySelector('[data-t="gateScan"]');
-    } else {
-      box = el("button");
-      box.setAttribute("data-t", "gateReader");
-      box.style.cssText = "text-align:center;font-size:56px;background:transparent;border:0;padding:0;color:inherit;display:block;margin:0 auto";
-      box.textContent = "\uD83D\uDEEB";
-      c.stage.appendChild(box);
+  /* #2 게이트 — ★v0.17.19 [지시1] **팝업 폐지**. 직원을 탭해도 클로즈업이 뜨지 않고
+     맵의 다른 무팝업 자리처럼 **아래 코멘트(토스트)** 만 뜬다(화장실 바닥·사다리와 같은 관례).
+     탑승권 제출 인터랙션 자체는 그대로 — 가방에서 탑승권을 고른 채 직원을 탭하면 낸다.
+     맵 핫스팟의 data-t 는 예전 클로즈업 안 버튼과 같은 "gateReader" 로 두었다(검증 절차 유지). */
+  function gateGive() {
+    var sel = S.sel;
+    if (sel !== "ticket") {
+      if (sel) G.sfxBad();
+      G.toast("직원이 탑승권을 기다리고 있다.", 1700);
+      return;
     }
-    c.cap("게이트 앞. 직원이 탑승권을 기다리고 있다.");
-    function give() {
-      var sel = S.sel;
-      if (sel !== "ticket") {
-        if (sel) G.sfxBad();
-        G.toast("직원이 탑승권을 기다리고 있다.", 1700);
-        return;
-      }
-      S.sel = null; renderInv();
-      closeCU();
-      transit("기내로 이동 중…", 1400, function () {
-        /* ★v0.17.15 [지시1] 기내로 들어가기 직전 인트로 스토리텔링 — 브리지 걷기부터
-           기내방송·여파 코멘트까지. 끝나면 예전처럼 좌석 맵으로. */
-        introSeq(function () {
-          S.map = "seat"; G.setFlag("boarded"); G.save(); render();
-        });
+    S.sel = null; renderInv();
+    transit("기내로 이동 중…", 1400, function () {
+      /* ★v0.17.15 [지시1] 기내로 들어가기 직전 인트로 스토리텔링 — 브리지 걷기부터
+         기내방송·여파 코멘트까지. 끝나면 예전처럼 좌석 맵으로. */
+      introSeq(function () {
+        S.map = "seat"; G.setFlag("boarded"); G.save(); render();
       });
-    }
-    box.onclick = give;
-    if (scan) scan.onclick = give;
+    });
+  }
+
+  /* ★v0.17.19 [지시2] 게이트 첫 입장 독백 2컷 — 게임을 처음 시작했을 때 한 번만,
+     탭으로 한 줄씩 넘긴다(기존 story() 오버레이 = 기내식 컷과 같은 방식).
+     세이브 플래그 gateSeen 으로 한 번만 나오고, 재로드 즉시복귀(resumeGame)에서는 안 나온다.
+     끝나면 탑승권을 내고 이어지는 브리지 독백("드디어 출발!…")과 자연스럽게 이어진다.
+     검증 훅: window.__gateIntroAt() · window.__gateIntroSkip() */
+  var GATE_CUTS = [
+    "시간 딱 맞춰 공항에 도착했다. 사람이 꽤 많네.",
+    "저기가 내 탑승 게이트다. 탑승권 내고 들어가자."
+  ];
+  var gateCutAt = -1;
+  function gateIntro() {
+    if (G.flag("gateSeen")) return;
+    gateCutAt = 0;
+    (function step() {
+      if (gateCutAt >= GATE_CUTS.length) { gateCutAt = -1; G.setFlag("gateSeen"); G.save(); return; }
+      story([GATE_CUTS[gateCutAt++]], step);
+    })();
+  }
+  window.__gateIntroAt = function () {
+    var t = document.querySelector("#story .txt");
+    return { at: gateCutAt, total: GATE_CUTS.length, seen: !!G.flag("gateSeen"),
+             shown: $("story").classList.contains("show"), txt: t ? t.textContent : "" };
+  };
+  /* 검증 스크립트용 — 게이트 독백을 건너뛰고 곧장 맵으로(플레이에서는 쓰이지 않는다) */
+  window.__gateIntroSkip = function () {
+    gateCutAt = -1;
+    var s = $("story"); s.classList.remove("show", "big"); clear(s);
+    if (G.syncOverlay) G.syncOverlay();
+    G.setFlag("gateSeen"); G.save();
   };
 
   /* ★v0.14 쌍안경(#23) 배경음 — 뷰를 열면 바로 재생, 끝나면 지체 없이 처음부터(루프),
@@ -17745,7 +17811,46 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   ZOOM.blanket = function () {
     openZoom({ id: "blanket", title: "담요", img: DATA.IMG + "blanket_zoom.jpg", cap: "무늬 사이에 글자가 반복된다." });
   };
-  ZOOM.case = function () {
+  /* ═══════════ ★v0.17.19 #5 헤드셋 케이스 — 로고 4칸 글자 끼우기 ═══════════
+     ① 전체컷(로고가 빠진 케이스) — 캡션 "내 헤드셋인데, 로고가 빠져있다..."
+     ② 4칸 자리를 탭하면 **확대 뷰**(같은 케이스의 로고 영역만 크게). 뒤로가기로 ①로 복귀.
+     ③ 확대 뷰에서 글자칩 12개(정답 B·O·S·E 포함)를 칸 4개에 끼운다.
+        · 칩을 탭하면 **왼쪽부터 빈 칸**에 들어간다(임의 결정 — 끌기 없이 한 손가락으로 되게).
+        · 끼운 칸을 탭하면 빠져 칩으로 돌아온다.
+        · 오답은 **아무 일도 일어나지 않는다**(기존 imgLock 관례 — 소리·문구·리셋 전부 없음).
+     ④ BOSE 가 맞으면 완성된 로고를 잠깐 보여 준 뒤 기존 해결 흐름 그대로
+        (markSolved("p5") → 열린 케이스 → 헤드폰).
+     글자는 26자 전부 **음각 스프라이트 시트**(case_letters.png)로 그린다 — 칩에 찍힌 글자와
+     칸에 끼워진 글자가 같은 그림이라 "이 글자가 저기 들어간다" 가 한눈에 보인다. */
+  var CASE_ALPH = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+  var caseSlots = [null, null, null, null];   /* 칸에 끼워진 글자 */
+  var caseChips = null;                       /* 칩 12개(고정 순서) */
+  var caseUsed = null;                        /* 칩이 이미 칸에 들어가 있는지 */
+  var caseDone = false;                       /* 이번 판에서 정답을 맞췄는지(연출 중 입력 잠금) */
+  function caseReset() { caseSlots = [null, null, null, null]; caseChips = null; caseUsed = null; caseDone = false; }
+  /* 시드 고정 셔플 — 언제 열어도 칩 배치가 같다(아이콘형 자물쇠와 같은 관례) */
+  function caseMakeChips() {
+    var ans = String(DATA.ANS.p5).split("");
+    var rnd = G.lcg(G.hashSeed("p5#chips"));
+    var rest = CASE_ALPH.filter(function (c) { return ans.indexOf(c) < 0; });
+    for (var k = rest.length - 1; k > 0; k--) { var j = (rnd() * (k + 1)) | 0; var t = rest[k]; rest[k] = rest[j]; rest[j] = t; }
+    var list = ans.concat(rest.slice(0, DATA.CASE.chipN - ans.length));
+    for (k = list.length - 1; k > 0; k--) { j = (rnd() * (k + 1)) | 0; t = list[k]; list[k] = list[j]; list[j] = t; }
+    return list;
+  }
+  /* 스프라이트 시트에서 글자 한 칸을 잘라 붙인다(칸 하나 = 슬롯 하나와 같은 상자) */
+  function caseGlyph(node, ch) {
+    var C = DATA.CASE, L = C.letters;
+    if (!ch) { node.style.backgroundImage = ""; node.classList.remove("on"); return; }
+    var i = CASE_ALPH.indexOf(ch);
+    if (i < 0) { node.style.backgroundImage = ""; node.classList.remove("on"); return; }
+    var col = i % L.cols, row = (i / L.cols) | 0;
+    node.style.backgroundImage = "url('" + L.img + "')";
+    node.style.backgroundSize = (L.cols * 100) + "% " + (L.rows * 100) + "%";
+    node.style.backgroundPosition = (col * 100 / (L.cols - 1)) + "% " + (row * 100 / (L.rows - 1)) + "%";
+    node.classList.add("on");
+  }
+  ZOOM.case = function (view) {
     if (G.solved("p5")) {
       var got = G.has("headphones") || G.flag("tookPhones");
       /* ★v0.10 버튼 대신 사진 속 헤드폰을 직접 탭 */
@@ -17761,15 +17866,118 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         cap: got ? "비어 있다." : "안에 헤드폰이 들어 있다." });
       return;
     }
-    var L = DATA.LOCKS.p5;
-    var node = W.imgLock({
-      id: "p5", img: L.img, nw: L.nw, nh: L.nh, crop: L.crop, cells: L.cells, faces: L.faces, faceLight: L.faceLight, faceDy: L.faceDy,
-      /* ★v0.17.10 [지시I] 로고 자리 4칸은 **각인된 워드마크** 모양으로 찍는다(북쑥: 서체가 너무 달라 연상이 어렵다) */
-      brandFace: true,
-      pool: "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(""), size: 12, answer: DATA.ANS.p5,
-      onSolve: function () { G.markSolved("p5"); closeZoom(); setTimeout(function () { ZOOM.case(); }, 120); }
+    /* 풀린 뒤 다시 잠긴 판(새 게임·디버그 되돌리기)은 입력 상태를 비우고 시작한다 */
+    if (caseDone) caseReset();
+    if (!caseChips) { caseChips = caseMakeChips(); caseUsed = caseChips.map(function () { return false; }); }
+    if (view === "logo") caseZoomView(); else caseFullView();
+  };
+  /* ① 전체컷 */
+  function caseFullView() {
+    var C = DATA.CASE, gl = [];
+    var ov = C.popupCells.map(function (c, i) {
+      return { x: c.x, y: c.y, w: c.w, h: c.h, t: "caseGlyph" + i, cls: "caseGlyph",
+        build: function (n) { var v = el("div", "bcLetter"); n.appendChild(v); gl[i] = v; } };
     });
-    openZoom({ id: "case", title: "헤드셋 케이스", node: node, cap: "로고 자리의 네모 4칸." });
+    ov.push({ x: C.popupHit.x, y: C.popupHit.y, w: C.popupHit.w, h: C.popupHit.h,
+      t: "caseLogo", cls: "hot caseHit", onTap: function () { ZOOM.case("logo"); } });
+    var node = W.cropView(C.popup.img, null, ov, { nw: C.popup.nw, nh: C.popup.nh });
+    for (var i = 0; i < 4; i++) caseGlyph(gl[i], caseSlots[i]);
+    W.unregister();
+    caseRegisterDebug();
+    openZoom({ id: "case", title: "헤드셋 케이스", node: node, cap: "내 헤드셋인데, 로고가 빠져있다..." });
+  }
+  /* ② 확대 뷰 + ③ 글자칩 */
+  function caseZoomView() {
+    var C = DATA.CASE, sl = [], chipNodes = [];
+    var ov = C.zoomCells.map(function (c, i) {
+      return { x: c.x, y: c.y, w: c.w, h: c.h, t: "caseSlot" + i, cls: "caseSlot",
+        build: function (n) { var v = el("div", "bcLetter"); n.appendChild(v); sl[i] = v; },
+        onTap: function () { pull(i); } };
+    });
+    ov.push({ x: C.zoomBack.x, y: C.zoomBack.y, w: C.zoomBack.w, h: C.zoomBack.h,
+      t: "caseBack", cls: "ifeBack",
+      build: function (n) { var cv = el("div", "cv"); cv._noFit = true; cv.innerHTML = BACK_SVG; n.appendChild(cv); },
+      onTap: function () { ZOOM.case("full"); } });
+    var node = W.cropView(C.zoom.img, null, ov, { nw: C.zoom.nw, nh: C.zoom.nh });
+
+    var tray = el("div", "bcTray");
+    caseChips.forEach(function (ch, i) {
+      var b = el("button", "bcChip");
+      b.setAttribute("data-t", "caseChip" + i);
+      b.setAttribute("data-ch", ch);
+      var v = el("div", "bcLetter"); caseGlyph(v, ch); b.appendChild(v);
+      b.onclick = function () { push(i); };
+      chipNodes[i] = b; tray.appendChild(b);
+    });
+
+    function paint() {
+      for (var i = 0; i < 4; i++) {
+        caseGlyph(sl[i], caseSlots[i]);
+        var cell = sl[i].parentNode;
+        if (cell) cell.setAttribute("data-v", caseSlots[i] || "-");
+      }
+      chipNodes.forEach(function (b, i) { b.classList.toggle("used", !!caseUsed[i]); b.disabled = !!caseUsed[i]; });
+    }
+    function push(i) {
+      if (caseDone || caseUsed[i]) return;
+      var k = caseSlots.indexOf(null);
+      if (k < 0) return;                       /* 칸이 다 찼다 — 무반응 */
+      caseSlots[k] = caseChips[i]; caseUsed[i] = true;
+      G.sfxTap(); paint(); check();
+    }
+    function pull(i) {
+      if (caseDone || caseSlots[i] === null) return;
+      var ch = caseSlots[i];
+      caseSlots[i] = null;
+      for (var k = 0; k < caseChips.length; k++) if (caseUsed[k] && caseChips[k] === ch) { caseUsed[k] = false; break; }
+      G.sfxTap(); paint();
+    }
+    function check() {
+      for (var i = 0; i < 4; i++) if (caseSlots[i] === null) return;
+      /* ★오답 = 완전 무반응(기존 imgLock 과 같은 관례) */
+      if (caseSlots.join("") !== String(DATA.ANS.p5)) return;
+      win();
+    }
+    function win() {
+      if (caseDone) return;
+      caseDone = true;
+      G.sfxOk(); G.buzz([30, 40, 60]);
+      sl.forEach(function (v) { if (v.parentNode) v.parentNode.classList.add("done"); });
+      W.unregister();
+      /* 완성된 로고를 잠깐 보여 준 뒤 기존 해결 흐름 그대로 */
+      setTimeout(function () {
+        G.markSolved("p5"); G.save();
+        closeZoom(); setTimeout(function () { ZOOM.case(); }, 120);
+      }, 900);
+    }
+    W.unregister();
+    caseRegisterDebug(function () {
+      var ans = String(DATA.ANS.p5).split("");
+      caseSlots = ans.slice();
+      caseUsed = caseChips.map(function (c) { return ans.indexOf(c) >= 0; });
+      paint(); check();
+    });
+    paint();
+    openZoom({ id: "case", title: "헤드셋 케이스", node: node, panel: tray, cap: "로고 자리의 네모 4칸." });
+  }
+  /* 디버그 바(자물쇠 정답·통과)용 등록 — 기존 W.register 와 같은 모양으로 __lock 에 심는다 */
+  function caseRegisterDebug(force) {
+    window.__lock = {
+      answer: String(DATA.ANS.p5),
+      cands: null,
+      force: force || function () {
+        var ans = String(DATA.ANS.p5).split("");
+        caseSlots = ans.slice();
+        caseUsed = caseChips.map(function (c) { return ans.indexOf(c) >= 0; });
+        caseDone = true; G.markSolved("p5"); G.save();
+        closeZoom(); setTimeout(function () { ZOOM.case(); }, 120);
+      }
+    };
+  }
+  /* 검증용 — 지금 화면/상태를 한 번에 읽는다 */
+  window.__caseState = function () {
+    return { slots: caseSlots.slice(), chips: caseChips ? caseChips.slice() : null,
+             used: caseUsed ? caseUsed.slice() : null, done: caseDone, solved: !!G.solved("p5") };
   };
 
   /* ★v0.7 — 헤드셋 더블탭 = 착용 뒷모습 화면에서 5곡 연속 재생. 언제나 첫 곡부터. */
@@ -18837,12 +19045,14 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       G.wipe();
       S.started = true; S.map = "gate"; S.inv = []; S.flags = {}; S.solved = {}; S.misc = {}; S.sel = null;
       ["passport", "phone", "ticket"].forEach(function (i) { G.give(i); });
+      caseReset();                                  /* ★v0.17.19 #5 글자칸 입력 상태도 새 판으로 */
       G.save();
     }
     $("intro").style.display = "none";
     G.audio();
     G.BGM.start();                                  /* ★v0.17 메인 BGM — 첫 제스처(시작하기 탭) 안에서 시작 */
     render();
+    gateIntro();                                    /* ★v0.17.19 [지시2] 게이트 첫 입장 독백 2컷 */
   }
 
   /* ★v0.17.3 새로고침·재접속 — 저장이 있으면 인트로를 건너뛰고 **곧장 저장된 장면**으로 돌아온다.
@@ -18858,8 +19068,11 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   }
 
   /* ★v0.17.18 [지시2] 시작 화면 "소리 테스트" — 짧은 소리를 한 번 내서 볼륨을 확인시킨다.
-     · 소재는 **mictap.mp3**("톡, 톡" 마이크 두드리는 소리). 고른 이유 둘 —
-       ①의미가 그대로 "소리 확인"이다 ②게임에서 가장 작은 효과음이라, 이게 들리면 나머지는 다 들린다.
+     ★v0.17.19 [지시] 소재 교체 — mictap.mp3(0.49초)는 "너무 짧다"(북쑥). 이제 **sndtest.mp3**
+       = 밝은 비브라폰 징글 **3.785초**(OpenGameArt "Win Jingle" / Fupi / CC0. LICENSES.md §14).
+       레벨은 다른 효과음과 같은 대역(트루피크 −2.1dBFS · mean −17.1dB), 46KB.
+       버튼의 "소리 나는 중…" 표시도 재생 길이에 맞춰 0.9초 → **3.9초**.
+       기내방송 시작음(mictap.mp3)은 그대로 둔다.
      · iOS 오디오 언락을 **겸한다**. 이 탭은 사용자 제스처 안이라 여기서 AudioContext 가 살아나고
        (core.js 의 firstGesture 가 capture 단계에서 이미 unlockAudio/sfxUnlock 을 돌린다)
        파일 엘리먼트도 play() 권한을 얻는다. BGM 은 여기서 시작하지 않는다(시작하기 탭에서만).
@@ -18869,7 +19082,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     var b = $("btnSndTest");
     G.audio();                                   /* AudioContext 생성·resume (제스처 안) */
     if (G.unlockAudio) G.unlockAudio();           /* 엘리먼트 음원 언락(무음 play → pause) */
-    if (!G.sfxFile("mictap.mp3", 1)) {            /* ★v0.17.18 [지시4] 재생 게인 0.7 → 1.0 */
+    if (!G.sfxFile("sndtest.mp3", 1)) {            /* ★v0.17.19 소재 교체(3.785초 징글) */
       G.beep(880, .12, "sine", .22);
       setTimeout(function () { G.beep(660, .16, "sine", .22); }, 180);
     }
@@ -18879,14 +19092,17 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     sndTestT = setTimeout(function () {
       b.classList.remove("playing");
       b.textContent = "소리 테스트 ▶";
-    }, 900);
+    }, SND_TEST_MS);
   }
+  /* 파일 길이 3.785초 + 여유 — ffprobe 실측값에 맞춘다 */
+  var SND_TEST_MS = 3900;
   /* 검증용 — 버튼이 실제로 소리를 재생했는지(파일/폴백) 확인한다 */
   window.__sndTest = function () {
     var b = $("btnSndTest");
     return { label: b ? b.textContent : null, playing: !!(b && b.classList.contains("playing")),
              hint: ($("sndHint") || {}).textContent || "",
-             plays: (window.__sfxLog || []).filter(function (x) { return x.file === "mictap.mp3"; }).length };
+             ms: SND_TEST_MS,
+             plays: (window.__sfxLog || []).filter(function (x) { return x.file === "sndtest.mp3"; }).length };
   };
 
   function bind() {

@@ -1,5 +1,5 @@
 /* 발리 가는 길에서 생긴 일 — 오프라인 서비스워커 (자동 생성) */
-const CACHE = "odyssey-ODY-S1-20260914-0756";
+const CACHE = "odyssey-ODY-S1-20260914-1025";
 const PRECACHE = [
  "./",
  "./index.html",
@@ -29,8 +29,11 @@ const PRECACHE = [
  "./img/book_empty.jpg",
  "./img/book_tile.jpg",
  "./img/bridge_walk.jpg",
+ "./img/case_letters.png",
  "./img/case_open_empty.jpg",
  "./img/case_open_headset.jpg",
+ "./img/case_popup.jpg",
+ "./img/case_zoom.jpg",
  "./img/ceiling_open_cardkey.jpg",
  "./img/ceiling_open_empty.jpg",
  "./img/cello_align.png",
@@ -64,7 +67,6 @@ const PRECACHE = [
  "./img/gmap_plane.png",
  "./img/gmap_typhoon.png",
  "./img/headphones.jpg",
- "./img/headset_case.jpg",
  "./img/headset_worn.jpg",
  "./img/hint_phonecase.jpg",
  "./img/ic_blanket.png",
@@ -158,6 +160,7 @@ const PRECACHE = [
  "./audio/footstep.mp3",
  "./audio/main_bgm.mp3",
  "./audio/mictap.mp3",
+ "./audio/sndtest.mp3",
  "./audio/song1.mp3",
  "./audio/song2.mp3",
  "./audio/song3.mp3",
