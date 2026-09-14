@@ -1123,6 +1123,53 @@ body.zoomOpen #closeup .sheetClose{visibility:hidden}
 .cvcell.cabBtn{background:transparent;border-radius:8px}
 body.dbg .cvcell.cabBtn:active{box-shadow:inset 0 0 0 3px rgba(255,255,255,.8)}
 
+/* ═══════════════ ★v0.17.20 신규 UI ═══════════════ */
+
+/* [지시3] 우측 상단 버튼 — 방 이름이 길어도 두 버튼을 밀어내지 않게 이름을 줄인다 */
+#roomName{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#topRight{flex:0 0 auto}
+.tbtn.tbtnIcon{padding:6px 9px;font-size:14px;line-height:1}
+.tbtn.tbtnIcon.muted{border-color:rgba(208,96,92,.55);color:#d8b0ac}
+
+/* [지시3] 게임 UI 확인 알람 — 앱 위 전면 딤 + 가운데 카드(iOS 알럿 톤, 어두운 테마) */
+.gAlertWrap{position:absolute;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;
+  padding:0 24px;background:rgba(0,0,0,.46);-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px)}
+.gAlert{width:100%;max-width:300px;border-radius:16px;overflow:hidden;text-align:center;
+  background:rgba(30,30,34,.97);border:1px solid rgba(255,255,255,.12);
+  box-shadow:0 16px 48px rgba(0,0,0,.6)}
+.gAlertMsg{padding:20px 18px 16px;font-size:14px;line-height:1.5;color:#e8e9ee}
+.gAlertBtns{display:flex;border-top:1px solid rgba(255,255,255,.12)}
+.gAlertBtn{-webkit-appearance:none;appearance:none;flex:1 1 0;min-width:0;background:transparent;border:0;
+  padding:12px 4px;font:15px/1.2 inherit;color:#8fb7ff;letter-spacing:-.1px}
+.gAlertBtn.primary{font-weight:700}
+.gAlertBtn + .gAlertBtn{border-left:1px solid rgba(255,255,255,.12)}
+.gAlertBtn:active{background:rgba(255,255,255,.06)}
+
+/* [지시4] GPS 꺼짐 안내 — 2줄 코멘트가 카드 안에서 자연스럽게 접히게 */
+.gpsBox{max-width:calc(100% - 28px)}
+.gpsMsg{display:flex;flex-direction:column;gap:3px;text-align:center}
+.gpsMsg .gpsMsgL{font-size:12px;font-weight:600;line-height:1.45;color:#e8e9ee;letter-spacing:.1px}
+
+/* [지시] 온스크린 QWERTY 키보드 — 폰 화면 안 하단. 폰 폭에 10키가 한 줄에 들어간다 */
+#phoneScreen > .osk,
+#phoneScreen.wall > .osk{
+  position:absolute;left:0;right:0;bottom:0;z-index:40;
+  display:flex;flex-direction:column;gap:4px;
+  padding:5px 3px calc(5px + var(--safeB));
+  background:rgba(20,20,24,.985);border-top:1px solid rgba(255,255,255,.14);
+  box-shadow:0 -6px 18px rgba(0,0,0,.5)}
+.oskRow{display:flex;gap:3px;justify-content:center}
+.oskKey{-webkit-appearance:none;appearance:none;flex:1 1 0;min-width:0;
+  padding:8px 0;border:1px solid rgba(255,255,255,.16);border-radius:6px;
+  background:#2c2c31;color:#f0f0f3;font:15px/1 inherit;letter-spacing:0}
+.oskKey:active{background:#4a4a52}
+.oskKey.oskWide{flex:1.6 1 0}
+.oskKey.oskFn{flex:2 1 0;font-size:13px;color:#cfd2da}
+.oskKey.oskEnter{background:#3a5aa0;border-color:#4a6ec0;color:#fff;font-weight:700}
+.oskKey.oskEnter:active{background:#4a6ec0}
+/* 입력칸 포커스 표시(커서 유지 + 테두리 강조) */
+input.osk-focus{outline:none;box-shadow:0 0 0 2px rgba(120,150,255,.6) !important}
+
 </style>
 </head>
 <body>
@@ -1132,8 +1179,10 @@ body.dbg .cvcell.cabBtn:active{box-shadow:inset 0 0 0 3px rgba(255,255,255,.8)}
   <!-- 상단 바 -->
   <div id="topbar">
     <div id="roomName">발리 가는 길에서 생긴 일</div>
+    <!-- ★v0.17.20 [지시3] 우측 상단 = "처음부터" + "음소거" 두 버튼(예전 ☰ 대체) -->
     <div id="topRight">
-      <button class="tbtn" id="btnMenu" data-t="menu">☰</button>
+      <button class="tbtn" id="btnReset" data-t="reset">처음부터</button>
+      <button class="tbtn tbtnIcon" id="btnMute" data-t="mute" aria-label="음소거">🔊</button>
     </div>
   </div>
 
@@ -11326,7 +11375,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 (function () {
   "use strict";
 
-  var BUILD = "ODY-S1-20260914-1025";
+  var BUILD = "ODY-S1-20260914-1216";
   var LSKEY = "odyssey.s1.v1";
 
   var qs = new URLSearchParams(location.search);
@@ -11466,6 +11515,22 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 
   /* ───────── 소리(Web Audio, 음원 없이 신호음) ───────── */
   var actx = null;
+  /* ★v0.17.20 [지시3] 전체 음소거 — 우측 상단 "음소거" 버튼이 켜고 끈다.
+     한 곳(muted)만 보고 모든 소리 진입점(beep·sfxFile·BGM)이 조용해진다.
+     · 상태는 세이브 플래그(soundMuted)로 남겨 새로고침(=GPS 퍼즐)에도 그대로 유지된다.
+     · 엘리먼트 음원(노래 #5 = shared · sfx · BGM)은 .muted 도 함께 걸어 즉시 끊는다.
+       (main.js 쌍안경 binocAu 는 그쪽에서 함께 끈다 — 여기 손이 안 닿는 별도 엘리먼트라.) */
+  var muted = false;
+  function isMuted() { return muted; }
+  function setMuted(on) {
+    muted = !!on;
+    /* 엘리먼트 음원을 즉시 하드뮤트/해제 (페이드 중에도 소리가 새지 않게) */
+    try { if (shared) shared.muted = muted; } catch (e) {}
+    try { Object.keys(bgmRec).forEach(function (k) { try { bgmRec[k].au.muted = muted; } catch (e) {} }); } catch (e) {}
+    try { Object.keys(sfxRec).forEach(function (k) { try { sfxRec[k].au.muted = muted; } catch (e) {} }); } catch (e) {}
+    /* BGM: bgmWant() 이 muted 면 null 을 돌려주므로, 재적용하면 현재 트랙이 멈춘다(해제 시 되살아난다) */
+    try { bgmApply(true); } catch (e) {}
+  }
   /* ★v0.17.9 [지시E] "interrupted" 는 사파리 전용 상태다 —
      전화·알람·다른 앱의 소리처럼 **시스템이 오디오를 빼앗아 갔을 때** 들어가고,
      "suspended"(백그라운드 진입·자동재생 차단)와 달리 이름이 달라서 여기서 안 걸러 주면
@@ -11867,6 +11932,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     return !!(a && b && name !== "main" && a.file === b.file);
   }
   function bgmWant() {
+    if (muted) return null;                            /* ★v0.17.20 음소거 중엔 무음 */
     if (bgmOver) {
       if (bgmWantMain && bgmSameFileAsMain(bgmOver)) return "main";   /* 같은 곡 → 이어재생 */
       return bgmOver;
@@ -12019,6 +12085,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   }
   window.__sfxLog = [];
   function sfxFile(file, vol) {
+    if (muted) return false;                            /* ★v0.17.20 음소거 */
     var r = sfxRecOf(file);
     if (!r) return false;
     audio();
@@ -12142,6 +12209,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     lastTouchEnd = now; lastTX = x; lastTY = y;
   }, { passive: false });
   function beep(freq, dur, type, vol) {
+    if (muted) return;                                  /* ★v0.17.20 음소거 */
     var a = audio(); if (!a) return;
     try {
       var o = a.createOscillator(), g = a.createGain();
@@ -12370,7 +12438,8 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     beep: beep, sfxOk: sfxOk, sfxBad: sfxBad, sfxTap: sfxTap, buzz: buzz, audio: audio, syncInvH: syncInvH,
     sha256: sha256, drag: drag, tapper: tapper,
     sharedAudio: sharedAudio, unlockAudio: unlockAudio, audioUnlocked: audioUnlocked,
-    BGM: BGM, sfxFile: sfxFile, sfxWarm: sfxWarm, haveAudio: haveAudio
+    BGM: BGM, sfxFile: sfxFile, sfxWarm: sfxWarm, haveAudio: haveAudio,
+    setMuted: setMuted, isMuted: isMuted                /* ★v0.17.20 [지시3] 전체 음소거 */
   };
 })();
 
@@ -14159,11 +14228,10 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     inkClip.appendChild(ink);
     layer.appendChild(inkClip);
     stack.appendChild(layer);
-    /* ★v0.17.9 [지시H] ↕ 는 **기본 숨김** — 드래그 없이 탭만 3번이면 그때 한 번 나타난다
-       (활쏘기 "스크롤 해서…"·여권 안내와 같은 1회 온보딩. 표시 방식은 그대로, 등장 조건만 바뀜) */
-    var hint = el("div", "dragHint", "↕");
-    stack.appendChild(hint);
-    var hTaps = 0, hShown = false, hDragged = false;
+    /* ★v0.17.20 [지시6] ↕ 화살표(dragHint) 온보딩 폐지 → **하단 코멘트(토스트)** 로 안내.
+       드래그 없이 탭만 3번이면 그때 한 번 토스트가 뜬다(예전 ↕ 등장 조건 그대로, 표현만 코멘트로). */
+    var SCROLL_MSG = opt.scrollMsg || "스크롤할 수 있을 것 같다";
+    var hTaps = 0, hToasted = false, hDragged = false;
     wrap.appendChild(stack);
 
     /* 사진 실측(이미지 세로 %) */
@@ -14193,7 +14261,6 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       /* 인쇄된 것들은 하우징 선 위로는 안 보인다(가리개가 아직 안 나온 부분) */
       var icp = "inset(" + TOP.toFixed(2) + "% 0 0 0)";
       inkClip.style.clipPath = icp; inkClip.style.webkitClipPath = icp;
-      hint.style.display = (hShown && d <= g.D * 0.985) ? "block" : "none";
       centerDigits();
       /* ★v0.17.10 [지시F] 가리개·로고·코드 자리가 다 잡혔다 — 이제 레이어를 보여 준다 */
       if (preFit) { preFit = false; layer.classList.remove("preFit"); }
@@ -14203,27 +14270,27 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       start: function (q) { startY = q.y; startD = d; hMoved = false; },
       move: function (q) {
         /* 손가락이 6px 넘게 움직이면 드래그 — 조작을 아는 것이므로 안내를 아예 끈다 */
-        if (!hMoved && Math.abs(q.y - startY) > 6) { hMoved = true; hDragged = true; hTaps = 0; hShown = false; }
+        if (!hMoved && Math.abs(q.y - startY) > 6) { hMoved = true; hDragged = true; hTaps = 0; }
         d = startD + (q.y - startY); apply();
       },
       end: function () {
         /* ★v0.17.11 [지시1] 사진을 **탭**한 경우 먼저 호출자에게 넘긴다(창문×쌍안경 useAt).
-           호출자가 true 를 돌려주면 그 탭은 거기서 끝 — 아래 ↕ 온보딩 집계도, 스냅도 건너뛴다
+           호출자가 true 를 돌려주면 그 탭은 거기서 끝 — 아래 온보딩 집계도, 스냅도 건너뛴다
            (뷰가 바뀌어 이 노드가 화면에서 빠지므로 스냅을 돌리면 안 된다). */
         if (!hMoved && opt.onTap && opt.onTap()) return;
-        if (!hMoved && !hDragged && !hShown) {          /* 드래그가 아니라 탭 */
+        if (!hMoved && !hDragged && !hToasted) {        /* 드래그가 아니라 탭 */
           hTaps++;
-          if (hTaps >= 3) { hShown = true; apply(); }
+          if (hTaps >= 3) { hToasted = true; G.toast(SCROLL_MSG, 2600); }   /* ★v0.17.20 ↕ 대신 하단 코멘트 */
         }
         var g = geom();
         if (d > g.D * 0.9) { d = g.D; apply(); if (opt.onClosed) opt.onClosed(); }
         else if (d < g.D * 0.08) { d = 0; apply(); }
       }
     });
-    /* 검증 훅 */
+    /* 검증 훅 — ★v0.17.20 ↕ 폐지, 토스트 안내로 바뀜(toasted·hintText). shown/visible 은 항상 false(옛 검증 폴백). */
     wrap._hint = function () {
-      return { taps: hTaps, shown: hShown, dragged: hDragged,
-               visible: getComputedStyle(hint).display !== "none" };
+      return { taps: hTaps, toasted: hToasted, dragged: hDragged, hintText: SCROLL_MSG,
+               shown: false, visible: false };
     };
     if (opt.closed) d = 1e9;
     apply();
@@ -14300,11 +14367,10 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     stack.appendChild(artCv);
     var preFit = true;
     wrap.appendChild(stack);
-    /* ★v0.17.9 [지시H] 가리개와 같은 규칙 — ↕ 기본 숨김, 드래그 없이 탭 3번이면 한 번 등장.
+    /* ★v0.17.20 [지시6] 가리개와 같은 규칙 — ↕ 폐지, 탭 3회에 **하단 코멘트(토스트)** 로 안내.
        카운트는 이 위젯 것만 센다(가리개와 독립). */
-    var hint = el("div", "dragHint", "↕");
-    wrap.appendChild(hint);
-    var hTaps = 0, hShown = false, hDragged = false;
+    var SCROLL_MSG = opt.scrollMsg || "스크롤할 수 있을 것 같다";
+    var hTaps = 0, hToasted = false, hDragged = false;
 
     var artImg = new Image();
     artImg.onload = function () { apply(); };
@@ -14355,7 +14421,6 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       tear.style.clipPath = tcp; tear.style.webkitClipPath = tcp;
       tear.style.display = cut >= PEND - 0.5 ? "none" : "block";
       drawArt(g, g.top0 + d);
-      hint.style.display = (hShown && d <= g.D * 0.985) ? "block" : "none";
       /* ★v0.17.10 [지시F] 자리가 다 잡혔다 — 이제 보여 준다.
          ★그림 캔버스만 따로 본다 — 무늬 이미지(artImg)가 아직이면 drawArt 가 그냥 돌아가서
            캔버스가 **기본 크기(300×150)** 인 채로 남는다(webkit 실측). 그때 풀면 그게 플래시가 된다. */
@@ -14387,21 +14452,21 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     G.drag(stack, {
       start: function (q) { startY = q.y; startD = d; hMoved = false; },
       move: function (q) {
-        if (!hMoved && Math.abs(q.y - startY) > 6) { hMoved = true; hDragged = true; hTaps = 0; hShown = false; }
+        if (!hMoved && Math.abs(q.y - startY) > 6) { hMoved = true; hDragged = true; hTaps = 0; }
         d = startD + (q.y - startY); apply();                          /* 1:1 */
       },
       end: function () {
-        if (!hMoved && !hDragged && !hShown) {
+        if (!hMoved && !hDragged && !hToasted) {
           hTaps++;
-          if (hTaps >= 3) { hShown = true; apply(); }
+          if (hTaps >= 3) { hToasted = true; G.toast(SCROLL_MSG, 2600); }   /* ★v0.17.20 ↕ 대신 하단 코멘트 */
         }
         var g = geom();
         if (d > g.D * 0.98) { d = g.D; apply(); if (opt.onFull) opt.onFull(); }
       }
     });
-    wrap._hint = function () {
-      return { taps: hTaps, shown: hShown, dragged: hDragged,
-               visible: getComputedStyle(hint).display !== "none" };
+    wrap._hint = function () {   /* ★v0.17.20 ↕ 폐지 → 토스트 안내 */
+      return { taps: hTaps, toasted: hToasted, dragged: hDragged, hintText: SCROLL_MSG,
+               shown: false, visible: false };
     };
     requestAnimationFrame(apply);       /* ★v0.17.10 [지시F] 붙자마자 첫 프레임에 배치 */
     setTimeout(apply, 20); setTimeout(apply, 200); setTimeout(apply, 600);
@@ -15593,6 +15658,92 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     return t;
   }
 
+  /* ═══════════ ★v0.17.20 [지시] 온스크린 QWERTY 키보드 ═══════════
+     iOS 네이티브 키보드를 막고(입력칸 inputmode="none") 게임 자체 키보드로만 입력받는다.
+     · 폰 화면(#phoneScreen) 안 **하단**에 붙는다. 폰 폭(~286px)에 맞춰 10키가 한 줄에 들어간다(키 ~25px).
+     · 입력칸을 가리지 않는다 — 혹시 겹치면 입력칸이 든 패널(.pBody/.pSheet)을 위로 살짝 올린다(lift).
+     · 정답 판정 등 기존 입력 로직은 그대로 — 값(inp.value)만 우리 키보드가 채운다. page.fill 도 그대로 동작.
+     검증 훅: window.__osk (show/hide/state) · data-t: osk·oskKey·oskBack·oskEnter·oskClose */
+  var OSK_ROWS = ["qwertyuiop".split(""), "asdfghjkl".split(""), "zxcvbnm".split("")];
+  var oskInput = null, oskSubmit = null, oskLift = null;
+  function oskHide() {
+    var sc = $("phoneScreen"); var k = sc && sc.querySelector(".osk");
+    if (k) k.remove();
+    if (oskLift) { try { oskLift.style.transform = ""; } catch (e) {} oskLift = null; }
+    if (oskInput) { try { oskInput.classList.remove("osk-focus"); } catch (e) {} }
+    oskInput = null; oskSubmit = null;
+  }
+  function oskEmit() { try { oskInput.dispatchEvent(new Event("input", { bubbles: true })); } catch (e) {} }
+  function oskInsert(ch) { if (oskInput) { oskInput.value += ch; oskEmit(); } }
+  function oskBack() { if (oskInput) { oskInput.value = oskInput.value.slice(0, -1); oskEmit(); } }
+  function oskKey(label, cls, dataT, onHit) {
+    var b = el("button", "oskKey" + (cls ? " " + cls : ""), label);
+    b.setAttribute("data-t", dataT); if (dataT === "oskKey") b.setAttribute("data-k", label);
+    b.onclick = function (e) { e.preventDefault(); e.stopPropagation(); onHit(); };
+    return b;
+  }
+  function oskRow(keys) {
+    var row = el("div", "oskRow");
+    keys.forEach(function (ch) { row.appendChild(oskKey(ch, null, "oskKey", function () { G.sfxTap(); oskInsert(ch); })); });
+    return row;
+  }
+  function oskShow(inp, submitFn) {
+    oskHide();
+    oskInput = inp; oskSubmit = submitFn || null;
+    try { inp.classList.add("osk-focus"); } catch (e) {}
+    var sc = $("phoneScreen");
+    var kb = el("div", "osk"); kb.setAttribute("data-t", "osk");
+    /* 키를 눌러도 입력칸이 blur 되지 않게(커서 유지) — 키보드 위 pointerdown 기본동작만 차단 */
+    kb.addEventListener("pointerdown", function (e) { e.preventDefault(); }, { passive: false });
+    kb.addEventListener("mousedown", function (e) { e.preventDefault(); });
+    kb.appendChild(oskRow(OSK_ROWS[0]));
+    kb.appendChild(oskRow(OSK_ROWS[1]));
+    var r3 = oskRow(OSK_ROWS[2]);
+    r3.appendChild(oskKey("⌫", "oskWide", "oskBack", function () { G.sfxTap(); oskBack(); }));
+    kb.appendChild(r3);
+    var r4 = el("div", "oskRow");
+    r4.appendChild(oskKey("닫기", "oskFn", "oskClose", function () { oskHide(); }));
+    r4.appendChild(oskKey("확인", "oskFn oskEnter", "oskEnter", function () { G.sfxTap(); if (oskSubmit) oskSubmit(); }));
+    kb.appendChild(r4);
+    sc.appendChild(kb);
+    /* 입력칸을 가리면 그 패널을 위로 올린다(안전망 — 보통은 안 겹친다) */
+    requestAnimationFrame(function () {
+      try {
+        var kr = kb.getBoundingClientRect(), ir = inp.getBoundingClientRect();
+        var over = ir.bottom + 6 - kr.top;
+        if (over > 0) {
+          oskLift = inp.closest(".pBody") || inp.closest(".pSheet") || inp.closest(".pAlertWrap");
+          if (oskLift) oskLift.style.transform = "translateY(" + (-Math.ceil(over)) + "px)";
+        }
+      } catch (e) {}
+    });
+    return kb;
+  }
+  /* 입력칸에 붙인다 — 네이티브 키보드 억제 + 탭하면 우리 키보드 (page.fill 은 pointerdown 을 안 쏘므로 안 뜬다) */
+  function oskAttach(inp, submitFn) {
+    inp.setAttribute("inputmode", "none");
+    inp.setAttribute("autocomplete", "off");
+    inp.setAttribute("autocapitalize", "off");
+    inp.setAttribute("autocorrect", "off");
+    inp.setAttribute("spellcheck", "false");
+    inp.addEventListener("pointerdown", function () { oskShow(inp, submitFn); });
+    return inp;
+  }
+  window.__osk = {
+    show: oskShow, hide: oskHide,
+    state: function () {
+      var sc = $("phoneScreen"), kb = sc && sc.querySelector(".osk");
+      if (!kb) return { open: false };
+      var kr = kb.getBoundingClientRect();
+      var ir = oskInput ? oskInput.getBoundingClientRect() : null;
+      var overlap = ir ? !(ir.bottom <= kr.top || ir.top >= kr.bottom || ir.right <= kr.left || ir.left >= kr.right) : null;
+      return { open: true, val: oskInput ? oskInput.value : null,
+               kb: { l: kr.left, t: kr.top, r: kr.right, b: kr.bottom },
+               inp: ir ? { l: ir.left, t: ir.top, r: ir.right, b: ir.bottom } : null,
+               overlap: overlap };
+    }
+  };
+
   /* ═══════════ 잠금화면 (#4) ═══════════ */
   function viewLock() {
     var sc = screen(true);
@@ -15706,23 +15857,25 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     body.appendChild(el("div", "pSheetT", "미니게임 설치"));
     /* ★v0.15.5 설명 문구 제거 — 제목 + 비밀번호 칸 + 설치 버튼만 */
     var inp = el("input"); inp.type = "text"; inp.setAttribute("data-t", "mgPass");
-    inp.setAttribute("autocapitalize", "off"); inp.setAttribute("autocorrect", "off");
     inp.placeholder = "password";
     body.appendChild(inp);
     var msg = el("div", "lockMsg"); body.appendChild(msg);
     sh.appendChild(body);
     /* iOS 알럿 버튼줄 — 위 구분선 + 가운데 세로 구분선, 취소가 왼쪽 / 기본동작이 오른쪽(굵게) */
     var row = el("div", "pSheetBtns");
-    var cc = el("button", "pAlertBtn", "취소"); cc.onclick = function () { wrap.remove(); };
+    var cc = el("button", "pAlertBtn", "취소"); cc.onclick = function () { oskHide(); wrap.remove(); };
     var ok = el("button", "pAlertBtn primary", "설치"); ok.setAttribute("data-t", "mgInstall");
-    ok.onclick = function () {
-      if (inp.value.trim().toLowerCase() === DATA.ANS.p19) { wrap.remove(); runInstall(node); }
+    function submitPass() {
+      if (inp.value.trim().toLowerCase() === DATA.ANS.p19) { oskHide(); wrap.remove(); runInstall(node); }
       else { msg.textContent = "비밀번호가 달라"; msg.className = "lockMsg bad"; G.sfxBad(); }
-    };
+    }
+    ok.onclick = submitPass;
     row.appendChild(cc); row.appendChild(ok);
     sh.appendChild(row);
     wrap.appendChild(sh);
     sc.appendChild(wrap);
+    /* ★v0.17.20 [지시] 네이티브 키보드 억제 + 우리 온스크린 키보드(탭하면 등장, 확인=설치) */
+    oskAttach(inp, submitPass);
     setTimeout(function () { try { inp.focus(); } catch (e) {} }, 60);
   }
 
@@ -15752,20 +15905,36 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   }
 
   /* ═══════════ 카카오톡 (#16 힌트) ═══════════ */
+  /* ★v0.17.20 [지시] 카톡 메시지 시각 — 날짜는 9/17 고정, 시간은 **플레이어가 카톡을 처음 연 시점**의
+     기기 로컬 시각을 한 번 잡아(misc.kakaoOpenedAt, epoch ms) 그 뒤로 일관 표시한다
+     (여닫을 때마다 시간이 흔들리지 않게 — 오프라인 게임이라 디바이스 로컬 시간 기준).
+     세이브에 없는 예전 판이면 처음 열 때 지금 시각을 잡아 저장한다(세이브 호환). */
+  function kakaoTimeStr() {
+    var t = G.S.misc.kakaoOpenedAt;
+    if (!t) { t = Date.now(); G.S.misc.kakaoOpenedAt = t; G.save(); }
+    var dt = new Date(t);
+    var h = dt.getHours(), m = dt.getMinutes();
+    var ap = h < 12 ? "오전" : "오후";
+    var h12 = h % 12; if (h12 === 0) h12 = 12;
+    return ap + " " + h12 + ":" + (m < 10 ? "0" + m : "" + m);
+  }
   function viewKakao() {
     var sc = screen();
     sc.appendChild(statusbar());
     var body = el("div", "pBody");
     body.appendChild(header(DATA.KAKAO_FROM, function () { go("home"); }));
     var room = el("div", "pScroll kkRoom");
-    var d = el("div", null, "2026년 8월 27일");
+    var d = el("div", null, "2026년 9월 17일");   /* ★v0.17.20 날짜 9/17 고정 */
+    d.setAttribute("data-t", "kkDate");
     d.style.cssText = "text-align:center;font-size:10px;color:#8b8d95;margin:2px 0 10px";
     room.appendChild(d);
     var wrap = el("div");
     wrap.appendChild(el("div", "kkFrom", DATA.KAKAO_FROM));
     var b = el("div", "kkBubble", DATA.KAKAO_MSG);
     wrap.appendChild(b);
-    wrap.appendChild(el("div", "kkTime", "오전 9:12"));
+    var tm = el("div", "kkTime", kakaoTimeStr());   /* ★v0.17.20 카톡 첫 오픈 로컬 시각 */
+    tm.setAttribute("data-t", "kkTime");
+    wrap.appendChild(tm);
     room.appendChild(wrap);
     body.appendChild(room);
     sc.appendChild(body);
@@ -15823,12 +15992,13 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     manual.style.cssText = "width:100%;padding:0 8px";
     var inp = el("input"); inp.type = "text"; inp.placeholder = "코드 직접 입력";
     inp.setAttribute("data-t", "qrManual");
-    inp.setAttribute("autocapitalize", "off"); inp.setAttribute("autocorrect", "off");
     inp.style.fontSize = "12px";
     manual.appendChild(inp);
     var mb = el("button", "btn", "확인"); mb.setAttribute("data-t", "qrSubmit");
     mb.style.cssText = "width:100%;margin:6px 0 0;padding:8px";
     mb.onclick = function () { hit(inp.value.trim()); };
+    /* ★v0.17.20 [지시] 네이티브 키보드 억제 + 우리 온스크린 키보드(탭하면 등장, 확인=코드 제출) */
+    oskAttach(inp, function () { hit(inp.value.trim()); });
     manual.appendChild(mb);
     /* ★v0.17.19 [지시] 카메라로 못 찍는 상황(실물 QR 이 없을 때)을 위한 힌트 버튼.
        누르면 위 안내 줄(hint)에 정답을 가리키는 문구가 뜬다 — 직접 입력 칸 바로 아래라
@@ -16198,7 +16368,11 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       var gbox = el("div", "gpsBox");
       var gico = el("div", "gpsIco"); gico.innerHTML = GPS_LOST_SVG;
       gbox.appendChild(gico);
-      gbox.appendChild(el("div", "gpsMsg", "GPS 연결 끊김"));
+      /* ★v0.17.20 [지시4] GPS 꺼짐 안내 문구 교체(2줄). 새로고침 퍼즐 로직은 그대로 — 문구만. */
+      var gmsg = el("div", "gpsMsg"); gmsg.setAttribute("data-t", "gpsMsg");
+      gmsg.appendChild(el("div", "gpsMsgL", "태풍으로 인해 GPS가 꺼진 것 같아..."));
+      gmsg.appendChild(el("div", "gpsMsgL", "기내를 돌아다니며 복구하는 방법을 알아봐야겠는데?"));
+      gbox.appendChild(gmsg);
       dead.appendChild(gbox);
       body.appendChild(dead);
       sc.appendChild(body);
@@ -16603,12 +16777,12 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       return;
     }
     S.sel = null; renderInv();
-    transit("기내로 이동 중…", 1400, function () {
-      /* ★v0.17.15 [지시1] 기내로 들어가기 직전 인트로 스토리텔링 — 브리지 걷기부터
-         기내방송·여파 코멘트까지. 끝나면 예전처럼 좌석 맵으로. */
-      introSeq(function () {
-        S.map = "seat"; G.setFlag("boarded"); G.save(); render();
-      });
+    /* ★v0.17.20 [지시1] "기내로 이동 중…" 2초 대기(transit 로딩바 1400ms) 제거.
+       예전엔 탑승권을 내면 transit 로딩바가 ~1.5초 돈 뒤에야 인트로가 시작됐다(북쑥: 거슬린다).
+       이제 딜레이 없이 곧바로 인트로 스토리텔링(브리지 걷기 → 기내방송 → 여파 코멘트)으로 넘어간다.
+       인트로 내부 컷 타이밍·순서는 그대로 — 앞의 대기 구간만 없앴다. */
+    introSeq(function () {
+      S.map = "seat"; G.setFlag("boarded"); G.save(); render();
     });
   }
 
@@ -16655,6 +16829,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       binocAu.preload = "auto";
     }
     try { binocAu.currentTime = 0; } catch (e) {}
+    try { binocAu.muted = !!(G.isMuted && G.isMuted()); } catch (e) {}   /* ★v0.17.20 음소거 중이면 무음 재생 */
     var pr = null;
     try { pr = binocAu.play(); } catch (e) {}
     if (pr && pr.catch) pr.catch(function () {});
@@ -16713,6 +16888,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       base: DATA.IMG + "window_open.jpg",
       shadeImg: DATA.IMG + "window_shade_plain.jpg",   /* ★v0.13.3 로고 지운 가리개 */
       logoImg: DATA.IMG + "shade_logo.png",            /* 로고는 별도 레이어로 같이 내려온다 */
+      scrollMsg: "창문을 스크롤할 수 있을 것 같다",     /* ★v0.17.20 [지시6] 하단 코멘트(↕ 대체) */
       closed: G.flag("shadeDown"),
       /* ★v0.17.3 [지시6] 가리개를 내렸을 때 나오던 설명(토스트 1개 + 캡션 1개)을 전부 삭제한다 —
          무엇을 보라고 짚어 주면 추론하는 재미가 사라진다(북쑥 지시).
@@ -17282,6 +17458,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     c.stage.appendChild(W.tissue({
       idle: DATA.IMG + "lav_tissue_roll.jpg",   /* ★v0.13.2 자락 없는 롤 — 늘어진 종이는 위젯이 그린다 */
       img: DATA.IMG + "lav_tissue.jpg",
+      scrollMsg: "휴지를 스크롤 할 수 있을 것 같다",   /* ★v0.17.20 [지시6] 하단 코멘트(↕ 대체·원문 띄어쓰기 그대로) */
       /* ★v0.17.3 [지시14] 다 내렸을 때 뜨던 완료 토스트 삭제 — 플래그만 세운다 */
       onFull: function () { if (!G.flag("tissueOpen")) G.setFlag("tissueOpen"); }
     }));
@@ -17958,7 +18135,8 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       paint(); check();
     });
     paint();
-    openZoom({ id: "case", title: "헤드셋 케이스", node: node, panel: tray, cap: "로고 자리의 네모 4칸." });
+    /* ★v0.17.20 [지시B] 확대뷰 캡션을 팝업과 동일하게 통일 — "내 헤드셋인데, 로고가 빠져있다..." */
+    openZoom({ id: "case", title: "헤드셋 케이스", node: node, panel: tray, cap: "내 헤드셋인데, 로고가 빠져있다..." });
   }
   /* 디버그 바(자물쇠 정답·통과)용 등록 — 기존 W.register 와 같은 모양으로 __lock 에 심는다 */
   function caseRegisterDebug(force) {
@@ -18588,7 +18766,9 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   var WALK_STEP_MS = 520;      /* 한 걸음 = 520ms (보통 걷기 속도 ≈ 115 steps/min) */
   var WALK_LEAD = 180;         /* ★v0.17.17 첫 걸음까지의 여유(webkit 첫 페인트 지연 흡수) */
   /* ★v0.17.17 [지시5] 상하 bob(±1.6%) 폐지 — 북쑥 "지진급이라 거슬린다". 발소리만 남는다. */
-  var INTRO_TY_MS = 4600;      /* ★v0.17.17 [지시2] 태풍이 내 위치까지 다가오는 시간(2200 → 4600) */
+  /* ★v0.17.20 [지시] 태풍 접근 속도 상향 — 다가오는 시간을 예전(4600)의 75%(3450ms)로 단축.
+     정지 위치(경계 반노출)·점등·흔들림 등 다른 연출은 그대로. */
+  var INTRO_TY_MS = 3450;      /* ★v0.17.17 4600 → ★v0.17.20 3450(= 4600×0.75) 태풍 접근 시간 */
   var INTRO_STORM = 2400;      /* 태풍 도달 연출(배경 점등 + 소리) 지속 */
   /* ★v0.17.17 [지시4] 폰 뒤 배경 점등 — 5회, 한 번에 120ms 켜고 400ms 간격(총 1.72초) */
   var FLASH_N = 5, FLASH_ON = 120, FLASH_GAP = 400;
@@ -18614,8 +18794,11 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     { act: "tyHit" },                               /* 접근 → 배경 점등 + 흔들림 + 태풍 소리 → 암전 (자동) */
     /* ★v0.17.18 [지시3] 기내방송 **맨 앞줄 추가** — 마이크 톡톡(mic)이 이 첫 줄로 옮겨 왔다.
        노란 글씨(pa)도 동일. 암전이 걷히고 첫 마디가 방송으로 시작한다. */
-    { sc: "sky", pa: true, mic: true, cap: "승객여러분 모두 무사하십니까?" },
-    { pa: true, cap: "(기내방송) 아차차.... 이번에는 조심해서 잘 가고있었는데 태풍때문에 버뮤다삼각지대를 또 지나고 말았습니다." },
+    /* ★v0.17.20 [지시2] 기내방송 화자 라벨 정리 — **첫 줄에만** "(기내방송)" 을 붙이고,
+       이어지는 방송 줄에서는 뺀다. 예전엔 첫 줄엔 없고 둘째 줄("아차차...")에 붙어 있었다.
+       방송 원문(아차차 …)은 손대지 않고 라벨만 옮긴다. */
+    { sc: "sky", pa: true, mic: true, cap: "(기내방송) 승객여러분 모두 무사하십니까?" },
+    { pa: true, cap: "아차차.... 이번에는 조심해서 잘 가고있었는데 태풍때문에 버뮤다삼각지대를 또 지나고 말았습니다." },
     { pa: true, cap: "운행에는 문제가 없으니 걱정하지 않으셔도 괜찮습니다" },
     { cap: "휴… 피해가 크지 않아서 다행이다." },
     { cap: "그런데 또 버뮤다 삼각지대라니… 이번엔 무슨 일이 생기려나. 조금 걱정되는데." },
@@ -19051,6 +19234,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     $("intro").style.display = "none";
     G.audio();
     G.BGM.start();                                  /* ★v0.17 메인 BGM — 첫 제스처(시작하기 탭) 안에서 시작 */
+    applyMute(!!G.flag("soundMuted"));              /* ★v0.17.20 저장된 음소거 상태 복원(새 판이면 flag 없음 → 소리 켜짐) */
     render();
     gateIntro();                                    /* ★v0.17.19 [지시2] 게이트 첫 입장 독백 2컷 */
   }
@@ -19064,6 +19248,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     $("intro").style.display = "none";
     G.audio();
     G.BGM.start();
+    applyMute(!!G.flag("soundMuted"));              /* ★v0.17.20 재접속(새로고침)에도 음소거 유지 */
     render();
   }
 
@@ -19114,11 +19299,64 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     $("btnStart").onclick = function () { startGame(true); };
     $("btnResume").onclick = function () { startGame(false); };
     $("btnSndTest").onclick = soundTest;
-    $("btnMenu").onclick = function () {
-      /* ★v0.17.3 여기서 일어나는 재로드는 "사용자 새로고침" 이 아니다 — 감지에서 빼 둔다 */
-      if (confirm("처음부터 다시 시작할까?")) { G.wipe(); G.markAutoNav(); location.href = location.pathname + location.search; }
+    /* ★v0.17.20 [지시3] 우측 상단 "처음부터" — 예전 ☰ 와 같은 확인 후 초기화 동작.
+       브라우저 confirm 대신 게임 UI 알람(gameConfirm)으로 띄운다(iOS 에서 자연스럽고 캡처도 된다). */
+    $("btnReset").onclick = function () {
+      gameConfirm("처음부터 다시 시작할까?", function () {
+        /* ★v0.17.3 여기서 일어나는 재로드는 "사용자 새로고침" 이 아니다 — 감지에서 빼 둔다 */
+        G.wipe(); G.markAutoNav(); location.href = location.pathname + location.search;
+      });
     };
+    /* ★v0.17.20 [지시3] 우측 상단 "음소거" 토글.
+       · 켤 때(소리 끄기): 확인 알람 — "일부 문제는 노래를 들어야 풀 수 있어. 그래도 소리를 끌까?"
+       · 끌 때(다시 켜기): 알람 없이 즉시. 아이콘으로 상태 표시(🔊 켜짐 / 🔇 꺼짐). */
+    $("btnMute").onclick = function () {
+      if (G.isMuted()) { applyMute(false); return; }   /* 해제는 즉시 */
+      gameConfirm("일부 문제는 노래를 들어야 풀 수 있어. 그래도 소리를 끌까?", function () { applyMute(true); });
+    };
+    syncMuteBtn();
   }
+
+  /* ★v0.17.20 [지시3] 전체 음소거 적용 — core(G.setMuted) + main 전용 엘리먼트(쌍안경) + 세이브 + 아이콘 */
+  function applyMute(on) {
+    G.setMuted(on);
+    if (binocAu) { try { binocAu.muted = on; } catch (e) {} }
+    G.setFlag("soundMuted", on);
+    syncMuteBtn();
+  }
+  function syncMuteBtn() {
+    var b = $("btnMute"); if (!b) return;
+    var m = G.isMuted();
+    b.textContent = m ? "🔇" : "🔊";
+    b.classList.toggle("muted", m);
+    b.setAttribute("aria-label", m ? "음소거 해제" : "음소거");
+  }
+  window.__muteState = function () {   /* 검증용 */
+    var b = $("btnMute");
+    return { muted: G.isMuted(), flag: !!G.flag("soundMuted"),
+             icon: b ? b.textContent : null, bgm: (window.__bgmState ? window.__bgmState().cur : null) };
+  };
+
+  /* ★v0.17.20 [지시3] 게임 UI 확인 알람(브라우저 confirm 대체) —
+     iOS 에서 네이티브 confirm 은 헤드리스 캡처가 안 되고 앞뒤가 어색하다. 앱 위에 알람 카드를 띄운다.
+     한 번에 하나만(중복 방지). data-t 로 검증이 잡는다: gAlert · gAlertOk · gAlertCancel */
+  function gameConfirm(msg, onYes, onNo) {
+    var old = $("gAlert"); if (old) old.remove();
+    var wrap = el("div", "gAlertWrap"); wrap.id = "gAlert"; wrap.setAttribute("data-t", "gAlert");
+    var card = el("div", "gAlert");
+    card.appendChild(el("div", "gAlertMsg", msg));
+    var row = el("div", "gAlertBtns");
+    var cc = el("button", "gAlertBtn", "취소"); cc.setAttribute("data-t", "gAlertCancel");
+    var ok = el("button", "gAlertBtn primary", "확인"); ok.setAttribute("data-t", "gAlertOk");
+    function close() { wrap.remove(); }
+    cc.onclick = function () { close(); if (onNo) onNo(); };
+    ok.onclick = function () { close(); if (onYes) onYes(); };
+    row.appendChild(cc); row.appendChild(ok);
+    card.appendChild(row); wrap.appendChild(card);
+    ($("app") || document.body).appendChild(wrap);
+    return wrap;
+  }
+  window.__gameConfirm = gameConfirm;   /* 검증용 진입점 */
 
   /* 서비스워커 */
   function sw() {
