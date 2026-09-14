@@ -11388,7 +11388,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 (function () {
   "use strict";
 
-  var BUILD = "ODY-S1-20260915-0732";
+  var BUILD = "ODY-S1-20260915-0756";
   var LSKEY = "odyssey.s1.v1";
 
   var qs = new URLSearchParams(location.search);
@@ -12268,7 +12268,9 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   }
   function sfxOk() { beep(660, .12, "sine"); setTimeout(function () { beep(990, .18, "sine"); }, 110); }
   function sfxBad() { beep(180, .22, "square", .12); }
-  function sfxTap() { beep(420, .05, "triangle", .07); }
+  /* ★v0.17.28 [지시②] 탭/버튼음이 메인 BGM(gain 0.42)에 묻혀 안 들렸다 →
+     gain 0.07 → 0.24 (3.4배)·dur 0.05 → 0.06s 로 상향. #3 IFE 아이콘 탭도 이 sfxTap 을 쓴다. */
+  function sfxTap() { beep(420, .06, "triangle", .24); }
 
   function buzz(p) { try { if (navigator.vibrate) navigator.vibrate(p || 40); } catch (e) {} }
 
@@ -13350,23 +13352,53 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
      칸을 탭하면 값이 한 단계씩 바뀐다. 칸마다 후보 = 정답 글자를 포함한 N개(기본 12,
      후보 풀이 N개 이하면 전부). 후보 목록·순서·초기값은 칸별 시드로 고정돼 재접속해도 같다.
      길게 누르면 이전 값. 다 맞으면 자동 판정.                                        */
-  /* ══════════ ★v0.10 순환칸 후보 만들기 — 무작위 금지 ══════════
-     · 후보는 **풀의 원래 순서 그대로**(숫자 0→9, 알파벳 A→Z, 히라가나 오십음도) 연속 구간.
-     · 숫자는 10개 전부. 그 밖(알파벳·히라가나)은 정답을 품은 연속 size 글자 구간.
-     · 구간 시작 오프셋은 시드로 고정하되, **정답이 구간 양 끝에 오지 않게** 한다
-       (전부 첫 칸/끝 칸이면 그 자체가 힌트가 된다).
-     · 탭 = 다음(오름), 롱프레스 = 이전. 초기 표시는 구간의 첫 글자. */
-  function orderedWindow(pool, ans, size, seedKey) {
+  /* ══════════ ★v0.17.28 [지시③] 자리별 후보 리스트 통일 — 무작위 금지 ══════════
+     · 예전(orderedWindow)은 칸마다 "정답 글자를 품은 서로 다른 연속 구간"을 줘서
+       자리별 후보가 달랐다 → 이제 **모든 칸이 같은 하나의 공유 리스트**를 쓴다.
+     · 공유 리스트 = 그 퍼즐 정답의 **유니크 글자 전부** + 디코이로 size 채움.
+       디코이는 풀(A~Z / 오십음도)에서 정답 글자 제외하고 **시드로 결정적** 선택.
+       최종 리스트는 **풀 순서**(A→Z, 오십음도)로 정렬 → 재접속해도 같다.
+     · 정답 글자는 전부 리스트에 들어가므로 항상 풀린다.
+     · 숫자(size>=pool)는 예전처럼 풀 전체(이미 통일)라 그대로.
+     · 탭 = 다음(오름), 롱프레스 = 이전. */
+  function sharedCands(pool, ansStr, size, seedKey) {
     var len = pool.length;
+    size = Math.min(size || 12, len);
     if (size >= len) return pool.slice();               /* 숫자 0~9 처럼 전부 쓰는 경우 */
-    var ap = pool.indexOf(ans);
-    if (ap < 0) return pool.slice(0, size);
-    var lo = Math.max(0, ap - (size - 2));              /* 정답이 끝(size-1)에 오지 않게 */
-    var hi = Math.min(len - size, ap - 1);              /* 정답이 처음(0)에 오지 않게 */
-    if (hi < lo) { lo = Math.max(0, Math.min(len - size, ap - Math.floor(size / 2))); hi = lo; }
-    var rnd = G.lcg(G.hashSeed(seedKey));
-    var off = lo + Math.floor(rnd() * (hi - lo + 1));
-    return pool.slice(off, off + size);
+    var seen = {}, inPool = {};
+    pool.forEach(function (c) { inPool[c] = 1; });
+    var uniq = [];
+    String(ansStr).split("").forEach(function (c) {
+      if (inPool[c] && !seen[c]) { seen[c] = 1; uniq.push(c); }
+    });
+    var want = Math.min(len, Math.max(size, uniq.length));   /* 정답 유니크가 많으면 넓혀 전부 포함 */
+    var need = want - uniq.length;
+    var rest = pool.filter(function (c) { return !seen[c]; });
+    var rnd = G.lcg(G.hashSeed(seedKey + "#shared"));
+    for (var k = rest.length - 1; k > 0; k--) { var j = (rnd() * (k + 1)) | 0; var t = rest[k]; rest[k] = rest[j]; rest[j] = t; }
+    var list = uniq.concat(rest.slice(0, need));
+    list.sort(function (a, b) { return pool.indexOf(a) - pool.indexOf(b); });   /* 풀 순서 */
+    return list;
+  }
+  /* 자리별 초기 표시 인덱스 — 공유 리스트에서 시드로 흩되,
+     ①자기 정답으로 시작하지 않게 ②(가능하면) 다른 칸과 다른 글자로 시작하게. */
+  function initIndices(list, ansArr, seedKey) {
+    var n = list.length, out = [], used = {};
+    for (var i = 0; i < ansArr.length; i++) {
+      var rnd = G.lcg(G.hashSeed(seedKey + "#init#" + i));
+      var start = n ? (rnd() * n) | 0 : 0, chosen = -1, fallback = -1;
+      for (var t = 0; t < n; t++) {
+        var idx = (start + t) % n, ch = list[idx];
+        if (ch === ansArr[i]) continue;              /* 자기 정답 회피 */
+        if (fallback < 0) fallback = idx;            /* 정답만 아니면 후보(예비) */
+        if (used[ch]) continue;                      /* 이미 다른 칸이 쓴 글자 회피 */
+        chosen = idx; break;
+      }
+      if (chosen < 0) chosen = fallback >= 0 ? fallback : start;
+      used[list[chosen]] = 1;
+      out.push(chosen);
+    }
+    return out;
   }
 
   function cycleLock(opt) {
@@ -13374,10 +13406,10 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     var size = Math.min(opt.size || 12, opt.pool.length);
     var ans = String(opt.answer).split("");
     var cands = [], idx = [], slots = [];
-    for (var i = 0; i < opt.n; i++) {
-      cands.push(orderedWindow(opt.pool, ans[i], size, (opt.id || "lock") + "#" + i + "#" + ans[i]));
-      idx.push(0);   /* ★v0.10 초기 표시 = 구간의 첫 글자 */
-    }
+    /* ★v0.17.28 [지시③] 모든 칸이 같은 공유 리스트 · 초기값은 자리별 시드 글자 */
+    var shared = sharedCands(opt.pool, opt.answer, size, (opt.id || "lock"));
+    var init = initIndices(shared, ans, (opt.id || "lock"));
+    for (var i = 0; i < opt.n; i++) { cands.push(shared); idx.push(init[i]); }
 
     var box = el("div", "lock");
     var slotWrap = el("div", "slots");
@@ -13780,6 +13812,15 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     var size = Math.min(opt.size || (isIcon ? pool.length : 12), pool.length);
 
     var cands = [], idx = [], vnodes = [];
+    /* ★v0.17.28 [지시③] 문자형(알파벳·히라가나)은 모든 칸이 같은 공유 리스트를 쓴다.
+       창(size<pool)일 때만 자리별 초기 글자를 시드로 흩는다(대시 아님). 숫자(size>=pool)·
+       해시형은 예전처럼 대시로 시작 — 변경 없음. */
+    var textShared = null, textInit = null;
+    var windowed = (!isIcon && !isHash && size < pool.length);
+    if (!isIcon && !isHash) {
+      textShared = sharedCands(pool, ansArr.join(""), size, (opt.id || "lock"));
+      if (windowed) textInit = initIndices(textShared, ansArr, (opt.id || "lock"));
+    }
     for (var i = 0; i < n; i++) {
       if (isIcon) {
         /* 아이콘형(국기·음식·색)은 현행 유지 — 시드 고정 셔플 */
@@ -13796,9 +13837,9 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         cands.push(pool.slice(0, size));
         idx.push(-1);          /* ★v0.15 초기 표시 = 대시 · 첫 탭에 구간 첫 글자 */
       } else {
-        /* ★v0.10 문자형은 풀 순서 그대로의 연속 구간 */
-        cands.push(orderedWindow(pool, ansArr[i], size, (opt.id || "lock") + "#" + i + "#" + ansArr[i]));
-        idx.push(-1);          /* ★v0.15 초기 표시 = 대시 · 첫 탭에 구간 첫 글자 */
+        /* 문자형 — 공유 리스트. 창이면 자리별 초기 글자, 숫자면 대시(-1) */
+        cands.push(textShared);
+        idx.push(windowed ? textInit[i] : -1);
       }
     }
 
@@ -17684,12 +17725,12 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     if (!(hasImg(B.tileImg) && hasImg(B.emptyImg))) {
       var db = el("div", null, "📖"); db.style.cssText = "font-size:54px;text-align:center";
       c.stage.appendChild(db);
-      c.cap(gotB ? "누가 읽던 책이다." : "책 위에 나무 판이 놓여 있다.");
+      c.cap(gotB ? "갈색판을 조용히 챙겼다." : "책 위에 나무 판이 놓여 있다.");
       return;
     }
     c.stage.appendChild(imgStage(DATA.IMG + (gotB ? B.emptyImg : B.tileImg),
       gotB ? [] : [pick(B.prizeCell, "takeTileBrown", B.prize, "tookBrown")]));
-    c.cap(gotB ? "누가 읽던 책이다." : "책 위에 나무 판이 놓여 있다.");
+    c.cap(gotB ? "갈색판을 조용히 챙겼다." : "책 위에 나무 판이 놓여 있다.");
   };
 
   /* ★v0.14 #27 화장실 상단 수납장2 — 문 사진(gen/56b) 위 정사각 홈 8칸(알파벳).
