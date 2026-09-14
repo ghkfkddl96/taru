@@ -396,7 +396,11 @@ body.dbg .ifeHot:active{box-shadow:0 0 0 2px rgba(255,255,255,.95)}
 .archAd{position:absolute;left:8px;top:8px;z-index:5;pointer-events:none;
   background:rgba(58,58,64,.55);color:#fff;font-size:14px;font-weight:700;letter-spacing:2.2px;
   line-height:1;padding:8px 12px 7px;border-radius:10px;border:1px solid rgba(255,255,255,.18)}
-#archer{position:absolute;left:13%;width:22%;transition:top .05s linear;
+/* ★v0.17.24 궁수 드래그 잔상·렉 수정 — top(%) 애니메이션 폐기.
+   세로 이동은 transform:translateY 로(games.js 에서 px 세팅) → 레이어+drop-shadow 가
+   GPU 합성으로 한 덩어리로 움직인다(리플로우·재래스터 없음 = 잔상 제거·부드러움). */
+#archer{position:absolute;left:13%;top:0;width:22%;transform:translateY(0);transition:none;
+  will-change:transform;backface-visibility:hidden;-webkit-backface-visibility:hidden;
   filter:drop-shadow(0 5px 6px rgba(32,60,20,.3))}
 #archer img{width:100%;display:block}
 .tgt{position:absolute;right:3%;width:19%;aspect-ratio:1;border-radius:50%;background:
@@ -11375,7 +11379,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 (function () {
   "use strict";
 
-  var BUILD = "ODY-S1-20260914-1757";
+  var BUILD = "ODY-S1-20260914-2158";
   var LSKEY = "odyssey.s1.v1";
 
   var qs = new URLSearchParams(location.search);
@@ -15286,7 +15290,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         /* ★v0.17 흰 배경을 지운 투명 PNG(archer.png). 없으면 예전 jpg 로 폴백 */
         var af = (window.__IMG && window.__IMG.indexOf("archer.png") >= 0) ? "archer.png" : "archer.jpg";
         var ai = new Image(); ai.src = DATA.IMG + af; ar.appendChild(ai);
-        ar.style.top = "42%";
+        /* ★v0.17.24 초기 위치(42%)는 setPos/place 가 transform 으로 잡는다(아래). top 은 CSS 고정 0. */
         stage.appendChild(ar);
         var ud = el("div", "updown", "↕");
         ud.style.left = "1%"; ud.style.top = "46%";
@@ -15296,23 +15300,48 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         var arrow = el("div"); arrow.id = "arrow"; stage.appendChild(arrow);
 
         var pos = 42;
-        function setPos(p) { pos = Math.max(2, Math.min(80, p)); ar.style.top = pos + "%"; }
+        /* ★v0.17.24 궁수 배치 = top(%) → transform:translateY(px).
+           판정용 pos(%숫자)는 그대로 두고, 화면 배치 방식만 바꾼다(리플로우·drop-shadow 재래스터 제거). */
+        function place() {
+          var h = stage.getBoundingClientRect().height;
+          ar.style.transform = "translateY(" + (pos / 100 * h) + "px)";
+        }
+        function setPos(p) { pos = Math.max(2, Math.min(80, p)); place(); }
+        /* 레이아웃이 잡힌 뒤 초기 위치(42%)를 transform 으로 세팅 — 예전 top:42% 와 같은 자리 */
+        requestAnimationFrame(place);
+        /* pointermove → 위치 갱신을 requestAnimationFrame 으로 스로틀(프레임당 1회) —
+           레이아웃 스래싱 방지 + 부드러움. 최신 clientY 만 저장해 rAF 에서 한 번 적용. */
+        var rafId = 0, pendingY = null;
+        function applyClientY(clientY) {
+          var r2 = stage.getBoundingClientRect();
+          pos = Math.max(2, Math.min(80, (clientY - r2.top) / r2.height * 100 - 9));
+          ar.style.transform = "translateY(" + (pos / 100 * r2.height) + "px)";
+        }
+        function schedule(clientY) {
+          pendingY = clientY;
+          if (rafId) return;
+          rafId = requestAnimationFrame(function () {
+            rafId = 0;
+            if (pendingY != null) applyClientY(pendingY);
+            pendingY = null;
+          });
+        }
+        function endDrag() {                     /* 드래그 종료 시 마지막 위치 반영 + rAF 정리 */
+          if (pendingY != null) applyClientY(pendingY);
+          if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
+          pendingY = null;
+        }
         G.drag(ar, {
-          move: function (q) {
-            var r2 = stage.getBoundingClientRect();
-            setPos((q.y - r2.top) / r2.height * 100 - 9);
-          }
+          move: function (q) { schedule(q.y); },
+          end: function () { endDrag(); }
         });
         /* ★v0.17.4 [지시20] 드래그 없이 탭만 3번이면 조작 안내를 한 번 띄운다 */
         var tapOnly = 0, movedOnce = false, scrollHinted = false;
         G.drag(stage, {
           start: function () { movedOnce = false; },
-          move: function (q) {
-            movedOnce = true;
-            var r2 = stage.getBoundingClientRect();
-            setPos((q.y - r2.top) / r2.height * 100 - 9);
-          },
+          move: function (q) { movedOnce = true; schedule(q.y); },
           end: function () {
+            endDrag();
             if (movedOnce) return;
             tapOnly++;
             if (tapOnly >= 3 && !scrollHinted) { scrollHinted = true; say("스크롤 해서 캐릭터를 움직여봐"); }
