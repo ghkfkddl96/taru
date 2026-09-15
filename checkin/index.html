@@ -268,12 +268,11 @@ h2.title{margin:0;font-size:19px;line-height:1.38;letter-spacing:-.025em;font-we
 .pass .meta{margin-top:13px;gap:11px 8px}
 .pass .dash{border-top-color:rgba(22,33,63,.1)}
 .perf{position:relative;height:0;border-top:2px dashed rgba(22,33,63,.18);margin:15px -16px 13px}
-.barcode{height:44px;border-radius:2px;
-  background:repeating-linear-gradient(90deg,
-    #16213f 0 2px,transparent 2px 5px,#16213f 5px 6px,transparent 6px 10px,
-    #16213f 10px 13px,transparent 13px 14px,#16213f 14px 15px,transparent 15px 19px,
-    #16213f 19px 21px,transparent 21px 24px)}
-.bcode{margin-top:8px;text-align:center;font-size:9.5px;font-weight:700;letter-spacing:.2em;color:var(--mute);
+/* 절취선 아래 티켓 푸터 — 실제 공항에서 스캔 시도될 수 있어 바코드는 넣지 않는다 */
+.passfoot{display:flex;align-items:center;justify-content:space-between;gap:10px;min-width:0;padding:1px 0 2px}
+.pf-l{min-width:0}
+.pf-k{font-size:8.5px;font-weight:700;letter-spacing:.15em;color:var(--mute)}
+.pf-v{margin-top:3px;font-size:10.5px;font-weight:800;letter-spacing:.04em;color:var(--navy);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 /* 하단 스텁 */
 .stub{margin-top:10px;display:flex;align-items:center;gap:10px;min-width:0;
@@ -539,8 +538,16 @@ h2.title{margin:0;font-size:19px;line-height:1.38;letter-spacing:-.025em;font-we
       </div>
 
       <div class="perf"></div>
-      <div class="barcode"></div>
-      <div class="bcode">MRA0916 · MR431 · ICNDPS · 001</div>
+      <div class="passfoot">
+        <div class="pf-l">
+          <div class="pf-k">ISSUED</div>
+          <div class="pf-v">2026.09.16 · WEB CHECK-IN</div>
+        </div>
+        <div class="logo">
+          <svg class="bird" style="width:23px;height:15px" aria-hidden="true"><use href="#maru-bird" xlink:href="#maru-bird"/></svg>
+          <div class="wordmark" style="font-size:11.5px">MARU<em> AIR</em></div>
+        </div>
+      </div>
     </div>
 
     <!-- BOARDING STUB (E-TICKET 바우처 하단 스텁 모티브) -->
