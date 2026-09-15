@@ -11388,7 +11388,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 (function () {
   "use strict";
 
-  var BUILD = "ODY-S1-20260915-0756";
+  var BUILD = "ODY-S1-20260915-0851";
   var LSKEY = "odyssey.s1.v1";
 
   var qs = new URLSearchParams(location.search);
@@ -11535,7 +11535,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   /* ★v0.17.25 탭-투-디스미스(sticky) 토스트 — 자동 타이머 없이 계속 떠 있고,
      토스트를 탭/클릭하면 사라진다(그 토스트에 한해 pointer-events 활성 + 1회성 리스너).
      새 sticky 를 띄우면 이전 것을 먼저 정리한다. 다음 단계 안내처럼 "읽어야 하는" 코멘트에 쓴다. */
-  function toastHold(msg) {
+  function toastHold(msg, onDismiss) {
     var t = $("toast");
     clearTimeout(toastTimer);
     clearToastHold();                     /* 이전 sticky 정리 */
@@ -11550,6 +11550,8 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       t.classList.remove("show");
       toastHoldOff = null;
       setTimeout(function () { if (!t.classList.contains("show")) { t.classList.remove("hold"); clear(t); } }, 240);
+      /* ★v0.17.29 [지시C] 탭으로 넘길 때 다음 단계로(콜백). 강제정리(toastHoldOff)에는 안 부른다. */
+      if (onDismiss) onDismiss();
     }
     t.addEventListener("click", dismiss);
     toastHoldOff = function () {          /* 외부(새 토스트)에서 강제 정리할 때 */
@@ -12271,6 +12273,9 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   /* ★v0.17.28 [지시②] 탭/버튼음이 메인 BGM(gain 0.42)에 묻혀 안 들렸다 →
      gain 0.07 → 0.24 (3.4배)·dur 0.05 → 0.06s 로 상향. #3 IFE 아이콘 탭도 이 sfxTap 을 쓴다. */
   function sfxTap() { beep(420, .06, "triangle", .24); }
+  /* ★v0.17.29 [지시B] 물건 줍기 효과음 — 짧고 부드러운 상승 블립(픽업감).
+     sfxOk(정답 축하: 660→990 sine)와 달리 낮은 음역·triangle·짧게 → "집었다" 느낌만 준다. */
+  function sfxPick() { beep(500, .05, "triangle", .2); setTimeout(function () { beep(720, .06, "triangle", .16); }, 45); }
 
   function buzz(p) { try { if (navigator.vibrate) navigator.vibrate(p || 40); } catch (e) {} }
 
@@ -12482,7 +12487,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     flag: flag, setFlag: setFlag, has: has, give: give, take: take,
     solved: solved, markSolved: markSolved,
     $: $, el: el, clear: clear, on: on, toast: toast, toastHold: toastHold,
-    beep: beep, sfxOk: sfxOk, sfxBad: sfxBad, sfxTap: sfxTap, buzz: buzz, audio: audio, syncInvH: syncInvH,
+    beep: beep, sfxOk: sfxOk, sfxBad: sfxBad, sfxTap: sfxTap, sfxPick: sfxPick, buzz: buzz, audio: audio, syncInvH: syncInvH,
     sha256: sha256, drag: drag, tapper: tapper,
     sharedAudio: sharedAudio, unlockAudio: unlockAudio, audioUnlocked: audioUnlocked,
     BGM: BGM, sfxFile: sfxFile, sfxWarm: sfxWarm, haveAudio: haveAudio,
@@ -13406,10 +13411,10 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     var size = Math.min(opt.size || 12, opt.pool.length);
     var ans = String(opt.answer).split("");
     var cands = [], idx = [], slots = [];
-    /* ★v0.17.28 [지시③] 모든 칸이 같은 공유 리스트 · 초기값은 자리별 시드 글자 */
+    /* ★v0.17.28 [지시③] 모든 칸이 같은 공유 리스트(사전순 로테이션).
+       ★v0.17.29 [지시A] 공유 리스트는 유지하되 초기 표시는 대시(–)로 복귀 · 첫 탭에 리스트 첫 글자부터 순환. */
     var shared = sharedCands(opt.pool, opt.answer, size, (opt.id || "lock"));
-    var init = initIndices(shared, ans, (opt.id || "lock"));
-    for (var i = 0; i < opt.n; i++) { cands.push(shared); idx.push(init[i]); }
+    for (var i = 0; i < opt.n; i++) { cands.push(shared); idx.push(-1); }
 
     var box = el("div", "lock");
     var slotWrap = el("div", "slots");
@@ -13417,12 +13422,12 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       var s = el("button", "slot cyc" + (opt.n > 4 ? " small" : ""));
       s.setAttribute("data-t", "slot" + i);
       if (opt.labels && opt.labels[i]) s.appendChild(el("i", "cnum", opt.labels[i]));
-      var v = el("b", "v", cands[i][idx[i]]);
-      s.setAttribute("data-v", cands[i][idx[i]]);
+      var v = el("b", "v", idx[i] < 0 ? DASH : cands[i][idx[i]]);
+      s.setAttribute("data-v", idx[i] < 0 ? "-" : cands[i][idx[i]]);
       s.appendChild(v);
       G.tapper(s, {
-        tap: function () { idx[i] = (idx[i] + 1) % cands[i].length; G.sfxTap(); paint(); check(); },
-        long: function () { idx[i] = (idx[i] - 1 + cands[i].length) % cands[i].length; G.sfxTap(); paint(); check(); }
+        tap: function () { idx[i] = idx[i] < 0 ? 0 : (idx[i] + 1) % cands[i].length; G.sfxTap(); paint(); check(); },
+        long: function () { idx[i] = idx[i] <= 0 ? cands[i].length - 1 : idx[i] - 1; G.sfxTap(); paint(); check(); }
       });
       slots.push(s); slotWrap.appendChild(s);
     })(i);
@@ -13431,8 +13436,8 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 
     function paint() {
       for (var i = 0; i < opt.n; i++) {
-        slots[i].querySelector(".v").textContent = cands[i][idx[i]];
-        slots[i].setAttribute("data-v", cands[i][idx[i]]);
+        slots[i].querySelector(".v").textContent = idx[i] < 0 ? DASH : cands[i][idx[i]];
+        slots[i].setAttribute("data-v", idx[i] < 0 ? "-" : cands[i][idx[i]]);
       }
     }
     function value() { return idx.map(function (v, i) { return cands[i][v]; }).join(""); }
@@ -13812,14 +13817,13 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     var size = Math.min(opt.size || (isIcon ? pool.length : 12), pool.length);
 
     var cands = [], idx = [], vnodes = [];
-    /* ★v0.17.28 [지시③] 문자형(알파벳·히라가나)은 모든 칸이 같은 공유 리스트를 쓴다.
-       창(size<pool)일 때만 자리별 초기 글자를 시드로 흩는다(대시 아님). 숫자(size>=pool)·
-       해시형은 예전처럼 대시로 시작 — 변경 없음. */
-    var textShared = null, textInit = null;
-    var windowed = (!isIcon && !isHash && size < pool.length);
+    /* ★v0.17.28 [지시③] 문자형(알파벳·히라가나)은 모든 칸이 같은 공유 리스트를 쓴다(사전순 로테이션).
+       ★v0.17.29 [지시A] 공유 리스트(sharedCands)는 그대로 유지하되, **초기 표시는 대시(–)로 복귀**한다.
+       (v0.17.28 의 자리별 시드 초기 글자 = initIndices 는 쓰지 않는다.) 첫 탭에 리스트 첫 글자부터 순환.
+       숫자(size>=pool)·해시형은 예전처럼 대시로 시작 — 변경 없음. */
+    var textShared = null;
     if (!isIcon && !isHash) {
       textShared = sharedCands(pool, ansArr.join(""), size, (opt.id || "lock"));
-      if (windowed) textInit = initIndices(textShared, ansArr, (opt.id || "lock"));
     }
     for (var i = 0; i < n; i++) {
       if (isIcon) {
@@ -13837,9 +13841,9 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         cands.push(pool.slice(0, size));
         idx.push(-1);          /* ★v0.15 초기 표시 = 대시 · 첫 탭에 구간 첫 글자 */
       } else {
-        /* 문자형 — 공유 리스트. 창이면 자리별 초기 글자, 숫자면 대시(-1) */
+        /* ★v0.17.29 [지시A] 문자형 — 공유 리스트 유지, 초기 표시는 대시(-1)로 복귀 */
         cands.push(textShared);
-        idx.push(windowed ? textInit[i] : -1);
+        idx.push(-1);
       }
     }
 
@@ -16370,6 +16374,11 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     return Math.atan2(dy, dx) * 180 / Math.PI;
   }
   var PLANE_T0 = 0.44;      /* 지금 비행기가 와 있는 지점(항로 한가운데쯤 — 라벨을 안 가리는 바다 위) */
+  /* ★v0.17.29 [지시C-1] 도착 애니메이션 **시작점 전용** 상수 — 발리에 더 가깝게(선분 ~20%만 남음).
+     항로는 준(準)직선(곡선길이 1229 ≈ 직선 1213, 1.3% 차)이라 t=0.80 이면 직선·호길이 모두 ~20% 남는다.
+     ★PLANE_T0(0.44)와 분리한 이유: PLANE_T0 은 인트로 컷(태풍 충돌 높이·비행기 위치, main.js)과 공유돼
+       옮기면 인트로 프레이밍이 깨진다 → 도착 뷰만 이 상수를 쓴다. */
+  var PLANE_ARRIVE_T0 = 0.80;
 
   /* 지도 좌표(px) → 상자 안 퍼센트. cover(=slice)와 **같은 식**이라 SVG 와 정확히 겹친다. */
   function mapPct(g, x, y) {
@@ -16537,29 +16546,47 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
        파문(pin)만 발리 좌표에 남긴다. data-t 는 그대로(gmDps) — 기존 검증이 잡는 손잡이. */
     var pin = marker(g, "pin", "", 1);
     pin.setAttribute("data-t", "gmDps");
-    var plane = marker(g, "plane", "", PLANE_T0);
+    /* ★v0.17.29 [지시C-1] 도착 시작점 = 발리 근처(PLANE_ARRIVE_T0 ≈ 항로 20% 남음) */
+    var plane = marker(g, "plane", "", PLANE_ARRIVE_T0);
     plane.setAttribute("data-t", "gmPlane");
     map.appendChild(g);
     body.appendChild(map);
     sc.appendChild(body);
 
-    var t = 0, STEP = 0.0145;                            /* 60ms × 69스텝 ≈ 4.1초 */
-    gmapStop();
-    gmapAnim = setInterval(function () {
-      t = Math.min(1, t + STEP);
-      var tt = PLANE_T0 + (1 - PLANE_T0) * t;
-      var q = routeAt(tt);
-      moveTo(plane, q[0], q[1]);
-      faceAlong(plane, tt);                              /* 이동 중에도 기수 = 접선 */
-      if (t >= 1) {
-        gmapStop();
-        plane.classList.add("landed");
-        pin.classList.add("arrive");                     /* 발리 마커 위로 파문 */
-        G.beep(520, .18, "sine", .1);
-        setTimeout(function () { if (isOpen()) MAIN.ending(); }, 620);
-      }
-    }, 60);
-    window.__gmapSkip = function () { gmapStop(); MAIN.ending(); };
+    /* ★도착 애니메이션 시작점(PLANE_ARRIVE_T0) → 발리(t=1) */
+    function startArriveAnim() {
+      var t = 0, STEP = 0.0145;                          /* 60ms × 69스텝 ≈ 4.1초 */
+      gmapStop();
+      gmapAnim = setInterval(function () {
+        t = Math.min(1, t + STEP);
+        var tt = PLANE_ARRIVE_T0 + (1 - PLANE_ARRIVE_T0) * t;
+        var q = routeAt(tt);
+        moveTo(plane, q[0], q[1]);
+        faceAlong(plane, tt);                            /* 이동 중에도 기수 = 접선 */
+        if (t >= 1) {
+          gmapStop();
+          plane.classList.add("landed");
+          pin.classList.add("arrive");                   /* 발리 마커 위로 파문 */
+          G.beep(520, .18, "sine", .1);
+          setTimeout(function () { if (isOpen()) MAIN.ending(); }, 620);
+        }
+      }, 60);
+    }
+    window.__gmapSkip = function () { gmapStop(); MAIN.ending(); };   /* 디버그·검증용 즉시 종료 */
+
+    /* ★v0.17.29 [지시C-2] 도착 **첫 진입 1회만**: 애니메이션 전에 코멘트 2개 순차(탭으로 넘김).
+         재렌더/재로드 반복 시엔 안 뜨게 세이브 플래그(gmapArriveSeen)로 가드.
+       ★기존 씬 코멘트("앗 GPS가 복구된 것 같다! …", main.js GPS_RESTORED)는 방 화면용 — 여기선 안 건드림. */
+    if (!G.flag("gmapArriveSeen")) {
+      G.setFlag("gmapArriveSeen");
+      G.toastHold("GPS가 정상적으로 연결된다!", function () {
+        G.toastHold("이제 거의 다 도착한 것 같은걸?", function () {
+          startArriveAnim();
+        });
+      });
+    } else {
+      startArriveAnim();
+    }
   }
 
   function render() {
@@ -16609,6 +16636,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
                아무것도 안 골랐으면 관찰 문구만, 엉뚱한 걸 골랐으면 sfxBad + 관찰 문구. */
   function pick(cell, t, itemId, flag) {
     return { x: cell.x, y: cell.y, w: cell.w, h: cell.h, t: t, onTap: function () {
+      G.sfxPick();                       /* ★v0.17.29 [지시B] 물건 줍기 효과음(픽업 블립) */
       if (flag) G.setFlag(flag);
       prize(itemId, "");
       reopenCU();
