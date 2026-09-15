@@ -600,7 +600,13 @@ body.dbg .ifeHot:active{box-shadow:0 0 0 2px rgba(255,255,255,.95)}
   max-width:86%;padding:13px 17px 14px;
   background:rgba(10,10,12,.74);border:1px solid rgba(255,255,255,.11);border-radius:14px;
   font-size:14px;line-height:1.78;color:var(--n8);white-space:pre-line;text-align:center;
-  box-shadow:0 8px 26px rgba(0,0,0,.5);transition:opacity .22s}
+  box-shadow:0 8px 26px rgba(0,0,0,.5);transition:opacity .22s;
+  /* ★v0.17.32 [지시3] 한국어 자막은 **어절 단위로** 감기게 한다.
+     기본값(word-break:normal)은 한국어를 음절 단위로 끊어서, 마지막 컷이
+     "…구글맵을 열어 확인해보 / 자!" 처럼 단어 중간에서 줄이 바뀌었다(v0.17.31 실측).
+     안전망으로 overflow-wrap:break-word 도 같이 둔다 — keep-all 은 한 어절이 상자보다
+     길면 밖으로 삐져나가는데(URL·긴 합성어), 그때만 강제로 쪼개 넘침을 막는다. */
+  word-break:keep-all;overflow-wrap:break-word}
 .seqCap:empty{opacity:0}
 /* ★v0.17.17 [지시7] 기내방송은 **노란 글씨** — 주인공 혼잣말(회백색)과 눈으로 구분된다 */
 .seqCap.pa{color:#ffd75e}
@@ -640,6 +646,27 @@ body.dbg .ifeHot:active{box-shadow:0 0 0 2px rgba(255,255,255,.95)}
 .gcHead{font-size:17px;font-weight:800;margin:6px 0 5px;color:#17181c}
 /* ★v0.17.17 [지시8] "→ 2차로" 버튼 폐지 — 카드가 마지막 화면이다(`#story.gc .btn` 규칙도 삭제) */
 .gcBody{font-size:13px;line-height:1.7;color:#3a3d45;white-space:pre-line;margin-bottom:2px}
+
+/* ★v0.17.32 [지시2] 클리어 팝업(현실 선물 안내) — JS: main.js gcGiftPopup.
+   놓치면 안 되는 안내라 **화면 전체를 덮어** 폭죽·유리카드보다 확실히 앞에 세운다(z:8 > .gcCard z:3).
+   두 문장은 각각 블록이라 줄이 섞이지 않고, keep-all + break-word 로 상자 밖으로 절대 안 나간다. */
+.gcGift{position:absolute;inset:0;z-index:8;display:flex;align-items:center;justify-content:center;
+  padding:calc(var(--safeT) + 18px) 18px calc(var(--safeB) + 18px);
+  background:rgba(6,8,12,.66);-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);
+  animation:gcGiftFade .26s ease-out both}
+@keyframes gcGiftFade{from{opacity:0}to{opacity:1}}
+.gcGiftCard{width:100%;max-width:300px;box-sizing:border-box;
+  background:#fffdf8;border:2px solid #ffd75e;border-radius:22px;padding:18px 18px 16px;
+  box-shadow:0 22px 52px rgba(0,0,0,.5);text-align:center;color:#17181c;
+  animation:gcGiftRise .42s cubic-bezier(.2,1.5,.42,1) both}
+@keyframes gcGiftRise{from{transform:translateY(22px) scale(.9);opacity:0}to{transform:translateY(0) scale(1);opacity:1}}
+.gcGiftIco{font-size:38px;line-height:1.1;margin-bottom:8px}
+.gcGiftLine{font-size:15px;font-weight:800;line-height:1.62;color:#17181c;
+  word-break:keep-all;overflow-wrap:break-word;overflow:hidden}
+.gcGiftLine + .gcGiftLine{margin-top:9px}
+.gcGiftOk{margin-top:15px;width:100%;box-sizing:border-box;padding:11px 0;border:0;border-radius:13px;
+  background:#17181c;color:#fff;font-size:14px;font-weight:800;letter-spacing:.5px}
+.gcGiftOk:active{background:#3a3d45}
 
 /* ───────── 오버레이/기타 ───────── */
 .overlay{
@@ -11414,7 +11441,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 (function () {
   "use strict";
 
-  var BUILD = "ODY-S1-20260916-0025";
+  var BUILD = "ODY-S1-20260916-0133";
   var LSKEY = "odyssey.s1.v1";
 
   var qs = new URLSearchParams(location.search);
@@ -19452,6 +19479,46 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     s.appendChild(card);
     G.sfxOk();
     G.buzz([40, 60, 120]);
+    gcGiftPopup(s);
+  }
+
+  /* ★v0.17.32 [지시2] 클리어 화면 팝업 코멘트 — **현실의 선물 안내**.
+     여자친구가 비행기에서 플레이하고, 다 깨면 실제 캐리어 세면파우치 옆에 숨겨 둔 선물을 찾는다.
+     → 절대 못 놓치게 화면을 어둡게 덮고 한가운데에 띄운다(카드만 얹으면 폭죽·유리카드에 묻힌다).
+     · 클리어 카드가 먼저 보이고 GIFT_DELAY(1.2초) 뒤에 올라온다 — 카드의 gcPop/무지개 애니메이션을
+       충분히 본 다음 팝업이 뜨는 순서.
+     · 탭(또는 확인 버튼)으로 닫히고, 닫아도 클리어 화면은 그대로 남는다(오버레이만 제거).
+     · gameClear() 가 돌 때마다 뜬다 — s1done 이 이미 있는 세이브로 다시 도달해도 똑같이 뜬다.
+     ★문구는 북쑥 지정 원문 그대로(느낌표 개수 포함). 손대지 않는다. */
+  var GIFT_DELAY = 1200;
+  var GIFT_LINES = [
+    "방탈출 클리어 너무 축하드려요!!!!",
+    "마지막으로 캐리어 안의 세면파우치 근처를 확인해주세요!!!!"
+  ];
+  function gcGiftPopup(host) {
+    setTimeout(function () {
+      if (!host || !host.isConnected || !host.classList.contains("gc")) return;   /* 그새 화면이 바뀌었으면 취소 */
+      if (host.querySelector('[data-t="gcGift"]')) return;                        /* 중복 방지 */
+      var ov = el("div", "gcGift");
+      ov.setAttribute("data-t", "gcGift");
+      var box = el("div", "gcGiftCard");
+      box.setAttribute("data-t", "gcGiftCard");
+      box.appendChild(el("div", "gcGiftIco", "🎁"));
+      GIFT_LINES.forEach(function (t, i) {
+        var line = el("div", "gcGiftLine", t);
+        line.setAttribute("data-t", "gcGiftLine" + (i + 1));
+        box.appendChild(line);
+      });
+      var ok = el("button", "gcGiftOk", "확인");
+      ok.setAttribute("data-t", "gcGiftOk");
+      box.appendChild(ok);
+      ov.appendChild(box);
+      function close(e) { if (e) { e.preventDefault(); e.stopPropagation(); } if (ov.parentNode) ov.parentNode.removeChild(ov); }
+      ov.onclick = close; ok.onclick = close;
+      host.appendChild(ov);
+      G.sfxOk();
+      G.buzz([30, 50, 30, 50, 90]);
+    }, GIFT_DELAY);
   }
 
   /* ═══════════ 디버그 ═══════════ */
