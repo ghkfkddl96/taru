@@ -11414,7 +11414,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 (function () {
   "use strict";
 
-  var BUILD = "ODY-S1-20260915-0914";
+  var BUILD = "ODY-S1-20260916-0025";
   var LSKEY = "odyssey.s1.v1";
 
   var qs = new URLSearchParams(location.search);
@@ -19045,6 +19045,11 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   /* ★v0.17.20 [지시] 태풍 접근 속도 상향 — 다가오는 시간을 예전(4600)의 75%(3450ms)로 단축.
      정지 위치(경계 반노출)·점등·흔들림 등 다른 연출은 그대로. */
   var INTRO_TY_MS = 3450;      /* ★v0.17.17 4600 → ★v0.17.20 3450(= 4600×0.75) 태풍 접근 시간 */
+  /* ★v0.17.31 [지시1] 태풍 **등장**(화면 밖 → 경계 반노출 정지)이 "너무 슉" 나온다(북쑥).
+     900ms 매직넘버를 상수로 올리고 2600ms 로 늦춘다. 들어오는 동안 자막은 "…" 만 두고,
+     반쯤 걸쳐 멈춘 순간에 확정 카피로 바꾼다(아래 go() tyIn 참고).
+     접근 시간(INTRO_TY_MS)·정지 위치·태풍 크기·점등·흔들림·소리는 **그대로**. */
+  var INTRO_TY_IN_MS = 2600;   /* ★v0.17.31 [지시1] 900 → 2600 태풍 등장(슬라이드 인) 시간 */
   var INTRO_STORM = 2400;      /* 태풍 도달 연출(배경 점등 + 소리) 지속 */
   /* ★v0.17.17 [지시4] 폰 뒤 배경 점등 — 5회, 한 번에 120ms 켜고 400ms 간격(총 1.72초) */
   var FLASH_N = 5, FLASH_ON = 120, FLASH_GAP = 400;
@@ -19078,7 +19083,9 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     { pa: true, cap: "운행에는 문제가 없으니 걱정하지 않으셔도 괜찮습니다" },
     { cap: "휴… 피해가 크지 않아서 다행이다." },
     { cap: "그런데 또 버뮤다 삼각지대라니… 이번엔 무슨 일이 생기려나. 조금 걱정되는데." },
-    { cap: "어찌 됐든! 얼마나 왔는지 다시 확인해 보자!" }
+    /* ★v0.17.31 [지시2] 마지막 컷 카피 교체 — 북쑥 지정 원문 그대로(띄어쓰기 포함, 손대지 않는다).
+       옛 문구 "어찌 됐든! 얼마나 왔는지 다시 확인해 보자!" 는 폐기. */
+    { cap: "지금 어디까지 왔는지 폰에서 구글맵을 열어 확인해보자!" }
   ];
 
   function introSeq(done) {
@@ -19274,8 +19281,11 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
            bow_shot(−0.2dB·게인1.0) · storm(−1.9dB·게인1.0) 과 같은 체감이 된다. */
         if (c.mic) G.sfxFile("mictap.mp3", 1);
         if (c.act === "tyIn") {
-          busy = true; say(c.cap, false);
-          moveTy(tyOff(), tyPark(), 900, function () { busy = false; say(c.cap); });
+          /* ★v0.17.31 [지시1] 들어오는 **동안**에는 자막을 "…" 만 띄운다(탭 마커 없음 · busy 유지).
+             경계에 반쯤 걸쳐 **멈춘 순간**에 확정 카피("…저게 뭐지? 설마 태풍인가?!")로 바꾸고
+             탭을 연다. 등장 시간은 INTRO_TY_IN_MS(2600ms). */
+          busy = true; say("…", false);
+          moveTy(tyOff(), tyPark(), INTRO_TY_IN_MS, function () { busy = false; say(c.cap); });
           return;
         }
         if (c.act === "tyHit") { busy = true; say(""); quake(); return; }

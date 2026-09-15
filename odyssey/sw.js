@@ -1,5 +1,5 @@
 /* 발리 가는 길에서 생긴 일 — 오프라인 서비스워커 (자동 생성) */
-const CACHE = "odyssey-ODY-S1-20260915-0914";
+const CACHE = "odyssey-ODY-S1-20260916-0025";
 const PRECACHE = [
  "./",
  "./index.html",
