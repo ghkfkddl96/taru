@@ -1,0 +1,1069 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MARU AIR | 웹 체크인</title>
+<meta name="theme-color" content="#eef2f7">
+<meta name="format-detection" content="telephone=no">
+<meta name="description" content="MARU AIR 웹 체크인 · MR431 ICN → DPS 모바일 탑승권 발급">
+<meta property="og:title" content="MARU AIR 웹 체크인">
+<meta property="og:description" content="MR431 · 인천(ICN) → 덴파사르(DPS) · 모바일 탑승권을 미리 받아두세요.">
+<meta property="og:type" content="website">
+<style>
+/* ═══════════ MARU AIR — 브랜드 토큰 (팜플렛/E-TICKET 바우처 팔레트) ═══════════ */
+:root{
+  --navy:#16213f;
+  --navy2:#233457;
+  --blue:#3f6297;
+  --blue-l:#9fc0de;
+  --blue-p:#d9e5f1;
+  --gold:#b8912f;
+  --gold-l:#dcc06a;
+  --paper:#faf6ec;
+  --paper2:#f1ece0;
+  --ink:#3a4360;
+  --mute:#79839b;
+  --line:rgba(22,33,63,.13);
+  --line-s:rgba(22,33,63,.07);
+  --bad:#c0392f;
+  --sat:env(safe-area-inset-top,0px);
+  --sab:env(safe-area-inset-bottom,0px);
+  --font:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Noto Sans KR","Malgun Gothic","맑은 고딕",system-ui,sans-serif;
+  color-scheme:light;
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:var(--font);
+  color:var(--navy);
+  background:#eef2f7;
+  background-image:
+    radial-gradient(130% 62% at 8% -6%, #ffffff 0%, rgba(255,255,255,0) 60%),
+    radial-gradient(120% 55% at 98% 4%, #dfe9f4 0%, rgba(223,233,244,0) 62%),
+    linear-gradient(176deg,#f2f5f9 0%,#e8eef6 52%,#eef1f6 100%);
+  background-attachment:fixed;
+  min-height:100vh;min-height:100dvh;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+button{font-family:inherit;color:inherit}
+input{font-family:inherit}
+[hidden]{display:none!important}
+
+/* ═══════════ layout ═══════════ */
+#app{position:relative;width:100%;max-width:520px;margin:0 auto}
+.screen{
+  display:none;flex-direction:column;
+  min-height:100vh;min-height:100dvh;
+  padding:calc(var(--sat) + 10px) 16px calc(var(--sab) + 16px);
+}
+.screen.on{display:flex;animation:fadeIn .3s ease both}
+@keyframes fadeIn{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+.spacer{flex:1 1 auto;min-height:12px}
+
+/* ═══════════ 브랜드 바 ═══════════ */
+.brandbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:4px 2px 10px}
+.logo{display:flex;align-items:center;gap:9px;min-width:0}
+.bird{width:31px;height:20px;flex:0 0 auto;display:block}
+.wordmark{font-size:16.5px;font-weight:800;letter-spacing:.14em;color:var(--navy);white-space:nowrap;line-height:1}
+.wordmark em{font-style:normal;color:var(--blue)}
+.bartag{font-size:9.5px;font-weight:700;letter-spacing:.14em;color:var(--mute);white-space:nowrap;text-transform:uppercase}
+
+/* 티켓 상단 사선 스트라이프 (ticket_bg 모티브) */
+.stripe{position:relative;height:10px;overflow:hidden;border-radius:2px;
+  background:linear-gradient(90deg,#16213f 0%,#1c2b4e 26%,#2c4470 52%,#5d84b4 79%,#a9c8e4 100%)}
+.stripe::before,.stripe::after{content:"";position:absolute;top:-5px;bottom:-5px;width:8px;transform:skewX(-32deg);background:var(--stripe-cut,#fff)}
+.stripe::before{left:41%}
+.stripe::after{left:63%}
+
+/* ═══════════ 타이포 ═══════════ */
+h1.title{margin:0;font-size:22px;line-height:1.3;letter-spacing:-.025em;font-weight:800}
+h2.title{margin:0;font-size:19px;line-height:1.38;letter-spacing:-.025em;font-weight:800;word-break:keep-all}
+.sub{margin:7px 0 0;font-size:12.5px;line-height:1.62;color:var(--ink);opacity:.82;word-break:keep-all}
+.sect{display:flex;align-items:center;gap:7px;font-size:9.5px;font-weight:800;letter-spacing:.15em;color:var(--navy);text-transform:uppercase}
+.sect::before{content:"";flex:0 0 auto;width:3px;height:11px;border-radius:1px;background:var(--gold)}
+
+/* ═══════════ 카드 ═══════════ */
+.card{
+  background:#fff;border:1px solid var(--line-s);border-radius:16px;
+  padding:15px 15px 14px;
+  box-shadow:0 12px 28px -18px rgba(22,33,63,.45), 0 1px 3px -1px rgba(22,33,63,.1);
+}
+.card + .card{margin-top:10px}
+.spacer{min-height:8px}
+.row-top{display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0;margin-top:11px}
+.fno{font-size:15px;font-weight:800;letter-spacing:.04em;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fno span{color:var(--mute);font-weight:700;letter-spacing:0;font-size:10.5px;margin-left:6px}
+.chip{flex:0 0 auto;font-size:10px;font-weight:800;letter-spacing:.02em;padding:4px 9px;border-radius:4px;white-space:nowrap;
+  background:rgba(184,145,47,.13);color:#8d6c18;border:1px solid rgba(184,145,47,.25)}
+
+/* 노선 */
+.route{display:flex;align-items:flex-end;gap:8px;margin:14px 0 2px;min-width:0}
+.port{min-width:0;flex:0 1 auto}
+.port .code{font-size:31px;line-height:1;font-weight:800;letter-spacing:-.015em}
+.port .city{margin-top:5px;font-size:10.5px;font-weight:600;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.port.to{text-align:right}
+.mid{flex:1 1 auto;min-width:34px;padding-bottom:8px;display:flex;flex-direction:column;align-items:center;gap:4px}
+.mid .dur{font-size:9px;font-weight:700;color:var(--mute);letter-spacing:.04em;white-space:nowrap}
+.mid .lineplane{display:flex;align-items:center;gap:3px;width:100%}
+.mid .lineplane i{flex:1 1 auto;height:1px;background:linear-gradient(90deg,rgba(63,98,151,.15),rgba(63,98,151,.5))}
+.mid .lineplane i:last-child{background:linear-gradient(90deg,rgba(63,98,151,.5),rgba(63,98,151,.15))}
+.mid .lineplane svg{width:12px;height:12px;flex:0 0 auto;color:var(--blue)}
+
+.dash{height:0;border-top:1px solid var(--line-s);margin:13px 0 12px}
+
+/* 표 */
+.meta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px 8px}
+.meta .k{font-size:9px;font-weight:700;letter-spacing:.1em;color:var(--mute);text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.meta .v{margin-top:3px;font-size:13.5px;font-weight:800;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.meta .v small{font-size:9.5px;font-weight:700;color:var(--mute);margin-left:2px}
+
+/* key–value 목록 */
+.kv{margin-top:11px}
+.kv-row{display:flex;align-items:baseline;justify-content:space-between;gap:10px;min-width:0;
+  padding:7px 0;border-bottom:1px solid var(--line-s)}
+.kv-row:last-child{border-bottom:0;padding-bottom:0}
+.kv .kk{flex:0 0 auto;font-size:11.5px;font-weight:700;color:var(--mute);white-space:nowrap}
+.kv .vv{min-width:0;text-align:right;font-size:12.5px;font-weight:700;color:var(--navy);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kv .cute{display:block;margin-top:3px;font-style:normal;font-size:10.5px;font-weight:600;color:var(--mute)}
+
+.notice{margin-top:12px;display:flex;gap:8px;align-items:flex-start;
+  background:#f6f8fb;border-left:3px solid var(--gold);border-radius:3px;padding:9px 11px}
+.notice p{margin:0;font-size:11px;line-height:1.6;color:var(--ink);word-break:keep-all}
+.notice b{color:var(--navy);font-weight:800}
+
+/* ═══════════ 버튼 ═══════════ */
+.btn{-webkit-appearance:none;appearance:none;border:0;cursor:pointer;
+  width:100%;display:flex;align-items:center;justify-content:center;gap:8px;
+  min-height:52px;padding:12px 16px;border-radius:12px;
+  font-size:16px;font-weight:800;letter-spacing:-.015em;
+  transition:transform .12s ease,box-shadow .2s ease,opacity .2s ease;
+  -webkit-tap-highlight-color:transparent}
+.btn:active{transform:scale(.978)}
+.btn.primary{background:linear-gradient(140deg,#25365f,#16213f);color:#fff;
+  box-shadow:0 10px 22px -12px rgba(22,33,63,.9)}
+.btn.board{background:linear-gradient(140deg,#25365f,#101a34);color:#fff;
+  box-shadow:0 13px 26px -12px rgba(22,33,63,.95);font-size:17px;min-height:56px;
+  position:relative;overflow:hidden}
+.btn.board::after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;
+  background:linear-gradient(90deg,var(--gold),var(--gold-l),var(--gold))}
+.btn.ghost{background:#fff;color:var(--navy);border:1px solid var(--line);min-height:46px;font-size:14px;font-weight:700}
+.btn svg{width:17px;height:17px;flex:0 0 auto}
+.btn .lbl{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.btn[disabled]{opacity:.5;pointer-events:none}
+.foot{margin-top:10px;text-align:center;font-size:10px;line-height:1.65;color:var(--mute)}
+.foot b{color:var(--ink);font-weight:800;letter-spacing:.04em}
+
+.back{-webkit-appearance:none;appearance:none;background:none;border:0;cursor:pointer;
+  padding:4px 6px 4px 0;margin:0 0 4px -6px;display:inline-flex;align-items:center;gap:4px;
+  font-size:12.5px;font-weight:700;color:var(--mute);-webkit-tap-highlight-color:transparent}
+.back svg{width:14px;height:14px}
+
+/* ═══════════ 본인확인 ═══════════ */
+.qcard{margin-top:14px;padding-bottom:6px}
+.qlabel{display:block;margin-top:10px;font-size:15.5px;font-weight:800;line-height:1.5;letter-spacing:-.02em;word-break:keep-all}
+
+/* 스크롤 휠 날짜 피커 */
+.picker{
+  --item:38px;
+  position:relative;margin-top:14px;
+  height:calc(var(--item) * 5);
+  border-radius:12px;background:#f6f8fb;border:1px solid var(--line-s);
+  display:grid;grid-template-columns:1.18fr 1fr 1fr;
+  overflow:hidden;
+}
+.pk-band{
+  position:absolute;left:6px;right:6px;top:calc(var(--item) * 2);height:var(--item);
+  border-radius:8px;background:rgba(63,98,151,.1);
+  box-shadow:inset 0 0 0 1px rgba(63,98,151,.18);
+  pointer-events:none;z-index:1;
+}
+.pk-fade{position:absolute;inset:0;pointer-events:none;z-index:3;
+  background:linear-gradient(#f6f8fb 2%,rgba(246,248,251,.55) 16%,rgba(246,248,251,0) 38%,rgba(246,248,251,0) 62%,rgba(246,248,251,.55) 84%,#f6f8fb 98%)}
+.pk-col{
+  position:relative;z-index:2;height:100%;overflow-y:scroll;overflow-x:hidden;
+  scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch;
+  scrollbar-width:none;-ms-overflow-style:none;
+  touch-action:pan-y;
+}
+.pk-col::-webkit-scrollbar{display:none;width:0;height:0}
+.pk-col ul{margin:0;padding:calc(var(--item) * 2) 0;list-style:none}
+.pk-col li{
+  height:var(--item);line-height:var(--item);
+  scroll-snap-align:center;scroll-snap-stop:normal;
+  text-align:center;font-size:17px;font-weight:700;color:#aab2c4;
+  letter-spacing:-.01em;white-space:nowrap;overflow:hidden;
+  transition:color .12s ease,font-weight .12s ease;
+  -webkit-user-select:none;user-select:none;
+}
+.pk-col li.sel{color:var(--navy);font-weight:800;font-size:18px}
+.pk-col li.near{color:#6f7891}
+.pk-hint{margin:11px 2px 0;font-size:10.5px;line-height:1.6;color:var(--mute);word-break:keep-all}
+
+@keyframes shake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(4px)}
+  30%,50%,70%{transform:translateX(-7px)}40%,60%{transform:translateX(7px)}}
+.shake{animation:shake .5s cubic-bezier(.36,.07,.19,.97) both}
+.picker.err{border-color:var(--bad);box-shadow:0 0 0 3px rgba(192,57,47,.12)}
+
+/* ═══════════ 토스트 ═══════════ */
+#toast{
+  position:fixed;left:50%;bottom:calc(var(--sab) + 26px);transform:translate(-50%,14px);
+  max-width:min(340px,calc(100vw - 40px));
+  background:rgba(16,25,48,.96);color:#fff;padding:12px 16px;border-radius:10px;
+  font-size:13px;font-weight:700;line-height:1.45;text-align:center;
+  box-shadow:0 14px 30px -12px rgba(0,0,0,.6);
+  opacity:0;pointer-events:none;transition:opacity .22s ease,transform .22s ease;
+  z-index:80;word-break:keep-all}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+
+/* ═══════════ 발급 중 ═══════════ */
+#sc-issue{align-items:center;justify-content:center;text-align:center}
+.issue-in{width:100%;max-width:290px}
+.issue-in .bird{width:60px;height:38px;margin:0 auto 20px;animation:bob 1.15s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.issue-in .t{font-size:17px;font-weight:800;letter-spacing:-.02em}
+.issue-in .s{margin-top:7px;font-size:11.5px;color:var(--mute);font-weight:600}
+.bar{margin-top:18px;height:4px;border-radius:99px;background:rgba(22,33,63,.1);overflow:hidden}
+.bar i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,#3f6297,#16213f)}
+.bar.go i{animation:fill 1.25s cubic-bezier(.35,.9,.4,1) forwards}
+@keyframes fill{to{width:100%}}
+.stamp{
+  position:absolute;left:50%;top:50%;width:154px;height:154px;margin:-77px 0 0 -77px;
+  border-radius:50%;border:3.5px solid var(--gold);color:var(--gold);
+  display:grid;place-items:center;text-align:center;
+  font-size:12.5px;font-weight:900;letter-spacing:.09em;line-height:1.45;
+  opacity:0;transform:scale(2.6) rotate(-16deg);background:rgba(250,246,236,.5);
+  pointer-events:none}
+.stamp span{display:block;font-size:9px;letter-spacing:.14em;margin-top:5px;opacity:.85}
+.stamp.go{animation:stampIn .5s cubic-bezier(.2,1.3,.4,1) forwards}
+@keyframes stampIn{0%{opacity:0;transform:scale(2.6) rotate(-16deg)}
+  62%{opacity:1;transform:scale(.93) rotate(-11deg)}100%{opacity:1;transform:scale(1) rotate(-11deg)}}
+
+/* ═══════════ 모바일 탑승권 ═══════════ */
+.pass{
+  --notch:239px;--stripe-cut:#faf6ec;
+  position:relative;margin-top:2px;padding:15px 16px 14px;color:var(--navy);
+  border-radius:14px;
+  background:
+    radial-gradient(circle at 0 var(--notch), rgba(250,246,236,0) 8px, var(--paper) 8.5px) left top/50.6% 100% no-repeat,
+    radial-gradient(circle at 100% var(--notch), rgba(250,246,236,0) 8px, var(--paper) 8.5px) right top/50.6% 100% no-repeat;
+  box-shadow:0 18px 36px -18px rgba(22,33,63,.55), 0 2px 6px -3px rgba(22,33,63,.16);
+  animation:slideUp .55s cubic-bezier(.2,.85,.3,1) both}
+@keyframes slideUp{from{opacity:0;transform:translateY(24px) scale(.986)}to{opacity:1;transform:none}}
+.pass-head{display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0;margin-bottom:9px}
+.pass-head .cls{flex:0 0 auto;font-size:9px;font-weight:800;letter-spacing:.1em;
+  background:var(--navy);color:#fff;padding:4px 9px;border-radius:3px;white-space:nowrap}
+.pass-kind{margin-top:10px;font-size:9px;font-weight:700;letter-spacing:.26em;color:var(--mute)}
+.pax{margin-top:11px;display:flex;align-items:flex-end;justify-content:space-between;gap:10px;min-width:0}
+.pax .k{font-size:9px;font-weight:700;letter-spacing:.11em;color:var(--mute)}
+.pax .v{margin-top:4px;font-size:21px;font-weight:800;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pax .latin{margin-top:3px;font-size:10px;font-weight:700;letter-spacing:.12em;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pax .pnr{flex:0 0 auto;text-align:right}
+.pax .pnr .v{font-size:15px;letter-spacing:.06em}
+.pass .route{margin:13px 0 2px}
+.pass .port .code{font-size:32px}
+.pass .meta{margin-top:13px;gap:11px 8px}
+.pass .dash{border-top-color:rgba(22,33,63,.1)}
+.perf{position:relative;height:0;border-top:2px dashed rgba(22,33,63,.18);margin:15px -16px 13px}
+.barcode{height:44px;border-radius:2px;
+  background:repeating-linear-gradient(90deg,
+    #16213f 0 2px,transparent 2px 5px,#16213f 5px 6px,transparent 6px 10px,
+    #16213f 10px 13px,transparent 13px 14px,#16213f 14px 15px,transparent 15px 19px,
+    #16213f 19px 21px,transparent 21px 24px)}
+.bcode{margin-top:8px;text-align:center;font-size:9.5px;font-weight:700;letter-spacing:.2em;color:var(--mute);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* 하단 스텁 */
+.stub{margin-top:10px;display:flex;align-items:center;gap:10px;min-width:0;
+  background:#e9eef5;border:1px solid var(--line-s);border-radius:10px;padding:10px 13px}
+.stub-l{min-width:0;flex:0 1 auto}
+.stub-route{font-size:15px;font-weight:800;letter-spacing:-.01em;white-space:nowrap}
+.stub-route span{color:var(--blue);margin:0 2px}
+.stub-sub{margin-top:3px;font-size:9px;font-weight:700;letter-spacing:.1em;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stub-mid{flex:1 1 auto;min-width:0;text-align:center;font-size:8.5px;font-weight:800;letter-spacing:.12em;
+  color:var(--gold);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stub-r{flex:0 0 auto;font-size:10.5px;font-weight:800;letter-spacing:.09em;color:var(--navy);white-space:nowrap}
+
+.offline{margin:13px 2px 0;display:flex;gap:7px;align-items:flex-start;
+  font-size:11px;line-height:1.6;color:var(--ink);opacity:.92}
+.offline .em{flex:0 0 auto;font-size:11px;line-height:1.5}
+.offline p{margin:0;word-break:keep-all}
+.offline b{color:var(--navy);font-weight:800}
+
+/* ═══════════ 오버레이 ═══════════ */
+.ov{position:fixed;inset:0;z-index:90;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:calc(var(--sat) + 22px) 20px calc(var(--sab) + 22px);
+  background:linear-gradient(176deg,#f2f5f9 0%,#e8eef6 54%,#eef1f6 100%);
+  text-align:center;overflow-y:auto}
+.ov .inner{width:100%;max-width:340px}
+.ov .bird{width:54px;height:34px;margin:0 auto}
+.ov h3{margin:14px 0 0;font-size:18.5px;font-weight:800;line-height:1.42;letter-spacing:-.025em;word-break:keep-all}
+.ov p.lead{margin:9px 0 0;font-size:12.5px;line-height:1.68;color:var(--ink);word-break:keep-all}
+.steps{margin:17px 0 0;padding:14px;text-align:left;background:#fff;border:1px solid var(--line-s);
+  border-radius:13px;box-shadow:0 10px 24px -18px rgba(22,33,63,.5)}
+.steps li{list-style:none;display:flex;gap:9px;align-items:flex-start;font-size:12.5px;line-height:1.58;font-weight:600;word-break:keep-all}
+.steps li + li{margin-top:10px}
+.steps li .n{flex:0 0 auto;width:18px;height:18px;border-radius:50%;margin-top:1px;
+  background:var(--navy);color:#fff;font-size:10px;font-weight:800;display:grid;place-items:center}
+.steps li b{color:var(--navy);font-weight:800}
+.urlbox{margin-top:11px;width:100%;-webkit-appearance:none;appearance:none;
+  border:1px solid var(--line);border-radius:10px;background:#fff;padding:10px 12px;
+  font-size:11.5px;font-weight:600;color:var(--ink);text-align:center;-webkit-user-select:all;user-select:all}
+.ovbtns{margin-top:11px;display:flex;flex-direction:column;gap:8px}
+.ov .tiny{margin:11px 0 0;font-size:10px;line-height:1.65;color:var(--mute);word-break:keep-all}
+.spin{width:32px;height:32px;margin:16px auto 0;border-radius:50%;
+  border:3px solid rgba(63,98,151,.2);border-top-color:var(--navy);animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(1turn)}}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+@media (max-height:700px){
+  h1.title{font-size:21px}
+  .port .code{font-size:27px}
+  .pass .port .code{font-size:28px}
+  .picker{--item:34px}
+  .btn.board{min-height:52px}
+}
+</style>
+</head>
+<body>
+
+<!-- 브랜드 마크(정의) : MARU AIR 스위프트 ─ 팜플렛/티켓 공통 로고 -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="maru-bird" viewBox="0 0 120 76">
+      <path fill="#A7C6E2" d="M2 4c24 3 44 14 58 31-3-15-13-26-27-31-10-3-21-3-31 0z"/>
+      <path fill="#2C4470" d="M118 2c-26 5-48 17-65 36-9 10-15 22-19 36 8-6 15-14 21-22 14-19 34-33 57-42 3-1 5-4 6-8z"/>
+      <path fill="#16213F" d="M118 2C92 12 70 27 55 47c-8 10-14 18-19 27 14-6 26-15 36-26 14-15 30-28 46-46z"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div id="app">
+
+  <!-- ───────── ① 웹 체크인 ───────── -->
+  <section class="screen" id="sc-checkin">
+    <div class="brandbar">
+      <div class="logo">
+        <svg class="bird" aria-hidden="true"><use href="#maru-bird" xlink:href="#maru-bird"/></svg>
+        <div class="wordmark">MARU<em> AIR</em></div>
+      </div>
+      <div class="bartag">Web Check-in</div>
+    </div>
+    <div class="stripe" style="--stripe-cut:#f0f4f9"></div>
+
+    <div style="margin-top:13px">
+      <h1 class="title">웹 체크인</h1>
+      <p class="sub">출발 전에 모바일 탑승권을 미리 받아두세요.</p>
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <div class="sect">Flight</div>
+      <div class="row-top">
+        <div class="fno" id="f-no">MR431 <span>MARU AIR</span></div>
+        <div class="chip" id="f-status">체크인 가능</div>
+      </div>
+
+      <div class="route">
+        <div class="port">
+          <div class="code" id="f-from">ICN</div>
+          <div class="city" id="f-fromCity">인천 · SEOUL</div>
+        </div>
+        <div class="mid">
+          <div class="dur" id="f-dur">7H 05M</div>
+          <div class="lineplane">
+            <i></i>
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5L21 16z"/></svg>
+            <i></i>
+          </div>
+          <div class="dur">직항</div>
+        </div>
+        <div class="port to">
+          <div class="code" id="f-to">DPS</div>
+          <div class="city" id="f-toCity">덴파사르 · BALI</div>
+        </div>
+      </div>
+
+      <div class="dash"></div>
+
+      <div class="meta">
+        <div><div class="k">Date</div><div class="v" id="f-date">09.16 (수)</div></div>
+        <div><div class="k">Departure</div><div class="v" id="f-dep">16:20</div></div>
+        <div><div class="k">Arrival</div><div class="v" id="f-arr">22:25</div></div>
+        <div><div class="k">Terminal</div><div class="v">T2</div></div>
+        <div><div class="k">Gate</div><div class="v">추후 안내</div></div>
+        <div><div class="k">Seat</div><div class="v">미배정</div></div>
+      </div>
+
+      <div class="notice">
+        <p><b>NOTICE</b> — 본 항공편의 모바일 탑승권은 예약 승객 본인만 발급받을 수 있습니다. 다음 단계에서 탑승자 본인확인이 진행됩니다.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="sect">Booking</div>
+      <div class="kv">
+        <div class="kv-row"><span class="kk">예약자</span><span class="vv" id="f-pax">정다혜</span></div>
+        <div class="kv-row"><span class="kk">여정</span><span class="vv">인천 → 덴파사르 · 편도</span></div>
+        <div class="kv-row"><span class="kk">위탁수하물</span><span class="vv">23KG · 1개 <em class="cute">🧳 설렘 1개 · 초과요금 없음</em></span></div>
+      </div>
+    </div>
+
+    <div class="spacer"></div>
+
+    <button class="btn primary" id="btn-start" type="button">
+      <span class="lbl">체크인 시작하기</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M13 6l6 6-6 6"/></svg>
+    </button>
+    <div class="foot">MARU AIR · 예약번호 <b id="f-pnr">MRA-0916</b> · 발행일 2026.09.16</div>
+  </section>
+
+  <!-- ───────── ② 탑승자 본인확인 ───────── -->
+  <section class="screen" id="sc-verify">
+    <div class="brandbar">
+      <div class="logo">
+        <svg class="bird" aria-hidden="true"><use href="#maru-bird" xlink:href="#maru-bird"/></svg>
+        <div class="wordmark">MARU<em> AIR</em></div>
+      </div>
+      <div class="bartag">Step 2 / 2</div>
+    </div>
+    <div class="stripe" style="--stripe-cut:#f0f4f9"></div>
+
+    <div style="margin-top:14px">
+      <button class="back" id="btn-back" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
+        항공편 정보
+      </button>
+      <h2 class="title">탑승자 본인확인이 필요합니다</h2>
+      <p class="sub">예약자 정보 보호를 위해 아래 확인 질문에 답해주세요.</p>
+    </div>
+
+    <div class="card qcard" id="q-card">
+      <div class="sect">Security Check</div>
+      <div class="qlabel" id="q-question">질문을 불러오는 중…</div>
+
+      <div class="picker" id="picker">
+        <div class="pk-band"></div>
+        <div class="pk-col" id="pk-y" data-unit="y" tabindex="0" role="listbox" aria-label="년"><ul></ul></div>
+        <div class="pk-col" id="pk-m" data-unit="m" tabindex="0" role="listbox" aria-label="월"><ul></ul></div>
+        <div class="pk-col" id="pk-d" data-unit="d" tabindex="0" role="listbox" aria-label="일"><ul></ul></div>
+        <div class="pk-fade"></div>
+      </div>
+      <p class="pk-hint">위아래로 굴려 생년월일을 맞춰주세요. 입력하신 정보는 이 기기에서만 확인되며 어디에도 전송되지 않습니다.</p>
+    </div>
+
+    <div class="spacer"></div>
+
+    <button class="btn primary" id="q-submit" type="button">
+      <span class="lbl">확인하고 탑승권 받기</span>
+    </button>
+    <div class="foot">MARU AIR · 예약번호 <b>MRA-0916</b> · MR431 ICN → DPS</div>
+  </section>
+
+  <!-- ───────── ③ 발급 중 ───────── -->
+  <section class="screen" id="sc-issue">
+    <div class="issue-in">
+      <svg class="bird" aria-hidden="true"><use href="#maru-bird" xlink:href="#maru-bird"/></svg>
+      <div class="t">모바일 탑승권 발급 중</div>
+      <div class="s">탑승자 정보를 확인했습니다</div>
+      <div class="bar" id="issue-bar"><i></i></div>
+    </div>
+    <div class="stamp" id="issue-stamp"><div>BOARDING PASS<br>ISSUED<span>MARU AIR · MR431</span></div></div>
+  </section>
+
+  <!-- ───────── ④ 모바일 탑승권 ───────── -->
+  <section class="screen" id="sc-pass">
+    <div class="brandbar">
+      <div class="logo">
+        <svg class="bird" aria-hidden="true"><use href="#maru-bird" xlink:href="#maru-bird"/></svg>
+        <div class="wordmark">MARU<em> AIR</em></div>
+      </div>
+      <div class="bartag">Mobile Boarding Pass</div>
+    </div>
+
+    <div class="pass" id="pass-card">
+      <div class="pass-head">
+        <div class="logo">
+          <svg class="bird" style="width:26px;height:17px" aria-hidden="true"><use href="#maru-bird" xlink:href="#maru-bird"/></svg>
+          <div class="wordmark" style="font-size:14px">MARU<em> AIR</em></div>
+        </div>
+        <div class="cls">COUPLE CLASS</div>
+      </div>
+      <div class="stripe"></div>
+      <div class="pass-kind">MOBILE BOARDING PASS</div>
+
+      <div class="pax">
+        <div style="min-width:0">
+          <div class="k">PASSENGER</div>
+          <div class="v" id="p-name">정다혜</div>
+          <div class="latin" id="p-latin">JUNG DAHYE</div>
+        </div>
+        <div class="pnr">
+          <div class="k">BOOKING REF</div>
+          <div class="v">MRA-0916</div>
+        </div>
+      </div>
+
+      <div class="route">
+        <div class="port">
+          <div class="code">ICN</div>
+          <div class="city">인천 · SEOUL</div>
+        </div>
+        <div class="mid">
+          <div class="dur">MR431</div>
+          <div class="lineplane">
+            <i></i>
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5L21 16z"/></svg>
+            <i></i>
+          </div>
+          <div class="dur">7H 05M</div>
+        </div>
+        <div class="port to">
+          <div class="code">DPS</div>
+          <div class="city">덴파사르 · BALI</div>
+        </div>
+      </div>
+
+      <div class="dash"></div>
+
+      <div class="meta">
+        <div><div class="k">Date</div><div class="v">16 SEP</div></div>
+        <div><div class="k">Boarding</div><div class="v">15:30</div></div>
+        <div><div class="k">Gate</div><div class="v">217</div></div>
+        <div><div class="k">Seat</div><div class="v">9A</div></div>
+        <div><div class="k">Zone</div><div class="v">1</div></div>
+        <div><div class="k">Seq</div><div class="v">001</div></div>
+      </div>
+
+      <div class="perf"></div>
+      <div class="barcode"></div>
+      <div class="bcode">MRA0916 · MR431 · ICNDPS · 001</div>
+    </div>
+
+    <!-- BOARDING STUB (E-TICKET 바우처 하단 스텁 모티브) -->
+    <div class="stub">
+      <div class="stub-l">
+        <div class="stub-route">ICN <span>→</span> DPS</div>
+        <div class="stub-sub">MR431 · 16 SEP · 9A</div>
+      </div>
+      <div class="stub-mid">BOARDING STUB</div>
+      <div class="stub-r">MARU AIR</div>
+    </div>
+
+    <div class="offline">
+      <span class="em">✈️</span>
+      <p>기내 모드 전, 지금 <b>탑승</b>해 두면 비행 중에도 계속 이용하실 수 있습니다.</p>
+    </div>
+
+    <div class="spacer"></div>
+
+    <button class="btn board" id="btn-board" type="button">
+      <span class="lbl">탑승하기</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M13 6l6 6-6 6"/></svg>
+    </button>
+    <div class="foot">탑승구 앞에서 이 화면을 제시해 주세요 · MARU AIR</div>
+  </section>
+
+</div>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<!-- 카카오톡 자동 탈출 스플래시 -->
+<div class="ov" id="ov-kakao" hidden>
+  <div class="inner">
+    <svg class="bird" aria-hidden="true"><use href="#maru-bird" xlink:href="#maru-bird"/></svg>
+    <div class="spin"></div>
+    <h3>기본 브라우저로 이동 중입니다</h3>
+    <p class="lead">안전한 탑승권 발급을 위해<br>Safari(기본 브라우저)에서 이어서 진행됩니다.</p>
+    <p class="tiny">잠시만 기다려 주세요…</p>
+  </div>
+</div>
+
+<!-- 인앱 브라우저 수동 안내 -->
+<div class="ov" id="ov-inapp" hidden>
+  <div class="inner">
+    <svg class="bird" aria-hidden="true"><use href="#maru-bird" xlink:href="#maru-bird"/></svg>
+    <h3 id="ov-title">기본 브라우저에서 열어주세요</h3>
+    <p class="lead" id="ov-lead">현재 앱 안의 간이 브라우저에서는 모바일 탑승권이 정상적으로 발급되지 않습니다.</p>
+    <ul class="steps">
+      <li><span class="n">1</span><span>화면 <b>우측 하단</b>(또는 우측 상단)의 <b>⋯</b> 메뉴를 누르세요.</span></li>
+      <li><span class="n">2</span><span><b>‘다른 브라우저로 열기’</b> 또는 <b>‘Safari로 열기’</b>를 선택하세요.</span></li>
+      <li><span class="n">3</span><span>열린 브라우저에서 체크인을 계속 진행하시면 됩니다.</span></li>
+    </ul>
+    <input class="urlbox" id="ov-url" type="text" readonly value="">
+    <div class="ovbtns">
+      <button class="btn primary" id="ov-safari" type="button"><span class="lbl">Safari로 열기 시도</span></button>
+      <button class="btn ghost" id="ov-copy" type="button"><span class="lbl">주소 복사하기</span></button>
+    </div>
+    <p class="tiny">버튼이 동작하지 않으면 위 주소를 길게 눌러 복사한 뒤,<br>Safari 주소창에 붙여넣어 주세요.</p>
+  </div>
+</div>
+
+<script>
+"use strict";
+/* ═══════════════════════════════════════════════════════════════
+   ▣ 설정 상수 — 여기만 고치면 된다
+   ═══════════════════════════════════════════════════════════════ */
+
+/* 최종 목적지(게임) */
+const GAME_URL = "https://ghkfkddl96.github.io/taru/odyssey/";
+
+/* 탑승자명 — 탑승권 카드에 찍히는 이름 (한글 / 영문 병기) */
+const PASSENGER = "정다혜";
+const PASSENGER_LATIN = "JUNG DAHYE";
+
+/* 본인확인 퀴즈 (생년월일 스크롤 피커)
+   · question   : 화면에 보이는 질문 문구
+   · answerHash : 정답 SHA-256 16진수 해시 (평문 저장 금지)
+                  해시 대상 문자열 = "YYYY-MM-DD" 를 정규화한 값
+                  정규화 = NFC → 앞뒤공백 제거 → 모든 공백 제거 → 소문자화
+                  새 해시 만드는 법(둘 중 하나):
+                    ① 이 페이지를 열고 콘솔에서  __hash("YYYY-MM-DD")
+                    ② node -e "const c=require('crypto');console.log(c.createHash('sha256').update(process.argv[1]).digest('hex'))" YYYY-MM-DD
+   · initial    : 피커 초기 선택값 (정답이 아닌 값이어야 한다)
+   · yearRange  : 피커 년도 범위 */
+const QUIZ = {
+  question: "예약하신 화랑강지의 생일을 입력해주세요.",
+  answerHash: "10e83aadaf827d23a147d0d4dde0cdb5b8b7201c0b7a23c4e1895826e0b85354",
+  placeholder: "정답 입력",
+  initial: { y: 2000, m: 6, d: 15 },
+  yearRange: { from: 1990, to: 2005 }
+};
+
+/* 인앱브라우저 탈출 마커 (?ext=1 이면 탈출 로직 스킵 → 무한루프 방지) */
+const ESCAPE_PARAM = "ext";
+
+/* ═══════════════════════════════════════════════════════════════
+   ▣ SHA-256 (외부 의존성 없음 / 비보안 컨텍스트에서도 동작)
+   ═══════════════════════════════════════════════════════════════ */
+const SHA_K = [
+  0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
+  0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
+  0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
+  0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,
+  0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,
+  0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
+  0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
+  0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2
+];
+function utf8Bytes(str){
+  if (typeof TextEncoder === "function") return Array.from(new TextEncoder().encode(str));
+  const out = [], s = unescape(encodeURIComponent(str));
+  for (let i = 0; i < s.length; i++) out.push(s.charCodeAt(i) & 255);
+  return out;
+}
+function sha256Hex(str){
+  const rotr = (x, n) => (x >>> n) | (x << (32 - n));
+  let H = [0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
+  const b = utf8Bytes(str);
+  const bitLen = b.length * 8;
+  b.push(0x80);
+  while (b.length % 64 !== 56) b.push(0);
+  const hi = Math.floor(bitLen / 4294967296), lo = bitLen >>> 0;
+  b.push((hi>>>24)&255,(hi>>>16)&255,(hi>>>8)&255,hi&255,(lo>>>24)&255,(lo>>>16)&255,(lo>>>8)&255,lo&255);
+  const w = new Uint32Array(64);
+  for (let i = 0; i < b.length; i += 64){
+    for (let t = 0; t < 16; t++) w[t] = (b[i+t*4]<<24) | (b[i+t*4+1]<<16) | (b[i+t*4+2]<<8) | b[i+t*4+3];
+    for (let t = 16; t < 64; t++){
+      const x = w[t-15], y = w[t-2];
+      const s0 = rotr(x,7) ^ rotr(x,18) ^ (x >>> 3);
+      const s1 = rotr(y,17) ^ rotr(y,19) ^ (y >>> 10);
+      w[t] = (w[t-16] + s0 + w[t-7] + s1) >>> 0;
+    }
+    let a=H[0], bb=H[1], c=H[2], d=H[3], e=H[4], f=H[5], g=H[6], h=H[7];
+    for (let t = 0; t < 64; t++){
+      const S1 = rotr(e,6) ^ rotr(e,11) ^ rotr(e,25);
+      const ch = (e & f) ^ (~e & g);
+      const t1 = (h + S1 + ch + SHA_K[t] + w[t]) >>> 0;
+      const S0 = rotr(a,2) ^ rotr(a,13) ^ rotr(a,22);
+      const maj = (a & bb) ^ (a & c) ^ (bb & c);
+      const t2 = (S0 + maj) >>> 0;
+      h=g; g=f; f=e; e=(d + t1) >>> 0; d=c; c=bb; bb=a; a=(t1 + t2) >>> 0;
+    }
+    H = [(H[0]+a)>>>0,(H[1]+bb)>>>0,(H[2]+c)>>>0,(H[3]+d)>>>0,(H[4]+e)>>>0,(H[5]+f)>>>0,(H[6]+g)>>>0,(H[7]+h)>>>0];
+  }
+  return H.map((x) => (x >>> 0).toString(16).padStart(8,"0")).join("");
+}
+function normalizeAnswer(s){
+  s = String(s == null ? "" : s);
+  if (String.prototype.normalize) s = s.normalize("NFC");
+  return s.trim().replace(/\s+/g, "").toLowerCase();
+}
+/* 정답 해시 산출용 콘솔 헬퍼 */
+window.__hash = (plain) => sha256Hex(normalizeAnswer(plain));
+
+/* ═══════════════════════════════════════════════════════════════
+   ▣ 인앱브라우저 판별 · 탈출
+   ═══════════════════════════════════════════════════════════════ */
+const IN_APP_RULES = [
+  { key:"kakaotalk",  label:"카카오톡",     auto:true,  re:/KAKAOTALK/i },
+  { key:"naver",      label:"네이버 앱",    auto:false, re:/NAVER\(inapp/i },
+  { key:"instagram",  label:"인스타그램",   auto:false, re:/Instagram/i },
+  { key:"facebook",   label:"페이스북",     auto:false, re:/FBAN|FBAV|FB_IAB|FB4A/i },
+  { key:"line",       label:"라인",         auto:false, re:/\bLine\// },
+  { key:"daum",       label:"다음 앱",      auto:false, re:/DaumApps|DaumDevice/i },
+  { key:"band",       label:"밴드",         auto:false, re:/BAND\//i },
+  { key:"everytime",  label:"에브리타임",   auto:false, re:/everytimeApp/i },
+  { key:"kakaostory", label:"카카오스토리", auto:false, re:/KAKAOSTORY/i }
+];
+
+/* 탈출 후 열릴 URL (= 현재 URL + ?ext=1) */
+function externalUrl(){
+  try {
+    const u = new URL(location.href);
+    u.searchParams.set(ESCAPE_PARAM, "1");
+    return u.toString();
+  } catch (_) {
+    const sep = location.href.indexOf("?") >= 0 ? "&" : "?";
+    return location.href + sep + ESCAPE_PARAM + "=1";
+  }
+}
+
+/* 판별기 — 디버그 훅 window.__gateEnv() */
+function detectEnv(ua, search){
+  const u  = (ua === undefined || ua === null) ? (navigator.userAgent || "") : String(ua);
+  const qs = (search === undefined || search === null) ? location.search : String(search);
+  let escaped;
+  try { escaped = new URLSearchParams(qs).get(ESCAPE_PARAM) === "1"; }
+  catch (_) { escaped = /[?&]ext=1(?:&|$)/.test(qs); }
+
+  const ios = /iPad|iPhone|iPod/.test(u) || (/Macintosh/.test(u) && (navigator.maxTouchPoints || 0) > 1);
+  const android = /Android/.test(u);
+
+  let hit = null;
+  for (let i = 0; i < IN_APP_RULES.length; i++){
+    if (IN_APP_RULES[i].re.test(u)) { hit = IN_APP_RULES[i]; break; }
+  }
+  return {
+    ua: u, ios: ios, android: android, escaped: escaped,
+    inApp: hit ? hit.key : null,
+    inAppLabel: hit ? hit.label : null,
+    autoEscape: !!(hit && hit.auto),
+    action: escaped ? "skip" : (hit ? (hit.auto ? "kakao-scheme" : "manual-overlay") : "none"),
+    externalUrl: externalUrl()
+  };
+}
+window.__gateEnv = (ua, search) => detectEnv(ua, search);
+
+/* 이동 로그 — 검증에서 window.__gateNav() 로 확인 */
+const NAV_LOG = [];
+window.__gateNav = () => NAV_LOG.slice();
+function go(url){
+  NAV_LOG.push(url);
+  /* 관측 가능한 이동 — 리스너가 preventDefault() 하면 실제 이동을 취소한다(검증용) */
+  let proceed = true;
+  try {
+    proceed = window.dispatchEvent(new CustomEvent("gate:navigate", { detail: { url: url }, cancelable: true }));
+  } catch (_) {}
+  if (!proceed) return;
+  try { location.href = url; } catch (e) { /* 커스텀 스킴 차단 등 */ }
+}
+
+let leftPage = false;
+const markLeft = () => { leftPage = true; };
+
+function escapeKakao(){
+  const target = externalUrl();
+  document.addEventListener("visibilitychange", () => { if (document.hidden) markLeft(); });
+  window.addEventListener("pagehide", markLeft);
+  window.addEventListener("blur", markLeft);
+  go("kakaotalk://web/openExternal?url=" + encodeURIComponent(target));
+  /* 스킴이 안 먹는 구버전 대비 — 1.5초 뒤에도 남아 있으면 수동 안내 */
+  setTimeout(() => {
+    if (leftPage || document.hidden) return;
+    document.getElementById("ov-kakao").hidden = true;
+    showInAppOverlay({ inApp:"kakaotalk", inAppLabel:"카카오톡", ios:true }, true);
+  }, 1500);
+}
+
+function showInAppOverlay(env, isKakaoFallback){
+  const label = (env && env.inAppLabel) ? env.inAppLabel : "현재 앱";
+  document.getElementById("ov-title").textContent =
+    isKakaoFallback ? "Safari로 자동 이동하지 못했어요" : "기본 브라우저에서 열어주세요";
+  document.getElementById("ov-lead").innerHTML =
+    label + " 안의 간이 브라우저에서는 모바일 탑승권이 정상적으로 발급되지 않습니다."
+    + (isKakaoFallback ? "<br>아래 방법으로 직접 열어주세요." : "");
+  document.getElementById("ov-url").value = externalUrl();
+  document.getElementById("ov-safari").hidden = !(env && env.ios !== false);
+  document.getElementById("ov-inapp").hidden = false;
+}
+
+function runGate(){
+  const env = detectEnv();
+  window.__gateEnvResult = env;
+  if (env.action === "kakao-scheme"){
+    document.getElementById("ov-kakao").hidden = false;
+    escapeKakao();
+  } else if (env.action === "manual-overlay"){
+    showInAppOverlay(env, false);
+  }
+  return env;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ▣ 화면 전환 · 토스트
+   ═══════════════════════════════════════════════════════════════ */
+const SCREENS = ["sc-checkin","sc-verify","sc-issue","sc-pass"];
+function show(id){
+  SCREENS.forEach((s) => {
+    const el = document.getElementById(s);
+    if (el) el.classList.toggle("on", s === id);
+  });
+  window.scrollTo(0, 0);
+  window.__gateScreen = id;
+  if (id === "sc-verify" && PK.y){
+    syncPicker();                                   /* 레이아웃 직후 1차 */
+    requestAnimationFrame(() => syncPicker());      /* 안전망 */
+  }
+  if (id === "sc-pass"){
+    syncNotch();
+    requestAnimationFrame(syncNotch);
+    setTimeout(syncNotch, 620);      /* 슬라이드인 종료 후 재확인 */
+  }
+}
+/* 탑승권 절취선(.perf) 위치에 좌우 노치 구멍을 정확히 맞춘다 */
+function syncNotch(){
+  const pass = document.getElementById("pass-card");
+  const perf = pass && pass.querySelector(".perf");
+  if (!pass || !perf) return;
+  /* getBoundingClientRect 는 슬라이드인 애니메이션의 scale 영향을 받는다 → 레이아웃 값 사용 */
+  const y = perf.offsetTop;
+  if (y > 0) pass.style.setProperty("--notch", y.toFixed(1) + "px");
+  window.__gateNotch = y;
+}
+window.__gateShow = show;
+
+let toastTimer = 0;
+function toast(msg, ms){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("on");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("on"), ms || 2200);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ▣ 생년월일 스크롤 휠 피커 (CSS scroll-snap 자체 구현)
+   ═══════════════════════════════════════════════════════════════ */
+const PK = {};      /* unit -> { el, ul, values, timer } */
+function pkItemH(){
+  const px = getComputedStyle(document.getElementById("picker")).getPropertyValue("--item");
+  const n = parseFloat(px);
+  return (isFinite(n) && n > 0) ? n : 38;
+}
+function buildColumn(unit, values, suffix){
+  const el = document.getElementById("pk-" + unit);
+  const ul = el.querySelector("ul");
+  ul.innerHTML = "";
+  values.forEach((v, i) => {
+    const li = document.createElement("li");
+    li.textContent = v + suffix;
+    li.dataset.i = String(i);
+    li.setAttribute("role", "option");
+    ul.appendChild(li);
+  });
+  PK[unit] = { el: el, ul: ul, values: values, timer: 0, idx: 0 };
+  el.addEventListener("scroll", () => {
+    if (!el.clientHeight) return;        /* 화면 숨김 중 scrollTop 리셋은 무시 */
+    paintColumn(unit);
+    clearTimeout(PK[unit].timer);
+    PK[unit].timer = setTimeout(() => paintColumn(unit), 90);
+  }, { passive: true });
+  /* 항목 탭 → 그 값으로 이동 */
+  ul.addEventListener("click", (e) => {
+    const li = e.target.closest("li");
+    if (!li) return;
+    setColumn(unit, parseInt(li.dataset.i, 10), true);
+  });
+}
+/* 선택 인덱스의 원본은 c.idx — 화면이 숨겨져 있을 때도 값이 살아있다 */
+function colIndex(unit){
+  const c = PK[unit];
+  if (!c) return 0;
+  if (c.el.clientHeight > 0){
+    const idx = Math.round(c.el.scrollTop / pkItemH());
+    c.idx = Math.max(0, Math.min(c.values.length - 1, idx));
+  }
+  return c.idx;
+}
+function setColumn(unit, idx, smooth){
+  const c = PK[unit];
+  if (!c) return;
+  c.idx = Math.max(0, Math.min(c.values.length - 1, idx));
+  if (c.el.clientHeight > 0){
+    const top = c.idx * pkItemH();
+    if (smooth && c.el.scrollTo) { try { c.el.scrollTo({ top: top, behavior: "smooth" }); } catch (_) { c.el.scrollTop = top; } }
+    else c.el.scrollTop = top;
+  }
+  paintColumn(unit);
+}
+/* 화면이 보이게 된 뒤 스크롤 위치를 저장된 인덱스에 맞춘다 */
+function syncPicker(){
+  ["y","m","d"].forEach((u) => {
+    const c = PK[u];
+    if (!c || !c.el.clientHeight) return;
+    c.el.scrollTop = c.idx * pkItemH();
+    paintColumn(u);
+  });
+}
+function paintColumn(unit){
+  const c = PK[unit];
+  if (!c) return;
+  const sel = colIndex(unit);
+  const items = c.ul.children;
+  for (let i = 0; i < items.length; i++){
+    const d = Math.abs(i - sel);
+    items[i].className = d === 0 ? "sel" : (d === 1 ? "near" : "");
+  }
+}
+function pickerValue(){
+  return {
+    y: PK.y ? PK.y.values[colIndex("y")] : 0,
+    m: PK.m ? PK.m.values[colIndex("m")] : 0,
+    d: PK.d ? PK.d.values[colIndex("d")] : 0
+  };
+}
+const pad2 = (n) => (n < 10 ? "0" + n : String(n));
+function pickerISO(){
+  const v = pickerValue();
+  return v.y + "-" + pad2(v.m) + "-" + pad2(v.d);
+}
+/* 디버그/검증 훅 — 실제 스크롤 경로를 그대로 사용한다 */
+window.__gatePicker = pickerValue;
+window.__gatePickerISO = pickerISO;
+window.__gateSetDate = function(y, m, d){
+  setColumn("y", PK.y.values.indexOf(y), false);
+  setColumn("m", PK.m.values.indexOf(m), false);
+  setColumn("d", PK.d.values.indexOf(d), false);
+  return pickerISO();
+};
+function initPicker(){
+  const years = [];
+  for (let y = QUIZ.yearRange.from; y <= QUIZ.yearRange.to; y++) years.push(y);
+  const months = []; for (let m = 1; m <= 12; m++) months.push(m);
+  const days = [];   for (let d = 1; d <= 31; d++) days.push(d);
+  buildColumn("y", years, "년");
+  buildColumn("m", months, "월");
+  buildColumn("d", days, "일");
+  const init = QUIZ.initial || { y: years[0], m: 1, d: 1 };
+  setColumn("y", Math.max(0, years.indexOf(init.y)), false);
+  setColumn("m", Math.max(0, months.indexOf(init.m)), false);
+  setColumn("d", Math.max(0, days.indexOf(init.d)), false);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ▣ 본인확인 판정
+   ═══════════════════════════════════════════════════════════════ */
+function checkAnswer(){
+  const iso = pickerISO();
+  const card = document.getElementById("q-card");
+  const picker = document.getElementById("picker");
+  const ok = sha256Hex(normalizeAnswer(iso)) === String(QUIZ.answerHash).trim().toLowerCase();
+  if (ok){
+    picker.classList.remove("err");
+    issuePass();
+    return true;
+  }
+  picker.classList.add("err");
+  card.classList.remove("shake");
+  void card.offsetWidth;          /* reflow → 애니메이션 재시작 */
+  card.classList.add("shake");
+  toast("탑승자 정보가 일치하지 않습니다");
+  try { if (navigator.vibrate) navigator.vibrate(60); } catch (_) {}
+  setTimeout(() => picker.classList.remove("err"), 1600);
+  return false;
+}
+window.__gateCheck = checkAnswer;
+
+/* ═══════════════════════════════════════════════════════════════
+   ▣ 탑승권 발급 연출
+   ═══════════════════════════════════════════════════════════════ */
+let issuing = false;
+function issuePass(){
+  if (issuing) return;
+  issuing = true;
+  const bar = document.getElementById("issue-bar");
+  const stamp = document.getElementById("issue-stamp");
+  bar.classList.remove("go");
+  stamp.classList.remove("go");
+  show("sc-issue");
+  void bar.offsetWidth;
+  bar.classList.add("go");
+  setTimeout(() => { void stamp.offsetWidth; stamp.classList.add("go"); }, 1250);
+  setTimeout(() => {
+    const card = document.getElementById("pass-card");
+    card.style.animation = "none";
+    void card.offsetWidth;
+    card.style.animation = "";
+    show("sc-pass");
+    issuing = false;
+  }, 1900);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ▣ 초기화
+   ═══════════════════════════════════════════════════════════════ */
+(function init(){
+  document.getElementById("q-question").textContent = QUIZ.question;
+  document.getElementById("p-name").textContent = PASSENGER;
+  document.getElementById("p-latin").textContent = PASSENGER_LATIN;
+  document.getElementById("f-pax").textContent = PASSENGER;
+
+  initPicker();
+
+  document.getElementById("btn-start").addEventListener("click", () => show("sc-verify"));
+  document.getElementById("btn-back").addEventListener("click", () => show("sc-checkin"));
+  document.getElementById("q-submit").addEventListener("click", checkAnswer);
+  document.getElementById("btn-board").addEventListener("click", () => go(GAME_URL));
+
+  /* 키보드(접근성) — 피커 위/아래 */
+  ["y","m","d"].forEach((unit) => {
+    PK[unit].el.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowDown"){ e.preventDefault(); setColumn(unit, colIndex(unit) + 1, true); }
+      else if (e.key === "ArrowUp"){ e.preventDefault(); setColumn(unit, colIndex(unit) - 1, true); }
+    });
+  });
+
+  /* 인앱 안내 오버레이 버튼 */
+  document.getElementById("ov-safari").addEventListener("click", () => {
+    go("x-safari-" + externalUrl());
+    setTimeout(() => toast("열리지 않으면 ⋯ 메뉴 → ‘다른 브라우저로 열기’를 눌러주세요", 3200), 1200);
+  });
+  document.getElementById("ov-copy").addEventListener("click", async () => {
+    const url = externalUrl();
+    let done = false;
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText){ await navigator.clipboard.writeText(url); done = true; }
+    } catch (_) {}
+    if (!done){
+      try {
+        const box = document.getElementById("ov-url");
+        box.removeAttribute("readonly");
+        box.focus(); box.setSelectionRange(0, url.length);
+        done = document.execCommand("copy");
+        box.setAttribute("readonly", "readonly");
+      } catch (_) {}
+    }
+    toast(done ? "주소를 복사했습니다" : "복사에 실패했어요. 주소를 길게 눌러 복사해 주세요", 2600);
+  });
+
+  /* 리사이즈 시 피커 위치 보정(--item 이 미디어쿼리로 바뀔 수 있음) */
+  let rzTimer = 0;
+  window.addEventListener("resize", () => {
+    clearTimeout(rzTimer);
+    rzTimer = setTimeout(() => {
+      ["y","m","d"].forEach((u) => paintColumn(u));
+      if (window.__gateScreen === "sc-verify") syncPicker();
+      if (window.__gateScreen === "sc-pass") syncNotch();
+    }, 120);
+  });
+
+  show("sc-checkin");
+  runGate();
+})();
+</script>
+</body>
+</html>
