@@ -150,6 +150,19 @@ h2.title{margin:0;font-size:19px;line-height:1.38;letter-spacing:-.025em;font-we
   position:relative;overflow:hidden}
 .btn.board::after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;
   background:linear-gradient(90deg,var(--gold),var(--gold-l),var(--gold))}
+/* 탑승 시각 전 — 항공사 앱 비활성 버튼 톤(회색) */
+.btn.board.closed{background:linear-gradient(140deg,#a7adbd,#8f95a8);color:#fff;
+  box-shadow:0 6px 14px -10px rgba(22,33,63,.45);font-size:14.5px;cursor:default}
+.btn.board.closed::after{background:linear-gradient(90deg,#c3c8d4,#dcdfe7,#c3c8d4)}
+.btn.board.closed:active{transform:scale(.99)}
+.board-note{margin-top:9px;display:flex;align-items:center;justify-content:center;gap:6px;
+  font-size:11.5px;font-weight:700;color:var(--mute);white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+.board-note .bn-dot{flex:0 0 auto;width:5px;height:5px;border-radius:50%;background:var(--gold);
+  animation:bnPulse 1.6s ease-in-out infinite}
+@keyframes bnPulse{0%,100%{opacity:.3}50%{opacity:1}}
+.board-note + .foot{margin-top:8px}
+
 .btn.ghost{background:#fff;color:var(--navy);border:1px solid var(--line);min-height:46px;font-size:14px;font-weight:700}
 .btn svg{width:17px;height:17px;flex:0 0 auto}
 .btn .lbl{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -568,9 +581,13 @@ h2.title{margin:0;font-size:19px;line-height:1.38;letter-spacing:-.025em;font-we
     <div class="spacer"></div>
 
     <button class="btn board" id="btn-board" type="button">
-      <span class="lbl">탑승하기</span>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M13 6l6 6-6 6"/></svg>
+      <span class="lbl" id="board-lbl">탑승하기</span>
+      <svg id="board-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M13 6l6 6-6 6"/></svg>
     </button>
+    <div class="board-note" id="board-note" hidden>
+      <span class="bn-dot" aria-hidden="true"></span>
+      <span id="board-count">탑승 시작까지 --:--:--</span>
+    </div>
     <div class="foot">탑승구 앞에서 이 화면을 제시해 주세요 · MARU AIR</div>
   </section>
 
@@ -642,6 +659,12 @@ const QUIZ = {
 
 /* 인앱브라우저 탈출 마커 (?ext=1 이면 탈출 로직 스킵 → 무한루프 방지) */
 const ESCAPE_PARAM = "ext";
+
+/* 탑승(게임 진입) 개시 시각 — 절대 시각으로 비교하므로 기기 시간대가 달라도 안전.
+   이 시각 전에는 '탑승하기' 버튼이 회색 비활성 + 카운트다운 상태가 된다. */
+const BOARDING_OPEN_AT    = new Date("2026-09-16T15:00:00+09:00").getTime();
+const BOARDING_OPEN_LABEL = "15:00";
+const BOARDING_PARAM      = "boarding";
 
 /* ═══════════════════════════════════════════════════════════════
    ▣ SHA-256 (외부 의존성 없음 / 비보안 컨텍스트에서도 동작)
@@ -986,6 +1009,61 @@ function checkAnswer(){
 window.__gateCheck = checkAnswer;
 
 /* ═══════════════════════════════════════════════════════════════
+   ▣ 탑승 개시 시각 게이트
+   ═══════════════════════════════════════════════════════════════ */
+function boardingOverride(){
+  try {
+    const v = new URLSearchParams(location.search).get(BOARDING_PARAM);
+    return (v === "open" || v === "closed") ? v : null;
+  } catch (_) { return null; }
+}
+function boardingState(now){
+  const t  = (now === undefined || now === null) ? Date.now() : now;
+  const ov = boardingOverride();
+  const left = Math.max(0, BOARDING_OPEN_AT - t);
+  if (ov === "open")   return { open: true,  forced: "open",   msLeft: 0,    openAt: BOARDING_OPEN_AT };
+  if (ov === "closed") return { open: false, forced: "closed", msLeft: left, openAt: BOARDING_OPEN_AT };
+  return { open: t >= BOARDING_OPEN_AT, forced: null, msLeft: left, openAt: BOARDING_OPEN_AT };
+}
+window.__gateBoarding = boardingState;
+
+function fmtLeft(ms){
+  const s = Math.max(0, Math.ceil(ms / 1000));
+  return pad2(Math.floor(s / 3600)) + ":" + pad2(Math.floor((s % 3600) / 60)) + ":" + pad2(s % 60);
+}
+let boardTimer = 0;
+function paintBoarding(){
+  const st    = boardingState();
+  const btn   = document.getElementById("btn-board");
+  const lbl   = document.getElementById("board-lbl");
+  const arrow = document.getElementById("board-arrow");
+  const note  = document.getElementById("board-note");
+  if (st.open){
+    btn.classList.remove("closed");
+    btn.setAttribute("aria-disabled", "false");
+    lbl.textContent = "탑승하기";
+    /* ★SVGElement 에는 .hidden 프로퍼티가 없다(HTMLElement 전용) — 속성으로 직접 토글해야 한다 */
+    arrow.removeAttribute("hidden");
+    note.hidden = true;
+    if (boardTimer){ clearInterval(boardTimer); boardTimer = 0; }
+  } else {
+    btn.classList.add("closed");
+    btn.setAttribute("aria-disabled", "true");
+    lbl.textContent = "탑승 준비 중 · " + BOARDING_OPEN_LABEL + "부터";
+    arrow.setAttribute("hidden", "");
+    note.hidden = false;
+    document.getElementById("board-count").textContent = "탑승 시작까지 " + fmtLeft(st.msLeft);
+  }
+  window.__gateBoardOpen = st.open;
+  return st;
+}
+/* 페이지를 열어둔 채 시각이 지나면 새로고침 없이 자동 활성화 */
+function startBoardingTimer(){
+  if (boardTimer) return;
+  boardTimer = setInterval(paintBoarding, 500);
+}
+
+/* ═══════════════════════════════════════════════════════════════
    ▣ 탑승권 발급 연출
    ═══════════════════════════════════════════════════════════════ */
 let issuing = false;
@@ -1024,7 +1102,16 @@ function issuePass(){
   document.getElementById("btn-start").addEventListener("click", () => show("sc-verify"));
   document.getElementById("btn-back").addEventListener("click", () => show("sc-checkin"));
   document.getElementById("q-submit").addEventListener("click", checkAnswer);
-  document.getElementById("btn-board").addEventListener("click", () => go(GAME_URL));
+  document.getElementById("btn-board").addEventListener("click", () => {
+    const st = paintBoarding();           /* 눌린 시점 기준으로 최신 상태 반영 */
+    if (!st.open){
+      toast("탑승은 " + BOARDING_OPEN_LABEL + "부터 활성화됩니다.");
+      return;
+    }
+    go(GAME_URL);
+  });
+  paintBoarding();
+  if (!window.__gateBoardOpen) startBoardingTimer();
 
   /* 키보드(접근성) — 피커 위/아래 */
   ["y","m","d"].forEach((unit) => {
